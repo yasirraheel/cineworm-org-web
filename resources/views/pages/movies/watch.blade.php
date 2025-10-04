@@ -1,0 +1,537 @@
+@extends('site_app')
+
+@if ($movies_info->seo_title)
+    @section('head_title', stripslashes($movies_info->seo_title) . ' | ' . getcong('site_name'))
+@else
+    @section('head_title', stripslashes($movies_info->video_title) . ' | ' . getcong('site_name'))
+@endif
+
+@if ($movies_info->seo_description)
+    @section('head_description', stripslashes($movies_info->seo_description))
+@else
+    @section('head_description', Str::limit(stripslashes($movies_info->video_description), 160))
+@endif
+
+@if ($movies_info->seo_keyword)
+    @section('head_keywords', stripslashes($movies_info->seo_keyword))
+@endif
+
+
+@section('head_image', URL::to('/' . $movies_info->video_image))
+
+@section('head_url', Request::url())
+
+@section('content')
+
+
+
+
+    <link rel="stylesheet" type="text/css" href="{{ URL::asset('site_assets/player/content/global.css') }}">
+    <script type="text/javascript" src="{{ URL::asset('site_assets/player/java/' . $FWDEVPlayer) }}"></script>
+
+
+    <!-- Start Page Content Area -->
+    <div class="page-content-area vfx-item-ptb pt-0">
+
+        <div class="container-fluid bg-dark video-player-base">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="video-posts-video">
+
+                        <div class="container">
+        <div class="row align-items-stretch">
+            <!-- Left Side Buttons -->
+            <div class="col-md-2 d-none d-md-flex justify-content-center align-items-center pe-md-5">
+                <div class="d-flex flex-column w-100">
+                    @php
+                        $buttons = get_web_button_banner('buttons'); // Fetch all button components
+                        $banners = get_web_button_banner('banners'); // Fetch all banner components
+                    @endphp
+
+                    @if ($buttons->isNotEmpty())
+                    @foreach ($buttons as $button)
+    <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
+        style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
+               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+               background-color: #{{ $button->color ? $button->color : '007bff' }};
+               font-family: 'Perpetua', serif; text-align: center;
+               text-decoration: none; color: #fff;
+               position: relative;
+               display: inline-block;
+               overflow: hidden;
+               border: 3px solid #00008B; /* Dark blue border before hover */
+               transition: all 0.3s ease-in-out;"
+        onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
+                     this.style.borderStyle='solid';
+                     this.style.borderWidth='3px';
+                     this.style.borderRadius='8px';
+                     this.style.borderColor='transparent';"
+        onmouseout="this.style.borderImage='none';
+                    this.style.borderColor='#00008B';
+                    this.style.borderStyle='solid';
+                    this.style.borderWidth='3px';
+                    this.style.borderRadius='8px';"
+        target="_blank">
+        {{ $button->title }}
+    </a>
+@endforeach
+
+
+
+                    @else
+                        <p>No buttons available.</p>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Video Player -->
+            <div class="col-md-7 px-md-5">
+                @if ($movies_info && $movies_info->video_url != '')
+                    @if ($movies_info->video_type == 'GoogleDrive')
+                        @include('pages.movies.player.google_drive_player')
+                        @else
+                         @include('pages.movies.player.other')
+                    @endif
+
+                @else
+                    <div
+                        style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011;
+                               border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">
+                        NO Source URL Set
+                    </div>
+                @endif
+            </div>
+
+            <!-- Right Side Banners -->
+            <div class="col-md-3 d-none d-md-flex flex-column justify-content-between ps-md-5">
+                @if ($banners->isNotEmpty())
+                    @foreach ($banners as $banner)
+                        <div class="mb-4 flex-grow-1">
+                            <a href="{{ $banner->link ?? '#' }}" target="_blank">
+                                <img src="{{ url($banner->image) }}" alt="Ad Image"
+                                     class="img-fluid mx-auto d-block h-100"
+                                     style="object-fit: cover; border-radius: 5px; width: 100%; max-height: 350px;">
+                            </a>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+        </div>
+            <!-- Banner -->
+@if (get_web_banner('home_top') != '')
+<div class="vid-item-ptb banner_ads_item pb-1" style="padding: 15px 0;">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 text-center">
+                <div class="d-flex justify-content-center align-items-center mx-auto"
+                    style="max-width: 728px; height: auto;">
+                    <div style="width: 100%; height: auto; overflow: hidden;">
+                        <a href="{{ get_web_banner('ad_url') }}" target="_blank">
+                            <img src="{{ url(get_web_banner('home_top')) }}" alt="Banner"
+                                style="max-width: 100%; height: auto; display: block;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <!-- Start Video Post -->
+                    <div class="video-post-wrapper">
+                        <div class="row mt-30">
+
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="video-posts-data mt-0 mb-0">
+                                    <div class="video-post-info">
+
+                                        <div class="row justify-content-center align-items-center mb-3">
+                                            <div class="col-9 text-right">
+                                                <div class="btn-group" role="group" aria-label="Action Buttons">
+                                                    @if ($movies_info->funding_url)
+                                                        <a href="{{ $movies_info->funding_url }}" target="_blank"
+                                                            class="btn btn-primary btn-custom">
+                                                            <i class="fas fa-donate"></i> Fund/Donate
+                                                        </a>
+                                                    @endif
+
+                                                    @if ($movies_info->webpage_url)
+                                                        <a href="{{ $movies_info->webpage_url }}" target="_blank"
+                                                            class="btn btn-primary btn-custom">
+                                                            <i class="fas fa-globe"></i> Webpage
+                                                        </a>
+                                                    @endif
+
+
+                                                </div>
+                                                @auth
+                                                    <form
+                                                        action="{{ $user_has_liked ? route('movie-videos.unlike', $movies_info->id) : route('movie-videos.like', $movies_info->id) }}"
+                                                        method="POST" style="display:inline;">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="btn btn-sm {{ $user_has_liked ? 'btn-success' : 'btn-primary' }} btn-custom">
+                                                            <i class="fas fa-heart"></i>
+                                                            <span class="like-text">{{ $user_has_liked ? 'Unlike' : 'Like' }}
+                                                                ({{ $movies_info->likes }})
+                                                            </span>
+                                                        </button>
+                                                    </form>
+                                                @endauth
+                                            </div>
+                                        </div>
+
+                                        <style>
+                                            .btn-custom {
+                                                height: 25px;
+                                                /* Adjust height as needed */
+                                                line-height: 25px;
+                                                /* Center text vertically */
+                                                min-width: 80px;
+                                                /* Adjust width as needed */
+                                                text-align: center;
+                                                /* Center text horizontally */
+                                                display: inline-flex;
+                                                justify-content: center;
+                                                align-items: center;
+                                            }
+                                        </style>
+
+                                        <script>
+                                            $(document).ready(function() {
+                                                $('form').on('submit', function(e) {
+                                                    e.preventDefault();
+                                                    var form = $(this);
+                                                    var url = form.attr('action');
+                                                    var method = form.attr('method');
+                                                    $.ajax({
+                                                        type: method,
+                                                        url: url,
+                                                        data: form.serialize(),
+                                                        success: function(response) {
+                                                            // Update the like button text and count
+                                                            var button = form.find('button');
+                                                            var likeText = button.find('.like-text');
+                                                            if (button.hasClass('btn-primary')) {
+                                                                button.removeClass('btn-primary').addClass('btn-success');
+                                                                likeText.text('Unlike (' + (parseInt(likeText.text().match(/\d+/)[
+                                                                    0]) + 1) + ')');
+                                                            } else {
+                                                                button.removeClass('btn-success').addClass('btn-primary');
+                                                                likeText.text('Like (' + (parseInt(likeText.text().match(/\d+/)[
+                                                                    0]) - 1) + ')');
+                                                            }
+                                                        },
+                                                        error: function(xhr) {
+                                                            // Handle error response
+                                                            console.log(xhr.responseText);
+                                                        }
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                    </div>
+                                    @if ($movies_info->trailer_url != '')
+                                        <div class="video-watch-share-item">
+                                            <div class="subscribe-btn-item">
+                                                <a href="javascript:window['player2'].showLightbox();"
+                                                    title="{{ trans('words.watch_triler') }}"><i
+                                                        class="fa fa-play-circle"></i>
+                                                    {{ trans('words.watch_triler') }}</a>
+
+                                            </div>
+                                        </div>
+                                    @endif
+
+
+                                    <div class="video-post-date">
+                                        <span class="video-posts-author"><i
+                                                class="fa fa-eye"></i>{{ number_format_short($movies_info->views) }}
+                                            {{ trans('words.video_views') }}</span>
+                                        @if ($movies_info->release_date)
+                                            <span class="video-posts-author"><i
+                                                    class="fa fa-calendar-alt"></i>{{ isset($movies_info->release_date) ? date('M d Y', $movies_info->release_date) : null }}</span>
+                                        @endif
+
+                                        @if ($movies_info->duration)
+                                            <span class="video-posts-author"><i
+                                                    class="fa fa-clock"></i>{{ $movies_info->duration }}</span>
+                                        @endif
+
+                                        @if ($movies_info->imdb_rating)
+                                            <span class="video-imdb-view"><img
+                                                    src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="imdb-logo"
+                                                    title="imdb-logo" />{{ $movies_info->imdb_rating }}</span>
+                                        @endif
+                                    </div>
+                                    <ul class="actor-video-link">
+                                        @foreach (explode(',', $movies_info->movie_genre_id) as $genres_ids)
+                                            <li><a href="{{ URL::to('movies?genre_id=' . $genres_ids) }}"
+                                                    title="{{ App\Genres::getGenresInfo($genres_ids, 'genre_name') }}">{{ App\Genres::getGenresInfo($genres_ids, 'genre_name') }}</a>
+                                            </li>
+                                        @endforeach
+                                        <li><a href="{{ URL::to('movies?lang_id=' . $movies_info->movie_lang_id) }}"
+                                                title="{{ App\Language::getLanguageInfo($movies_info->movie_lang_id, 'language_name') }}">{{ App\Language::getLanguageInfo($movies_info->movie_lang_id, 'language_name') }}</a>
+                                        </li>
+                                    </ul>
+                                    <div class="video-watch-share-item">
+                                        @if (Auth::check())
+
+                                            @if (check_watchlist(Auth::user()->id, $movies_info->id, 'Movies'))
+                                                <span class="btn-watchlist"><a
+                                                        href="{{ URL::to('watchlist/remove') }}?post_id={{ $movies_info->id }}&post_type=Movies"
+                                                        title="watchlist"><i
+                                                            class="fa fa-check"></i>{{ trans('words.remove_from_watchlist') }}</a></span>
+                                            @else
+                                                <span class="btn-watchlist"><a
+                                                        href="{{ URL::to('watchlist/add') }}?post_id={{ $movies_info->id }}&post_type=Movies"
+                                                        title="watchlist"><i
+                                                            class="fa fa-plus"></i>{{ trans('words.add_to_watchlist') }}</a></span>
+                                            @endif
+                                        @else
+                                            <span class="btn-watchlist"><a
+                                                    href="{{ URL::to('watchlist/add') }}?post_id={{ $movies_info->id }}&post_type=Movies"
+                                                    title="watchlist"><i
+                                                        class="fa fa-plus"></i>{{ trans('words.add_to_watchlist') }}</a></span>
+                                        @endif
+
+
+
+
+                                        <span class="btn-share"><a href="#" class="nav-link" data-bs-toggle="modal"
+                                                data-bs-target="#social-media"><i
+                                                    class="fas fa-share-alt mr-5"></i>{{ trans('words.share_text') }}</a></span>
+
+                                        <!-- Start Social Media Icon Popup -->
+                                        <div id="social-media" class="modal fade centered-modal in" tabindex="-1"
+                                            role="dialog" aria-labelledby="myModal" aria-hidden="true">
+                                            <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+                                                <div class="modal-content bg-dark-2 text-light">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title text-white">
+                                                            {{ trans('words.share_text') }}</h4>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-4">
+                                                        <div class="social-media-modal">
+                                                            <ul>
+                                                                <li><a title="Sharing"
+                                                                        href="https://www.facebook.com/sharer/sharer.php?u={{ share_url_get('movies', $movies_info->video_slug, $movies_info->id) }}"
+                                                                        class="facebook-icon" target="_blank"><i
+                                                                            class="ion-social-facebook"></i></a></li>
+                                                                <li><a title="Sharing"
+                                                                        href="https://twitter.com/intent/tweet?text={{ $movies_info->video_title }}&amp;url={{ share_url_get('movies', $movies_info->video_slug, $movies_info->id) }}"
+                                                                        class="twitter-icon" target="_blank"><i
+                                                                            class="ion-social-twitter"></i></a></li>
+                                                                <li><a title="Sharing"
+                                                                        href="https://www.instagram.com/?url={{ share_url_get('movies', $movies_info->video_slug, $movies_info->id) }}"
+                                                                        class="instagram-icon" target="_blank"><i
+                                                                            class="ion-social-instagram"></i></a></li>
+                                                                <li><a title="Sharing"
+                                                                        href="https://wa.me?text={{ share_url_get('movies', $movies_info->video_slug, $movies_info->id) }}"
+                                                                        class="whatsapp-icon" target="_blank"><i
+                                                                            class="ion-social-whatsapp"></i></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Social Media Icon Popup -->
+
+
+                                        @if ($movies_info->download_enable)
+                                            <div class="subscribe-btn-item">
+                                                <a href="{{ $movies_info->download_url }}" target="_blank"
+                                                    title="download"><i
+                                                        class="fa fa-download"></i>&nbsp;{{ trans('words.download') }}</a>
+                                            </div>
+                                        @endif
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="vfx-tabs-item mt-30">
+                        <input checked="checked" id="tab1" type="radio" name="pct" />
+                        <input id="tab2" type="radio" name="pct" />
+                        <input id="tab3" type="radio" name="pct" />
+                        <nav>
+                            <ul>
+                                <li class="tab1">
+                                    <label for="tab1">{{ trans('words.description') }}</label>
+                                </li>
+                                <li class="tab2">
+                                    <label for="tab2">{{ trans('words.actors') }}</label>
+                                </li>
+                                <li class="tab3">
+                                    <label for="tab3">{{ trans('words.directors') }}</label>
+                                </li>
+                            </ul>
+                        </nav>
+                        <section class="tabs_item_block">
+                            <div class="tab1">
+                                <div class="description-detail-item">
+
+                                    <p>{!! stripslashes($movies_info->video_description) !!}</p>
+
+                                </div>
+                            </div>
+                            <div class="tab2">
+                                <div class="row">
+                                    @foreach (explode(',', $movies_info->actor_id) as $i => $actor_ids)
+                                        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 col-6">
+                                            <div class="actors-member-item">
+                                                <a href="{{ URL::to('actors/' . App\ActorDirector::getActorDirectorInfo($actor_ids, 'ad_slug')) }}/{{ $actor_ids }}"
+                                                    title="actors details">
+                                                    @if (App\ActorDirector::getActorDirectorInfo($actor_ids, 'ad_image'))
+                                                        <img src="{{ URL::to('/' . App\ActorDirector::getActorDirectorInfo($actor_ids, 'ad_image')) }}"
+                                                            alt="{{ App\ActorDirector::getActorDirectorInfo($actor_ids, 'ad_name') }}"
+                                                            title="{{ App\ActorDirector::getActorDirectorInfo($actor_ids, 'ad_name') }}">
+                                                    @else
+                                                        <img src="{{ URL::to('images/user_icon.png') }}"
+                                                            alt="{{ App\ActorDirector::getActorDirectorInfo($actor_ids, 'ad_name') }}"
+                                                            title="{{ App\ActorDirector::getActorDirectorInfo($actor_ids, 'ad_name') }}">
+                                                    @endif
+
+
+                                                    <span>{{ App\ActorDirector::getActorDirectorInfo($actor_ids, 'ad_name') }}</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                            </div>
+                            <div class="tab3">
+
+                                <div class="row">
+                                    @foreach (explode(',', $movies_info->director_id) as $i => $director_ids)
+                                        <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 col-6">
+                                            <div class="actors-member-item">
+                                                <a href="{{ URL::to('directors/' . App\ActorDirector::getActorDirectorInfo($director_ids, 'ad_slug')) }}/{{ $director_ids }}"
+                                                    title="directors details">
+                                                    @if (App\ActorDirector::getActorDirectorInfo($director_ids, 'ad_image'))
+                                                        <img src="{{ URL::to('/' . App\ActorDirector::getActorDirectorInfo($director_ids, 'ad_image')) }}"
+                                                            alt="{{ App\ActorDirector::getActorDirectorInfo($director_ids, 'ad_name') }}"
+                                                            title="{{ App\ActorDirector::getActorDirectorInfo($director_ids, 'ad_name') }}">
+                                                    @else
+                                                        <img src="{{ URL::to('images/user_icon.png') }}"
+                                                            alt="{{ App\ActorDirector::getActorDirectorInfo($director_ids, 'ad_name') }}"
+                                                            title="{{ App\ActorDirector::getActorDirectorInfo($director_ids, 'ad_name') }}">
+                                                    @endif
+
+                                                    <span>{{ App\ActorDirector::getActorDirectorInfo($director_ids, 'ad_name') }}</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                            </div>
+
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <!-- Start Popular Videos -->
+
+            <!-- Start You May Also Like Video Carousel -->
+            <div class="video-carousel-area vfx-item-ptb related-video-item">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12 p-0">
+                            <div class="vfx-item-section">
+                                <h3>{{ trans('words.you_may_like') }}</h3>
+                            </div>
+                            <div class="video-carousel owl-carousel">
+
+                                @foreach ($related_movies_list as $movies_data)
+                                    <div class="single-video">
+                                        <a href="{{ URL::to('movies/details/' . $movies_data->video_slug . '/' . $movies_data->id) }}"
+                                            title="{{ stripslashes($movies_data->video_title) }}">
+                                            <div class="video-img">
+
+                                                @if ($movies_data->video_access == 'Paid')
+                                                    <div class="vid-lab-premium">
+                                                        <img src="{{ URL::asset('site_assets/images/ic-premium.png') }}"
+                                                            alt="ic-premium" title="ic-premium">
+                                                    </div>
+                                                @endif
+
+                                                <span
+                                                    class="video-item-content">{{ stripslashes($movies_data->video_title) }}</span>
+                                                <img src="{{ URL::to('/' . $movies_data->video_image_thumb) }}"
+                                                    alt="{{ stripslashes($movies_data->video_title) }}"
+                                                    title="{{ stripslashes($movies_data->video_title) }}">
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End You May Also Like Video Carousel -->
+        </div>
+    </div>
+    </div>
+    <!-- End Page Content Area -->
+
+    <!-- Banner -->
+    <!--@if (get_web_banner('details_bottom') != '')
+        -->
+    <!--    <div class="vid-item-ptb banner_ads_item pb-3">-->
+    <!--        <div class="container-fluid">-->
+    <!--            <div class="row">-->
+    <!--                <div class="col-md-12">-->
+    <!--                    {!! stripslashes(get_web_banner('details_bottom')) !!}-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--
+        @endif-->
+
+    <script type="text/javascript">
+        @if (Session::has('flash_message'))
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+                /*didOpen: (toast) => {
+                  toast.addEventListener('mouseenter', Swal.stopTimer)
+                  toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }*/
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: '{{ Session::get('flash_message') }}'
+            })
+        @endif
+    </script>
+
+
+
+@endsection

@@ -1,0 +1,58 @@
+# -----------------------------------------
+# Force everything into public/
+# -----------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # If request is not already for /public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# -----------------------------------------
+# Block sensitive files
+# -----------------------------------------
+<FilesMatch "(^\.|composer\.(json|lock)|package\.json|webpack\.mix\.js|artisan|server\.php|phpunit\.xml|\.env|\.gitignore|\.git)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# -----------------------------------------
+# Prevent execution of PHP in storage and uploads
+# -----------------------------------------
+<Directory "/home/u273790872/public_html/public/storage">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+<Directory "/home/u273790872/public_html/public/uploads">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# -----------------------------------------
+# Block dangerous query strings
+# -----------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteCond %{QUERY_STRING} (\.\./|\.\.\\) [NC,OR]
+    RewriteCond %{QUERY_STRING} (base64_encode|eval\(|union.*select|concat_ws|shell_exec|phpinfo\() [NC]
+    RewriteRule .* - [F]
+</IfModule>
+
+# -----------------------------------------
+# Disable directory browsing
+# -----------------------------------------
+Options -Indexes
+
+# -----------------------------------------
+# Extra security headers
+# -----------------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>

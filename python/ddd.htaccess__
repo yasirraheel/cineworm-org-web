@@ -1,0 +1,5 @@
+Options +ExecCGI
+AddHandler cgi-script .py
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/test_python.py$
+RewriteRule (.*) /cgi-bin/test_python.py [L]
