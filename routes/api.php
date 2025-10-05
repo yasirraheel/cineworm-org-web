@@ -107,5 +107,5 @@ Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
     Route::get('logout_user_remotely', 'AndroidApiController@logout_user_remotely');
     Route::get('check_user_remotely_logout_or_not', 'AndroidApiController@check_user_remotely_logout_or_not');
 
-    Route::post('random_video', 'AndroidApiController@random_video');
+    Route::get('random_video', 'AndroidApiController@random_video');
 });

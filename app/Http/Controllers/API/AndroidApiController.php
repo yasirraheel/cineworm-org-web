@@ -4780,36 +4780,11 @@ class AndroidApiController extends MainAPIController
 
     public function random_video()
     {
-        // Check if data parameter exists
-        if (!isset($_POST['data']) || empty($_POST['data'])) {
-            return \Response::json(array(            
-                'VIDEO_STREAMING_APP' => array(),
-                'msg' => 'Missing data parameter',
-                'success' => '0',
-                'status_code' => 400
-            ));
-        }
+        // Simple GET method - no parameters required
+        // Just return a random video like slider functionality
         
-        try {
-            $get_data = checkSignSalt($_POST['data']);
-        } catch(\Exception $e) {
-            return \Response::json(array(            
-                'VIDEO_STREAMING_APP' => array(),
-                'msg' => 'Invalid data format: ' . $e->getMessage(),
-                'success' => '0',
-                'status_code' => 400
-            ));
-        }
-        
-        // Optional user ID for personalized content
-        $user_id = isset($get_data['user_id']) ? $get_data['user_id'] : '';        if($user_id != "")
-        {
-            $user_plan_status = check_app_user_plan($user_id);
-        }
-        else
-        {
-            $user_plan_status = false;
-        }
+        // Default for anonymous users
+        $user_plan_status = false;
 
         // Define available content types
         $content_types = [];
