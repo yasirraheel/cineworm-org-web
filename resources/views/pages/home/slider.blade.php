@@ -194,25 +194,33 @@
             /* Sidebar Action Buttons */
             .sidebar-action-btn {
                 display: block;
-                padding: 8px;
-                font-size: 18px;
-                font-weight: bold;
+                padding: 10px 8px;
+                font-size: 14px;
+                font-weight: 700;
                 text-align: center;
                 color: #ffffff;
-                background-color: #007bff;
-                border: none;
-                border-radius: 8px;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 6px;
                 text-decoration: none;
                 transition: all 0.3s ease;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-                font-family: 'Perpetua', serif;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                hyphens: auto;
+                line-height: 1.4;
+                min-height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .sidebar-action-btn:hover {
-                background-color: #0056b3;
+                background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+                border-color: rgba(22, 122, 198, 0.5);
                 color: #ffffff;
                 transform: translateY(-2px);
-                box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 6px 16px rgba(22, 122, 198, 0.4);
             }
 
             /* Banner Items */
@@ -550,8 +558,9 @@
                 }
 
                 .sidebar-action-btn {
-                    padding: 6px 10px;
-                    font-size: 16px;
+                    padding: 8px 6px;
+                    font-size: 13px;
+                    min-height: 45px;
                 }
 
                 .banner-wrapper {
