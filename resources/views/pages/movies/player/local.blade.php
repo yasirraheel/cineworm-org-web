@@ -11,9 +11,16 @@
     <style>
         /* Forcefully setting the width and height of the player */
         #viavi_player {
-            width: 960px; /* Desired width */
-            height: 640px; /* Desired height */
-            margin: auto; /* Center the player */
+            width: 100%;
+            max-width: 1200px;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            margin: auto;
+        }
+        @media (min-width: 1600px) {
+            #viavi_player {
+                max-width: 1600px;
+            }
         }
         .plyr__video-embed {
             position: relative;
@@ -96,8 +103,8 @@
 					autoPlayText:"Click to Unmute",
 					loop:"yes",
 					scrubAtTimeAtFirstPlay:"00:00:00",
-					maxWidth:1325,
-					maxHeight:535,
+					maxWidth:1600,
+					maxHeight:900,
 					volume:.8,
 					greenScreenTolerance:200,
 					backgroundColor:"#000000",
