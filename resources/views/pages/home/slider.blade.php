@@ -4,12 +4,12 @@
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-<div class="slider-area">
-    <div class="container-fluid px-lg-5">
-        <div class="row align-items-stretch">
+<div class="slider-area p-0">
+    <div class="container-fluid px-0">
+        <div class="row g-2 align-items-stretch">
             @if (request()->getHost() != 'home.cineworm.org')
                 <!-- Left Side Buttons -->
-                <div class="col-md-2 col-lg-2 col-xl-1 d-none d-md-flex justify-content-center align-items-center pe-md-5">
+                <div class="col-md-2 col-lg-2 col-xl-1 d-none d-md-flex justify-content-center align-items-center">
                     <div class="d-flex flex-column w-100">
                         @php
                             $buttons = get_web_button_banner('buttons'); // Fetch all button components
@@ -18,7 +18,7 @@
 
                         @if ($buttons->isNotEmpty())
                             @foreach ($buttons as $button)
-                                <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
+                                <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-2"
                                     style="padding: 8px; font-size: 18px; font-weight: bold; border-radius: 8px;
                                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
                                        background-color: #{{ $button->color ? $button->color : '007bff' }};
@@ -33,7 +33,7 @@
                 </div>
             @endif
             <!-- Video Player -->
-            <div class="col-md-7 col-lg-8 col-xl-10 px-md-5">
+            <div class="col-md-8 col-lg-8 col-xl-10">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -50,10 +50,10 @@
             </div>
             @if (request()->getHost() != 'home.cineworm.org')
                 <!-- Right Side Banners -->
-                <div class="col-md-3 col-lg-2 col-xl-1 d-none d-md-flex flex-column justify-content-between ps-md-5">
+                <div class="col-md-2 col-lg-2 col-xl-1 d-none d-md-flex flex-column justify-content-between">
                     @if ($banners->isNotEmpty())
                         @foreach ($banners as $banner)
-                            <div class="mb-4 flex-grow-1">
+                            <div class="mb-2 flex-grow-1">
                                 <a href="{{ $banner->link ?? '#' }}" target="_blank">
                                     <img src="{{ url($banner->image) }}" alt="Ad Image"
                                         class="img-fluid mx-auto d-block h-100"

@@ -4,8 +4,8 @@
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-<div class="slider-area">
-    <div class="container-fluid px-lg-5">
+<div class="slider-area p-0">
+    <div class="container-fluid px-0">
         
 
             <!-- Video Player -->

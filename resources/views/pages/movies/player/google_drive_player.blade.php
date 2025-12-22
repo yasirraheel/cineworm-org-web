@@ -9,19 +9,13 @@
         /* Basic styling for the container */
         .video-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
             position: relative;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             overflow: hidden;
             background-color: #000;
-        }
-
-        @media (min-width: 1600px) {
-            .video-container {
-                max-width: 1600px;
-            }
         }
 
         /* Beautiful video styling */

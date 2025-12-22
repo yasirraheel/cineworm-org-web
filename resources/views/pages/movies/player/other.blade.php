@@ -12,15 +12,10 @@
         /* Forcefully setting the width and height of the player */
         #viavi_player {
             width: 100%;
-            max-width: 1200px;
+            max-width: 100%;
             height: auto;
             aspect-ratio: 16 / 9;
             margin: auto;
-        }
-        @media (min-width: 1600px) {
-            #viavi_player {
-                max-width: 1600px;
-            }
         }
         .plyr__video-embed {
             position: relative;
