@@ -6,11 +6,11 @@
 
 <div class="slider-area p-0">
     <div class="container-fluid px-0">
-        <div class="row g-2 align-items-stretch">
+        <div class="row g-3 align-items-stretch">
             @if (request()->getHost() != 'home.cineworm.org')
                 <!-- Left Side Buttons -->
                 <div class="col-md-2 col-lg-2 col-xl-1 d-none d-md-flex justify-content-center align-items-center">
-                    <div class="d-flex flex-column w-100">
+                    <div class="d-flex flex-column w-100 sidebar-buttons-container">
                         @php
                             $buttons = get_web_button_banner('buttons'); // Fetch all button components
                             $banners = get_web_button_banner('banners'); // Fetch all banner components
@@ -46,18 +46,23 @@
             </div>
             @if (request()->getHost() != 'home.cineworm.org')
                 <!-- Right Side Banners -->
-                <div class="col-md-2 col-lg-2 col-xl-1 d-none d-md-flex flex-column justify-content-between">
-                    @if ($banners->isNotEmpty())
-                        @foreach ($banners as $banner)
-                            <div class="mb-2 flex-grow-1">
-                                <a href="{{ $banner->link ?? '#' }}" target="_blank">
-                                    <img src="{{ url($banner->image) }}" alt="Ad Image"
-                                        class="img-fluid mx-auto d-block h-100"
-                                        style="object-fit: cover; border-radius: 5px; width: 100%; max-height: 350px;">
-                                </a>
-                            </div>
-                        @endforeach
-                    @endif
+                <div class="col-md-2 col-lg-2 col-xl-1 d-none d-md-flex flex-column justify-content-start">
+                    <div class="sidebar-banners-container">
+                        @if ($banners->isNotEmpty())
+                            @foreach ($banners as $banner)
+                                <div class="banner-item">
+                                    <a href="{{ $banner->link ?? '#' }}" target="_blank" class="banner-link">
+                                        <div class="banner-wrapper">
+                                            <img src="{{ url($banner->image) }}" alt="Advertisement" class="banner-image">
+                                            <div class="banner-overlay">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
                 </div>
             @endif
         </div>
@@ -174,6 +179,18 @@
         <!-- End Social Media Icon Popup -->
 
         <style>
+            /* Sidebar Containers */
+            .sidebar-buttons-container {
+                padding: 10px;
+            }
+
+            .sidebar-banners-container {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                padding: 10px;
+            }
+
             /* Sidebar Action Buttons */
             .sidebar-action-btn {
                 display: block;
@@ -196,6 +213,92 @@
                 color: #ffffff;
                 transform: translateY(-2px);
                 box-shadow: 0 6px 15px rgba(253, 5, 117, 0.5);
+            }
+
+            /* Banner Items */
+            .banner-item {
+                position: relative;
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .banner-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .banner-link {
+                display: block;
+                text-decoration: none;
+            }
+
+            .banner-wrapper {
+                position: relative;
+                background: linear-gradient(135deg, #1a0d33 0%, #0d0620 100%);
+                border-radius: 8px;
+                padding: 8px;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+                transition: all 0.3s ease;
+                border: 2px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .banner-wrapper:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(254, 136, 5, 0.3);
+                border-color: rgba(254, 136, 5, 0.4);
+            }
+
+            .banner-image {
+                width: 100%;
+                height: auto;
+                max-height: 350px;
+                object-fit: cover;
+                border-radius: 6px;
+                display: block;
+                transition: all 0.3s ease;
+            }
+
+            .banner-wrapper:hover .banner-image {
+                opacity: 0.9;
+                transform: scale(1.02);
+            }
+
+            .banner-overlay {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: rgba(254, 136, 5, 0.9);
+                color: #ffffff;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: all 0.3s ease;
+                font-size: 14px;
+            }
+
+            .banner-wrapper:hover .banner-overlay {
+                opacity: 1;
+                transform: rotate(360deg);
+            }
+
+            /* Advertisement Label (Optional) */
+            .banner-item::before {
+                content: 'AD';
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                background: rgba(0, 0, 0, 0.7);
+                color: #fe8805;
+                font-size: 10px;
+                font-weight: 700;
+                padding: 3px 8px;
+                border-radius: 3px;
+                z-index: 2;
+                letter-spacing: 1px;
             }
 
             /* Player Footer Section */
@@ -433,6 +536,21 @@
                 .sidebar-action-btn {
                     padding: 10px 12px;
                     font-size: 14px;
+                }
+
+                .banner-wrapper {
+                    padding: 6px;
+                }
+
+                .banner-image {
+                    max-height: 250px;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .sidebar-banners-container,
+                .sidebar-buttons-container {
+                    display: none !important;
                 }
             }
         </style>
