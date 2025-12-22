@@ -181,14 +181,14 @@
         <style>
             /* Sidebar Containers */
             .sidebar-buttons-container {
-                padding: 10px;
+                padding: 0 5px;
             }
 
             .sidebar-banners-container {
                 display: flex;
                 flex-direction: column;
-                gap: 15px;
-                padding: 10px;
+                gap: 12px;
+                padding: 0;
             }
 
             /* Sidebar Action Buttons */
@@ -219,7 +219,7 @@
             .banner-item {
                 position: relative;
                 width: 100%;
-                margin-bottom: 12px;
+                margin-bottom: 10px;
             }
 
             .banner-item:last-child {
@@ -233,75 +233,88 @@
 
             .banner-wrapper {
                 position: relative;
-                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-                border-radius: 10px;
-                padding: 10px;
+                background: #0d0d0d;
+                border-radius: 6px;
+                padding: 5px;
                 overflow: hidden;
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                border: 2px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .banner-wrapper::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(22, 122, 198, 0.05) 0%, rgba(142, 68, 173, 0.05) 100%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
             }
 
             .banner-wrapper:hover {
-                transform: translateY(-5px) scale(1.02);
-                box-shadow: 0 10px 30px rgba(22, 122, 198, 0.4);
-                border-color: rgba(22, 122, 198, 0.5);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 24px rgba(22, 122, 198, 0.3);
+                border-color: rgba(22, 122, 198, 0.4);
+            }
+
+            .banner-wrapper:hover::after {
+                opacity: 1;
             }
 
             .banner-image {
                 width: 100%;
                 height: auto;
-                min-height: 200px;
-                max-height: 400px;
+                min-height: 180px;
+                max-height: 350px;
                 object-fit: cover;
-                border-radius: 8px;
+                border-radius: 4px;
                 display: block;
-                transition: all 0.4s ease;
+                transition: all 0.3s ease;
             }
 
             .banner-wrapper:hover .banner-image {
-                opacity: 0.95;
-                transform: scale(1.05);
+                opacity: 0.92;
             }
 
             .banner-overlay {
                 position: absolute;
-                top: 10px;
-                right: 10px;
-                background: linear-gradient(135deg, #167ac6, #0a789c);
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(22, 122, 198, 0.95);
                 color: #ffffff;
-                width: 38px;
-                height: 38px;
+                width: 45px;
+                height: 45px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 opacity: 0;
-                transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                font-size: 16px;
-                box-shadow: 0 4px 12px rgba(22, 122, 198, 0.5);
+                transition: all 0.3s ease;
+                font-size: 18px;
+                box-shadow: 0 4px 16px rgba(22, 122, 198, 0.6);
             }
 
             .banner-wrapper:hover .banner-overlay {
                 opacity: 1;
-                transform: rotate(360deg) scale(1.1);
             }
 
             /* Advertisement Label */
             .banner-item::before {
                 content: 'AD';
                 position: absolute;
-                top: 8px;
-                left: 8px;
-                background: linear-gradient(90deg, #fe8805, #ff6b00);
-                color: #ffffff;
-                font-size: 11px;
+                top: 3px;
+                left: 3px;
+                background: rgba(0, 0, 0, 0.85);
+                color: #fe8805;
+                font-size: 9px;
                 font-weight: 800;
-                padding: 4px 10px;
-                border-radius: 5px;
+                padding: 3px 7px;
+                border-radius: 3px;
                 z-index: 10;
-                letter-spacing: 1.5px;
-                box-shadow: 0 3px 8px rgba(254, 136, 5, 0.4);
+                letter-spacing: 1px;
+                border: 1px solid rgba(254, 136, 5, 0.3);
             }
 
             /* Player Footer Section */
@@ -542,12 +555,29 @@
                 }
 
                 .banner-wrapper {
-                    padding: 8px;
+                    padding: 4px;
+                }
+
+                .banner-image {
+                    max-height: 280px;
+                    min-height: 140px;
+                }
+
+                .banner-overlay {
+                    width: 40px;
+                    height: 40px;
+                    font-size: 16px;
+                }
+            }
+
+            @media (max-width: 992px) {
+                .banner-wrapper {
+                    padding: 4px;
                 }
 
                 .banner-image {
                     max-height: 300px;
-                    min-height: 150px;
+                    min-height: 160px;
                 }
             }
 
