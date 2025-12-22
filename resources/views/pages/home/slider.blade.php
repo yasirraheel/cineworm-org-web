@@ -194,32 +194,32 @@
             /* Sidebar Action Buttons */
             .sidebar-action-btn {
                 display: block;
-                padding: 12px 15px;
-                font-size: 16px;
-                font-weight: 700;
+                padding: 8px;
+                font-size: 18px;
+                font-weight: bold;
                 text-align: center;
-                text-transform: uppercase;
                 color: #ffffff;
-                background: linear-gradient(90deg, #ff8508, #fd0575);
+                background-color: #007bff;
                 border: none;
-                border-radius: 6px;
+                border-radius: 8px;
                 text-decoration: none;
                 transition: all 0.3s ease;
-                box-shadow: 0 4px 10px rgba(253, 5, 117, 0.3);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                font-family: 'Perpetua', serif;
             }
 
             .sidebar-action-btn:hover {
-                background: linear-gradient(90deg, #fd0575, #ff8508);
+                background-color: #0056b3;
                 color: #ffffff;
                 transform: translateY(-2px);
-                box-shadow: 0 6px 15px rgba(253, 5, 117, 0.5);
+                box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
             }
 
             /* Banner Items */
             .banner-item {
                 position: relative;
                 width: 100%;
-                margin-bottom: 15px;
+                margin-bottom: 12px;
             }
 
             .banner-item:last-child {
@@ -233,72 +233,75 @@
 
             .banner-wrapper {
                 position: relative;
-                background: linear-gradient(135deg, #1a0d33 0%, #0d0620 100%);
-                border-radius: 8px;
-                padding: 8px;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                border-radius: 10px;
+                padding: 10px;
                 overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-                transition: all 0.3s ease;
-                border: 2px solid rgba(255, 255, 255, 0.05);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 2px solid rgba(255, 255, 255, 0.08);
             }
 
             .banner-wrapper:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 20px rgba(254, 136, 5, 0.3);
-                border-color: rgba(254, 136, 5, 0.4);
+                transform: translateY(-5px) scale(1.02);
+                box-shadow: 0 10px 30px rgba(22, 122, 198, 0.4);
+                border-color: rgba(22, 122, 198, 0.5);
             }
 
             .banner-image {
                 width: 100%;
                 height: auto;
-                max-height: 350px;
+                min-height: 200px;
+                max-height: 400px;
                 object-fit: cover;
-                border-radius: 6px;
+                border-radius: 8px;
                 display: block;
-                transition: all 0.3s ease;
+                transition: all 0.4s ease;
             }
 
             .banner-wrapper:hover .banner-image {
-                opacity: 0.9;
-                transform: scale(1.02);
+                opacity: 0.95;
+                transform: scale(1.05);
             }
 
             .banner-overlay {
                 position: absolute;
-                top: 8px;
-                right: 8px;
-                background: rgba(254, 136, 5, 0.9);
+                top: 10px;
+                right: 10px;
+                background: linear-gradient(135deg, #167ac6, #0a789c);
                 color: #ffffff;
-                width: 32px;
-                height: 32px;
+                width: 38px;
+                height: 38px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 opacity: 0;
-                transition: all 0.3s ease;
-                font-size: 14px;
+                transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                font-size: 16px;
+                box-shadow: 0 4px 12px rgba(22, 122, 198, 0.5);
             }
 
             .banner-wrapper:hover .banner-overlay {
                 opacity: 1;
-                transform: rotate(360deg);
+                transform: rotate(360deg) scale(1.1);
             }
 
-            /* Advertisement Label (Optional) */
+            /* Advertisement Label */
             .banner-item::before {
                 content: 'AD';
                 position: absolute;
-                top: 5px;
-                left: 5px;
-                background: rgba(0, 0, 0, 0.7);
-                color: #fe8805;
-                font-size: 10px;
-                font-weight: 700;
-                padding: 3px 8px;
-                border-radius: 3px;
-                z-index: 2;
-                letter-spacing: 1px;
+                top: 8px;
+                left: 8px;
+                background: linear-gradient(90deg, #fe8805, #ff6b00);
+                color: #ffffff;
+                font-size: 11px;
+                font-weight: 800;
+                padding: 4px 10px;
+                border-radius: 5px;
+                z-index: 10;
+                letter-spacing: 1.5px;
+                box-shadow: 0 3px 8px rgba(254, 136, 5, 0.4);
             }
 
             /* Player Footer Section */
@@ -534,16 +537,17 @@
                 }
 
                 .sidebar-action-btn {
-                    padding: 10px 12px;
-                    font-size: 14px;
+                    padding: 6px 10px;
+                    font-size: 16px;
                 }
 
                 .banner-wrapper {
-                    padding: 6px;
+                    padding: 8px;
                 }
 
                 .banner-image {
-                    max-height: 250px;
+                    max-height: 300px;
+                    min-height: 150px;
                 }
             }
 
