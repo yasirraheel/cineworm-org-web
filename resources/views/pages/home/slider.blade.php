@@ -18,11 +18,7 @@
 
                         @if ($buttons->isNotEmpty())
                             @foreach ($buttons as $button)
-                                <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-2"
-                                    style="padding: 8px; font-size: 18px; font-weight: bold; border-radius: 8px;
-                                       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-                                       background-color: #{{ $button->color ? $button->color : '007bff' }};
-                                       font-family: 'Perpetua', serif; text-align: center;">
+                                <a href="{{ $button->link ?? '#' }}" class="sidebar-action-btn w-100 mb-2">
                                     {{ $button->title }}
                                 </a>
                             @endforeach
@@ -78,35 +74,33 @@
                 </a>
             </div>
             <div class="col-9 text-right">
-                <div class="btn-group" role="group" aria-label="Action Buttons">
+                <div class="action-buttons-group" role="group" aria-label="Action Buttons">
                     @if ($movies_info->funding_url)
-                        <a href="{{ $movies_info->funding_url }}" target="_blank" class="btn btn-primary btn-custom">
+                        <a href="{{ $movies_info->funding_url }}" target="_blank" class="action-btn donate-btn">
                             <i class="fas fa-donate"></i> Fund/Donate
                         </a>
                     @endif
 
                     @if ($movies_info->webpage_url)
-                        <a href="{{ $movies_info->webpage_url }}" target="_blank" class="btn btn-primary btn-custom">
+                        <a href="{{ $movies_info->webpage_url }}" target="_blank" class="action-btn webpage-btn">
                             <i class="fas fa-globe"></i> Webpage
                         </a>
                     @endif
 
-
+                    @auth
+                        <form
+                            action="{{ $user_has_liked ? route('movie-videos.unlike', $movies_info->id) : route('movie-videos.like', $movies_info->id) }}"
+                            method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="action-btn like-btn {{ $user_has_liked ? 'liked' : '' }}">
+                                <i class="fas fa-heart"></i>
+                                <span class="like-text">{{ $user_has_liked ? 'Unlike' : 'Like' }}
+                                    ({{ $movies_info->likes }})
+                                </span>
+                            </button>
+                        </form>
+                    @endauth
                 </div>
-                @auth
-                    <form
-                        action="{{ $user_has_liked ? route('movie-videos.unlike', $movies_info->id) : route('movie-videos.like', $movies_info->id) }}"
-                        method="POST" style="display:inline;">
-                        @csrf
-                        <button type="submit"
-                            class="btn btn-sm {{ $user_has_liked ? 'btn-success' : 'btn-primary' }} btn-custom">
-                            <i class="fas fa-heart"></i>
-                            <span class="like-text">{{ $user_has_liked ? 'Unlike' : 'Like' }}
-                                ({{ $movies_info->likes }})
-                            </span>
-                        </button>
-                    </form>
-                @endauth
             </div>
             <div class="video-post-date">
                 <span class="video-posts-author"><i
@@ -168,18 +162,120 @@
         <!-- End Social Media Icon Popup -->
 
         <style>
-            .btn-custom {
-                height: 25px;
-                /* Adjust height as needed */
-                line-height: 25px;
-                /* Center text vertically */
-                min-width: 80px;
-                /* Adjust width as needed */
+            /* Sidebar Action Buttons */
+            .sidebar-action-btn {
+                display: block;
+                padding: 12px 15px;
+                font-size: 16px;
+                font-weight: 700;
                 text-align: center;
-                /* Center text horizontally */
+                text-transform: uppercase;
+                color: #ffffff;
+                background: linear-gradient(90deg, #ff8508, #fd0575);
+                border: none;
+                border-radius: 6px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 10px rgba(253, 5, 117, 0.3);
+            }
+
+            .sidebar-action-btn:hover {
+                background: linear-gradient(90deg, #fd0575, #ff8508);
+                color: #ffffff;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(253, 5, 117, 0.5);
+            }
+
+            /* Action Buttons Group */
+            .action-buttons-group {
                 display: inline-flex;
-                justify-content: center;
+                gap: 10px;
+                flex-wrap: wrap;
                 align-items: center;
+            }
+
+            /* Base Action Button Style */
+            .action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px 16px;
+                font-size: 14px;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #ffffff;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                gap: 6px;
+            }
+
+            .action-btn i {
+                font-size: 14px;
+            }
+
+            /* Donate Button */
+            .donate-btn {
+                background: linear-gradient(90deg, #fe8805, #ff6b00);
+                box-shadow: 0 3px 8px rgba(254, 136, 5, 0.3);
+            }
+
+            .donate-btn:hover {
+                background: linear-gradient(90deg, #ff6b00, #fe8805);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 12px rgba(254, 136, 5, 0.5);
+                color: #ffffff;
+            }
+
+            /* Webpage Button */
+            .webpage-btn {
+                background: linear-gradient(90deg, #167ac6, #0a789c);
+                box-shadow: 0 3px 8px rgba(22, 122, 198, 0.3);
+            }
+
+            .webpage-btn:hover {
+                background: linear-gradient(90deg, #0a789c, #167ac6);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 12px rgba(22, 122, 198, 0.5);
+                color: #ffffff;
+            }
+
+            /* Like Button */
+            .like-btn {
+                background: linear-gradient(90deg, #fe0278, #d10257);
+                box-shadow: 0 3px 8px rgba(254, 2, 120, 0.3);
+            }
+
+            .like-btn:hover {
+                background: linear-gradient(90deg, #d10257, #fe0278);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 12px rgba(254, 2, 120, 0.5);
+            }
+
+            .like-btn.liked {
+                background: linear-gradient(90deg, #118d04, #0d6b03);
+                box-shadow: 0 3px 8px rgba(17, 141, 4, 0.3);
+            }
+
+            .like-btn.liked:hover {
+                background: linear-gradient(90deg, #0d6b03, #118d04);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 12px rgba(17, 141, 4, 0.5);
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .action-btn {
+                    padding: 6px 12px;
+                    font-size: 12px;
+                }
+
+                .sidebar-action-btn {
+                    padding: 10px 12px;
+                    font-size: 14px;
+                }
             }
         </style>
 
@@ -198,14 +294,14 @@
                             // Update the like button text and count
                             var button = form.find('button');
                             var likeText = button.find('.like-text');
-                            if (button.hasClass('btn-primary')) {
-                                button.removeClass('btn-primary').addClass('btn-success');
-                                likeText.text('Unlike (' + (parseInt(likeText.text().match(/\d+/)[
-                                    0]) + 1) + ')');
+                            if (button.hasClass('liked')) {
+                                button.removeClass('liked');
+                                var currentCount = parseInt(likeText.text().match(/\d+/)[0]);
+                                likeText.text('Like (' + (currentCount - 1) + ')');
                             } else {
-                                button.removeClass('btn-success').addClass('btn-primary');
-                                likeText.text('Like (' + (parseInt(likeText.text().match(/\d+/)[
-                                    0]) - 1) + ')');
+                                button.addClass('liked');
+                                var currentCount = parseInt(likeText.text().match(/\d+/)[0]);
+                                likeText.text('Unlike (' + (currentCount + 1) + ')');
                             }
                         },
                         error: function(xhr) {
