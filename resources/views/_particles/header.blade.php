@@ -1,5 +1,8 @@
 <!-- Start Header -->
-<header style="position: relative; height: 100px;">
+<header id="auto-hide-header" style="position: relative; height: 100px;">
+    <!-- Hover trigger area -->
+    <div id="header-hover-trigger" style="position: fixed; top: 0; left: 0; right: 0; height: 80px; z-index: 999;"></div>
+
     <!-- Start Navigation Area -->
     <div class="main-menu">
         <nav class="header-section pin-style">
@@ -198,8 +201,89 @@
 
 <!-- Custom CSS for Responsive Behavior -->
 <style>
-    /* Hide the Stumble button on large screens */
+    /* Auto-hide header styles */
+    #auto-hide-header {
+        transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    }
 
+    #auto-hide-header.header-hidden {
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+    }
 
-    /* Show Stumble button only on mobile screens */
+    #auto-hide-header.header-visible {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    #header-hover-trigger {
+        pointer-events: all;
+    }
+
+    /* Ensure header-section is positioned correctly */
+    .header-section {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const header = document.getElementById('auto-hide-header');
+        const hoverTrigger = document.getElementById('header-hover-trigger');
+        let hideTimeout;
+        let isHidden = false;
+
+        // Function to hide header
+        function hideHeader() {
+            header.classList.add('header-hidden');
+            header.classList.remove('header-visible');
+            isHidden = true;
+        }
+
+        // Function to show header
+        function showHeader() {
+            header.classList.remove('header-hidden');
+            header.classList.add('header-visible');
+            isHidden = false;
+        }
+
+        // Auto-hide after 5 seconds on page load
+        hideTimeout = setTimeout(() => {
+            hideHeader();
+        }, 5000);
+
+        // Show header when hovering over trigger area
+        hoverTrigger.addEventListener('mouseenter', function() {
+            if (isHidden) {
+                showHeader();
+            }
+        });
+
+        // Hide header when mouse leaves header area
+        header.addEventListener('mouseleave', function() {
+            if (!isHidden) {
+                setTimeout(() => {
+                    hideHeader();
+                }, 1000); // Delay before hiding
+            }
+        });
+
+        // Cancel auto-hide if user interacts with header before 5 seconds
+        header.addEventListener('mouseenter', function() {
+            clearTimeout(hideTimeout);
+            showHeader();
+        });
+
+        // Also show header on any click within the header
+        header.addEventListener('click', function() {
+            clearTimeout(hideTimeout);
+            showHeader();
+        });
+    });
+</script>
