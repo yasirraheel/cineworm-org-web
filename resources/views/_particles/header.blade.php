@@ -239,7 +239,6 @@
         let autoHideTimeout;
         let delayedHideTimeout;
         let isHidden = false;
-        let isHovering = false;
 
         // Function to hide header
         function hideHeader() {
@@ -250,6 +249,8 @@
 
         // Function to show header
         function showHeader() {
+            clearTimeout(autoHideTimeout);
+            clearTimeout(delayedHideTimeout);
             header.classList.remove('header-hidden');
             header.classList.add('header-visible');
             isHidden = false;
@@ -257,48 +258,57 @@
 
         // Auto-hide after 5 seconds on page load
         autoHideTimeout = setTimeout(() => {
-            if (!isHovering) {
-                hideHeader();
-            }
+            hideHeader();
         }, 5000);
 
         // Show header when hovering over trigger area
         hoverTrigger.addEventListener('mouseenter', function() {
-            isHovering = true;
-            clearTimeout(autoHideTimeout);
-            clearTimeout(delayedHideTimeout);
             showHeader();
         });
 
-        hoverTrigger.addEventListener('mouseleave', function() {
-            isHovering = false;
+        // Delay hide when leaving trigger area
+        hoverTrigger.addEventListener('mouseleave', function(e) {
+            // Check if mouse is moving to the header
+            const rect = header.getBoundingClientRect();
+            if (e.clientY > rect.bottom) {
+                // Mouse moved down, away from header
+                delayedHideTimeout = setTimeout(() => {
+                    hideHeader();
+                }, 800);
+            }
         });
 
         // Keep header visible when mouse enters header
         header.addEventListener('mouseenter', function() {
-            isHovering = true;
-            clearTimeout(autoHideTimeout);
-            clearTimeout(delayedHideTimeout);
             showHeader();
         });
 
-        // Set timeout to hide when mouse leaves header
+        // Delay hide when mouse leaves header
         header.addEventListener('mouseleave', function(e) {
-            isHovering = false;
-
-            // Only hide if mouse is not moving to trigger area
-            delayedHideTimeout = setTimeout(() => {
-                if (!isHovering) {
+            // Only hide if mouse is moving down (away from top)
+            if (e.clientY > 100) {
+                delayedHideTimeout = setTimeout(() => {
                     hideHeader();
-                }
-            }, 500);
+                }, 800);
+            }
         });
 
-        // Also show header on any click within the header
+        // Cancel hide on any interaction within header
         header.addEventListener('click', function() {
-            clearTimeout(autoHideTimeout);
-            clearTimeout(delayedHideTimeout);
             showHeader();
         });
+
+        // Also respond to scroll - show header when scrolling up near top
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop < 100 && scrollTop < lastScrollTop) {
+                // Near top and scrolling up
+                showHeader();
+            }
+
+            lastScrollTop = scrollTop;
+        }, false);
     });
 </script>
