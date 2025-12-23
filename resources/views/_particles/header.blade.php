@@ -1,5 +1,5 @@
 <!-- Start Header -->
-<header id="auto-hide-header" style="position: relative; height: 100px;">
+<header id="auto-hide-header">
     <!-- Hover trigger area -->
     <div id="header-hover-trigger" style="position: fixed; top: 0; left: 0; right: 0; height: 80px; z-index: 999;"></div>
 
@@ -203,6 +203,12 @@
 <style>
     /* Auto-hide header styles */
     #auto-hide-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        height: 100px;
         transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
     }
 
@@ -224,11 +230,21 @@
 
     /* Ensure header-section is positioned correctly */
     .header-section {
-        position: fixed;
+        position: relative;
         top: 0;
         left: 0;
         right: 0;
         z-index: 1000;
+    }
+
+    /* Body padding to accommodate header */
+    body {
+        padding-top: 100px;
+        transition: padding-top 0.4s ease-in-out;
+    }
+
+    body.header-is-hidden {
+        padding-top: 0;
     }
 </style>
 
@@ -244,6 +260,7 @@
         function hideHeader() {
             header.classList.add('header-hidden');
             header.classList.remove('header-visible');
+            document.body.classList.add('header-is-hidden');
             isHidden = true;
         }
 
@@ -253,6 +270,7 @@
             clearTimeout(delayedHideTimeout);
             header.classList.remove('header-hidden');
             header.classList.add('header-visible');
+            document.body.classList.remove('header-is-hidden');
             isHidden = false;
         }
 
