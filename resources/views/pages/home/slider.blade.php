@@ -22,8 +22,6 @@
                                     {{ $button->title }}
                                 </a>
                             @endforeach
-                        @else
-                            <p>No buttons available.</p>
                         @endif
                     </div>
                 </div>
