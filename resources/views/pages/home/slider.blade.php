@@ -726,26 +726,31 @@
                 });
 
                 // Header visibility observer for Next button
-                var header = document.querySelector('header');
-                var nextBtn = document.getElementById('footer-next-btn');
+                function checkHeaderVisibility() {
+                    var header = document.querySelector('header');
+                    var nextBtn = document.getElementById('footer-next-btn');
+                    
+                    if (!header || !nextBtn) return;
 
-                if (header && nextBtn) {
-                    var observer = new IntersectionObserver(function(entries) {
-                        entries.forEach(function(entry) {
-                            // Check if header is not intersecting (hidden or scrolled out)
-                            // Also check if boundingClientRect.top is negative (scrolled past) or if it's just hidden
-                            if (!entry.isIntersecting || entry.intersectionRatio === 0) {
-                                nextBtn.style.display = 'inline-flex';
-                            } else {
-                                nextBtn.style.display = 'none';
-                            }
-                        });
-                    }, { threshold: 0 });
+                    var style = window.getComputedStyle(header);
+                    var isHidden = style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0';
+                    var rect = header.getBoundingClientRect();
+                    var isScrolledOut = rect.bottom < 0;
 
-                    observer.observe(header);
-                } else if (!header && nextBtn) {
-                     nextBtn.style.display = 'inline-flex';
+                    if (isHidden || isScrolledOut) {
+                        nextBtn.style.display = 'inline-flex';
+                    } else {
+                        nextBtn.style.display = 'none';
+                    }
                 }
+
+                // Check on scroll, resize, and periodically
+                window.addEventListener('scroll', checkHeaderVisibility);
+                window.addEventListener('resize', checkHeaderVisibility);
+                setInterval(checkHeaderVisibility, 500); // Check every 500ms for manual hiding
+                
+                // Initial check
+                checkHeaderVisibility();
             });
         </script>
     </div>
