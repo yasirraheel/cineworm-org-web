@@ -156,11 +156,42 @@ class IndexController extends Controller
 
         $news_tickers = NewsTicker::where('status', 1)->orderBy('is_breaking', 'desc')->orderBy('created_at', 'desc')->get();
 
+        $rss_news = [];
+        try {
+            $rss_content = @file_get_contents('https://rss.dw.com/xml/rss-en-all');
+            if ($rss_content) {
+                 $rss = simplexml_load_string($rss_content);
+                 if ($rss) {
+                    $count = 0;
+                    foreach ($rss->channel->item as $item) {
+                        if($count >= 20) break; // Limit to 20 items
+
+                        $image = '';
+                        // Try to find image
+                        if (isset($item->enclosure) && isset($item->enclosure['url'])) {
+                             $image = (string)$item->enclosure['url'];
+                        }
+
+                        $rss_news[] = [
+                            'headline' => (string)$item->title,
+                            'details' => (string)$item->description,
+                            'created_at' => (string)$item->pubDate,
+                            'link' => (string)$item->link,
+                            'image' => $image
+                        ];
+                        $count++;
+                    }
+                 }
+            }
+        } catch (\Exception $e) {
+             \Log::error("RSS Fetch Error: " . $e->getMessage());
+        }
+
         if(request()->getHost() != 'home.cineworm.org'){
-            return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers'));
+            return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers', 'rss_news'));
 
         }
-        return view('pages.index_home', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers'));
+        return view('pages.index_home', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers', 'rss_news'));
     }
 
     public function home_collections($slug, $id)
