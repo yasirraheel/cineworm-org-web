@@ -179,6 +179,12 @@
                     <i class="fas fa-share-alt"></i>
                     <span>{{ trans('words.share_text') }}</span>
                 </button>
+
+                <!-- Next Button (Hidden by default, shown when header disappears) -->
+                <a href="{{ URL::to('/') }}" class="action-btn next-btn" id="footer-next-btn" style="display: none;">
+                    <i class="fas fa-step-forward"></i>
+                    <span>Next</span>
+                </a>
             </div>
         </div>
 
@@ -545,6 +551,19 @@
                 color: #ffffff;
             }
 
+            /* Next Button */
+            .next-btn {
+                background: linear-gradient(90deg, #2c3e50, #4ca1af);
+                box-shadow: 0 2px 8px rgba(44, 62, 80, 0.25);
+            }
+
+            .next-btn:hover {
+                background: linear-gradient(90deg, #4ca1af, #2c3e50);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(44, 62, 80, 0.4);
+                color: #ffffff;
+            }
+
             /* Player Footer Meta */
             .player-footer-meta {
                 display: flex;
@@ -705,6 +724,28 @@
                         }
                     });
                 });
+
+                // Header visibility observer for Next button
+                var header = document.querySelector('header');
+                var nextBtn = document.getElementById('footer-next-btn');
+
+                if (header && nextBtn) {
+                    var observer = new IntersectionObserver(function(entries) {
+                        entries.forEach(function(entry) {
+                            // Check if header is not intersecting (hidden or scrolled out)
+                            // Also check if boundingClientRect.top is negative (scrolled past) or if it's just hidden
+                            if (!entry.isIntersecting || entry.intersectionRatio === 0) {
+                                nextBtn.style.display = 'inline-flex';
+                            } else {
+                                nextBtn.style.display = 'none';
+                            }
+                        });
+                    }, { threshold: 0 });
+
+                    observer.observe(header);
+                } else if (!header && nextBtn) {
+                     nextBtn.style.display = 'inline-flex';
+                }
             });
         </script>
     </div>
