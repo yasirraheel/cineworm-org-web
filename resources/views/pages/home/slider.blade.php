@@ -247,6 +247,13 @@
         </div>
         <!-- End Social Media Icon Popup -->
 
+        @if(request()->getHost() != 'home.cineworm.org')
+            <!-- Mobile News Ticker Section -->
+            <div class="d-md-none mt-3">
+                 @include('pages.home.news_ticker')
+            </div>
+        @endif
+
         <style>
             /* Sidebar Containers */
             .sidebar-buttons-container {
