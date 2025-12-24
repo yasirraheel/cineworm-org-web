@@ -112,32 +112,57 @@
             </div>
             @if (request()->getHost() != 'home.cineworm.org')
                 <!-- Right Side News Ticker -->
-                <div class="col-md-3 col-lg-3 col-xl-3 d-none d-md-flex flex-column justify-content-start">
+                <div class="col-md-3 col-lg-3 col-xl-3 d-flex flex-column justify-content-start">
 
                      <div class="news-ticker-container">
                         <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
                             Latest News
                         </h4>
-                        @if(isset($news_tickers) && count($news_tickers) > 0)
-                            @foreach($news_tickers as $news)
-                                <div class="news-item">
-                                    <div class="news-headline">
-                                        @if($news->is_breaking)
-                                            <span class="breaking-badge">BREAKING</span>
-                                        @endif
-                                        {{ $news->headline }}
-                                    </div>
-                                    <div class="news-details">
-                                        {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
-                                    </div>
-                                    <span class="news-time">
-                                        <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
-                                    </span>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="text-white">No news available.</div>
-                        @endif
+
+                        <div class="news-scroll-mask">
+                            <div class="news-scroll-content @if(isset($news_tickers) && count($news_tickers) > 2) scrolling @endif">
+                                @if(isset($news_tickers) && count($news_tickers) > 0)
+                                    @foreach($news_tickers as $news)
+                                        <div class="news-item">
+                                            <div class="news-headline">
+                                                @if($news->is_breaking)
+                                                    <span class="breaking-badge">BREAKING</span>
+                                                @endif
+                                                {{ $news->headline }}
+                                            </div>
+                                            <div class="news-details">
+                                                {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                            </div>
+                                            <span class="news-time">
+                                                <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                    @endforeach
+
+                                    @if(count($news_tickers) > 2)
+                                        <!-- Duplicate for smooth infinite scroll -->
+                                        @foreach($news_tickers as $news)
+                                            <div class="news-item">
+                                                <div class="news-headline">
+                                                    @if($news->is_breaking)
+                                                        <span class="breaking-badge">BREAKING</span>
+                                                    @endif
+                                                    {{ $news->headline }}
+                                                </div>
+                                                <div class="news-details">
+                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                                </div>
+                                                <span class="news-time">
+                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                @else
+                                    <div class="text-white">No news available.</div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
 
                     <div class="sidebar-banners-container mt-3">
