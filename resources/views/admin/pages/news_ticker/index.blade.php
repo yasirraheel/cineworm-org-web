@@ -5,14 +5,14 @@
 <div class="content-page">
     <div class="content">
         <div class="container-fluid">
-            
+
             <div class="row">
                 <div class="col-12">
                     <div class="card-box">
                         <h4 class="header-title m-t-0 m-b-30">{{ $page_title }}</h4>
 
                         {!! Form::open(array('url' => array('admin/news_ticker/save'),'class'=>'form-horizontal','name'=>'news_form','id'=>'news_form','role'=>'form','enctype' => 'multipart/form-data')) !!}
-                        
+
                         <input type="hidden" name="id" value="{{ isset($edit) ? $edit->id : '' }}">
 
                         <div class="form-group row">
@@ -77,7 +77,7 @@
                             </thead>
                             <tbody>
                                 @foreach($list as $item)
-                                <tr>
+                                <tr style="background-color: #323b49;">
                                     <td>{{ $item->headline }}</td>
                                     <td>
                                         @if($item->is_breaking)

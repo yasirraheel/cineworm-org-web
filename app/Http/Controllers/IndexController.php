@@ -25,6 +25,7 @@ use Intervention\Image\Facades\Image;
 
 
 
+use App\Models\NewsTicker;
 use ProtoneMedia\LaravelFFMpeg;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider;
@@ -153,11 +154,13 @@ class IndexController extends Controller
         $home_sections = HomeSections::where('status', 1)->orderby('id')->get();
         // user_has_liked
 
+        $news_tickers = NewsTicker::where('status', 1)->orderBy('is_breaking', 'desc')->orderBy('created_at', 'desc')->get();
+
         if(request()->getHost() != 'home.cineworm.org'){
-            return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked'));
+            return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers'));
 
         }
-        return view('pages.index_home', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked'));
+        return view('pages.index_home', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers'));
     }
 
     public function home_collections($slug, $id)
