@@ -27,7 +27,7 @@
             width: 100%;
             height: 100%;
         }
-    </style> 
+    </style>
 </head>
 <body>
     <div class="slider-area">
@@ -235,12 +235,12 @@
                 thumbnailsPreviewHeight: 110
             });
 
-           
+
         });
     </script>
-    
-    
-   
+
+
+
 
 
 

@@ -6,7 +6,7 @@
 
 <div class="slider-area p-0">
     <div class="container-fluid px-0">
-        
+
 
             <!-- Video Player -->
             <!--<div class="col-md-7 px-md-5">-->
@@ -25,7 +25,7 @@
                 @endif
             <!--</div>-->
 
-       
+
     </div>
 
 

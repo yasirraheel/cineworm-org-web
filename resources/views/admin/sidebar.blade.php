@@ -12,6 +12,8 @@
                                 class="fa fa-language"></i><span>{{ trans('words.language_text') }}</span></a></li>
                     <li><a href="{{ URL::to('admin/genres') }}" class="waves-effect {{ classActivePath('genres') }}"><i
                                 class="fa fa-list"></i><span>{{ trans('words.genres_text') }}</span></a></li>
+                    <li><a href="{{ URL::to('admin/news_ticker') }}" class="waves-effect {{ classActivePath('news_ticker') }}"><i
+                                class="fa fa-newspaper-o"></i><span>News Ticker</span></a></li>
 
                     <li class="has_sub">
                         <a href="javascript:void(0);" class="waves-effect">
