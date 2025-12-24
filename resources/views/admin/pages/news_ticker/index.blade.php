@@ -66,7 +66,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card-box table-responsive">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>Headline</th>
@@ -77,7 +77,7 @@
                             </thead>
                             <tbody>
                                 @foreach($list as $item)
-                                <tr style="background-color: #323b49;">
+                                <tr>
                                     <td>{{ $item->headline }}</td>
                                     <td>
                                         @if($item->is_breaking)

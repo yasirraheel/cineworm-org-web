@@ -4,12 +4,80 @@
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+<style>
+    .news-ticker-container {
+        background: #1a1a1a;
+        height: 100%;
+        max-height: 600px; /* Limit height */
+        overflow-y: auto;
+        padding: 15px;
+        color: #fff;
+        border-radius: 5px;
+    }
+    .news-item {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 15px;
+    }
+    .news-item:last-child {
+        border-bottom: none;
+    }
+    .news-headline {
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #e50914;
+    }
+    .news-details {
+        font-size: 13px;
+        color: #ccc;
+        line-height: 1.4;
+    }
+    .news-time {
+        font-size: 11px;
+        color: #888;
+        margin-top: 5px;
+        display: block;
+    }
+    .breaking-badge {
+        background-color: #e50914;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        text-transform: uppercase;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+    /* Scrollbar styling */
+    .news-ticker-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .news-ticker-container::-webkit-scrollbar-track {
+        background: #111;
+    }
+    .news-ticker-container::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 3px;
+    }
+    .news-ticker-container::-webkit-scrollbar-thumb:hover {
+        background: #666;
+    }
+
+    @media (max-width: 767px) {
+        .news-ticker-container {
+            height: 300px; /* Fixed height for mobile */
+            margin-top: 15px;
+        }
+    }
+</style>
+
 <div class="slider-area p-0">
     <div class="container-fluid px-0">
         <div class="row g-3 align-items-stretch">
             @if (request()->getHost() != 'home.cineworm.org')
                 <!-- Left Side Buttons -->
-                <div class="col-md-2 col-lg-2 col-xl-1 d-none d-md-flex justify-content-center align-items-center">
+                <div class="col-md-2 col-lg-2 col-xl-2 d-none d-md-flex justify-content-center align-items-center">
                     <div class="d-flex flex-column w-100 sidebar-buttons-container">
                         @php
                             $buttons = get_web_button_banner('buttons'); // Fetch all button components
@@ -27,7 +95,7 @@
                 </div>
             @endif
             <!-- Video Player -->
-            <div class="col-md-8 col-lg-8 col-xl-10">
+            <div class="col-md-7 col-lg-7 col-xl-7">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -43,9 +111,36 @@
                 @endif
             </div>
             @if (request()->getHost() != 'home.cineworm.org')
-                <!-- Right Side Banners -->
-                <div class="col-md-2 col-lg-2 col-xl-1 d-none d-md-flex flex-column justify-content-start">
-                    <div class="sidebar-banners-container">
+                <!-- Right Side News Ticker -->
+                <div class="col-md-3 col-lg-3 col-xl-3 d-none d-md-flex flex-column justify-content-start">
+
+                     <div class="news-ticker-container">
+                        <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
+                            Latest News
+                        </h4>
+                        @if(isset($news_tickers) && count($news_tickers) > 0)
+                            @foreach($news_tickers as $news)
+                                <div class="news-item">
+                                    <div class="news-headline">
+                                        @if($news->is_breaking)
+                                            <span class="breaking-badge">BREAKING</span>
+                                        @endif
+                                        {{ $news->headline }}
+                                    </div>
+                                    <div class="news-details">
+                                        {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                    </div>
+                                    <span class="news-time">
+                                        <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-white">No news available.</div>
+                        @endif
+                    </div>
+
+                    <div class="sidebar-banners-container mt-3">
                         @if ($banners->isNotEmpty())
                             @foreach ($banners as $banner)
                                 <div class="banner-item">
