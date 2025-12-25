@@ -8,7 +8,6 @@
     .news-ticker-container {
         background: #1a1a1a;
         height: 100%;
-        max-height: 600px; /* Limit height */
         overflow-y: auto;
         padding: 15px;
         color: #fff;
@@ -62,6 +61,12 @@
     }
     .news-ticker-container::-webkit-scrollbar-thumb:hover {
         background: #666;
+    }
+
+    /* Make columns equal height */
+    .align-items-stretch > [class*='col-'] {
+        display: flex;
+        flex-direction: column;
     }
 
     @media (max-width: 767px) {
