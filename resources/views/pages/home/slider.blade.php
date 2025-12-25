@@ -783,6 +783,86 @@
                         clearInterval(checkInterval);
                     }
                 }, 500);
+
+                // Auto-scroll news ticker
+                function autoScrollTicker() {
+                    var ticker = document.querySelector('.news-ticker-container');
+                    if (!ticker) return;
+
+                    var scrollSpeed = 1; // pixels per interval
+                    var scrollInterval = 50; // milliseconds
+                    var pauseAtEnd = 2000; // pause at end before restarting (ms)
+                    var pauseAtTop = 3000; // pause at top before starting (ms)
+                    var isScrolling = false;
+                    var hasStarted = false;
+
+                    // Pause at top before starting
+                    setTimeout(function() {
+                        hasStarted = true;
+                        startScrolling();
+                    }, pauseAtTop);
+
+                    function startScrolling() {
+                        if (isScrolling) return;
+                        isScrolling = true;
+
+                        var scrollTimer = setInterval(function() {
+                            if (!ticker) {
+                                clearInterval(scrollTimer);
+                                return;
+                            }
+
+                            // Check if we've reached the bottom
+                            if (ticker.scrollTop + ticker.clientHeight >= ticker.scrollHeight - 5) {
+                                clearInterval(scrollTimer);
+                                isScrolling = false;
+
+                                // Pause at bottom, then scroll back to top
+                                setTimeout(function() {
+                                    ticker.scrollTo({
+                                        top: 0,
+                                        behavior: 'smooth'
+                                    });
+
+                                    // Wait for smooth scroll to complete, then restart
+                                    setTimeout(function() {
+                                        startScrolling();
+                                    }, pauseAtTop);
+                                }, pauseAtEnd);
+                            } else {
+                                // Scroll down smoothly
+                                ticker.scrollTop += scrollSpeed;
+                            }
+                        }, scrollInterval);
+                    }
+
+                    // Pause scrolling on hover
+                    ticker.addEventListener('mouseenter', function() {
+                        scrollSpeed = 0;
+                    });
+
+                    ticker.addEventListener('mouseleave', function() {
+                        if (hasStarted) {
+                            scrollSpeed = 1;
+                        }
+                    });
+
+                    // Pause scrolling on touch/click for mobile
+                    ticker.addEventListener('touchstart', function() {
+                        scrollSpeed = 0;
+                    });
+
+                    ticker.addEventListener('touchend', function() {
+                        setTimeout(function() {
+                            if (hasStarted) {
+                                scrollSpeed = 1;
+                            }
+                        }, 3000); // Resume after 3 seconds
+                    });
+                }
+
+                // Start auto-scroll after a brief delay
+                setTimeout(autoScrollTicker, 1000);
             });
         </script>
     </div>
