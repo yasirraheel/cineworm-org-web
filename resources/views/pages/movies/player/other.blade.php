@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Customized Video Player</title>
     <!-- Include Plyr CSS -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css">
@@ -235,7 +238,7 @@
                 thumbnailsPreviewHeight: 110
             });
 
-            // Force unmute and autoplay
+            // Force unmute and autoplay - multiple attempts
             setTimeout(function() {
                 if (player && player.setVolume) {
                     player.setVolume(1);
@@ -244,6 +247,24 @@
                     player.play();
                 }
             }, 500);
+
+            setTimeout(function() {
+                if (player && player.setVolume) {
+                    player.setVolume(1);
+                }
+                if (player && player.play) {
+                    player.play();
+                }
+            }, 1000);
+
+            setTimeout(function() {
+                if (player && player.setVolume) {
+                    player.setVolume(1);
+                }
+                if (player && player.play) {
+                    player.play();
+                }
+            }, 2000);
 
         });
     </script>
@@ -257,44 +278,157 @@
 
      <!-- Custom Script to Auto-click the Unmute Button and Force Autoplay -->
     <script type="text/javascript">
-        $(document).ready(function() {
-            // Multiple attempts to ensure autoplay and unmute
+        // Disable cache to ensure fresh load
+        if (performance.navigation.type !== 1) {
+            // Not a reload, force cache clear
+            window.onbeforeunload = function() {
+                window.scrollTo(0, 0);
+            };
+        }
+
+        // Run immediately without waiting for ready
+        (function forceAutoplayImmediately() {
             var attempts = 0;
-            var maxAttempts = 10;
+            var maxAttempts = 20;
 
             var forceAutoplay = setInterval(function() {
                 attempts++;
 
                 // Try to click any unmute button
-                $("*:contains('Click to Unmute')").each(function() {
-                    if ($(this).text().trim() === 'Click to Unmute') {
-                        $(this).click();
+                var unmuteElements = document.querySelectorAll('*');
+                unmuteElements.forEach(function(elem) {
+                    if (elem.textContent && elem.textContent.trim() === 'Click to Unmute') {
+                        elem.click();
                     }
                 });
 
-                // Try to find and click muted button
-                $('.fwdevp-volume-button').click();
-
-                // Stop after max attempts
-                if (attempts >= maxAttempts) {
-                    clearInterval(forceAutoplay);
-                }
-            }, 500);
-
-            // Also try on window load
-            $(window).on('load', function() {
-                setTimeout(function() {
+                // Try jQuery if available
+                if (typeof $ !== 'undefined') {
                     $("*:contains('Click to Unmute')").each(function() {
                         if ($(this).text().trim() === 'Click to Unmute') {
                             $(this).click();
                         }
                     });
 
-                    // Force play if paused
+                    // Try to click volume button
+                    $('.fwdevp-volume-button').click();
+
+                    // Try to click play button
                     $('.fwdevp-play-button').click();
-                }, 1000);
-            });
+                }
+
+                // Stop after max attempts
+                if (attempts >= maxAttempts) {
+                    clearInterval(forceAutoplay);
+                }
+            }, 300);
+        })();
+
+        // Also run on document ready
+        $(document).ready(function() {
+            setTimeout(function() {
+                $("*:contains('Click to Unmute')").each(function() {
+                    if ($(this).text().trim() === 'Click to Unmute') {
+                        $(this).click();
+                    }
+                });
+
+                $('.fwdevp-volume-button').click();
+                $('.fwdevp-play-button').click();
+            }, 500);
         });
+
+        // Also run on window load
+        $(window).on('load', function() {
+            setTimeout(function() {
+                $("*:contains('Click to Unmute')").each(function() {
+                    if ($(this).text().trim() === 'Click to Unmute') {
+                        $(this).click();
+                    }
+                });
+
+                $('.fwdevp-volume-button').click();
+                $('.fwdevp-play-button').click();
+            }, 500);
+
+            setTimeout(function() {
+                $('.fwdevp-volume-button').click();
+                $('.fwdevp-play-button').click();
+            }, 1500);
+        });
+
+        // Listen for any player ready events
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var playBtn = document.querySelector('.fwdevp-play-button');
+                var volBtn = document.querySelector('.fwdevp-volume-button');
+
+                if (playBtn) playBtn.click();
+                if (volBtn) volBtn.click();
+
+                // Also try to directly manipulate video elements
+                var videos = document.querySelectorAll('video');
+                videos.forEach(function(video) {
+                    video.muted = false;
+                    video.volume = 1;
+                    video.play().catch(function(e) {
+                        console.log('Autoplay prevented:', e);
+                    });
+                });
+
+                // Try iframes
+                var iframes = document.querySelectorAll('iframe');
+                iframes.forEach(function(iframe) {
+                    try {
+                        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        var iframeVideos = iframeDoc.querySelectorAll('video');
+                        iframeVideos.forEach(function(video) {
+                            video.muted = false;
+                            video.volume = 1;
+                            video.play();
+                        });
+                    } catch(e) {
+                        // Cross-origin, can't access
+                    }
+                });
+            }, 1000);
+
+            // Try again after 2 seconds
+            setTimeout(function() {
+                var videos = document.querySelectorAll('video');
+                videos.forEach(function(video) {
+                    video.muted = false;
+                    video.volume = 1;
+                    video.play().catch(function(e) {
+                        console.log('Autoplay prevented:', e);
+                    });
+                });
+            }, 2000);
+        });
+
+        // Force autoplay on any user interaction
+        var hasInteracted = false;
+        function forcePlayOnInteraction() {
+            if (hasInteracted) return;
+            hasInteracted = true;
+
+            var videos = document.querySelectorAll('video');
+            videos.forEach(function(video) {
+                video.muted = false;
+                video.volume = 1;
+                video.play();
+            });
+
+            if (typeof $ !== 'undefined') {
+                $('.fwdevp-volume-button').click();
+                $('.fwdevp-play-button').click();
+            }
+        }
+
+        // Listen for first interaction
+        document.addEventListener('click', forcePlayOnInteraction, { once: true });
+        document.addEventListener('touchstart', forcePlayOnInteraction, { once: true });
+        document.addEventListener('keydown', forcePlayOnInteraction, { once: true });
     </script>
 </body>
 </html>
