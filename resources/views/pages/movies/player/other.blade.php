@@ -54,7 +54,7 @@
              var isMobile = window.matchMedia("only screen and (max-width: 767px)").matches;
         var stickySetting = isMobile ? "yes" : "no";
          var controllerHideDelaySeconds = isMobile ? 1000 : 3;
-            FWDEVPlayer.videoStartBehaviour = "pause";
+            FWDEVPlayer.videoStartBehaviour = "play";
 
             var player = new FWDEVPlayer({
                 // Main settings
@@ -92,13 +92,13 @@
                 showPreloader: "yes",
                 preloaderColors: ["#999999", "#FFFFFF"],
                 addKeyboardSupport: "yes",
-                autoPlay: "{{ get_player_cong('autoplay') }}",
-                autoPlayText: "Click to Unmute",
+                autoPlay: "yes",
+                autoPlayText: "",
                 loop: "no",
                 scrubAtTimeAtFirstPlay: "00:00:00",
                 maxWidth: 1600,
                 maxHeight: 900,
-                volume: .8,
+                volume: 1,
                 greenScreenTolerance: 200,
                 backgroundColor: "#000000",
                 posterBackgroundColor: "#000000",
@@ -235,6 +235,15 @@
                 thumbnailsPreviewHeight: 110
             });
 
+            // Force unmute and autoplay
+            setTimeout(function() {
+                if (player && player.setVolume) {
+                    player.setVolume(1);
+                }
+                if (player && player.play) {
+                    player.play();
+                }
+            }, 500);
 
         });
     </script>
@@ -246,17 +255,46 @@
 
 
 
-     <!--Custom Script to Auto-click the Unmute Button -->
-    <!--<script type="text/javascript">-->
-    <!--    $(window).on('load', function() {-->
-    <!--        setTimeout(function() {-->
-    <!--            $("*:contains('Click to Unmute')").each(function() {-->
-    <!--                if ($(this).text().trim() === 'Click to Unmute') {-->
-    <!--                    $(this).click();-->
-    <!--                }-->
-    <!--            });-->
-    <!--        }, 5000); -->
-    <!--    });-->
-    <!--</script>-->
+     <!-- Custom Script to Auto-click the Unmute Button and Force Autoplay -->
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Multiple attempts to ensure autoplay and unmute
+            var attempts = 0;
+            var maxAttempts = 10;
+
+            var forceAutoplay = setInterval(function() {
+                attempts++;
+
+                // Try to click any unmute button
+                $("*:contains('Click to Unmute')").each(function() {
+                    if ($(this).text().trim() === 'Click to Unmute') {
+                        $(this).click();
+                    }
+                });
+
+                // Try to find and click muted button
+                $('.fwdevp-volume-button').click();
+
+                // Stop after max attempts
+                if (attempts >= maxAttempts) {
+                    clearInterval(forceAutoplay);
+                }
+            }, 500);
+
+            // Also try on window load
+            $(window).on('load', function() {
+                setTimeout(function() {
+                    $("*:contains('Click to Unmute')").each(function() {
+                        if ($(this).text().trim() === 'Click to Unmute') {
+                            $(this).click();
+                        }
+                    });
+
+                    // Force play if paused
+                    $('.fwdevp-play-button').click();
+                }, 1000);
+            });
+        });
+    </script>
 </body>
 </html>
