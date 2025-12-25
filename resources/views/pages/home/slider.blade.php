@@ -7,7 +7,6 @@
 <style>
     .news-ticker-container {
         background: #1a1a1a;
-        height: 100%;
         overflow-y: auto;
         padding: 15px;
         color: #fff;
@@ -61,12 +60,6 @@
     }
     .news-ticker-container::-webkit-scrollbar-thumb:hover {
         background: #666;
-    }
-
-    /* Make columns equal height */
-    .align-items-stretch > [class*='col-'] {
-        display: flex;
-        flex-direction: column;
     }
 
     @media (max-width: 767px) {
@@ -756,6 +749,40 @@
                 
                 // Initial check
                 checkHeaderVisibility();
+
+                // Match news ticker height with player height
+                function matchTickerToPlayerHeight() {
+                    // Only apply on desktop (md and above)
+                    if (window.innerWidth >= 768) {
+                        var player = document.getElementById('viavi_player');
+                        var ticker = document.querySelector('.news-ticker-container');
+
+                        if (player && ticker) {
+                            var playerHeight = player.offsetHeight;
+                            ticker.style.height = playerHeight + 'px';
+                        }
+                    } else {
+                        // Reset height on mobile
+                        var ticker = document.querySelector('.news-ticker-container');
+                        if (ticker) {
+                            ticker.style.height = '';
+                        }
+                    }
+                }
+
+                // Call on load, resize, and periodically to catch player initialization
+                window.addEventListener('resize', matchTickerToPlayerHeight);
+                window.addEventListener('load', matchTickerToPlayerHeight);
+
+                // Check periodically for the first few seconds after page load (player takes time to initialize)
+                var attempts = 0;
+                var checkInterval = setInterval(function() {
+                    matchTickerToPlayerHeight();
+                    attempts++;
+                    if (attempts > 20) { // Stop after ~10 seconds
+                        clearInterval(checkInterval);
+                    }
+                }, 500);
             });
         </script>
     </div>
