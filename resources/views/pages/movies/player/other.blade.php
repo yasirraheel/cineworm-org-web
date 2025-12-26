@@ -51,7 +51,10 @@
         var currentVideoIndex = 0;
 
         var currentUrl = window.location.pathname;
-        var redirectURL = currentUrl === '/' ? "{{ url('/') }}" : "{{ url('movies/watch/' . $random_movie->video_slug . '/' . $random_movie->id) }}";
+        @php
+            $redirect_movie = isset($random_movie) ? $random_movie : $movies_info;
+        @endphp
+        var redirectURL = currentUrl === '/' ? "{{ url('/') }}" : "{{ url('movies/watch/' . $redirect_movie->video_slug . '/' . $redirect_movie->id) }}";
 
         FWDEVPUtils.onReady(function() {
              var isMobile = window.matchMedia("only screen and (max-width: 767px)").matches;
