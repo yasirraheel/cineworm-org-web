@@ -196,65 +196,78 @@ class IndexController extends Controller
 
     public function getRandomMovie(Request $request)
     {
-        // Fetch the previously selected video IDs from the session
-        $previousVideos = Session::get('previous_videos', []);
+        try {
+            // Fetch the previously selected video IDs from the session
+            $previousVideos = Session::get('previous_videos', []);
 
-        // Fetch a random movie that hasn't been selected before
-        $movies_info = Movies::where('status', 1)
-            ->where('upcoming', 0)
-            ->whereNotIn('id', $previousVideos)
-            ->inRandomOrder()
-            ->first();
-
-        // If no more new movies are available, reset the session
-        if (!$movies_info) {
-            Session::forget('previous_videos');
-            $previousVideos = [];
+            // Fetch a random movie that hasn't been selected before
             $movies_info = Movies::where('status', 1)
                 ->where('upcoming', 0)
+                ->whereNotIn('id', $previousVideos)
                 ->inRandomOrder()
                 ->first();
-        }
 
-        if ($movies_info) {
+            // If no more new movies are available, reset the session
+            if (!$movies_info) {
+                Session::forget('previous_videos');
+                $previousVideos = [];
+                $movies_info = Movies::where('status', 1)
+                    ->where('upcoming', 0)
+                    ->inRandomOrder()
+                    ->first();
+            }
+
+            // If still no movies found, return error
+            if (!$movies_info) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No videos available at the moment'
+                ], 404);
+            }
+
+            // Add to previous videos
             $previousVideos[] = $movies_info->id;
             Session::put('previous_videos', $previousVideos);
-        }
 
-        // Check if user has liked
-        if (Auth::check()) {
-            $user_has_liked = Like::where('movie_video_id', $movies_info->id)
-                ->where('user_id', Auth::id())
-                ->first();
-        } else {
-            $user_has_liked = null;
-        }
-
-        // Return player HTML based on video type
-        if ($movies_info && $movies_info->video_url != '') {
-            if ($movies_info->video_type == 'GoogleDrive') {
-                $playerHtml = view('pages.movies.player.google_drive_player', compact('movies_info', 'user_has_liked'))->render();
+            // Check if user has liked
+            if (Auth::check()) {
+                $user_has_liked = Like::where('movie_video_id', $movies_info->id)
+                    ->where('user_id', Auth::id())
+                    ->first();
             } else {
-                $playerHtml = view('pages.movies.player.other', compact('movies_info', 'user_has_liked'))->render();
+                $user_has_liked = null;
             }
-        } else {
-            $playerHtml = '<div style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011; border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">NO Source URL Set</div>';
-        }
 
-        $movieInfo = null;
-        if ($movies_info) {
+            // Return player HTML based on video type
+            if ($movies_info->video_url != '') {
+                if ($movies_info->video_type == 'GoogleDrive') {
+                    $playerHtml = view('pages.movies.player.google_drive_player', compact('movies_info', 'user_has_liked'))->render();
+                } else {
+                    $playerHtml = view('pages.movies.player.other', compact('movies_info', 'user_has_liked'))->render();
+                }
+            } else {
+                $playerHtml = '<div style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011; border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">NO Source URL Set</div>';
+            }
+
             $movieInfo = [
                 'id' => $movies_info->id,
                 'title' => $movies_info->video_title,
                 'slug' => $movies_info->video_slug
             ];
-        }
 
-        return response()->json([
-            'success' => true,
-            'playerHtml' => $playerHtml,
-            'movieInfo' => $movieInfo
-        ]);
+            return response()->json([
+                'success' => true,
+                'playerHtml' => $playerHtml,
+                'movieInfo' => $movieInfo
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('getRandomMovie error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function home_collections($slug, $id)
