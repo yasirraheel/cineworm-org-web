@@ -25,23 +25,49 @@
 
 <!-- Setup FWDEVPlayer -->
 <script type="text/javascript">
-    var videoUrls = [
-        "{{ base64_encode($movies_info->video_url) }}",
-    ];
+    (function() {
+        console.log('Initializing FWDEVPlayer via AJAX');
 
-    var currentVideoIndex = 0;
+        var videoUrls = [
+            "{{ base64_encode($movies_info->video_url) }}",
+        ];
 
-    var currentUrl = window.location.pathname;
-    @php
-        $redirect_movie = isset($random_movie) ? $random_movie : $movies_info;
-    @endphp
-    var redirectURL = currentUrl === '/' ? "{{ url('/') }}" : "{{ url('movies/watch/' . $redirect_movie->video_slug . '/' . $redirect_movie->id) }}";
+        var currentVideoIndex = 0;
 
-    FWDEVPUtils.onReady(function() {
-         var isMobile = window.matchMedia("only screen and (max-width: 767px)").matches;
-    var stickySetting = isMobile ? "yes" : "no";
-     var controllerHideDelaySeconds = isMobile ? 1000 : 3;
-        FWDEVPlayer.videoStartBehaviour = "play";
+        var currentUrl = window.location.pathname;
+        @php
+            $redirect_movie = isset($random_movie) ? $random_movie : $movies_info;
+        @endphp
+        var redirectURL = currentUrl === '/' ? "{{ url('/') }}" : "{{ url('movies/watch/' . $redirect_movie->video_slug . '/' . $redirect_movie->id) }}";
+
+        // Initialize after a delay to ensure DOM is fully rendered
+        setTimeout(function() {
+            console.log('Attempting to initialize FWDEVPlayer');
+
+            // Check if the player container exists
+            var playerDiv = document.getElementById('viavi_player');
+            if (!playerDiv) {
+                console.error('viavi_player div not found in DOM!');
+                return;
+            }
+
+            console.log('Player div found:', playerDiv);
+
+            // Check if FWDEVPlayer library is loaded
+            if (typeof FWDEVPlayer === 'undefined') {
+                console.error('FWDEVPlayer library not loaded!');
+                return;
+            }
+
+            console.log('FWDEVPlayer library is available');
+
+            var isMobile = window.matchMedia("only screen and (max-width: 767px)").matches;
+            var stickySetting = isMobile ? "yes" : "no";
+            var controllerHideDelaySeconds = isMobile ? 1000 : 3;
+
+            FWDEVPlayer.videoStartBehaviour = "play";
+
+            console.log('Creating new FWDEVPlayer instance');
 
         var player = new FWDEVPlayer({
             // Main settings
@@ -250,5 +276,8 @@
             }
         }, 2000);
 
-    });
+            console.log('FWDEVPlayer instance created successfully:', player);
+
+        }, 500); // End setTimeout - wait 500ms for DOM to be fully rendered
+    })(); // End IIFE
 </script>
