@@ -385,6 +385,13 @@ class IndexController extends Controller
 
         if (Auth::attempt($credentials, $remember_me)) {
 
+            // Check if email is verified
+            if (Auth::user()->email_verified_at === null) {
+                \Auth::logout();
+                Session::flash('login_flash_error', 'required');
+                return redirect('/login')->withInput()->withErrors('Please verify your email address before logging in. Check your inbox for the verification link.');
+            }
+
             if (Auth::user()->status == '0' and Auth::user()->deleted_at != NULL) {
                 \Auth::logout();
 
@@ -551,29 +558,10 @@ class IndexController extends Controller
 
         $user->save();
 
-        //Welcome Email
+        // Send Email Verification
+        \App\Http\Controllers\Auth\EmailVerificationController::sendVerificationEmail($user);
 
-        try {
-            $user_name = $inputs['name'];
-            $user_email = $inputs['email'];
-
-            $data_email = array(
-                'name' => $user_name,
-                'email' => $user_email
-            );
-
-            \Mail::send('emails.welcome', $data_email, function ($message) use ($user_name, $user_email) {
-                $message->to($user_email, $user_name)
-                    ->from(getcong('site_email'), getcong('site_name'))
-                    ->subject('Welcome to ' . getcong('site_name'));
-            });
-        } catch (\Throwable $e) {
-
-            \Log::info($e->getMessage());
-        }
-
-
-        Session::flash('signup_flash_message', trans('words.account_created_successfully'));
+        Session::flash('signup_flash_message', 'Account created successfully! Please check your email to verify your account.');
 
         return redirect('signup');
     }

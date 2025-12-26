@@ -261,6 +261,9 @@ class AndroidApiController extends MainAPIController
 
                   $response[] = array('msg' => trans('words.account_banned'),'success'=>'0');
             }
+            else if($user_info->email_verified_at === null){
+                $response[] = array('msg' => 'Please verify your email address before logging in. Check your inbox for the verification link.','success'=>'0');
+            }
             else
             {
                 $user_id=$user_info->id;
@@ -600,28 +603,10 @@ class AndroidApiController extends MainAPIController
         $user->password= bcrypt($password);
         $user->save();
 
-        //Welcome Email
+        // Send Email Verification
+        \App\Http\Controllers\Auth\EmailVerificationController::sendVerificationEmail($user);
 
-        try{
-            $user_name=$name;
-            $user_email=$email;
-
-            $data_email = array(
-                'name' => $user_name,
-                'email' => $user_email
-                );
-
-            \Mail::send('emails.welcome', $data_email, function($message) use ($user_name,$user_email){
-                $message->to($user_email, $user_name)
-                ->from(getcong('site_email'), getcong('site_name'))
-                ->subject('Welcome to '.getcong('site_name'));
-            });
-        }catch (\Throwable $e) {
-
-                    \Log::info($e->getMessage());
-                }
-
-        $response[] = array('msg' => trans('words.account_created_successfully'),'success'=>'1');
+        $response[] = array('msg' => 'Account created successfully! Please check your email to verify your account.','success'=>'1');
         return \Response::json(array(
             'VIDEO_STREAMING_APP' => $response,
             'status_code' => 200

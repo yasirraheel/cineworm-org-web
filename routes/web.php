@@ -342,6 +342,11 @@ Route::get('auth/facebook/callback', 'Auth\FacebookController@handleFacebookCall
 Route::get('signup', 'IndexController@signup');
 Route::post('signup', 'IndexController@postSignup');
 
+// Email Verification Routes
+Route::get('email/verify', 'Auth\EmailVerificationController@notice')->name('verification.notice');
+Route::get('email/verify/{id}/{hash}', 'Auth\EmailVerificationController@verify')->name('verification.verify');
+Route::post('email/resend', 'Auth\EmailVerificationController@resend')->name('verification.resend');
+
 Route::get('logout', 'IndexController@logout');
 
 Route::get('logout_user_remotely/{session_id}', 'IndexController@logout_user_remotely');
