@@ -271,7 +271,18 @@ $(document).ready(function() {
                     console.log('Updating player container');
 
                     // Get the container as a DOM element
-                    var containerElement = $('.col-lg-9.col-md-12')[0];
+                    var $container = $('.col-lg-9.col-md-12');
+                    console.log('Found container:', $container.length);
+
+                    if ($container.length === 0) {
+                        console.error('Player container not found!');
+                        alert('Error: Player container not found on page');
+                        $('#stumble-text').text(originalText);
+                        $('#stumble-btn').css('pointer-events', 'auto');
+                        return;
+                    }
+
+                    var containerElement = $container[0];
 
                     // Create a temporary div to parse the HTML
                     var $temp = $('<div>').html(response.playerHtml);
