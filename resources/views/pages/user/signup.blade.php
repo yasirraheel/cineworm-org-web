@@ -80,7 +80,8 @@ function verifyCaptcha() {
             <button class="btn-submit btn-block mb-4" type="submit">{{trans('words.sign_up')}}</button>
             {!! Form::close() !!}
             <p class="text-3 text-center mb-3">{{trans('words.already_sign_up')}} <a class="btn-link" href="{{ url('login') }}" title="login">{{trans('words.login_text')}}</a></p>
-              
+            <p class="text-3 text-center mb-3"><a href="{{ route('verification.notice') }}" class="btn-link" title="resend verification">Resend verification email</a></p>
+
              <div class="socail-login-item mx-auto w-100 text-center">
  
                 @if(getcong('facebook_login'))

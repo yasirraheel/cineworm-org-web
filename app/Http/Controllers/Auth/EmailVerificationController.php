@@ -30,12 +30,23 @@ class EmailVerificationController extends Controller
 
         // Check if the hash matches
         if (!hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
-            return redirect('/login')->with('flash_error', 'Invalid verification link.');
+            return redirect('/login')->with('login_flash_error', 'required')->withErrors('Invalid verification link.');
         }
 
         // Check if already verified
         if ($user->hasVerifiedEmail()) {
-            return redirect('/login')->with('flash_success', 'Email already verified. Please login.');
+            // Auto-login if already verified
+            Auth::login($user);
+            \Session::flash('flash_message', 'Email already verified. Welcome back!');
+
+            if($user->usertype=="Admin" OR $user->usertype=="Sub_Admin")
+            {
+                return redirect('/');
+            }
+            else
+            {
+                return redirect('dashboard');
+            }
         }
 
         // Mark email as verified
@@ -43,7 +54,19 @@ class EmailVerificationController extends Controller
             event(new Verified($user));
         }
 
-        return redirect('/login')->with('flash_success', 'Email verified successfully! You can now login.');
+        // Auto-login the user after verification
+        Auth::login($user);
+        \Session::flash('flash_message', 'Email verified successfully! Welcome to ' . getcong('site_name'));
+
+        // Redirect based on user type
+        if($user->usertype=="Admin" OR $user->usertype=="Sub_Admin")
+        {
+            return redirect('/');
+        }
+        else
+        {
+            return redirect('dashboard');
+        }
     }
 
     /**
