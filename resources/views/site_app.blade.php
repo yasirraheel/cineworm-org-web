@@ -275,11 +275,24 @@ $(document).ready(function() {
                     $('#stumble-btn').css('pointer-events', 'auto');
 
                     $('html, body').animate({ scrollTop: 0 }, 300);
+                } else {
+                    console.error('Server returned success=false:', response.error);
+                    alert('Error: ' + (response.error || 'Failed to load video'));
+
+                    $('#stumble-text').text(originalText);
+                    $('#stumble-btn').css('pointer-events', 'auto');
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Error loading random movie:', error);
-                alert('Failed to load video. Please try again.');
+                console.error('AJAX Error:', {xhr: xhr, status: status, error: error});
+                console.error('Response Text:', xhr.responseText);
+
+                var errorMsg = 'Failed to load video. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                }
+
+                alert(errorMsg);
 
                 $('#stumble-text').text(originalText);
                 $('#stumble-btn').css('pointer-events', 'auto');
