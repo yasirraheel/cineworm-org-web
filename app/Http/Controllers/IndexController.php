@@ -241,12 +241,12 @@ class IndexController extends Controller
             // Set random_movie (same as movies_info for player compatibility)
             $random_movie = $movies_info;
 
-            // Return player HTML based on video type
+            // Return player HTML based on video type (AJAX-specific templates without full HTML structure)
             if ($movies_info->video_url != '') {
                 if ($movies_info->video_type == 'GoogleDrive') {
-                    $playerHtml = view('pages.movies.player.google_drive_player', compact('movies_info', 'user_has_liked', 'random_movie'))->render();
+                    $playerHtml = view('pages.movies.player.google_drive_player_ajax', compact('movies_info', 'user_has_liked', 'random_movie'))->render();
                 } else {
-                    $playerHtml = view('pages.movies.player.other', compact('movies_info', 'user_has_liked', 'random_movie'))->render();
+                    $playerHtml = view('pages.movies.player.other_ajax', compact('movies_info', 'user_has_liked', 'random_movie'))->render();
                 }
             } else {
                 $playerHtml = '<div style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011; border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">NO Source URL Set</div>';
