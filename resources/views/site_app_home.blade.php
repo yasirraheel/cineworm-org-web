@@ -266,8 +266,8 @@ $(document).ready(function() {
                 if (response.success) {
                     console.log('Updating player container');
 
-                    // Get the container
-                    var $container = $('.col-lg-9.col-md-12');
+                    // Get the container as a DOM element
+                    var containerElement = $('.col-lg-9.col-md-12')[0];
 
                     // Create a temporary div to parse the HTML
                     var $temp = $('<div>').html(response.playerHtml);
@@ -283,7 +283,7 @@ $(document).ready(function() {
                     });
 
                     // Set HTML without scripts first
-                    $container.html($temp.html());
+                    containerElement.innerHTML = $temp.html();
 
                     console.log('Found ' + scripts.length + ' scripts to execute');
 
@@ -318,7 +318,7 @@ $(document).ready(function() {
                             try {
                                 var script = document.createElement('script');
                                 script.text = scriptData.text;
-                                $container[0].appendChild(script);
+                                containerElement.appendChild(script);
                                 console.log('Inline script executed');
                             } catch(e) {
                                 console.error('Error executing inline script:', e);
