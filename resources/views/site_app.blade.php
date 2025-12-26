@@ -270,8 +270,12 @@ $(document).ready(function() {
                 if (response.success) {
                     console.log('Updating player container');
 
-                    // Get the container as a DOM element
-                    var $container = $('.col-lg-9.col-md-12');
+                    // Get the container as a DOM element - try multiple selectors
+                    var $container = $('.col-md-7.col-lg-7.col-xl-7');
+                    if ($container.length === 0) {
+                        $container = $('.col-lg-9.col-md-12');
+                    }
+
                     console.log('Found container:', $container.length);
 
                     if ($container.length === 0) {
