@@ -27,7 +27,7 @@
                             style="display: flex; justify-content: center; align-items: center; height: 100px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
 
                             <div class="subscribe-btn-item stumble-button">
-                                <a href="javascript:void(0);" id="stumble-btn" title="Stumble"
+                                <a href="#" id="stumble-btn" title="Stumble" onclick="return false;"
                                     style="display: flex; align-items: center; text-decoration: none; font-weight: bold; border: 2px solid #444; padding: 10px 20px; border-radius: 5px; transition: background 0.3s, border 0.3s; cursor: pointer;">
 
                                     <img src="{{ URL::asset('site_assets/images/ic-subscribe2.png') }}"
@@ -57,18 +57,28 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Stumble button script loaded');
+
     // Handle stumble button click
     var stumbleBtn = document.getElementById('stumble-btn');
     var stumbleText = document.getElementById('stumble-text');
 
     if (stumbleBtn) {
+        console.log('Stumble button found, attaching event listener');
+
         stumbleBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+
+            console.log('Stumble button clicked!');
 
             // Show loading state
             var originalText = stumbleText.textContent;
             stumbleText.textContent = 'Loading...';
             stumbleBtn.style.pointerEvents = 'none';
+
+            console.log('Making AJAX request...');
 
             // Make AJAX request to get random movie
             fetch('{{ route("ajax.random.movie") }}', {
@@ -78,12 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Accept': 'application/json'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response received:', response);
+                return response.json();
+            })
             .then(data => {
+                console.log('Data received:', data);
                 if (data.success) {
                     // Update the player section
                     var playerContainer = document.querySelector('.col-lg-9.col-md-12');
                     if (playerContainer) {
+                        console.log('Updating player container');
                         playerContainer.innerHTML = data.playerHtml;
                     }
 
@@ -103,7 +118,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 stumbleText.textContent = originalText;
                 stumbleBtn.style.pointerEvents = 'auto';
             });
-        });
+
+            return false;
+        }, true); // Use capture phase
+    } else {
+        console.log('Stumble button NOT found!');
     }
 });
 </script>
