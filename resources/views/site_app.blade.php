@@ -269,7 +269,21 @@ $(document).ready(function() {
                 console.log('Response received:', response);
                 if (response.success) {
                     console.log('Updating player container');
-                    $('.col-lg-9.col-md-12').html(response.playerHtml);
+
+                    // Replace the player HTML
+                    var $container = $('.col-lg-9.col-md-12');
+                    $container.html(response.playerHtml);
+
+                    // Execute all scripts in the new HTML
+                    $container.find('script').each(function() {
+                        if (this.src) {
+                            // External script - reload it
+                            $.getScript(this.src);
+                        } else {
+                            // Inline script - execute it
+                            eval($(this).text());
+                        }
+                    });
 
                     $('#stumble-text').text(originalText);
                     $('#stumble-btn').css('pointer-events', 'auto');
