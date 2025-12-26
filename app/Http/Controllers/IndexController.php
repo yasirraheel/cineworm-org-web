@@ -241,14 +241,19 @@ class IndexController extends Controller
             $playerHtml = '<div style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011; border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">NO Source URL Set</div>';
         }
 
-        return response()->json([
-            'success' => true,
-            'playerHtml' => $playerHtml,
-            'movieInfo' => [
+        $movieInfo = null;
+        if ($movies_info) {
+            $movieInfo = [
                 'id' => $movies_info->id,
                 'title' => $movies_info->video_title,
                 'slug' => $movies_info->video_slug
-            ]
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'playerHtml' => $playerHtml,
+            'movieInfo' => $movieInfo
         ]);
     }
 
