@@ -16,19 +16,6 @@ a:active, a:hover {outline: 0;transition: 0.4s;}
 .content {width: 100%; max-width: 520px;}
 .header {padding: 40px 30px 20px 30px;}
 .innerpadding {padding:25px 30px;}
-.verify-button {
-    display: inline-block;
-    padding: 12px 30px;
-    background-color: #fe0531;
-    color: #ffffff !important;
-    text-decoration: none !important;
-    border-radius: 4px;
-    font-weight: 600;
-    margin: 15px 0;
-}
-.verify-button:hover {
-    background-color: #d00428;
-}
 
 @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
 .innerpadding {padding:30px 20px;}
@@ -110,8 +97,14 @@ Thank you for signing up for {{getcong('site_name')}}! To complete your registra
 </td>
 </tr>
 <tr>
-<td dir="ltr" style="font-size:0px;padding:20px 5px 5px 5px;word-break:break-word" align="center">
-<a href="{{$verificationUrl}}" class="verify-button" style="color:#ffffff;text-decoration:none;">Verify Email Address</a>
+<td dir="ltr" style="font-size:0px;padding:20px 5px 20px 5px;word-break:break-word" align="center">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+<tr>
+<td style="border-radius:5px;background:#fe0531;text-align:center;">
+<a href="{{$verificationUrl}}" target="_blank" style="background:#fe0531;border:15px solid #fe0531;border-radius:5px;color:#ffffff;display:inline-block;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:18px;font-weight:bold;line-height:1.5;text-align:center;text-decoration:none;-webkit-text-size-adjust:none;mso-hide:all;">Verify Email Address</a>
+</td>
+</tr>
+</table>
 </td>
 </tr>
 <tr>
