@@ -54,3 +54,56 @@
 
     /* Show Stumble button only on mobile screens */
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle stumble button click
+    var stumbleBtn = document.getElementById('stumble-btn');
+    var stumbleText = document.getElementById('stumble-text');
+
+    if (stumbleBtn) {
+        stumbleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Show loading state
+            var originalText = stumbleText.textContent;
+            stumbleText.textContent = 'Loading...';
+            stumbleBtn.style.pointerEvents = 'none';
+
+            // Make AJAX request to get random movie
+            fetch('{{ route("ajax.random.movie") }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the player section
+                    var playerContainer = document.querySelector('.col-lg-9.col-md-12');
+                    if (playerContainer) {
+                        playerContainer.innerHTML = data.playerHtml;
+                    }
+
+                    // Reset button state
+                    stumbleText.textContent = originalText;
+                    stumbleBtn.style.pointerEvents = 'auto';
+
+                    // Scroll to top smoothly
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading random movie:', error);
+                alert('Failed to load video. Please try again.');
+
+                // Reset button state
+                stumbleText.textContent = originalText;
+                stumbleBtn.style.pointerEvents = 'auto';
+            });
+        });
+    }
+});
+</script>
