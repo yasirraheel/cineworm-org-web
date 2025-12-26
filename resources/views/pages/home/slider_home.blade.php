@@ -122,3 +122,45 @@
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    // Handle stumble button click
+    $('#stumble-btn').on('click', function(e) {
+        e.preventDefault();
+
+        // Show loading state
+        var originalText = $('#stumble-text').text();
+        $('#stumble-text').text('Loading...');
+        $('#stumble-btn').css('pointer-events', 'none');
+
+        // Make AJAX request to get random movie
+        $.ajax({
+            url: '{{ route("ajax.random.movie") }}',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Update the player section
+                    $('.col-lg-9.col-md-12').html(response.playerHtml);
+
+                    // Reset button state
+                    $('#stumble-text').text(originalText);
+                    $('#stumble-btn').css('pointer-events', 'auto');
+
+                    // Scroll to top smoothly
+                    $('html, body').animate({ scrollTop: 0 }, 300);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading random movie:', error);
+                alert('Failed to load video. Please try again.');
+
+                // Reset button state
+                $('#stumble-text').text(originalText);
+                $('#stumble-btn').css('pointer-events', 'auto');
+            }
+        });
+    });
+});
+</script>

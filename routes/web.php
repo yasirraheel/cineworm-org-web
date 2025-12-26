@@ -329,6 +329,8 @@ if (getcong('menu_livetv')) {
 
 /*========================================*/
 
+// AJAX route for stumble (get random movie)
+Route::get('ajax/get-random-movie', 'IndexController@getRandomMovie')->name('ajax.random.movie');
 
 Route::get('login', 'IndexController@login');
 Route::post('login', 'IndexController@postLogin');

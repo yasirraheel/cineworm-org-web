@@ -27,14 +27,14 @@
                             style="display: flex; justify-content: center; align-items: center; height: 100px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
 
                             <div class="subscribe-btn-item stumble-button">
-                                <a href="{{ URL::to('/') }}" title="Stumble"
-                                    style="display: flex; align-items: center; text-decoration: none; font-weight: bold; border: 2px solid #444; padding: 10px 20px; border-radius: 5px; transition: background 0.3s, border 0.3s;">
+                                <a href="javascript:void(0);" id="stumble-btn" title="Stumble"
+                                    style="display: flex; align-items: center; text-decoration: none; font-weight: bold; border: 2px solid #444; padding: 10px 20px; border-radius: 5px; transition: background 0.3s, border 0.3s; cursor: pointer;">
 
                                     <img src="{{ URL::asset('site_assets/images/ic-subscribe2.png') }}"
                                         alt="ic-subscribe" title="Stumble"
                                         style="width: 24px; height: 24px; margin-right: 8px;">
 
-                                    <span style="color: #fff;">Stumble</span>
+                                    <span style="color: #fff;" id="stumble-text">Stumble</span>
                                 </a>
                             </div>
                         </div>
