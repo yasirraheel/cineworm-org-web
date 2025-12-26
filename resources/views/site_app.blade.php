@@ -270,24 +270,68 @@ $(document).ready(function() {
                 if (response.success) {
                     console.log('Updating player container');
 
-                    // Replace the player HTML
+                    // Get the container
                     var $container = $('.col-lg-9.col-md-12');
-                    $container.html(response.playerHtml);
 
-                    // Execute all scripts in the new HTML
-                    $container.find('script').each(function() {
-                        if (this.src) {
-                            // External script - reload it
-                            $.getScript(this.src);
-                        } else {
-                            // Inline script - execute it
-                            eval($(this).text());
-                        }
+                    // Create a temporary div to parse the HTML
+                    var $temp = $('<div>').html(response.playerHtml);
+
+                    // Extract scripts
+                    var scripts = [];
+                    $temp.find('script').each(function() {
+                        scripts.push({
+                            src: this.src,
+                            text: $(this).text()
+                        });
+                        $(this).remove(); // Remove from HTML
                     });
 
-                    $('#stumble-text').text(originalText);
-                    $('#stumble-btn').css('pointer-events', 'auto');
+                    // Set HTML without scripts first
+                    $container.html($temp.html());
 
+                    console.log('Found ' + scripts.length + ' scripts to execute');
+
+                    // Execute scripts in order
+                    var scriptIndex = 0;
+                    function executeNextScript() {
+                        if (scriptIndex >= scripts.length) {
+                            console.log('All scripts executed');
+                            $('#stumble-text').text(originalText);
+                            $('#stumble-btn').css('pointer-events', 'auto');
+                            return;
+                        }
+
+                        var scriptData = scripts[scriptIndex];
+                        scriptIndex++;
+
+                        if (scriptData.src) {
+                            // External script
+                            console.log('Loading external script:', scriptData.src);
+                            $.getScript(scriptData.src)
+                                .done(function() {
+                                    console.log('External script loaded:', scriptData.src);
+                                    executeNextScript();
+                                })
+                                .fail(function() {
+                                    console.error('Failed to load script:', scriptData.src);
+                                    executeNextScript();
+                                });
+                        } else {
+                            // Inline script
+                            console.log('Executing inline script');
+                            try {
+                                var script = document.createElement('script');
+                                script.text = scriptData.text;
+                                $container[0].appendChild(script);
+                                console.log('Inline script executed');
+                            } catch(e) {
+                                console.error('Error executing inline script:', e);
+                            }
+                            executeNextScript();
+                        }
+                    }
+
+                    executeNextScript();
                     $('html, body').animate({ scrollTop: 0 }, 300);
                 } else {
                     console.error('Server returned success=false:', response.error);
