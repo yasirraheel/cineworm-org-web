@@ -243,6 +243,53 @@ $(document).ready(function() {
 
 @endif
 
+<script>
+// Stumble Button AJAX Handler
+$(document).ready(function() {
+    console.log('Stumble button script loaded');
+
+    $('#stumble-btn').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        console.log('Stumble button clicked!');
+
+        var originalText = $('#stumble-text').text();
+        $('#stumble-text').text('Loading...');
+        $('#stumble-btn').css('pointer-events', 'none');
+
+        console.log('Making AJAX request...');
+
+        $.ajax({
+            url: '{{ route("ajax.random.movie") }}',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                console.log('Response received:', response);
+                if (response.success) {
+                    console.log('Updating player container');
+                    $('.col-lg-9.col-md-12').html(response.playerHtml);
+
+                    $('#stumble-text').text(originalText);
+                    $('#stumble-btn').css('pointer-events', 'auto');
+
+                    $('html, body').animate({ scrollTop: 0 }, 300);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading random movie:', error);
+                alert('Failed to load video. Please try again.');
+
+                $('#stumble-text').text(originalText);
+                $('#stumble-btn').css('pointer-events', 'auto');
+            }
+        });
+
+        return false;
+    });
+});
+</script>
 
 @if(getcong('site_footer_code'))
     {!!stripslashes(getcong('site_footer_code'))!!}
