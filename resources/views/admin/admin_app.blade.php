@@ -25,9 +25,30 @@
      <link href="{{ URL::asset('admin_assets/plugins/switchery/switchery.min.css') }}" rel="stylesheet">
 
      <link href="{{ URL::asset('admin_assets/css/style.css') }}" rel="stylesheet" type="text/css" />
-      <link href="{{ URL::asset('admin_assets/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />  
+      <link href="{{ URL::asset('admin_assets/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
 
      <script src="{{ URL::asset('admin_assets/js/modernizr.min.js') }}"></script>
+
+     <style>
+     /* Home button responsive styles */
+     .home-btn {
+       transition: all 0.3s ease;
+     }
+     .home-btn:hover {
+       background: #4da896 !important;
+       transform: translateY(-1px);
+       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+     }
+     /* Mobile responsive - hide text on small screens */
+     @media (max-width: 768px) {
+       .home-btn .home-text {
+         display: none;
+       }
+       .home-btn {
+         padding: 8px !important;
+       }
+     }
+     </style>
  
 
   <!-- App css -->
