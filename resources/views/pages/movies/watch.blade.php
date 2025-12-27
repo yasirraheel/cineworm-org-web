@@ -253,6 +253,254 @@
                     @endif
                 </div>
             </div>
+
+            <style>
+            /* Player Footer Section */
+            .player-footer-section {
+                background: linear-gradient(135deg, #0d0620 0%, #1a0d33 100%);
+                border-radius: 8px;
+                margin-top: 8px;
+                padding: 20px 25px;
+                box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+            }
+
+            /* Player Footer Top Section */
+            .player-footer-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 20px;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* Video Title Section */
+            .video-title-section {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .video-title-link {
+                text-decoration: none;
+            }
+
+            .video-title {
+                font-size: 22px;
+                font-weight: 700;
+                color: #ffffff;
+                margin: 0;
+                line-height: 1.3;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                transition: color 0.3s ease;
+            }
+
+            .video-title-link:hover .video-title {
+                color: #fe8805;
+            }
+
+            /* Action Buttons Section */
+            .action-buttons-section {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .like-form {
+                display: inline-block;
+                margin: 0;
+            }
+
+            /* Base Action Button Style */
+            .action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 10px 18px;
+                font-size: 13px;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #ffffff;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                gap: 8px;
+                white-space: nowrap;
+            }
+
+            .action-btn i {
+                font-size: 14px;
+            }
+
+            /* Donate Button */
+            .donate-btn {
+                background: linear-gradient(90deg, #fe8805, #ff6b00);
+                box-shadow: 0 2px 8px rgba(254, 136, 5, 0.25);
+            }
+
+            .donate-btn:hover {
+                background: linear-gradient(90deg, #ff6b00, #fe8805);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(254, 136, 5, 0.4);
+                color: #ffffff;
+            }
+
+            /* Webpage Button */
+            .webpage-btn {
+                background: linear-gradient(90deg, #167ac6, #0a789c);
+                box-shadow: 0 2px 8px rgba(22, 122, 198, 0.25);
+            }
+
+            .webpage-btn:hover {
+                background: linear-gradient(90deg, #0a789c, #167ac6);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(22, 122, 198, 0.4);
+                color: #ffffff;
+            }
+
+            /* Like Button */
+            .like-btn {
+                background: linear-gradient(90deg, #fe0278, #d10257);
+                box-shadow: 0 2px 8px rgba(254, 2, 120, 0.25);
+            }
+
+            .like-btn:hover {
+                background: linear-gradient(90deg, #d10257, #fe0278);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(254, 2, 120, 0.4);
+            }
+
+            .like-btn.liked {
+                background: linear-gradient(90deg, #118d04, #0d6b03);
+                box-shadow: 0 2px 8px rgba(17, 141, 4, 0.25);
+            }
+
+            .like-btn.liked:hover {
+                background: linear-gradient(90deg, #0d6b03, #118d04);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(17, 141, 4, 0.4);
+            }
+
+            /* Share Button */
+            .share-btn {
+                background: linear-gradient(90deg, #8e44ad, #6c2d91);
+                box-shadow: 0 2px 8px rgba(142, 68, 173, 0.25);
+            }
+
+            .share-btn:hover {
+                background: linear-gradient(90deg, #6c2d91, #8e44ad);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(142, 68, 173, 0.4);
+                color: #ffffff;
+            }
+
+            /* Next Button */
+            .next-btn {
+                background: linear-gradient(90deg, #2c3e50, #4ca1af);
+                box-shadow: 0 2px 8px rgba(44, 62, 80, 0.25);
+            }
+
+            .next-btn:hover {
+                background: linear-gradient(90deg, #4ca1af, #2c3e50);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(44, 62, 80, 0.4);
+                color: #ffffff;
+            }
+
+            /* Player Footer Meta */
+            .player-footer-meta {
+                display: flex;
+                gap: 25px;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .meta-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #b5b5b5;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            .meta-item i {
+                font-size: 16px;
+                color: #fe8805;
+            }
+
+            .meta-item.imdb-rating {
+                background: rgba(245, 197, 24, 0.1);
+                padding: 5px 12px;
+                border-radius: 4px;
+            }
+
+            .imdb-logo {
+                width: 35px;
+                height: auto;
+                vertical-align: middle;
+            }
+
+            .meta-item.imdb-rating span {
+                color: #f5c518;
+                font-weight: 700;
+                font-size: 15px;
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 992px) {
+                .player-footer-top {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .action-buttons-section {
+                    width: 100%;
+                    justify-content: flex-start;
+                }
+
+                .video-title {
+                    font-size: 20px;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .player-footer-section {
+                    padding: 15px 18px;
+                }
+
+                .action-btn {
+                    padding: 8px 14px;
+                    font-size: 12px;
+                }
+
+                .action-btn span {
+                    display: none;
+                }
+
+                .action-btn i {
+                    margin: 0;
+                }
+
+                .video-title {
+                    font-size: 18px;
+                    white-space: normal;
+                }
+
+                .player-footer-meta {
+                    gap: 15px;
+                }
+
+                .meta-item {
+                    font-size: 13px;
+                }
+            }
+            </style>
         </div>
             <!-- Banner -->
 @if (get_web_banner('home_top') != '')
