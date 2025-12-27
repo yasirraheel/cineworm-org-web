@@ -63,24 +63,88 @@
     <div class="page-content-area vfx-item-ptb pt-0">
 
         <div class="container-fluid bg-dark video-player-base">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="container">
+                <div class="row align-items-stretch">
+                    <!-- Left Side Buttons -->
+                    <div class="col-md-2 d-none d-md-flex justify-content-center align-items-center pe-md-5">
+                        <div class="d-flex flex-column w-100">
+                            @php
+                                $buttons = get_web_button_banner('buttons');
+                                $banners = get_web_button_banner('banners');
+                            @endphp
 
-                    @if ($tv_info->channel_url != '')
-                        {{-- @dd($tv_info->channel_url) --}}
-                        @if ($tv_info->channel_url_type == 'Embed')
-                            @include('pages.livetv.player.embed')
+                            @if ($buttons->isNotEmpty())
+                                @foreach ($buttons as $button)
+                                    <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
+                                        style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
+                                               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                                               background-color: #{{ $button->color ? $button->color : '007bff' }};
+                                               font-family: 'Perpetua', serif; text-align: center;
+                                               text-decoration: none; color: #fff;
+                                               position: relative;
+                                               display: inline-block;
+                                               overflow: hidden;
+                                               border: 3px solid #00008B;
+                                               transition: all 0.3s ease-in-out;"
+                                        onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
+                                                     this.style.borderStyle='solid';
+                                                     this.style.borderWidth='3px';
+                                                     this.style.borderRadius='8px';
+                                                     this.style.borderColor='transparent';"
+                                        onmouseout="this.style.borderImage='none';
+                                                    this.style.borderColor='#00008B';
+                                                    this.style.borderStyle='solid';
+                                                    this.style.borderWidth='3px';
+                                                    this.style.borderRadius='8px';"
+                                        target="_blank">
+                                        {{ $button->title }}
+                                    </a>
+                                @endforeach
+                            @else
+                                <p>No buttons available.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Video Player -->
+                    <div class="col-md-7 px-md-5">
+                        @if ($tv_info->channel_url != '')
+                            {{-- @dd($tv_info->channel_url) --}}
+                            @if ($tv_info->channel_url_type == 'Embed')
+                                @include('pages.livetv.player.embed')
+                            @else
+                                @include('pages.livetv.player.other')
+                            @endif
                         @else
-                            @include('pages.livetv.player.other')
+                            <div
+                                style="text-align: center;padding: 70px 30px;font-size: 24px; font-weight: 700; background: #101011;border-radius: 10px;margin-top: 15px;min-height: 280px;
+                            line-height: 6;">
+                                NO Source URL Set</div>
                         @endif
-                    @else
-                        <div
-                            style="text-align: center;padding: 70px 30px;font-size: 24px;	font-weight: 700;	background: #101011;border-radius: 10px;margin-top: 15px;min-height: 280px;
-                        line-height: 6;">
-                            NO Source URL Set</div>
+                    </div>
 
-                    @endif
+                    <!-- Right Side News Ticker and Banners -->
+                    <div class="col-md-3 d-none d-md-flex flex-column justify-content-start ps-md-5">
 
+                        @include('pages.home.news_ticker')
+
+                        <div class="sidebar-banners-container mt-3">
+                            @if ($banners->isNotEmpty())
+                                @foreach ($banners as $banner)
+                                    <div class="banner-item">
+                                        <a href="{{ $banner->link ?? '#' }}" target="_blank" class="banner-link">
+                                            <div class="banner-wrapper">
+                                                <img src="{{ url($banner->image) }}" alt="Advertisement" class="banner-image" style="object-fit: cover; border-radius: 5px; width: 100%; max-height: 350px;">
+                                                <div class="banner-overlay">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

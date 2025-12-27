@@ -239,12 +239,42 @@ class SportsController extends Controller
 
         //View Update
         $v_id=$sports_info->id;
-        $video_obj = Sports::findOrFail($v_id);        
-        $video_obj->increment('views');     
+        $video_obj = Sports::findOrFail($v_id);
+        $video_obj->increment('views');
         $video_obj->save();
 
+        // Fetch DW RSS News
+        $rss_news = [];
+        try {
+            $rss_content = @file_get_contents('https://rss.dw.com/xml/rss-en-all');
+            if ($rss_content) {
+                $rss = simplexml_load_string($rss_content);
+                if ($rss) {
+                    $count = 0;
+                    foreach ($rss->channel->item as $item) {
+                        if($count >= 20) break;
 
-        return view('pages.sports.watch',compact('sports_info','related_sports_list')); 
+                        $image = '';
+                        if (isset($item->enclosure) && isset($item->enclosure['url'])) {
+                            $image = (string)$item->enclosure['url'];
+                        }
+
+                        $rss_news[] = [
+                            'headline' => (string)$item->title,
+                            'details' => (string)$item->description,
+                            'created_at' => (string)$item->pubDate,
+                            'link' => (string)$item->link,
+                            'image' => $image
+                        ];
+                        $count++;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error("RSS Fetch Error: " . $e->getMessage());
+        }
+
+        return view('pages.sports.watch',compact('sports_info','related_sports_list','rss_news')); 
     }
 
 

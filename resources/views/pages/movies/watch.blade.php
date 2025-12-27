@@ -102,19 +102,27 @@
                 @endif
             </div>
 
-            <!-- Right Side Banners -->
-            <div class="col-md-3 d-none d-md-flex flex-column justify-content-between ps-md-5">
-                @if ($banners->isNotEmpty())
-                    @foreach ($banners as $banner)
-                        <div class="mb-4 flex-grow-1">
-                            <a href="{{ $banner->link ?? '#' }}" target="_blank">
-                                <img src="{{ url($banner->image) }}" alt="Ad Image"
-                                     class="img-fluid mx-auto d-block h-100"
-                                     style="object-fit: cover; border-radius: 5px; width: 100%; max-height: 350px;">
-                            </a>
-                        </div>
-                    @endforeach
-                @endif
+            <!-- Right Side News Ticker and Banners -->
+            <div class="col-md-3 d-none d-md-flex flex-column justify-content-start ps-md-5">
+
+                @include('pages.home.news_ticker')
+
+                <div class="sidebar-banners-container mt-3">
+                    @if ($banners->isNotEmpty())
+                        @foreach ($banners as $banner)
+                            <div class="banner-item">
+                                <a href="{{ $banner->link ?? '#' }}" target="_blank" class="banner-link">
+                                    <div class="banner-wrapper">
+                                        <img src="{{ url($banner->image) }}" alt="Advertisement" class="banner-image" style="object-fit: cover; border-radius: 5px; width: 100%; max-height: 350px;">
+                                        <div class="banner-overlay">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
             </div>
         </div>
             <!-- Banner -->

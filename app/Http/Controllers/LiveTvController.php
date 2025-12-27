@@ -246,7 +246,38 @@ class LiveTvController extends Controller
         $video_obj->increment('views');
         $video_obj->save();
 
-        return view('pages.livetv.watch',compact('tv_info','related_livetv_list'));
+        // Fetch DW RSS News
+        $rss_news = [];
+        try {
+            $rss_content = @file_get_contents('https://rss.dw.com/xml/rss-en-all');
+            if ($rss_content) {
+                $rss = simplexml_load_string($rss_content);
+                if ($rss) {
+                    $count = 0;
+                    foreach ($rss->channel->item as $item) {
+                        if($count >= 20) break;
+
+                        $image = '';
+                        if (isset($item->enclosure) && isset($item->enclosure['url'])) {
+                            $image = (string)$item->enclosure['url'];
+                        }
+
+                        $rss_news[] = [
+                            'headline' => (string)$item->title,
+                            'details' => (string)$item->description,
+                            'created_at' => (string)$item->pubDate,
+                            'link' => (string)$item->link,
+                            'image' => $image
+                        ];
+                        $count++;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error("RSS Fetch Error: " . $e->getMessage());
+        }
+
+        return view('pages.livetv.watch',compact('tv_info','related_livetv_list','rss_news'));
     }
  public function stumble_random()
     {

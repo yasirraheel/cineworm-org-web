@@ -183,10 +183,42 @@ class MoviesController extends Controller
         } else {
             $user_has_liked = null;
         }
+
+        // Fetch DW RSS News
+        $rss_news = [];
+        try {
+            $rss_content = @file_get_contents('https://rss.dw.com/xml/rss-en-all');
+            if ($rss_content) {
+                $rss = simplexml_load_string($rss_content);
+                if ($rss) {
+                    $count = 0;
+                    foreach ($rss->channel->item as $item) {
+                        if($count >= 20) break;
+
+                        $image = '';
+                        if (isset($item->enclosure) && isset($item->enclosure['url'])) {
+                            $image = (string)$item->enclosure['url'];
+                        }
+
+                        $rss_news[] = [
+                            'headline' => (string)$item->title,
+                            'details' => (string)$item->description,
+                            'created_at' => (string)$item->pubDate,
+                            'link' => (string)$item->link,
+                            'image' => $image
+                        ];
+                        $count++;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error("RSS Fetch Error: " . $e->getMessage());
+        }
+
         if ($movies_info->upcoming == 1) {
-            return view('pages.movies.upcoming_watch', compact('movies_info', 'related_movies_list'));
+            return view('pages.movies.upcoming_watch', compact('movies_info', 'related_movies_list', 'rss_news'));
         } else {
-            return view('pages.movies.watch', compact('movies_info', 'related_movies_list', 'random_movie', 'user_has_liked'));
+            return view('pages.movies.watch', compact('movies_info', 'related_movies_list', 'random_movie', 'user_has_liked', 'rss_news'));
         }
     }
     public function like($video_id)
