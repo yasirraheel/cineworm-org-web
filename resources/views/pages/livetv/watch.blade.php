@@ -197,6 +197,43 @@
                             @endif
                         </div>
                     </div>
+
+                    <!-- Player Footer Section -->
+                    <div class="player-footer-section">
+                        <!-- Title and Action Buttons Row -->
+                        <div class="player-footer-top">
+                            <div class="video-title-section">
+                                <a href="{{ url('livetv/details', ['slug' => $tv_info->channel_slug, 'id' => $tv_info->id]) }}" class="video-title-link">
+                                    <h3 class="video-title">{{ stripslashes($tv_info->channel_name) }}</h3>
+                                </a>
+                            </div>
+
+                            <div class="action-buttons-section">
+                                <button class="action-btn share-btn" data-bs-toggle="modal" data-bs-target="#social-media">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span>{{ trans('words.share_text') }}</span>
+                                </button>
+
+                                <a href="{{ URL::to('/') }}" class="action-btn next-btn" id="footer-next-btn">
+                                    <i class="fas fa-step-forward"></i>
+                                    <span>Next</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Video Info Meta Row -->
+                        <div class="player-footer-meta">
+                            <div class="meta-item">
+                                <i class="fa fa-eye"></i>
+                                <span>{{ number_format_short($tv_info->views) }} {{ trans('words.video_views') }}</span>
+                            </div>
+
+                            <div class="meta-item">
+                                <i class="fa fa-tv"></i>
+                                <span>{{ App\TvCategory::getTvCategoryInfo($tv_info->channel_cat_id, 'category_name') }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

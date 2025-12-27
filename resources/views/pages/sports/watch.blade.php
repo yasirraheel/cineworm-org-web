@@ -183,6 +183,52 @@
                     @endif
                 </div>
             </div>
+
+            <!-- Player Footer Section -->
+            <div class="player-footer-section">
+                <!-- Title and Action Buttons Row -->
+                <div class="player-footer-top">
+                    <div class="video-title-section">
+                        <a href="{{ url('sports/details', ['slug' => $sports_info->video_slug, 'id' => $sports_info->id]) }}" class="video-title-link">
+                            <h3 class="video-title">{{ stripslashes($sports_info->video_title) }}</h3>
+                        </a>
+                    </div>
+
+                    <div class="action-buttons-section">
+                        <button class="action-btn share-btn" data-bs-toggle="modal" data-bs-target="#social-media">
+                            <i class="fas fa-share-alt"></i>
+                            <span>{{ trans('words.share_text') }}</span>
+                        </button>
+
+                        <a href="{{ URL::to('/') }}" class="action-btn next-btn" id="footer-next-btn">
+                            <i class="fas fa-step-forward"></i>
+                            <span>Next</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Video Info Meta Row -->
+                <div class="player-footer-meta">
+                    <div class="meta-item">
+                        <i class="fa fa-eye"></i>
+                        <span>{{ number_format_short($sports_info->views) }} {{ trans('words.video_views') }}</span>
+                    </div>
+
+                    @if($sports_info->date)
+                        <div class="meta-item">
+                            <i class="fa fa-calendar-alt"></i>
+                            <span>{{ date('M d, Y', $sports_info->date) }}</span>
+                        </div>
+                    @endif
+
+                    @if($sports_info->duration)
+                        <div class="meta-item">
+                            <i class="fa fa-clock"></i>
+                            <span>{{ $sports_info->duration }}</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
   </div>
