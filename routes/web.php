@@ -300,7 +300,7 @@ Route::get('movies', 'MoviesController@movies');
 Route::get('movies/details/{slug}/{id}', 'MoviesController@movies_details');
 Route::get('movies/watch/{slug}/{id}', 'MoviesController@movies_watch');
 
-Route::get('movies/{slug}/{id}', 'MoviesController@movies_single')->name('movies_single');
+Route::get('movies/{slug}/{id}', 'MoviesController@movies_details')->name('movies_single');
 
 if (getcong('menu_shows')) {
     Route::get('shows', 'ShowsController@shows');
