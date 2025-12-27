@@ -27,9 +27,8 @@
                     <ul class="list-inline mb-0">
                          
                         <li>
-                            <a href="{{ URL::to('/') }}" class="right-bar-toggle home-btn" data-toggle="tooltip" title="Home" style="display: flex; align-items: center; gap: 5px; padding: 8px 12px; background: #5fbeaa; color: white; border-radius: 4px; text-decoration: none;">
+                            <a href="{{ URL::to('/') }}" class="right-bar-toggle" data-toggle="tooltip" title="Home">
                                 <i class="fa fa-home"></i>
-                                <span class="home-text">Home</span>
                             </a>
                         </li>
                     </ul>
