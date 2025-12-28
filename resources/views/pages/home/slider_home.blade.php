@@ -68,13 +68,87 @@
             margin-top: 20px;
         }
     }
+
+    /* Pacman Game Container Styling */
+    .pacman-game-container {
+        background: #1a1a1a;
+        height: 100%;
+        overflow: hidden;
+        padding: 15px;
+        color: #fff;
+    }
+
+    .pacman-game-wrapper {
+        background: #000;
+        height: calc(100% - 50px);
+        min-height: 500px;
+        border-radius: 5px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .pacman-game-container h4 {
+        color: #fff;
+        border-bottom: 2px solid #e50914;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .pacman-game-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 991px) {
+        .pacman-game-container {
+            height: 400px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pacman-game-wrapper {
+            height: calc(100% - 50px);
+            min-height: 300px;
+        }
+    }
+
+    /* Desktop - ensure equal heights */
+    @media (min-width: 992px) {
+        .pacman-game-container,
+        .news-ticker-container {
+            min-height: 600px;
+            max-height: 800px;
+        }
+    }
 </style>
 
 <div class="slider-area p-0">
     <div class="container-fluid px-0">
         <div class="row no-gutters">
-            <!-- Video Player Column -->
-            <div class="col-lg-9 col-md-12">
+            <!-- Pacman Game Column - LEFT on desktop, MIDDLE on mobile -->
+            <div class="col-lg-3 col-md-12 order-2 order-lg-1">
+                <div class="pacman-game-container">
+                    <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
+                        Play Pacman
+                    </h4>
+                    <div class="pacman-game-wrapper">
+                        <iframe
+                            src="https://pacman.platzh1rsch.ch/"
+                            style="width: 100%; height: 100%; border: none;"
+                            allowfullscreen
+                            title="Pacman Game">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Player Column - CENTER on desktop, TOP on mobile -->
+            <div class="col-lg-6 col-md-12 order-1 order-lg-2">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -90,13 +164,13 @@
                 @endif
             </div>
 
-            <!-- News Ticker Column -->
-            <div class="col-lg-3 col-md-12">
+            <!-- News Ticker Column - RIGHT on desktop, BOTTOM on mobile -->
+            <div class="col-lg-3 col-md-12 order-3 order-lg-3">
                 <div class="news-ticker-container">
                     <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
                         Latest News
                     </h4>
-                    
+
                     @if(isset($news_tickers) && count($news_tickers) > 0)
                         @foreach($news_tickers as $news)
                             <div class="news-item">
