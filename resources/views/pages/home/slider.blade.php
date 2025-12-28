@@ -123,6 +123,10 @@
     <div class="container-fluid px-0">
         <div class="row g-3 align-items-stretch">
             @if (request()->getHost() != 'home.cineworm.org')
+                @php
+                    $banners = get_web_button_banner('banners'); // Fetch all banner components
+                @endphp
+
                 <!-- Pacman Game Column - LEFT on desktop -->
                 <div class="col-md-3 col-lg-3 col-xl-3 d-none d-md-flex justify-content-center align-items-stretch">
                     <div class="w-100">
