@@ -69,11 +69,11 @@
         }
     }
 
-    /* Pacman Game Container Styling */
+    /* Pacman Game Container Styling - Match News Ticker */
     .pacman-game-container {
         background: #1a1a1a;
         height: 100%;
-        overflow: hidden;
+        overflow-y: auto;
         padding: 15px;
         color: #fff;
     }
@@ -103,17 +103,31 @@
         display: block;
     }
 
+    /* Scrollbar styling - Match News Ticker */
+    .pacman-game-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .pacman-game-container::-webkit-scrollbar-track {
+        background: #111;
+    }
+    .pacman-game-container::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 3px;
+    }
+    .pacman-game-container::-webkit-scrollbar-thumb:hover {
+        background: #666;
+    }
+
     /* Mobile responsive adjustments */
     @media (max-width: 991px) {
         .pacman-game-container {
-            height: 400px;
+            height: 300px;
             margin-top: 20px;
-            margin-bottom: 20px;
         }
 
         .pacman-game-wrapper {
             height: calc(100% - 50px);
-            min-height: 300px;
+            min-height: 250px;
         }
     }
 
