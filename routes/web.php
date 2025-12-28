@@ -20,6 +20,25 @@ use Illuminate\Support\Facades\Session;
 /*Route::get('/', function () {
     return view('welcome');
 });*/
+
+// Temporary route to clear cache - REMOVE after use
+Route::get('/clear-all-cache', function() {
+    try {
+        // Clear view cache manually
+        $viewPath = storage_path('framework/views');
+        $files = glob($viewPath . '/*.php');
+        foreach($files as $file) {
+            if(is_file($file) && basename($file) !== '.gitignore') {
+                unlink($file);
+            }
+        }
+
+        return 'Cache cleared successfully! Views deleted: ' . count($files);
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
  Route::get('livetv/stumble/play', 'LiveTvController@stumble_random')->name('stumble_random');
 Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
     Route::get('movies', 'MoviesController@movies_list');
