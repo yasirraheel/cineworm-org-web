@@ -266,20 +266,43 @@ $(document).ready(function() {
                 if (response.success) {
                     console.log('Updating player container');
 
-                    // Get the container as a DOM element - try multiple selectors
-                    var $container = $('.col-md-9.col-lg-9.col-xl-9'); // Main domain
+                    // Get the container as a DOM element - try multiple selectors with specificity
+                    var $container = null;
+
+                    // Try main domain selector
+                    $container = $('.slider-area .col-md-9.col-lg-9.col-xl-9');
+                    console.log('Trying main domain selector (.col-md-9.col-lg-9.col-xl-9):', $container.length);
+
+                    // Try subdomain selector
                     if ($container.length === 0) {
-                        $container = $('.col-lg-9.col-md-12'); // home.cineworm.org subdomain
-                    }
-                    if ($container.length === 0) {
-                        $container = $('.slider-area .row > div').first(); // Fallback: first column in slider row
+                        $container = $('.slider-area .col-lg-9.col-md-12');
+                        console.log('Trying subdomain selector (.col-lg-9.col-md-12):', $container.length);
                     }
 
-                    console.log('Found container:', $container.length);
+                    // Try finding any column with col-lg-9 in slider area
+                    if ($container.length === 0) {
+                        $container = $('.slider-area .row [class*="col-lg-9"]').first();
+                        console.log('Trying col-lg-9 wildcard:', $container.length);
+                    }
+
+                    // Try finding any column with col-md-9 in slider area
+                    if ($container.length === 0) {
+                        $container = $('.slider-area .row [class*="col-md-9"]').first();
+                        console.log('Trying col-md-9 wildcard:', $container.length);
+                    }
+
+                    // Final fallback: first direct child of row in slider-area
+                    if ($container.length === 0) {
+                        $container = $('.slider-area .row > div').first();
+                        console.log('Trying first div fallback:', $container.length);
+                    }
+
+                    console.log('Final container found:', $container.length, $container.attr('class'));
 
                     if ($container.length === 0) {
                         console.error('Player container not found!');
-                        alert('Error: Player container not found on page');
+                        console.log('Available containers:', $('.slider-area .row > div').length);
+                        alert('Error: Player container not found on page. Please refresh and try again.');
                         $('#stumble-text').text(originalText);
                         $('#stumble-btn').css('pointer-events', 'auto');
                         return;
