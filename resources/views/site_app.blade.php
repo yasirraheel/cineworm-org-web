@@ -281,6 +281,11 @@ $(document).ready(function() {
                         $container = $('.col-lg-9.col-md-12');
                     }
 
+                    // Specific selector for Watch page
+                    if ($container.length === 0) {
+                        $container = $('.video-posts-video .col-md-7');
+                    }
+
                     // Fallback for different layouts
                     if ($container.length === 0) {
                         $container = $('.slider-area .row > div').first();
@@ -324,6 +329,11 @@ $(document).ready(function() {
                         var $footerContainer = $('.player-footer-section');
                         if ($footerContainer.length) {
                             $footerContainer.html(response.footerHtml);
+
+                            // If on Watch page, ensure Next button is visible (it defaults to hidden in the partial)
+                            if ($('.video-posts-video .col-md-7').length > 0) {
+                                $('#footer-next-btn').show();
+                            }
 
                             // Re-initialize any listeners for the new footer content if needed
                             // For example, if the next button is inside the footer, the delegated listener on document will handle it
