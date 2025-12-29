@@ -69,98 +69,13 @@
         }
     }
 
-    /* Pacman Game Container Styling - Match News Ticker */
-    .pacman-game-container {
-        background: #1a1a1a;
-        height: 100%;
-        overflow-y: auto;
-        padding: 15px;
-        color: #fff;
-    }
-
-    .pacman-game-wrapper {
-        background: #000;
-        height: calc(100% - 50px);
-        min-height: 500px;
-        border-radius: 5px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .pacman-game-container h4 {
-        color: #fff;
-        border-bottom: 2px solid #e50914;
-        padding-bottom: 10px;
-        margin-bottom: 15px;
-        font-size: 16px;
-        font-weight: bold;
-    }
-
-    .pacman-game-wrapper iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        display: block;
-    }
-
-    /* Scrollbar styling - Match News Ticker */
-    .pacman-game-container::-webkit-scrollbar {
-        width: 6px;
-    }
-    .pacman-game-container::-webkit-scrollbar-track {
-        background: #111;
-    }
-    .pacman-game-container::-webkit-scrollbar-thumb {
-        background: #444;
-        border-radius: 3px;
-    }
-    .pacman-game-container::-webkit-scrollbar-thumb:hover {
-        background: #666;
-    }
-
-    /* Mobile responsive adjustments */
-    @media (max-width: 767px) {
-        .pacman-game-container {
-            height: 300px;
-            margin-top: 20px;
-        }
-
-        .pacman-game-wrapper {
-            height: calc(100% - 50px);
-            min-height: 250px;
-        }
-    }
 </style>
 
 <div class="slider-area p-0">
     <div class="container-fluid px-0">
         <div class="row g-3 align-items-stretch">
-            @if (request()->getHost() != 'home.cineworm.org')
-                @php
-                    $banners = get_web_button_banner('banners'); // Fetch all banner components
-                @endphp
-
-                <!-- Pacman Game Column - LEFT on desktop -->
-                <div class="col-md-3 col-lg-3 col-xl-3 d-none d-md-flex justify-content-center align-items-stretch">
-                    <div class="w-100">
-                        <div class="pacman-game-container">
-                            <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
-                                Play Pacman
-                            </h4>
-                            <div class="pacman-game-wrapper">
-                                <iframe
-                                    src="https://pacman.platzh1rsch.ch/"
-                                    style="width: 100%; height: 100%; border: none;"
-                                    allowfullscreen
-                                    title="Pacman Game">
-                                </iframe>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
             <!-- Video Player -->
-            <div class="col-md-6 col-lg-6 col-xl-6">
+            <div class="col-md-9 col-lg-9 col-xl-9">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -176,6 +91,9 @@
                 @endif
             </div>
             @if (request()->getHost() != 'home.cineworm.org')
+                @php
+                    $banners = get_web_button_banner('banners');
+                @endphp
                 <!-- Right Side News Ticker -->
                 <div class="col-md-3 col-lg-3 col-xl-3 d-none d-md-flex flex-column justify-content-start">
 
@@ -319,23 +237,6 @@
         <!-- End Social Media Icon Popup -->
 
         @if(request()->getHost() != 'home.cineworm.org')
-            <!-- Mobile Pacman Game Section -->
-            <div class="d-md-none mt-3">
-                <div class="pacman-game-container">
-                    <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
-                        Play Pacman
-                    </h4>
-                    <div class="pacman-game-wrapper">
-                        <iframe
-                            src="https://pacman.platzh1rsch.ch/"
-                            style="width: 100%; height: 100%; border: none;"
-                            allowfullscreen
-                            title="Pacman Game">
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-
             <!-- Mobile News Ticker Section -->
             <div class="d-md-none mt-3">
                  @include('pages.home.news_ticker')
