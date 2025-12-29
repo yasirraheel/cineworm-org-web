@@ -71,7 +71,7 @@
 
         var player = new FWDEVPlayer({
             // Main settings
-            instanceName: "player1",
+            instanceName: "player_{{ uniqid() }}",
             parentId: "viavi_player",
             mainFolderPath: "{{ URL::asset('/site_assets/player/content/') }}",
             initializeOnlyWhenVisible: "no",
