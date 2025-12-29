@@ -255,10 +255,13 @@ $(document).ready(function() {
         $('#stumble-text').text('Loading...');
         $('#stumble-btn').css('pointer-events', 'none');
 
-        // Also disable next button if it exists
+        // Also disable next button if it exists and show loading
         var $nextBtn = $('#footer-next-btn');
+        var originalNextContent = '';
         if ($nextBtn.length) {
+            originalNextContent = $nextBtn.html();
             $nextBtn.addClass('disabled').css('pointer-events', 'none');
+            $nextBtn.html('<i class="fas fa-spinner fa-spin"></i> <span>Loading...</span>');
         }
 
         console.log('Making AJAX request...');
@@ -290,7 +293,10 @@ $(document).ready(function() {
                         alert('Error: Player container not found on page');
                         $('#stumble-text').text(originalText);
                         $('#stumble-btn').css('pointer-events', 'auto');
-                        if ($nextBtn.length) $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
+                        if ($nextBtn.length) {
+                            $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
+                            $nextBtn.html(originalNextContent);
+                        }
                         return;
                     }
 
@@ -342,7 +348,11 @@ $(document).ready(function() {
                             console.log('All scripts executed');
                             $('#stumble-text').text(originalText);
                             $('#stumble-btn').css('pointer-events', 'auto');
-                            if ($nextBtn.length) $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
+                            // If footer was NOT updated, restore next button
+                            if (!response.footerHtml && $nextBtn.length) {
+                                $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
+                                $nextBtn.html(originalNextContent);
+                            }
                             return;
                         }
 
@@ -384,7 +394,10 @@ $(document).ready(function() {
 
                     $('#stumble-text').text(originalText);
                     $('#stumble-btn').css('pointer-events', 'auto');
-                    if ($nextBtn.length) $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
+                    if ($nextBtn.length) {
+                        $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
+                        $nextBtn.html(originalNextContent);
+                    }
                 }
             },
             error: function(xhr, status, error) {
@@ -400,7 +413,10 @@ $(document).ready(function() {
 
                 $('#stumble-text').text(originalText);
                 $('#stumble-btn').css('pointer-events', 'auto');
-                if ($nextBtn.length) $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
+                if ($nextBtn.length) {
+                    $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
+                    $nextBtn.html(originalNextContent);
+                }
             }
         });
     }
