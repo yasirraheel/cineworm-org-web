@@ -96,175 +96,179 @@ class MoviesController extends MainAdminController
     }
 
     public function addnew(Request $request)
-{
-
-
-    if (!empty($request->actors)) {
-        $actorNames = explode(',', $request->actors);
-        foreach ($actorNames as $actorName) {
-            $actorId = $this->addActorOrDirector('actor', trim($actorName));
-            if ($actorId) {
-                $actorIds[] = $actorId;
+    {
+        try {
+            if (!empty($request->actors)) {
+                $actorNames = explode(',', $request->actors);
+                foreach ($actorNames as $actorName) {
+                    $actorId = $this->addActorOrDirector('actor', trim($actorName));
+                    if ($actorId) {
+                        $actorIds[] = $actorId;
+                    }
+                }
             }
-        }
-    }
-    if (!empty($request->director)) {
-        $directorNames = explode(',', $request->director);
-        foreach ($directorNames as $directorName) {
-            $directorId = $this->addActorOrDirector('director', trim($directorName));
-            if ($directorId) {
-                $directorIds[] = $directorId;
+            if (!empty($request->director)) {
+                $directorNames = explode(',', $request->director);
+                foreach ($directorNames as $directorName) {
+                    $directorId = $this->addActorOrDirector('director', trim($directorName));
+                    if ($directorId) {
+                        $directorIds[] = $directorId;
+                    }
+                }
             }
-        }
-    }
 
-    $video_url = $request->video_url;
-    $fileId = null;
-    $video_image = '';
+            $video_url = $request->video_url;
+            $fileId = null;
+            $video_image = '';
 
-    // Check if video URL is YouTube or Vimeo
-    if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
-        $video_image = $this->getVideoThumbnail($video_url) ?? '';  // Get YouTube thumbnail
-        $video_type = 'YouTube';
+            // Check if video URL is YouTube or Vimeo
+            if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
+                $video_image = $this->getVideoThumbnail($video_url) ?? '';  // Get YouTube thumbnail
+                $video_type = 'YouTube';
 
-    } elseif (strpos($video_url, 'vimeo.com') !== false) {
-        $video_image = $this->getVideoThumbnail($video_url) ?? '';  // Get Vimeo thumbnail
-        $video_type = 'Vimeo';
+            } elseif (strpos($video_url, 'vimeo.com') !== false) {
+                $video_image = $this->getVideoThumbnail($video_url) ?? '';  // Get Vimeo thumbnail
+                $video_type = 'Vimeo';
 
-    } else {
-        $video_type = 'GoogleDrive';
-        // Handle Google Drive URL
-        $google_drive_api = $this->getRandomApiKey();
-        GoogleDriveApi::where('api_key', $google_drive_api)->increment('calls');
-
-        $googleDriveUrl = $request->video_url;
-
-        // Check if URL is already a Google Drive streaming URL
-        if (strpos($googleDriveUrl, 'https://www.googleapis.com/drive/v3/files/') !== false) {
-            $video_url = $googleDriveUrl;
-            preg_match("/files\/(.*?)\?/", $googleDriveUrl, $matches);
-            $fileId = $matches[1];
-        } else {
-            preg_match("/\/d\/(.*?)\//", $googleDriveUrl, $matches);
-
-            if (isset($matches[1])) {
-                $fileId = $matches[1];
-                $video_url = "https://www.googleapis.com/drive/v3/files/{$fileId}?alt=media&key={$google_drive_api}";
             } else {
-                session()->flash('error', 'Invalid Google Drive URL');
-                return back();
+                $video_type = 'GoogleDrive';
+                // Handle Google Drive URL
+                $google_drive_api = $this->getRandomApiKey();
+                GoogleDriveApi::where('api_key', $google_drive_api)->increment('calls');
+
+                $googleDriveUrl = $request->video_url;
+
+                // Check if URL is already a Google Drive streaming URL
+                if (strpos($googleDriveUrl, 'https://www.googleapis.com/drive/v3/files/') !== false) {
+                    $video_url = $googleDriveUrl;
+                    preg_match("/files\/(.*?)\?/", $googleDriveUrl, $matches);
+                    $fileId = $matches[1];
+                } else {
+                    preg_match("/\/d\/(.*?)\//", $googleDriveUrl, $matches);
+
+                    if (isset($matches[1])) {
+                        $fileId = $matches[1];
+                        $video_url = "https://www.googleapis.com/drive/v3/files/{$fileId}?alt=media&key={$google_drive_api}";
+                    } else {
+                        session()->flash('error', 'Invalid Google Drive URL');
+                        return back();
+                    }
+                }
+
             }
-        }
-
-    }
 
 
-    // Validate the form input
-    $data = \Request::except(['_token']);
-    $inputs = $request->all();
-    $rule = [
-        'genres' => 'required',
-        'video_title' => 'required'
-    ];
+            // Validate the form input
+            $data = \Request::except(['_token']);
+            $inputs = $request->all();
+            $rule = [
+                'genres' => 'required',
+                'video_title' => 'required'
+            ];
 
-    $validator = \Validator::make($data, $rule);
+            $validator = \Validator::make($data, $rule);
 
-    if ($validator->fails()) {
-        return redirect()->back()->withInput()->withErrors($validator->messages());
-    }
+            if ($validator->fails()) {
+                return redirect()->back()->withInput()->withErrors($validator->messages());
+            }
 
-    // If updating an existing movie, retrieve it, else create a new movie object.
-    $movie_obj = !empty($inputs['id']) ? Movies::findOrFail($inputs['id']) : new Movies;
-    session()->put('movie_obj', $movie_obj);
+            // If updating an existing movie, retrieve it, else create a new movie object.
+            $movie_obj = !empty($inputs['id']) ? Movies::findOrFail($inputs['id']) : new Movies;
+            session()->put('movie_obj', $movie_obj);
 
-    // Generate the video slug
-    $video_slug = Str::slug($inputs['video_title'], '-', null);
+            // Generate the video slug
+            $video_slug = Str::slug($inputs['video_title'], '-', null);
 
-    // Fill in movie object data
-    $movie_obj->funding_url = $inputs['funding_url'];
-    $movie_obj->movie_lang_id = 0;
-    $movie_obj->movie_genre_id = implode(',', $inputs['genres']);
-    $movie_obj->video_title = addslashes($inputs['video_title']);
-    $movie_obj->video_slug = $video_slug;
-    $movie_obj->video_description = addslashes($inputs['video_description']);
+            // Fill in movie object data
+            $movie_obj->funding_url = $inputs['funding_url'];
+            $movie_obj->movie_lang_id = 0;
+            $movie_obj->movie_genre_id = implode(',', $inputs['genres']);
+            $movie_obj->video_title = addslashes($inputs['video_title']);
+            $movie_obj->video_slug = $video_slug;
+            $movie_obj->video_description = addslashes($inputs['video_description']);
 
-    $movie_obj->actor_id = isset($actorIds) ? implode(',', $actorIds) : null;
+            $movie_obj->actor_id = isset($actorIds) ? implode(',', $actorIds) : null;
 
-    $movie_obj->director_id = isset($directorIds) ? implode(',', $directorIds) : null;
+            $movie_obj->director_id = isset($directorIds) ? implode(',', $directorIds) : null;
 
-    // Handle poster link if provided
-    if (isset($inputs['poster_link']) && $inputs['poster_link'] != '') {
-        $image_source = $inputs['poster_link'];
-       $save_to = !empty($inputs['video_image']) ? public_path('/upload/images/' . $inputs['video_image']) : 'NA';
+            // Handle poster link if provided
+            if (isset($inputs['poster_link']) && $inputs['poster_link'] != '') {
+                $image_source = $inputs['poster_link'];
+                $save_to = !empty($inputs['video_image']) ? public_path('/upload/images/' . $inputs['video_image']) : 'NA';
 
-        grab_image($image_source, $save_to);
-       $movie_obj->video_image = !empty($inputs['video_image']) ? 'upload/images/' . $inputs['video_image'] : 'NA';
+                grab_image($image_source, $save_to);
+                $movie_obj->video_image = !empty($inputs['video_image']) ? 'upload/images/' . $inputs['video_image'] : 'NA';
 
-    } else {
-        // Use the extracted thumbnail (YouTube, Vimeo, or default image)
-        $movie_obj->video_image = $video_image;
-        $movie_obj->video_image_thumb = $video_image;
-    }
+            } else {
+                // Use the extracted thumbnail (YouTube, Vimeo, or default image)
+                $movie_obj->video_image = $video_image;
+                $movie_obj->video_image_thumb = $video_image;
+            }
 
-    // Other fields
-    $movie_obj->added_by = Auth::User()->id;
-    $movie_obj->file_id = $fileId;
-    $movie_obj->webpage_url = $inputs['webpage_url'];
+            // Other fields
+            $movie_obj->added_by = Auth::User()->id;
+            $movie_obj->file_id = $fileId;
+            $movie_obj->webpage_url = $inputs['webpage_url'];
 
-    $movie_obj->status = auth()->user()->usertype == 'Admin' || auth()->user()->usertype == 'Moderator' ? $inputs['status'] : 0;
+            $movie_obj->status = auth()->user()->usertype == 'Admin' || auth()->user()->usertype == 'Moderator' ? $inputs['status'] : 0;
 
-    $movie_obj->video_url = $video_url;
-    $movie_obj->video_type = $video_type;
+            $movie_obj->video_url = $video_url;
+            $movie_obj->video_type = $video_type;
 
-    // Optional fields for video quality, downloads, and subtitles
-    if (isset($inputs['video_quality'])) {
-        $movie_obj->video_quality = $inputs['video_quality'];
-    }
+            // Optional fields for video quality, downloads, and subtitles
+            if (isset($inputs['video_quality'])) {
+                $movie_obj->video_quality = $inputs['video_quality'];
+            }
 
-    if (isset($inputs['download_enable'])) {
-        $movie_obj->download_enable = $inputs['download_enable'];
-        $movie_obj->download_url = $inputs['download_url'];
-    }
+            if (isset($inputs['download_enable'])) {
+                $movie_obj->download_enable = $inputs['download_enable'];
+                $movie_obj->download_url = $inputs['download_url'];
+            }
 
-    if (isset($inputs['subtitle_on_off'])) {
-        $movie_obj->subtitle_on_off = $inputs['subtitle_on_off'];
-    }
-// dd($movie_obj->id);
+            if (isset($inputs['subtitle_on_off'])) {
+                $movie_obj->subtitle_on_off = $inputs['subtitle_on_off'];
+            }
+            // dd($movie_obj->id);
 
-    // Remove from recently watched if status is 0 (inactive)
-    if (!empty($inputs['id']) && $inputs['status'] == 0) {
+            // Remove from recently watched if status is 0 (inactive)
+            if (!empty($inputs['id']) && $inputs['status'] == 0) {
 
-        DB::table("recently_watched")
-            ->where("video_type", "=", "Movies")
-            ->where("video_id", "=", $inputs['id'])
-            ->delete();
-    }
+                DB::table("recently_watched")
+                    ->where("video_type", "=", "Movies")
+                    ->where("video_id", "=", $inputs['id'])
+                    ->delete();
+            }
 
 
-    if($video_type =='GoogleDrive'){
+            if($video_type =='GoogleDrive'){
 
-        $screenshotResult = $this->store_generateScreenshot($fileId);
-        if (isset($screenshotResult['error'])) {
-            // return redirect()->back()->with('error', $screenshotResult['error']);
-                Session::flash('flash_message',$screenshotResult['error']);
+                $screenshotResult = $this->store_generateScreenshot($fileId);
+                if (isset($screenshotResult['error'])) {
+                    // return redirect()->back()->with('error', $screenshotResult['error']);
+                    Session::flash('flash_message',$screenshotResult['error']);
 
-        }
-           // Flash success message and redirect back
-    // Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
+                }
+                // Flash success message and redirect back
+                // Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
 
-    $movie_obj->save();
-    return redirect()->back();
-    }
-         // Handle error if screenshot generation fails
-         $completed= $movie_obj->save();
+                $movie_obj->save();
+                return redirect()->back();
+            }
+            // Handle error if screenshot generation fails
+            $completed= $movie_obj->save();
             if(!$completed){
                 return redirect()->back()->with('error', 'Failed to save movie details');
             }
- // Flash success message and redirect back
- Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
- return redirect()->back();
+            // Flash success message and redirect back
+            Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
+            return redirect()->back();
+        } catch (\Exception $e) {
+            \Log::error('Error adding movie: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
 
-}
+    }
 
 
     public function editMovie($movie_id)
@@ -452,12 +456,31 @@ class MoviesController extends MainAdminController
         $thumbnail_path = $thumbnail_dir . '/' . $unique_name;
 
         // Download the image and store it in the public path
-        $image_content = @file_get_contents($thumbnail_url);
+        $image_content = false;
+
+        // Try with curl first
+        if (function_exists('curl_init')) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $thumbnail_url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Ignore SSL errors for simplicity
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+            $image_content = curl_exec($ch);
+            curl_close($ch);
+        }
+
+        // Fallback to file_get_contents if curl failed or is not available
+        if (!$image_content) {
+            $image_content = @file_get_contents($thumbnail_url);
+        }
+
         if ($image_content) {
             file_put_contents($thumbnail_path, $image_content);
 
             // Return the saved path (relative URL)
             return 'video-thumbnails/' . $unique_name;
+        } else {
+             \Log::error("Failed to download thumbnail from URL: $thumbnail_url");
         }
     }
 
