@@ -1,12 +1,12 @@
-<div class="news-ticker-container" id="news-ticker-main">
+<div class="news-ticker-container">
     <div class="d-flex justify-content-between align-items-center mb-3" style="border-bottom: 2px solid #e50914; padding-bottom: 10px;">
         <h4 style="color: #fff; margin: 0;">Latest News</h4>
-        <button id="back-to-news-btn" class="btn btn-sm btn-danger" style="display: none; font-size: 12px; padding: 2px 8px;">
+        <button class="btn btn-sm btn-danger back-to-news-btn" style="display: none; font-size: 12px; padding: 2px 8px;">
             <i class="fa fa-arrow-left"></i> Back
         </button>
     </div>
 
-    <div id="news-list-view" class="news-scroll-mask">
+    <div class="news-list-view news-scroll-mask">
         <div class="news-scroll-content @if(isset($rss_news) && count($rss_news) > 2) scrolling @endif">
             @if(isset($rss_news) && count($rss_news) > 0)
                 @foreach($rss_news as $news)
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Detail View Container -->
-    <div id="news-detail-view" style="display: none; animation: fadeIn 0.3s;">
+    <div class="news-detail-view" style="display: none; animation: fadeIn 0.3s;">
         <!-- Content will be injected here -->
     </div>
 </div>
@@ -112,31 +112,35 @@
             // Find the parent news item
             var $item = $(this).closest('.news-item');
 
+            // Find the main container for THIS specific ticker instance
+            var $container = $(this).closest('.news-ticker-container');
+
             // Get the full content template
             var content = $item.find('.news-full-content').html();
             var link = $item.find('.news-full-content a.btn').attr('href');
 
-            // Inject content into detail view
-            $('#news-detail-view').html(content);
+            // Inject content into detail view OF THIS CONTAINER
+            var $detailView = $container.find('.news-detail-view');
+            $detailView.html(content);
 
-            // Toggle views
-            $('#news-list-view').hide();
-            $('#news-detail-view').show();
-            $('#back-to-news-btn').show();
+            // Toggle views IN THIS CONTAINER
+            $container.find('.news-list-view').hide();
+            $detailView.show();
+            $container.find('.back-to-news-btn').show();
 
             // Reset scroll position of the main container
-            $('.news-ticker-container').scrollTop(0);
+            $container.scrollTop(0);
 
             // Add loading spinner
-            var $newsBody = $('#news-detail-view .news-body');
-            $newsBody.append('<div id="news-loading" class="text-center mt-3" style="color: #e50914;"><i class="fa fa-spinner fa-spin"></i> Loading full article...</div>');
+            var $newsBody = $detailView.find('.news-body');
+            $newsBody.append('<div class="news-loading text-center mt-3" style="color: #e50914;"><i class="fa fa-spinner fa-spin"></i> Loading full article...</div>');
 
             // Fetch full content via AJAX
             $.ajax({
                 url: '{{ url("ajax/get_news_content") }}',
                 data: { url: link },
                 success: function(response) {
-                    $('#news-loading').remove();
+                    $detailView.find('.news-loading').remove();
                     if(response.content) {
                         $newsBody.html(response.content);
                         // Make sure images in the content are responsive
@@ -144,7 +148,7 @@
                     }
                 },
                 error: function() {
-                    $('#news-loading').remove();
+                    $detailView.find('.news-loading').remove();
                     // Optional: show error message or just leave the summary
                     $newsBody.append('<div class="alert alert-warning mt-2" style="font-size: 12px; padding: 5px;">Could not load full text. <a href="'+link+'" target="_blank" class="text-dark"><u>Open original article</u></a></div>');
                 }
@@ -152,13 +156,15 @@
         });
 
         // Handle Back button click
-        $('#back-to-news-btn').click(function() {
-            $('#news-detail-view').hide();
-            $('#news-list-view').show();
+        $(document).on('click', '.back-to-news-btn', function() {
+            var $container = $(this).closest('.news-ticker-container');
+
+            $container.find('.news-detail-view').hide();
+            $container.find('.news-list-view').show();
             $(this).hide();
 
             // Clear detail view content
-            $('#news-detail-view').empty();
+            $container.find('.news-detail-view').empty();
         });
     });
 </script>
