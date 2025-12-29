@@ -267,9 +267,12 @@ $(document).ready(function() {
                     console.log('Updating player container');
 
                     // Get the container as a DOM element - try multiple selectors
-                    var $container = $('.col-md-7.col-lg-7.col-xl-7');
+                    var $container = $('.col-md-9.col-lg-9.col-xl-9'); // Main domain
                     if ($container.length === 0) {
-                        $container = $('.col-lg-9.col-md-12');
+                        $container = $('.col-lg-9.col-md-12'); // home.cineworm.org subdomain
+                    }
+                    if ($container.length === 0) {
+                        $container = $('.slider-area .row > div').first(); // Fallback: first column in slider row
                     }
 
                     console.log('Found container:', $container.length);
