@@ -252,6 +252,9 @@ class IndexController extends Controller
                 $playerHtml = '<div style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011; border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">NO Source URL Set</div>';
             }
 
+            // Render player footer HTML
+            $footerHtml = view('pages.home.player_footer', compact('movies_info', 'user_has_liked', 'random_movie'))->render();
+
             $movieInfo = [
                 'id' => $movies_info->id,
                 'title' => $movies_info->video_title,
@@ -261,6 +264,7 @@ class IndexController extends Controller
             return response()->json([
                 'success' => true,
                 'playerHtml' => $playerHtml,
+                'footerHtml' => $footerHtml,
                 'movieInfo' => $movieInfo
             ]);
 

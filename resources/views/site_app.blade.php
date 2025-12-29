@@ -248,16 +248,18 @@ $(document).ready(function() {
 $(document).ready(function() {
     console.log('Stumble button script loaded');
 
-    $('#stumble-btn').on('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-
-        console.log('Stumble button clicked!');
+    function loadRandomVideo() {
+        console.log('loadRandomVideo triggered');
 
         var originalText = $('#stumble-text').text();
         $('#stumble-text').text('Loading...');
         $('#stumble-btn').css('pointer-events', 'none');
+
+        // Also disable next button if it exists
+        var $nextBtn = $('#footer-next-btn');
+        if ($nextBtn.length) {
+            $nextBtn.addClass('disabled').css('pointer-events', 'none');
+        }
 
         console.log('Making AJAX request...');
 
@@ -276,6 +278,11 @@ $(document).ready(function() {
                         $container = $('.col-lg-9.col-md-12');
                     }
 
+                    // Fallback for different layouts
+                    if ($container.length === 0) {
+                        $container = $('.slider-area .row > div').first();
+                    }
+
                     console.log('Found container:', $container.length);
 
                     if ($container.length === 0) {
@@ -283,6 +290,7 @@ $(document).ready(function() {
                         alert('Error: Player container not found on page');
                         $('#stumble-text').text(originalText);
                         $('#stumble-btn').css('pointer-events', 'auto');
+                        if ($nextBtn.length) $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
                         return;
                     }
 
@@ -304,6 +312,27 @@ $(document).ready(function() {
                     // Set HTML without scripts first
                     containerElement.innerHTML = $temp.html();
 
+                    // Update Footer if provided
+                    if (response.footerHtml) {
+                        console.log('Updating footer container');
+                        var $footerContainer = $('.player-footer-section');
+                        if ($footerContainer.length) {
+                            $footerContainer.html(response.footerHtml);
+
+                            // Re-initialize any listeners for the new footer content if needed
+                            // For example, if the next button is inside the footer, the delegated listener on document will handle it
+
+                            // Re-initialize News Ticker if it was updated
+                            if (typeof window.initNewsTicker === 'function') {
+                                setTimeout(function() {
+                                    window.initNewsTicker();
+                                }, 500);
+                            }
+                        } else {
+                            console.warn('Footer container not found');
+                        }
+                    }
+
                     console.log('Found ' + scripts.length + ' scripts to execute');
 
                     // Execute scripts in order
@@ -313,6 +342,7 @@ $(document).ready(function() {
                             console.log('All scripts executed');
                             $('#stumble-text').text(originalText);
                             $('#stumble-btn').css('pointer-events', 'auto');
+                            if ($nextBtn.length) $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
                             return;
                         }
 
@@ -354,6 +384,7 @@ $(document).ready(function() {
 
                     $('#stumble-text').text(originalText);
                     $('#stumble-btn').css('pointer-events', 'auto');
+                    if ($nextBtn.length) $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
                 }
             },
             error: function(xhr, status, error) {
@@ -369,9 +400,24 @@ $(document).ready(function() {
 
                 $('#stumble-text').text(originalText);
                 $('#stumble-btn').css('pointer-events', 'auto');
+                if ($nextBtn.length) $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
             }
         });
+    }
 
+    // Bind click event to Stumble button
+    $('#stumble-btn').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        loadRandomVideo();
+        return false;
+    });
+
+    // Bind click event to Next button (delegated since it might be dynamic)
+    $(document).on('click', '#footer-next-btn', function(e) {
+        e.preventDefault();
+        loadRandomVideo();
         return false;
     });
 });
