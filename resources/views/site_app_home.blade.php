@@ -240,9 +240,9 @@ $(document).ready(function() {
 @endif
 
 <script>
-// Stumble Button AJAX Handler - VERSION 2.0 (Updated: 2024)
+// Stumble Button AJAX Handler - VERSION 3.0 (Updated: {{ date('Y-m-d H:i:s') }})
 $(document).ready(function() {
-    console.log('===== Stumble Button Script v2.0 Loaded =====');
+    console.log('===== Stumble Button Script v3.0 Loaded (Timestamp: {{ time() }}) =====');
     console.log('Available slider containers on page:', $('.slider-area').length);
     console.log('Available rows in slider:', $('.slider-area .row').length);
     console.log('Available divs in slider row:', $('.slider-area .row > div').length);
