@@ -124,11 +124,11 @@ class MoviesController extends MainAdminController
 
     // Check if video URL is YouTube or Vimeo
     if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
-        $video_image = $this->getVideoThumbnail($video_url);  // Get YouTube thumbnail
+        $video_image = $this->getVideoThumbnail($video_url) ?? '';  // Get YouTube thumbnail
         $video_type = 'YouTube';
 
     } elseif (strpos($video_url, 'vimeo.com') !== false) {
-        $video_image = $this->getVideoThumbnail($video_url);  // Get Vimeo thumbnail
+        $video_image = $this->getVideoThumbnail($video_url) ?? '';  // Get Vimeo thumbnail
         $video_type = 'Vimeo';
 
     } else {
@@ -428,9 +428,16 @@ class MoviesController extends MainAdminController
     }
     // Check if it's a Vimeo URL
     elseif (strpos($video_url, 'vimeo.com') !== false) {
-        $video_id = substr(parse_url($video_url, PHP_URL_PATH), 1);
-        $vimeo_data = json_decode(file_get_contents("https://vimeo.com/api/v2/video/$video_id.json"));
-        $thumbnail_url = $vimeo_data[0]->thumbnail_large ?? '';
+        if (preg_match('/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/', $video_url, $matches)) {
+            $video_id = $matches[1];
+            $json = @file_get_contents("https://vimeo.com/api/v2/video/$video_id.json");
+            if ($json) {
+                $vimeo_data = json_decode($json);
+                if (is_array($vimeo_data) && isset($vimeo_data[0])) {
+                    $thumbnail_url = $vimeo_data[0]->thumbnail_large ?? '';
+                }
+            }
+        }
     }
 
     // Save the thumbnail to local storage with a unique name
@@ -445,11 +452,13 @@ class MoviesController extends MainAdminController
         $thumbnail_path = $thumbnail_dir . '/' . $unique_name;
 
         // Download the image and store it in the public path
-        $image_content = file_get_contents($thumbnail_url);
-        file_put_contents($thumbnail_path, $image_content);
+        $image_content = @file_get_contents($thumbnail_url);
+        if ($image_content) {
+            file_put_contents($thumbnail_path, $image_content);
 
-        // Return the saved path (relative URL)
-        return 'video-thumbnails/' . $unique_name;
+            // Return the saved path (relative URL)
+            return 'video-thumbnails/' . $unique_name;
+        }
     }
 
     return null;
