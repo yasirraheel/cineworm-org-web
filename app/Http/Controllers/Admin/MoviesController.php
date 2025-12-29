@@ -117,32 +117,48 @@ class MoviesController extends MainAdminController
                 }
             }
 
-            $video_url = $request->video_url;
+            $video_type = $request->video_type;
+
+            if($video_type == 'Local') {
+                $video_url = $request->video_url_local;
+            } else if($video_type == 'URL') {
+                $video_url = $request->video_url;
+            } else if($video_type == 'HLS') {
+                $video_url = $request->video_url_hls;
+            } else if($video_type == 'DASH') {
+                $video_url = $request->video_url_dash;
+            } else if($video_type == 'Embed') {
+                $video_url = $request->video_embed_code;
+            } else {
+                $video_url = $request->video_url;
+            }
+
+            $video_url = trim($video_url);
             $fileId = null;
             $video_image = '';
 
             // Check if video URL is YouTube or Vimeo
-            if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
+            if (stripos($video_url, 'youtube.com') !== false || stripos($video_url, 'youtu.be') !== false) {
                 $video_image = $this->getVideoThumbnail($video_url) ?? '';  // Get YouTube thumbnail
                 $video_type = 'YouTube';
 
-            } elseif (strpos($video_url, 'vimeo.com') !== false) {
+            } elseif (stripos($video_url, 'vimeo.com') !== false) {
                 $video_image = $this->getVideoThumbnail($video_url) ?? '';  // Get Vimeo thumbnail
                 $video_type = 'Vimeo';
 
-            } else {
+            } elseif (stripos($video_url, 'drive.google.com') !== false || stripos($video_url, 'googleapis.com') !== false) {
                 $video_type = 'GoogleDrive';
                 // Handle Google Drive URL
                 $google_drive_api = $this->getRandomApiKey();
                 GoogleDriveApi::where('api_key', $google_drive_api)->increment('calls');
 
-                $googleDriveUrl = $request->video_url;
+                $googleDriveUrl = $video_url;
 
                 // Check if URL is already a Google Drive streaming URL
-                if (strpos($googleDriveUrl, 'https://www.googleapis.com/drive/v3/files/') !== false) {
+                if (stripos($googleDriveUrl, 'https://www.googleapis.com/drive/v3/files/') !== false) {
                     $video_url = $googleDriveUrl;
                     preg_match("/files\/(.*?)\?/", $googleDriveUrl, $matches);
-                    $fileId = $matches[1];
+                    $fileId = $matches[1] ?? null;
                 } else {
                     preg_match("/\/d\/(.*?)\//", $googleDriveUrl, $matches);
 
@@ -156,6 +172,8 @@ class MoviesController extends MainAdminController
                 }
 
             }
+            // Else: Keep the original video_type (Local, URL, HLS, Embed, etc.) without throwing error
+
 
 
             // Validate the form input
@@ -263,9 +281,9 @@ class MoviesController extends MainAdminController
             Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
             return redirect()->back();
         } catch (\Exception $e) {
-            // \Log::error('Error adding movie: ' . $e->getMessage());
-            // \Log::error($e->getTraceAsString());
-            dd($e->getMessage()); // Force display error for debugging
+            \Log::error('Error adding movie: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            // dd($e->getMessage()); // Force display error for debugging
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
 
