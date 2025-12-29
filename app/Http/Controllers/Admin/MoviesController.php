@@ -263,8 +263,9 @@ class MoviesController extends MainAdminController
             Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
             return redirect()->back();
         } catch (\Exception $e) {
-            \Log::error('Error adding movie: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
+            // \Log::error('Error adding movie: ' . $e->getMessage());
+            // \Log::error($e->getTraceAsString());
+            dd($e->getMessage()); // Force display error for debugging
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
 
