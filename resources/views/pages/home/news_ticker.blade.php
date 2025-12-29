@@ -112,8 +112,9 @@
             // Find the parent news item
             var $item = $(this).closest('.news-item');
 
-            // Get the full content
+            // Get the full content template
             var content = $item.find('.news-full-content').html();
+            var link = $item.find('.news-full-content a.btn').attr('href');
 
             // Inject content into detail view
             $('#news-detail-view').html(content);
@@ -125,6 +126,29 @@
 
             // Reset scroll position of the main container
             $('.news-ticker-container').scrollTop(0);
+
+            // Add loading spinner
+            var $newsBody = $('#news-detail-view .news-body');
+            $newsBody.append('<div id="news-loading" class="text-center mt-3" style="color: #e50914;"><i class="fa fa-spinner fa-spin"></i> Loading full article...</div>');
+
+            // Fetch full content via AJAX
+            $.ajax({
+                url: '{{ url("ajax/get_news_content") }}',
+                data: { url: link },
+                success: function(response) {
+                    $('#news-loading').remove();
+                    if(response.content) {
+                        $newsBody.html(response.content);
+                        // Make sure images in the content are responsive
+                        $newsBody.find('img').css({'max-width': '100%', 'height': 'auto', 'border-radius': '4px'});
+                    }
+                },
+                error: function() {
+                    $('#news-loading').remove();
+                    // Optional: show error message or just leave the summary
+                    $newsBody.append('<div class="alert alert-warning mt-2" style="font-size: 12px; padding: 5px;">Could not load full text. <a href="'+link+'" target="_blank" class="text-dark"><u>Open original article</u></a></div>');
+                }
+            });
         });
 
         // Handle Back button click

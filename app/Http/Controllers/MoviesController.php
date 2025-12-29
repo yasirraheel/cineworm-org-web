@@ -275,4 +275,68 @@ class MoviesController extends Controller
         // return response()->json(['message' => 'Video unliked successfully']);
         return redirect()->back()->with('success','Video unliked successfully');
     }
+
+    public function getNewsContent(Request $request)
+    {
+        $url = $request->query('url');
+        
+        if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return response()->json(['error' => 'Invalid URL'], 400);
+        }
+
+        // Basic security check: ensure it is a DW domain
+        $parsedUrl = parse_url($url);
+        if (!isset($parsedUrl['host']) || strpos($parsedUrl['host'], 'dw.com') === false) {
+            return response()->json(['error' => 'Invalid domain'], 400);
+        }
+
+        try {
+            // Set a user agent to avoid being blocked
+            $options = [
+                'http' => [
+                    'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n"
+                ]
+            ];
+            $context = stream_context_create($options);
+            $html = @file_get_contents($url, false, $context);
+
+            if (!$html) {
+                return response()->json(['error' => 'Failed to fetch content'], 500);
+            }
+
+            $dom = new \DOMDocument();
+            @$dom->loadHTML($html); // Suppress warnings for malformed HTML
+            $xpath = new \DOMXPath($dom);
+
+            // DW articles usually have content in div.rich-text
+            $nodes = $xpath->query('//div[contains(@class, "rich-text")]');
+            
+            $content = '';
+            
+            if ($nodes->length > 0) {
+                // If found, get the inner HTML
+                // We need to iterate over child nodes and export them
+                foreach ($nodes->item(0)->childNodes as $child) {
+                    $content .= $dom->saveHTML($child);
+                }
+            } else {
+                // Fallback: try finding <article> tag
+                $nodes = $xpath->query('//article');
+                if ($nodes->length > 0) {
+                    foreach ($nodes->item(0)->childNodes as $child) {
+                        $content .= $dom->saveHTML($child);
+                    }
+                } else {
+                    // Another fallback: try finding header and rich-text separately if structure is different
+                    // Sometimes title is separate. For now return not found if rich-text is missing.
+                     return response()->json(['error' => 'Content not found'], 404);
+                }
+            }
+            
+            return response()->json(['content' => $content]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

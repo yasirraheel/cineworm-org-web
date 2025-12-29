@@ -462,6 +462,9 @@ Route::get('sitemap-sports.xml', 'IndexController@sitemap_sports');
 Route::get('sitemap-livetv.xml', 'IndexController@sitemap_livetv');
 
 
+Route::get('ajax/get_news_content', 'MoviesController@getNewsContent');
+
+
 Route::get('watchlist/add', 'UserController@watchlist_add');
 Route::get('watchlist/remove', 'UserController@watchlist_remove');
 
