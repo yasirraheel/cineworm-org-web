@@ -86,15 +86,52 @@ class AndroidApiController extends MainAPIController
                 {
                     $user_status=false;
                 }
+
+                //User ad enable/diable
+                $user_plan_id=$user_info->plan_id;
+
+                if($user_plan_id==0)
+                {
+                    $user_ad_status=true;
+                }
+                else
+                {
+                    $plan_info = SubscriptionPlan::where('id',$user_plan_id)->first();
+
+                    if(!empty($plan_info) AND $plan_info->ads_on_off==1)
+                    {
+                        $user_ad_status=true;
+
+                    }
+                    else
+                    {
+                        $user_plan_id=$user_info->plan_id;
+                        $user_plan_exp_date=$user_info->exp_date;
+
+                        if(strtotime(date('m/d/Y'))>$user_plan_exp_date)
+                        {
+                            $user_ad_status=true;
+                        }
+                        else
+                        {
+                            $user_ad_status=false;
+                        }
+                    }
+                }
+
             }
             else
             {
                $user_status=false;
+
+               $user_ad_status=true;
             }
         }
         else
         {
             $user_status=false;
+
+            $user_ad_status=true;
         }
 
 
@@ -146,14 +183,40 @@ class AndroidApiController extends MainAPIController
         $menu_sports=$web_settings->menu_sports?"true":"false";
         $menu_livetv=$web_settings->menu_livetv?"true":"false";
 
+        //Mobile Ad
+        $player_settings = Player::findOrFail('1');
+
+        $player_default_ads=$player_settings->player_default_ads;
+
+        if($player_default_ads=="Vast")
+        {
+            $ad_on_off="on";
+
+            if($player_settings->vast_type=="Local")
+            {
+                $ad_url=\URL::to('/'.$player_settings->vast_url);
+            }
+            else
+            {
+                $ad_url=$player_settings->vast_url;
+            }
+
+        }
+        else
+        {
+            $ad_on_off="off";
+            $ad_url="";
+        }
+
 
         $app_package_name=env('BUYER_APP_PACKAGE_NAME')?env('BUYER_APP_PACKAGE_NAME'):"";
 
-        $response[] = array('app_package_name'=>$app_package_name,'app_name' => $app_name,'app_logo' => $app_logo,'app_version' => $app_version,'app_company' => $app_company,'app_email' => $app_email,'app_website' => $app_website,'app_contact' => $app_contact,'app_about' => $app_about,'app_privacy' => $app_privacy,'app_terms'=>$app_terms,'ads_list'=>$ads_obj,'app_update_hide_show' => $app_update_hide_show,'app_update_version_code' => $app_update_version_code,'app_update_desc' => $app_update_desc,'app_update_link' => $app_update_link,'app_update_cancel_option' => $app_update_cancel_option,'menu_shows'=>$menu_shows,'menu_movies'=>$menu_movies,'menu_sports'=>$menu_sports,'menu_livetv'=>$menu_livetv,'success'=>'1');
+        $response[] = array('app_package_name'=>$app_package_name,'app_name' => $app_name,'app_logo' => $app_logo,'app_version' => $app_version,'app_company' => $app_company,'app_email' => $app_email,'app_website' => $app_website,'app_contact' => $app_contact,'app_about' => $app_about,'app_privacy' => $app_privacy,'app_terms'=>$app_terms,'ads_list'=>$ads_obj,'app_update_hide_show' => $app_update_hide_show,'app_update_version_code' => $app_update_version_code,'app_update_desc' => $app_update_desc,'app_update_link' => $app_update_link,'app_update_cancel_option' => $app_update_cancel_option,'menu_shows'=>$menu_shows,'menu_movies'=>$menu_movies,'menu_sports'=>$menu_sports,'menu_livetv'=>$menu_livetv,'ad_on_off'=>$ad_on_off,'ad_url'=>$ad_url,'success'=>'1');
 
         return \Response::json(array(
             'VIDEO_STREAMING_APP' => $response,
             'user_status' => $user_status,
+            'user_ad_status' => $user_ad_status,
             'status_code' => 200
         ));
 
@@ -201,8 +264,7 @@ class AndroidApiController extends MainAPIController
 
         $settings = Settings::findOrFail('1');
 
-        $gateway_list = PaymentGateway::where('status','1')->orderby('id')->get();
-
+        $gateway_list = PaymentGateway::where('id','!=','1')->where('status','1')->orderby('id')->get();
 
         $settings = Settings::findOrFail('1');
 
@@ -261,9 +323,6 @@ class AndroidApiController extends MainAPIController
 
                   $response[] = array('msg' => trans('words.account_banned'),'success'=>'0');
             }
-            else if($user_info->email_verified_at === null){
-                $response[] = array('msg' => 'Please verify your email address before logging in. Check your inbox for the verification link.','success'=>'0');
-            }
             else
             {
                 $user_id=$user_info->id;
@@ -321,7 +380,7 @@ class AndroidApiController extends MainAPIController
                 }
                 else
                 {
-                    $user_image=\URL::asset('upload/profile.png');
+                    $user_image=\URL::asset('images/user_icon.png');
                 }
                 $phone= $user->phone?$user->phone:'';
                 $response[] = array('user_session_name' => $user_session_name,'device_limit_reached' => $device_limit_reached,'user_id' => $user_id,'name' => $user->name,'email' => $user->email,'phone' => $phone,'user_image' => $user_image,'msg' => 'Login successfully...','success'=>'1');
@@ -380,7 +439,7 @@ class AndroidApiController extends MainAPIController
                 }
                 else
                 {
-                    $user_image=\URL::asset('upload/profile.png');
+                    $user_image=\URL::asset('images/user_icon.png');
                 }
 
                 if($finduser->status=='0' AND $finduser->deleted_at!=NULL)
@@ -481,7 +540,7 @@ class AndroidApiController extends MainAPIController
                 }
                 else
                 {
-                    $user_image=\URL::asset('upload/profile.png');
+                    $user_image=\URL::asset('images/user_icon.png');
                 }
 
                 if($user->status=='0' AND $user->deleted_at!=NULL)
@@ -603,10 +662,28 @@ class AndroidApiController extends MainAPIController
         $user->password= bcrypt($password);
         $user->save();
 
-        // Send Email Verification
-        \App\Http\Controllers\Auth\EmailVerificationController::sendVerificationEmail($user);
+        //Welcome Email
 
-        $response[] = array('msg' => 'Account created successfully! Please check your email to verify your account.','success'=>'1');
+        try{
+            $user_name=$name;
+            $user_email=$email;
+
+            $data_email = array(
+                'name' => $user_name,
+                'email' => $user_email
+                );
+
+            \Mail::send('emails.welcome', $data_email, function($message) use ($user_name,$user_email){
+                $message->to($user_email, $user_name)
+                ->from(getcong('site_email'), getcong('site_name'))
+                ->subject('Welcome to '.getcong('site_name'));
+            });
+        }catch (\Throwable $e) {
+
+                    \Log::info($e->getMessage());
+                }
+
+        $response[] = array('msg' => trans('words.account_created_successfully'),'success'=>'1');
         return \Response::json(array(
             'VIDEO_STREAMING_APP' => $response,
             'status_code' => 200
@@ -669,7 +746,7 @@ class AndroidApiController extends MainAPIController
         }
         else
         {
-            $user_image=\URL::asset('upload/profile.jpg');
+            $user_image=\URL::asset('images/user_icon.png');
         }
 
         if($user->plan_id==0)
@@ -760,13 +837,13 @@ class AndroidApiController extends MainAPIController
         }
         else
         {
-            $user_image=\URL::asset('upload/profile.jpg');
+            $user_image=\URL::asset('images/user_icon.png');
         }
 
         $phone=$user->phone?$user->phone:'';
-        $user_address=$user->user_address?$user->user_address:'';
 
-        $response[] = array('user_id' => $user_id,'name' => $user->name,'email' => $user->email,'phone' => $phone,'user_address' => $user_address,'user_image' => $user_image,'msg' => 'Profile','success'=>'1');
+
+        $response[] = array('user_id' => $user_id,'name' => $user->name,'email' => $user->email,'phone' => $phone,'user_image' => $user_image,'msg' => 'Profile','success'=>'1');
 
 
         return \Response::json(array(
@@ -813,7 +890,6 @@ class AndroidApiController extends MainAPIController
         $user->name = $get_data['name'];
         $user->email = $get_data['email'];
         $user->phone = $get_data['phone'];
-        $user->user_address = $get_data['user_address'];
 
         if($get_data['password'])
         {
@@ -1014,32 +1090,90 @@ class AndroidApiController extends MainAPIController
 
         $get_data=checkSignSalt($_POST['data']);
 
+        $response['slider'] = array();
+        $response['home_sections'] = array();
+
         $slider= Slider::where('status',1)->whereRaw("find_in_set('Home',slider_display_on)")->orderby('id','DESC')->get();
 
         foreach($slider as $slider_data)
         {
             if($slider_data->slider_type=="Movies")
             {
-               $video_access= Movies::getMoviesInfo($slider_data->slider_post_id,'video_access');
+
+               $movies_info = Movies::where('status',1)->where('id',$slider_data->slider_post_id)->first();
+
+                if(!empty($movies_info))
+                {
+                    $lang_cat_id=$movies_info->movie_lang_id;
+                }
+                else
+                {
+                    $lang_cat_id='';
+                }
+
+                $lang_cat_name =  Language::getLanguageInfo($lang_cat_id,'language_name');
+
+                $video_access= $movies_info->video_access;
             }
             else if($slider_data->slider_type=="Shows")
             {
-                $video_access= Series::getSeriesInfo($slider_data->slider_post_id,'series_access');
+                $series_info = Series::where('status',1)->where('id',$slider_data->slider_post_id)->first();
+
+                if(!empty($series_info))
+                {
+                    $lang_cat_id=$series_info->series_lang_id;
+                }
+                else
+                {
+                    $lang_cat_id='';
+                }
+
+                $lang_cat_name =  Language::getLanguageInfo($lang_cat_id,'language_name');
+
+                $video_access= $series_info->series_access;
             }
             else if($slider_data->slider_type=="Sports")
             {
-                $video_access= Sports::getSportsInfo($slider_data->slider_post_id,'video_access');
+                $sports_info = Sports::where('status',1)->where('id',$slider_data->slider_post_id)->first();
+
+                if(!empty($sports_info))
+                {
+                    $lang_cat_id=$sports_info->sports_cat_id;
+                }
+                else
+                {
+                    $lang_cat_id='';
+                }
+
+                $lang_cat_name = SportsCategory::getSportsCategoryInfo($lang_cat_id,'category_name');
+
+                $video_access= $sports_info->video_access;
             }
             else if($slider_data->slider_type=="LiveTV")
             {
-                $video_access= LiveTV::getLiveTvInfo($slider_data->slider_post_id,'channel_access');
+                $livetv_info = LiveTV::where('status',1)->where('id',$slider_data->slider_post_id)->first();
+
+                if(!empty($livetv_info))
+                {
+                    $lang_cat_id=$livetv_info->channel_cat_id;
+                }
+                else
+                {
+                    $lang_cat_id='';
+                }
+
+                $lang_cat_name = TvCategory::getTvCategoryInfo($lang_cat_id,'category_name');
+
+                $video_access= $livetv_info->channel_access;
             }
             else
             {
+                $lang_cat_name ='';
+
                 $video_access='';
             }
 
-            $response['slider'][]=array("slider_title"=>stripslashes($slider_data->slider_title),"slider_type"=>$slider_data->slider_type,"slider_post_id"=>$slider_data->slider_post_id,"slider_image"=>\URL::to('/'.$slider_data->slider_image),"video_access"=>$video_access);
+            $response['slider'][]=array("slider_title"=>stripslashes($slider_data->slider_title),"slider_type"=>$slider_data->slider_type,"slider_post_id"=>$slider_data->slider_post_id,"slider_image"=>\URL::to('/'.$slider_data->slider_image),"video_access"=>$video_access,"lang_cat_name"=>$lang_cat_name);
         }
 
         //Recently Watched
@@ -1231,7 +1365,7 @@ class AndroidApiController extends MainAPIController
                 {
                     $movies_info = Movies::where('id',$movie_data)->first();
 
-                    if($movies_info->status==1)
+                    if($movies_info && $movies_info->status==1)
                     {
                         $video_id=$movies_info->id;
                         $video_type="Movie";
@@ -1286,7 +1420,7 @@ class AndroidApiController extends MainAPIController
                 {
                     $sports_info = Sports::where('id',$sport_data)->first();
 
-                    if($sports_info->status==1)
+                    if($sports_info && $sports_info->status==1)
                     {
                         $video_id=$sports_info->id;
                         $video_type="Sports";
@@ -1355,7 +1489,7 @@ class AndroidApiController extends MainAPIController
             {
                 $movies_info = Movies::where('id',$movie_data)->first();
 
-                if($movies_info->status==1)
+                if($movies_info && $movies_info->status==1)
                 {
                     $video_id=$movies_info->id;
                     $video_type="Movie";
@@ -1430,7 +1564,7 @@ class AndroidApiController extends MainAPIController
             {
                 $tv_info = LiveTV::where('id',$tv_data)->first();
 
-                if($tv_info->status==1)
+                if($tv_info && $tv_info->status==1)
                 {
                     $video_id=$tv_info->id;
                     $video_type="LiveTV";
@@ -1741,14 +1875,14 @@ class AndroidApiController extends MainAPIController
                 $ad_name= isset($ad_info->ad_name)?$ad_info->ad_name:'';
                 $ad_image= isset($ad_info->ad_image)?$ad_info->ad_image:'';
 
-                 if($ad_image)
-                 {
+                if($ad_image)
+                {
                     $ad_image_url= URL::to('/'.$ad_image);
-                 }
-                 else
-                 {
-                    $ad_image_url= URL::to('images/user_icon.png');
-                 }
+                }
+                else
+                {
+                    $ad_image_url= URL::to('admin_assets/images/placeholder.png');
+                }
 
 
                 $actor_list[]=array('ad_id'=>$actor_ids,'ad_name'=>$ad_name,'ad_image'=>$ad_image_url);
@@ -1771,14 +1905,14 @@ class AndroidApiController extends MainAPIController
                 $ad_name= isset($ad_info->ad_name)?$ad_info->ad_name:'';
                 $ad_image= isset($ad_info->ad_image)?$ad_info->ad_image:'';
 
-                 if($ad_image)
-                 {
+                if($ad_image)
+                {
                     $ad_image_url= URL::to('/'.$ad_image);
-                 }
-                 else
-                 {
-                    $ad_image_url= URL::to('images/user_icon.png');
-                 }
+                }
+                else
+                {
+                    $ad_image_url= URL::to('admin_assets/images/placeholder.png');
+                }
 
 
                 $director_list[]=array('ad_id'=>$director_ids,'ad_name'=>$ad_name,'ad_image'=>$ad_image_url);
@@ -2423,14 +2557,14 @@ class AndroidApiController extends MainAPIController
                 $ad_name= isset($ad_info->ad_name)?$ad_info->ad_name:'';
                 $ad_image= isset($ad_info->ad_image)?$ad_info->ad_image:'';
 
-                 if($ad_image)
-                 {
+                if($ad_image)
+                {
                     $ad_image_url= URL::to('/'.$ad_image);
-                 }
-                 else
-                 {
-                    $ad_image_url= URL::to('images/user_icon.png');
-                 }
+                }
+                else
+                {
+                    $ad_image_url= URL::to('admin_assets/images/placeholder.png');
+                }
 
 
                 $actor_list[]=array('ad_id'=>$actor_ids,'ad_name'=>$ad_name,'ad_image'=>$ad_image_url);
@@ -2452,14 +2586,14 @@ class AndroidApiController extends MainAPIController
                 $ad_name= isset($ad_info->ad_name)?$ad_info->ad_name:'';
                 $ad_image= isset($ad_info->ad_image)?$ad_info->ad_image:'';
 
-                 if($ad_image)
-                 {
+                if($ad_image)
+                {
                     $ad_image_url= URL::to('/'.$ad_image);
-                 }
-                 else
-                 {
-                    $ad_image_url= URL::to('images/user_icon.png');
-                 }
+                }
+                else
+                {
+                    $ad_image_url= URL::to('admin_assets/images/placeholder.png');
+                }
 
 
                 $director_list[]=array('ad_id'=>$director_ids,'ad_name'=>$ad_name,'ad_image'=>$ad_image_url);
@@ -3836,7 +3970,7 @@ class AndroidApiController extends MainAPIController
 
         require_once(base_path() . '/public/paypal_braintree/lib/Braintree.php');
 
-        $mode=getPaymentGatewayInfo(1,'mode');
+        $mode=getPaymentGatewayInfo(13,'mode');
 
         if($mode=="sandbox")
         {
@@ -3848,9 +3982,9 @@ class AndroidApiController extends MainAPIController
         }
 
 
-        $merchantId=getPaymentGatewayInfo(1,'braintree_merchant_id');
-        $publicKey=getPaymentGatewayInfo(1,'braintree_public_key');
-        $privateKey=getPaymentGatewayInfo(1,'braintree_private_key');
+        $merchantId=getPaymentGatewayInfo(13,'braintree_merchant_id');
+        $publicKey=getPaymentGatewayInfo(13,'braintree_public_key');
+        $privateKey=getPaymentGatewayInfo(13,'braintree_private_key');
 
 
         $gateway = new \Braintree\Gateway([
@@ -3879,7 +4013,7 @@ class AndroidApiController extends MainAPIController
 
         require_once(base_path() . '/public/paypal_braintree/lib/Braintree.php');
 
-        $mode=getPaymentGatewayInfo(1,'mode');
+        $mode=getPaymentGatewayInfo(13,'mode');
 
         if($mode=="sandbox")
         {
@@ -3891,10 +4025,10 @@ class AndroidApiController extends MainAPIController
         }
 
 
-        $merchantId=getPaymentGatewayInfo(1,'braintree_merchant_id');
-        $publicKey=getPaymentGatewayInfo(1,'braintree_public_key');
-        $privateKey=getPaymentGatewayInfo(1,'braintree_private_key');
-        $merchantAccountId=getPaymentGatewayInfo(1,'braintree_merchant_account_id');
+        $merchantId=getPaymentGatewayInfo(13,'braintree_merchant_id');
+        $publicKey=getPaymentGatewayInfo(13,'braintree_public_key');
+        $privateKey=getPaymentGatewayInfo(13,'braintree_private_key');
+        $merchantAccountId=getPaymentGatewayInfo(13,'braintree_merchant_account_id');
 
         $gateway = new \Braintree\Gateway([
                         'environment' => $environment,
@@ -4288,6 +4422,60 @@ class AndroidApiController extends MainAPIController
          return \Response::json(array(
             'VIDEO_STREAMING_APP' => $response_arr,
              'status_code' => 200
+        ));
+
+    }
+
+    public function paystack_token_get()
+    {
+
+        $get_data=checkSignSalt($_POST['data']);
+
+        $paystack_secret_key=getPaymentGatewayInfo(4,'paystack_secret_key');
+
+        $email=$get_data['email'];
+        $amount=$get_data['amount']*100;
+
+        $url = "https://api.paystack.co/transaction/initialize";
+
+        $fields = [
+            'email' => $email,
+            'amount' => $amount,
+        ];
+
+        $fields_string = http_build_query($fields);
+
+        //open connection
+        $ch = curl_init();
+
+        //set the url, number of POST vars, POST data
+        curl_setopt($ch,CURLOPT_URL, $url);
+        curl_setopt($ch,CURLOPT_POST, true);
+        curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            "Authorization: Bearer ".$paystack_secret_key,
+            "Cache-Control: no-cache",
+        ));
+
+        //So that curl_exec returns the contents of the cURL; rather than echoing it
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+
+        //execute post
+        $result = curl_exec($ch);
+
+        $tranx = json_decode($result, true);
+          //dd($tranx);
+
+        $access_code = $tranx['data']['access_code'];
+        $reference = $tranx['data']['reference'];
+
+
+        $response[]=array("access_code"=>$access_code,"reference"=>$reference,"msg" => 'Paystack access code','success'=>'1');
+
+
+          return \Response::json(array(
+            'VIDEO_STREAMING_APP' => $response,
+            'status_code' => 200
         ));
 
     }
@@ -4763,181 +4951,442 @@ class AndroidApiController extends MainAPIController
 
     }
 
-    public function random_video()
+    //Movies, Shows Filter
+
+    public function lang_genre_cat_list()
     {
-        // Simple GET method - no parameters required
-        // Just return a random video like slider functionality
-        
-        // Default for anonymous users
-        $user_plan_status = false;
+        $get_data=checkSignSalt($_POST['data']);
 
-        // Define available content types
-        $content_types = [];
+        $lang_list = Language::where('status',1)->orderby('id')->get();
 
-        if(getcong('menu_movies')) {
-            $content_types[] = 'movies';
-        }
-        if(getcong('menu_shows')) {
-            $content_types[] = 'shows';
-        }
-        if(getcong('menu_sports')) {
-            $content_types[] = 'sports';
-        }
-        if(getcong('menu_livetv')) {
-            $content_types[] = 'livetv';
+        foreach($lang_list as $lang_data)
+        {
+                $language_id= $lang_data->id;
+                $language_name= stripslashes($lang_data->language_name);
+                $response['language'][]=array("language_id"=>$language_id,"language_name"=>$language_name);
         }
 
-        // If no content types available, default to movies
-        if(empty($content_types)) {
-            $content_types = ['movies'];
+        $genres_list = Genres::where('status',1)->orderby('id')->get();
+
+        foreach($genres_list as $genres_data)
+        {
+                $genre_id= $genres_data->id;
+                $genre_name= stripslashes($genres_data->genre_name);
+                $response['genre'][]=array("genre_id"=>$genre_id,"genre_name"=>$genre_name);
         }
 
-        // Randomly select a content type
-        $random_type = $content_types[array_rand($content_types)];
+        $sports_cat_list = SportsCategory::where('status',1)->orderby('id')->get();
 
-        $response = array();
+        foreach($sports_cat_list as $sport_cat_data)
+        {
+                $category_id= $sport_cat_data->id;
+                $category_name= stripslashes($sport_cat_data->category_name);
 
-        try {
-            switch($random_type) {
-                case 'movies':
-                    $random_content = Movies::where('status', 1)->where('upcoming', 0)->inRandomOrder()->first();
-                    if($random_content) {
-                        $video_url = '';
-                        if($random_content->video_type == "Local") {
-                            $video_url = $random_content->video_url ? URL::to('/'.$random_content->video_url) : "";
-                        } else {
-                            $video_url = $random_content->video_url ? $random_content->video_url : "";
-                        }
+                $response['sports_category'][]=array("category_id"=>$category_id,"category_name"=>$category_name);
+        }
 
-                        $response = array(
-                            'content_type' => 'movie',
-                            'id' => $random_content->id,
-                            'title' => stripslashes($random_content->video_title),
-                            'description' => stripslashes($random_content->video_description),
-                            'image' => URL::to('/'.$random_content->video_image),
-                            'video_url' => $video_url,
-                            'video_type' => $random_content->video_type,
-                            'video_access' => $random_content->video_access,
-                            'duration' => $random_content->duration,
-                            'imdb_rating' => $random_content->imdb_rating ? $random_content->imdb_rating : "",
-                            'release_date' => isset($random_content->release_date) ? date('M d Y', $random_content->release_date) : '',
-                            'slug' => $random_content->video_slug
-                        );
-                    }
-                    break;
+        $tv_cat_list = TvCategory::where('status',1)->orderby('category_name')->get();
 
-                case 'shows':
-                    // Get random episode from a random series
-                    $random_series = Series::where('status', 1)->where('upcoming', 0)->inRandomOrder()->first();
-                    if($random_series) {
-                        $random_episode = Episodes::where('episode_series_id', $random_series->id)->where('status', 1)->inRandomOrder()->first();
-                        if($random_episode) {
-                            $video_url = '';
-                            if($random_episode->video_type == "Local") {
-                                $video_url = $random_episode->video_url ? URL::to('/'.$random_episode->video_url) : "";
-                            } else {
-                                $video_url = $random_episode->video_url ? $random_episode->video_url : "";
-                            }
+        foreach($tv_cat_list as $tv_cat_data)
+        {
+                $category_id= $tv_cat_data->id;
+                $category_name= stripslashes($tv_cat_data->category_name);
 
-                            $response = array(
-                                'content_type' => 'episode',
-                                'id' => $random_episode->id,
-                                'series_id' => $random_series->id,
-                                'title' => stripslashes($random_episode->video_title),
-                                'series_name' => stripslashes($random_series->series_name),
-                                'description' => stripslashes($random_episode->video_description),
-                                'image' => URL::to('/'.$random_episode->video_image),
-                                'video_url' => $video_url,
-                                'video_type' => $random_episode->video_type,
-                                'video_access' => $random_episode->video_access,
-                                'duration' => $random_episode->duration,
-                                'season_name' => $random_episode->season_name,
-                                'episode_number' => $random_episode->episode_number,
-                                'slug' => $random_episode->video_slug
-                            );
-                        }
-                    }
-                    break;
+                $response['tv_category'][]=array("category_id"=>$category_id,"category_name"=>$category_name);
+        }
 
-                case 'sports':
-                    $random_content = Sports::where('status', 1)->inRandomOrder()->first();
-                    if($random_content) {
-                        $video_url = '';
-                        if($random_content->video_type == "Local") {
-                            $video_url = $random_content->video_url ? URL::to('/'.$random_content->video_url) : "";
-                        } else {
-                            $video_url = $random_content->video_url ? $random_content->video_url : "";
-                        }
+        $response = isset($response)?$response:array();
 
-                        $response = array(
-                            'content_type' => 'sports',
-                            'id' => $random_content->id,
-                            'title' => stripslashes($random_content->video_title),
-                            'description' => stripslashes($random_content->video_description),
-                            'image' => URL::to('/'.$random_content->video_image),
-                            'video_url' => $video_url,
-                            'video_type' => $random_content->video_type,
-                            'video_access' => $random_content->video_access,
-                            'duration' => $random_content->duration,
-                            'slug' => $random_content->video_slug
-                        );
-                    }
-                    break;
+        return \Response::json(array(
+            'VIDEO_STREAMING_APP' => $response,
+            'status_code' => 200
+        ));
+    }
 
-                case 'livetv':
-                    $random_content = LiveTV::where('status', 1)->inRandomOrder()->first();
-                    if($random_content) {
-                        $video_url = '';
-                        if($random_content->channel_url_type == "HLS") {
-                            $video_url = $random_content->channel_url;
-                        } else if($random_content->channel_url_type == "DASH") {
-                            $video_url = $random_content->channel_url2;
-                        } else {
-                            $video_url = $random_content->channel_url3;
-                        }
+    public function movies_filter()
+    {
+        $get_data=checkSignSalt($_POST['data']);
 
-                        $response = array(
-                            'content_type' => 'livetv',
-                            'id' => $random_content->id,
-                            'title' => stripslashes($random_content->channel_name),
-                            'description' => stripslashes($random_content->channel_description),
-                            'image' => URL::to('/'.$random_content->channel_thumb),
-                            'video_url' => $video_url,
-                            'video_type' => $random_content->channel_url_type,
-                            'video_access' => $random_content->channel_access,
-                            'slug' => $random_content->channel_slug
-                        );
-                    }
-                    break;
+        $keyword=$get_data['filter'];
+
+        $filter_lang_id=$get_data['lang_id'];
+        $filter_genre_id=$get_data['genre_id'];
+
+        if($keyword=='old')
+        {
+            $lang_ids = $filter_lang_id?json_decode("[$filter_lang_id]", true):'';
+            $genre_id = $filter_genre_id?explode(',',$filter_genre_id):'';
+
+
+            $movies_list = Movies::where('status',1)->where('upcoming',0)->when($lang_ids, function ($q) use ($lang_ids) {
+                return $q->whereIn('movie_lang_id',$lang_ids);
+            })
+            ->when($genre_id, function ($q) use ($genre_id) {
+                foreach($genre_id as $term) {
+                    $q->whereRaw("find_in_set('$term',movie_genre_id)");
+                };
+            })->orderby('id','ASC')->paginate(12);
+
+
+        }
+        else if($keyword=='alpha')
+        {
+            $lang_ids = $filter_lang_id?json_decode("[$filter_lang_id]", true):'';
+            $genre_id = $filter_genre_id?explode(',',$filter_genre_id):'';
+
+
+            $movies_list = Movies::where('status',1)->where('upcoming',0)->when($lang_ids, function ($q) use ($lang_ids) {
+                return $q->whereIn('movie_lang_id',$lang_ids);
+            })
+            ->when($genre_id, function ($q) use ($genre_id) {
+                foreach($genre_id as $term) {
+                    $q->whereRaw("find_in_set('$term',movie_genre_id)");
+                };
+            })->orderby('video_title','ASC')->paginate(12);
+        }
+        else if($keyword=='rand')
+        {
+            $lang_ids = $filter_lang_id?json_decode("[$filter_lang_id]", true):'';
+            $genre_id = $filter_genre_id?explode(',',$filter_genre_id):'';
+
+
+            $movies_list = Movies::where('status',1)->where('upcoming',0)->when($lang_ids, function ($q) use ($lang_ids) {
+                return $q->whereIn('movie_lang_id',$lang_ids);
+            })
+            ->when($genre_id, function ($q) use ($genre_id) {
+                foreach($genre_id as $term) {
+                    $q->whereRaw("find_in_set('$term',movie_genre_id)");
+                };
+            })->inRandomOrder()->paginate(12);
+
+        }
+        else
+        {
+            $lang_ids = $filter_lang_id?json_decode("[$filter_lang_id]", true):'';
+            $genre_id = $filter_genre_id?explode(',',$filter_genre_id):'';
+
+
+            $movies_list = Movies::where('status',1)->where('upcoming',0)->when($lang_ids, function ($q) use ($lang_ids) {
+                return $q->whereIn('movie_lang_id',$lang_ids);
+            })
+            ->when($genre_id, function ($q) use ($genre_id) {
+                foreach($genre_id as $term) {
+                    $q->whereRaw("find_in_set('$term',movie_genre_id)");
+                };
+            })->orderby('id','DESC')->paginate(12);
+
+        }
+
+        if($movies_list->currentPage() == $movies_list->lastPage())
+        {
+            $load_more=false;
+        }
+        else
+        {
+            $load_more=true;
+        }
+
+
+    if($movies_list->count())
+    {
+            foreach($movies_list  as $movie_data)
+            {
+
+                    $movie_id= $movie_data->id;
+                    $movie_title= stripslashes($movie_data->video_title);
+                    $movie_poster= URL::to('/'.$movie_data->video_image_thumb);
+                    $movie_duration= $movie_data->duration;
+                    $movie_access= $movie_data->video_access;
+
+                    $content_rating= $movie_data->content_rating?$movie_data->content_rating:'';
+
+
+                    $response[]=array("movie_id"=>$movie_id,"content_rating"=>$content_rating,"movie_title"=>$movie_title,"movie_poster"=>$movie_poster,"movie_duration"=>$movie_duration,"movie_access"=>$movie_access);
+
             }
-
-            if(empty($response)) {
-                return \Response::json(array(
-                    'VIDEO_STREAMING_APP' => array(),
-                    'msg' => 'No random video found',
-                    'success' => '0',
-                    'status_code' => 404
-                ));
-            }
-
-            // Add user plan check result
-            $response['user_plan_status'] = $user_plan_status;
-
-            return \Response::json(array(
-                'VIDEO_STREAMING_APP' => $response,
-                'msg' => 'Random video fetched successfully',
-                'success' => '1',
-                'status_code' => 200
-            ));
-
-        } catch(\Exception $e) {
-            return \Response::json(array(
-                'VIDEO_STREAMING_APP' => array(),
-                'msg' => 'Error fetching random video: ' . $e->getMessage(),
-                'success' => '0',
-                'status_code' => 500
-            ));
         }
+        else
+        {
+            $response=array();
+        }
+
+        return \Response::json(array(
+            'VIDEO_STREAMING_APP' => $response,
+            'load_more' => $load_more,
+            'status_code' => 200
+        ));
+    }
+
+    public function shows_filter()
+    {
+        $get_data=checkSignSalt($_POST['data']);
+
+        $keyword=$get_data['filter'];
+
+        $filter_lang_id=$get_data['lang_id'];
+        $filter_genre_id=$get_data['genre_id'];
+
+
+        if($keyword=='old')
+        {
+            $lang_ids = $filter_lang_id?json_decode("[$filter_lang_id]", true):'';
+            $genre_id = $filter_genre_id?explode(',',$filter_genre_id):'';
+
+
+            $series_list = Series::where('status',1)->where('upcoming',0)->when($lang_ids, function ($q) use ($lang_ids) {
+                return $q->whereIn('series_lang_id',$lang_ids);
+            })
+            ->when($genre_id, function ($q) use ($genre_id) {
+                foreach($genre_id as $term) {
+                    $q->whereRaw("find_in_set('$term',series_genres)");
+                };
+            })->orderby('id','ASC')->paginate(12);
+
+
+        }
+        else if($keyword=='alpha')
+        {
+            $lang_ids = $filter_lang_id?json_decode("[$filter_lang_id]", true):'';
+            $genre_id = $filter_genre_id?explode(',',$filter_genre_id):'';
+
+
+            $series_list = Series::where('status',1)->where('upcoming',0)->when($lang_ids, function ($q) use ($lang_ids) {
+                return $q->whereIn('series_lang_id',$lang_ids);
+            })
+            ->when($genre_id, function ($q) use ($genre_id) {
+                foreach($genre_id as $term) {
+                    $q->whereRaw("find_in_set('$term',series_genres)");
+                };
+            })->orderby('video_title','ASC')->paginate(12);
+        }
+        else if($keyword=='rand')
+        {
+            $lang_ids = $filter_lang_id?json_decode("[$filter_lang_id]", true):'';
+            $genre_id = $filter_genre_id?explode(',',$filter_genre_id):'';
+
+
+            $series_list = Series::where('status',1)->where('upcoming',0)->when($lang_ids, function ($q) use ($lang_ids) {
+                return $q->whereIn('series_lang_id',$lang_ids);
+            })
+            ->when($genre_id, function ($q) use ($genre_id) {
+                foreach($genre_id as $term) {
+                    $q->whereRaw("find_in_set('$term',series_genres)");
+                };
+            })->inRandomOrder()->paginate(12);
+
+        }
+        else
+        {
+            $lang_ids = $filter_lang_id?json_decode("[$filter_lang_id]", true):'';
+            $genre_id = $filter_genre_id?explode(',',$filter_genre_id):'';
+
+
+            $series_list = Series::where('status',1)->where('upcoming',0)->when($lang_ids, function ($q) use ($lang_ids) {
+                return $q->whereIn('series_lang_id',$lang_ids);
+            })
+            ->when($genre_id, function ($q) use ($genre_id) {
+                foreach($genre_id as $term) {
+                    $q->whereRaw("find_in_set('$term',series_genres)");
+                };
+            })->orderby('id','DESC')->paginate(12);
+
+        }
+
+        if($series_list->currentPage() == $series_list->lastPage())
+        {
+            $load_more=false;
+        }
+        else
+        {
+            $load_more=true;
+        }
+
+       if($series_list->count())
+       {
+            foreach($series_list as $series_data)
+            {
+                    $show_id= $series_data->id;
+                    $show_title=  stripslashes($series_data->series_name);
+                    $show_poster=  URL::to('/'.$series_data->series_poster);
+
+                    $content_rating= $series_data->content_rating?$series_data->content_rating:'';
+
+                    $show_access= $series_data->series_access;
+
+                    $response[]=array("show_id"=>$show_id,"show_access"=>$show_access,"content_rating"=>$content_rating,"show_title"=>$show_title,"show_poster"=>$show_poster);
+            }
+       }
+       else
+       {
+            $response=array();
+       }
+
+        return \Response::json(array(
+            'VIDEO_STREAMING_APP' => $response,
+            'load_more' => $load_more,
+            'status_code' => 200
+        ));
+    }
+
+    public function sports_filter()
+    {
+        $get_data=checkSignSalt($_POST['data']);
+
+        $keyword=$get_data['filter'];
+
+        $filter_cat_id=$get_data['cat_id'];
+
+        if($keyword=='old')
+        {
+            $cat_ids = $filter_cat_id?json_decode("[$filter_cat_id]", true):'';
+
+            $sports_video_list = Sports::where('status',1)->when($cat_ids, function ($q) use ($cat_ids) {
+                return $q->whereIn('sports_cat_id',$cat_ids);
+            })->orderby('id','ASC')->paginate(12);
+
+
+        }
+        else if($keyword=='alpha')
+        {
+            $cat_ids = $filter_cat_id?json_decode("[$filter_cat_id]", true):'';
+
+            $sports_video_list = Sports::where('status',1)->when($cat_ids, function ($q) use ($cat_ids) {
+                return $q->whereIn('sports_cat_id',$cat_ids);
+            })->orderby('video_title','ASC')->paginate(12);
+        }
+        else if($keyword=='rand')
+        {
+            $cat_ids = $filter_cat_id?json_decode("[$filter_cat_id]", true):'';
+
+            $sports_video_list = Sports::where('status',1)->when($cat_ids, function ($q) use ($cat_ids) {
+                return $q->whereIn('sports_cat_id',$cat_ids);
+            })->inRandomOrder()->paginate(12);
+
+        }
+        else
+        {
+            $cat_ids = $filter_cat_id?json_decode("[$filter_cat_id]", true):'';
+
+            $sports_video_list = Sports::where('status',1)->when($cat_ids, function ($q) use ($cat_ids) {
+                return $q->whereIn('sports_cat_id',$cat_ids);
+            })->orderby('id','DESC')->paginate(12);
+
+        }
+
+        if($sports_video_list->currentPage() == $sports_video_list->lastPage())
+        {
+            $load_more=false;
+        }
+        else
+        {
+            $load_more=true;
+        }
+
+        if($sports_video_list->count())
+        {
+             foreach($sports_video_list  as $sports_data)
+             {
+
+                     $sport_id= $sports_data->id;
+                     $sport_title= stripslashes($sports_data->video_title);
+                     $sport_poster= URL::to('/'.$sports_data->video_image);
+                     $sport_duration= $sports_data->duration;
+                     $sport_access= $sports_data->video_access;
+
+                     $response[]=array("sport_id"=>$sport_id,"sport_title"=>$sport_title,"sport_image"=>$sport_poster,"sport_duration"=>$sport_duration,"sport_access"=>$sport_access);
+
+             }
+         }
+         else
+         {
+             $response=array();
+         }
+
+        return \Response::json(array(
+            'VIDEO_STREAMING_APP' => $response,
+            'load_more' => $load_more,
+            'status_code' => 200
+        ));
+    }
+
+    public function livetv_filter()
+    {
+        $get_data=checkSignSalt($_POST['data']);
+
+        $keyword=$get_data['filter'];
+
+        $filter_cat_id=$get_data['cat_id'];
+
+        if($keyword=='old')
+        {
+            $cat_ids = $filter_cat_id?json_decode("[$filter_cat_id]", true):'';
+
+            $live_tv_list = LiveTV::where('status',1)->when($cat_ids, function ($q) use ($cat_ids) {
+                return $q->whereIn('channel_cat_id',$cat_ids);
+            })->orderby('id','ASC')->paginate(12);
+
+
+        }
+        else if($keyword=='alpha')
+        {
+            $cat_ids = $filter_cat_id?json_decode("[$filter_cat_id]", true):'';
+
+            $live_tv_list = LiveTV::where('status',1)->when($cat_ids, function ($q) use ($cat_ids) {
+                return $q->whereIn('channel_cat_id',$cat_ids);
+            })->orderby('channel_name','ASC')->paginate(12);
+        }
+        else if($keyword=='rand')
+        {
+            $cat_ids = $filter_cat_id?json_decode("[$filter_cat_id]", true):'';
+
+            $live_tv_list = LiveTV::where('status',1)->when($cat_ids, function ($q) use ($cat_ids) {
+                return $q->whereIn('channel_cat_id',$cat_ids);
+            })->inRandomOrder()->paginate(12);
+
+        }
+        else
+        {
+            $cat_ids = $filter_cat_id?json_decode("[$filter_cat_id]", true):'';
+
+            $live_tv_list = LiveTV::where('status',1)->when($cat_ids, function ($q) use ($cat_ids) {
+                return $q->whereIn('channel_cat_id',$cat_ids);
+            })->orderby('id','DESC')->paginate(12);
+
+        }
+
+        if($live_tv_list->currentPage() == $live_tv_list->lastPage())
+        {
+            $load_more=false;
+        }
+        else
+        {
+            $load_more=true;
+        }
+
+        if($live_tv_list->count())
+        {
+            foreach($live_tv_list  as $live_tv_data)
+            {
+
+                    $tv_id= $live_tv_data->id;
+                    $tv_title= stripslashes($live_tv_data->channel_name);
+                    $tv_logo= URL::to('/'.$live_tv_data->channel_thumb);
+                    $tv_access= $live_tv_data->channel_access;
+
+                    $response[]=array("tv_id"=>$tv_id,"tv_title"=>$tv_title,"tv_logo"=>$tv_logo,"tv_access"=>$tv_access);
+
+            }
+        }
+        else
+        {
+            $response=array();
+        }
+
+        return \Response::json(array(
+            'VIDEO_STREAMING_APP' => $response,
+            'load_more' => $load_more,
+            'status_code' => 200
+        ));
     }
 
 
