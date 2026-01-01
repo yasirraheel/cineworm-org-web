@@ -210,6 +210,17 @@
                                     href="{{ URL::to('admin/android_settings') }}"
                                     class="{{ classActivePath('android_settings') }}"><i
                                         class="fa fa-cog"></i><span>{{ trans('words.android_app_settings') }}</span></a>
+                            </li>
+                            <li class="{{ classActivePath('android_notification') }}"><a
+                                    href="{{ URL::to('admin/android_notification') }}"
+                                    class="{{ classActivePath('android_notification') }}"><i
+                                        class="fa fa-bell"></i><span>{{ trans('words.android_app_notification') }}</span></a>
+                            </li>
+                            <li class="{{ classActivePath('verify_purchase_app') }}"><a
+                                    href="{{ URL::to('admin/verify_purchase_app') }}"
+                                    class="{{ classActivePath('verify_purchase_app') }}"><i
+                                        class="fa fa-check"></i><span>Verify Purchase</span></a>
+                            </li>
                         </ul>
                     </li>
                     <li class="{{ classActivePath('messages') }}">
@@ -306,6 +317,28 @@
                                     href="{{ URL::to('admin/deleted_users') }}"
                                     class="{{ classActivePath('deleted_users') }}"><i
                                         class="fa fa-users"></i><span>{{ trans('words.deleted_users') }}</span></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect"><i
+                                class="fa fa-android"></i><span>{{ trans('words.android_app') }}</span><span
+                                class="menu-arrow"></span></a>
+                        <ul class="list-unstyled">
+                            <li class="{{ classActivePath('android_settings') }}"><a
+                                    href="{{ URL::to('admin/android_settings') }}"
+                                    class="{{ classActivePath('android_settings') }}"><i
+                                        class="fa fa-cog"></i><span>{{ trans('words.android_app_settings') }}</span></a>
+                            </li>
+                            <li class="{{ classActivePath('android_notification') }}"><a
+                                    href="{{ URL::to('admin/android_notification') }}"
+                                    class="{{ classActivePath('android_notification') }}"><i
+                                        class="fa fa-bell"></i><span>{{ trans('words.android_app_notification') }}</span></a>
+                            </li>
+                            <li class="{{ classActivePath('verify_purchase_app') }}"><a
+                                    href="{{ URL::to('admin/verify_purchase_app') }}"
+                                    class="{{ classActivePath('verify_purchase_app') }}"><i
+                                        class="fa fa-check"></i><span>Verify Purchase</span></a>
                             </li>
                         </ul>
                     </li>
