@@ -22,12 +22,10 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <ul class="list-unstyled">
-                            @if (getcong('menu_movies'))
-                                <li><a href="{{ URL::to('admin/movies') }}"
-                                        class="waves-effect {{ classActivePath('movies') }}"><i
-                                            class="fa fa-video-camera"></i><span>{{ trans('words.movies_text') }}</span></a>
-                                </li>
-                            @endif
+                            <li><a href="{{ URL::to('admin/movies') }}"
+                                    class="waves-effect {{ classActivePath('movies') }}"><i
+                                        class="fa fa-video-camera"></i><span>{{ trans('words.movies_text') }}</span></a>
+                            </li>
 
                             <li class="{{ classActivePath('generateScreenshot') }}"><a
                                     href="{{ URL::to('admin/generateScreenshot') }}"
@@ -43,8 +41,24 @@
                         </ul>
                     </li>
 
+                    <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect"><i class="fa fa-television"></i><span>{{ trans('words.tv_shows_text') }}</span><span class="menu-arrow"></span></a>
+                        <ul class="list-unstyled">
+                            <li class="{{ classActivePath('series') }}"><a href="{{ URL::to('admin/series') }}" class="{{ classActivePath('series') }}"><i class="fa fa-film"></i><span>{{ trans('words.tv_shows_text') }}</span></a></li>
+                            <li class="{{ classActivePath('season') }}"><a href="{{ URL::to('admin/season') }}" class="{{ classActivePath('season') }}"><i class="fa fa-list"></i><span>{{ trans('words.seasons_text') }}</span></a></li>
+                            <li class="{{ classActivePath('episodes') }}"><a href="{{ URL::to('admin/episodes') }}" class="{{ classActivePath('episodes') }}"><i class="fa fa-list"></i><span>{{ trans('words.episodes_text') }}</span></a></li>
+                        </ul>
+                    </li>
 
-   @if(getcong('menu_livetv'))
+                    <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect"><i class="fa fa-soccer-ball-o"></i><span>{{ trans('words.sports_text') }}</span><span class="menu-arrow"></span></a>
+                        <ul class="list-unstyled">
+                            <li class="{{ classActivePath('sports_category') }}"><a href="{{ URL::to('admin/sports_category') }}" class="{{ classActivePath('sports_category') }}"><i class="fa fa-tags"></i><span>{{ trans('words.sports_cat_text') }}</span></a></li>
+                            <li class="{{ classActivePath('sports') }}"><a href="{{ URL::to('admin/sports') }}" class="{{ classActivePath('sports') }}"><i class="fa fa-list"></i><span>{{ trans('words.sports_video_text') }}</span></a></li>
+                        </ul>
+                    </li>
+
+
             <li class="has_sub">
               <a href="javascript:void(0);" class="waves-effect"><i class="fa fa-tv"></i><span>{{trans('words.live_tv')}}</span><span class="menu-arrow"></span></a>
               <ul class="list-unstyled">
@@ -52,7 +66,6 @@
                 <li class="{{classActivePath('live_tv')}}"><a href="{{ URL::to('admin/live_tv') }}" class="{{classActivePath('live_tv')}}"><i class="fa fa-list"></i><span>{{trans('words.tv_channel')}}</span></a></li>
                </ul>
             </li>
-            @endif
 
 
 
@@ -237,12 +250,10 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <ul class="list-unstyled">
-                            @if (getcong('menu_movies'))
-                                <li><a href="{{ URL::to('admin/movies') }}"
-                                        class="waves-effect {{ classActivePath('movies') }}"><i
-                                            class="fa fa-video-camera"></i><span>{{ trans('words.movies_text') }}</span></a>
-                                </li>
-                            @endif
+                            <li><a href="{{ URL::to('admin/movies') }}"
+                                    class="waves-effect {{ classActivePath('movies') }}"><i
+                                        class="fa fa-video-camera"></i><span>{{ trans('words.movies_text') }}</span></a>
+                            </li>
 
                             <li class="{{ classActivePath('generateScreenshot') }}"><a
                                     href="{{ URL::to('admin/generateScreenshot') }}"
@@ -255,6 +266,23 @@
                                     class="{{ classActivePath('google_drive_api') }}"><i
                                         class="fa fa-google"></i><span>
                                         Google Drive API</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect"><i class="fa fa-television"></i><span>{{ trans('words.tv_shows_text') }}</span><span class="menu-arrow"></span></a>
+                        <ul class="list-unstyled">
+                            <li class="{{ classActivePath('series') }}"><a href="{{ URL::to('admin/series') }}" class="{{ classActivePath('series') }}"><i class="fa fa-film"></i><span>{{ trans('words.tv_shows_text') }}</span></a></li>
+                            <li class="{{ classActivePath('season') }}"><a href="{{ URL::to('admin/season') }}" class="{{ classActivePath('season') }}"><i class="fa fa-list"></i><span>{{ trans('words.seasons_text') }}</span></a></li>
+                            <li class="{{ classActivePath('episodes') }}"><a href="{{ URL::to('admin/episodes') }}" class="{{ classActivePath('episodes') }}"><i class="fa fa-list"></i><span>{{ trans('words.episodes_text') }}</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect"><i class="fa fa-soccer-ball-o"></i><span>{{ trans('words.sports_text') }}</span><span class="menu-arrow"></span></a>
+                        <ul class="list-unstyled">
+                            <li class="{{ classActivePath('sports_category') }}"><a href="{{ URL::to('admin/sports_category') }}" class="{{ classActivePath('sports_category') }}"><i class="fa fa-tags"></i><span>{{ trans('words.sports_cat_text') }}</span></a></li>
+                            <li class="{{ classActivePath('sports') }}"><a href="{{ URL::to('admin/sports') }}" class="{{ classActivePath('sports') }}"><i class="fa fa-list"></i><span>{{ trans('words.sports_video_text') }}</span></a></li>
                         </ul>
                     </li>
                     <li class="has_sub">
@@ -293,12 +321,10 @@
         <div id="sidebar-menu">
 
             <ul>
-                @if (getcong('menu_movies'))
                             <li><a href="{{ URL::to('admin/movies') }}"
                                     class="waves-effect {{ classActivePath('movies') }}"><i
                                         class="fa fa-video-camera"></i><span>{{ trans('words.movies_text') }}</span></a>
                             </li>
-                        @endif
 
 
             </ul>
