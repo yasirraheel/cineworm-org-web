@@ -65,7 +65,7 @@
                     <div class="col-sm-8">
                       <select name="selected_movie[]" id="selected_movie" class="select2 select2-multiple" multiple="multiple" multiple data-placeholder="Select Movies...">
                                  @foreach($movies_list as $movies_data)
-                                    
+
                                     @if(isset($data_obj->movie_ids))
                                       <option value="{{$movies_data->id}}" @if(in_array($movies_data->id, explode(",",$data_obj->movie_ids))) selected @endif>{{$movies_data->video_title}}</option>
                                     @else
@@ -75,6 +75,10 @@
                                     @endif
                                  @endforeach
                             </select>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="selectAllMovies()">Select All</button>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="deselectAllMovies()">Deselect All</button>
+                            </div>
                     </div>
                   </div>
 
@@ -83,7 +87,7 @@
                     <div class="col-sm-8">
                       <select name="selected_shows[]" id="selected_shows" class="select2 select2-multiple" multiple="multiple" multiple data-placeholder="Select Shows...">
                                  @foreach($series_list as $series_data)
-                                    
+
                                     @if(isset($data_obj->show_ids))
                                       <option value="{{$series_data->id}}" @if(in_array($series_data->id, explode(",",$data_obj->show_ids))) selected @endif>{{$series_data->series_name}}</option>
                                     @else
@@ -93,6 +97,10 @@
                                     @endif
                                  @endforeach
                             </select>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="selectAllShows()">Select All</button>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="deselectAllShows()">Deselect All</button>
+                            </div>
                     </div>
                   </div>
 
@@ -101,7 +109,7 @@
                     <div class="col-sm-8">
                       <select name="selected_sport[]" id="selected_sport" class="select2 select2-multiple" multiple="multiple" multiple data-placeholder="Select Sports...">
                                  @foreach($sports_list as $sports_data)
-                                    
+
                                     @if(isset($data_obj->sport_ids))
                                       <option value="{{$sports_data->id}}" @if(in_array($sports_data->id, explode(",",$data_obj->sport_ids))) selected @endif>{{$sports_data->video_title}}</option>
                                     @else
@@ -111,6 +119,10 @@
                                     @endif
                                  @endforeach
                             </select>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="selectAllSports()">Select All</button>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="deselectAllSports()">Deselect All</button>
+                            </div>
                     </div>
                   </div>
 
@@ -119,7 +131,7 @@
                     <div class="col-sm-8">
                       <select name="selected_livetv[]" id="selected_livetv" class="select2 select2-multiple" multiple="multiple" multiple data-placeholder="Select Live TV...">
                                  @foreach($livetv_list as $livetv_data)
-                                    
+
                                     @if(isset($data_obj->tv_ids))
                                       <option value="{{$livetv_data->id}}" @if(in_array($livetv_data->id, explode(",",$data_obj->tv_ids))) selected @endif>{{$livetv_data->channel_name}}</option>
                                     @else
@@ -129,6 +141,10 @@
                                     @endif
                                  @endforeach
                             </select>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="selectAllLiveTV()">Select All</button>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="deselectAllLiveTV()">Deselect All</button>
+                            </div>
                     </div>
                   </div>
 
@@ -192,6 +208,43 @@
            }) 
   @endif
 
+  // Select All / Deselect All Functions
+  function selectAllMovies() {
+    $('#selected_movie option').prop('selected', true);
+    $('#selected_movie').trigger('change');
+  }
+
+  function deselectAllMovies() {
+    $('#selected_movie').val(null).trigger('change');
+  }
+
+  function selectAllShows() {
+    $('#selected_shows option').prop('selected', true);
+    $('#selected_shows').trigger('change');
+  }
+
+  function deselectAllShows() {
+    $('#selected_shows').val(null).trigger('change');
+  }
+
+  function selectAllSports() {
+    $('#selected_sport option').prop('selected', true);
+    $('#selected_sport').trigger('change');
+  }
+
+  function deselectAllSports() {
+    $('#selected_sport').val(null).trigger('change');
+  }
+
+  function selectAllLiveTV() {
+    $('#selected_livetv option').prop('selected', true);
+    $('#selected_livetv').trigger('change');
+  }
+
+  function deselectAllLiveTV() {
+    $('#selected_livetv').val(null).trigger('change');
+  }
+
 </script>
- 
+
 @endsection
