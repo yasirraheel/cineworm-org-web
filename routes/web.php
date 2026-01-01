@@ -210,7 +210,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('web_ads_settings', 'SettingsController@web_ads_settings');
         Route::post('web_ads_settings', 'SettingsController@update_web_ads_settings');
         Route::get('web_ads_settings/delete/{id}', 'SettingsController@web_ads_settings_delete');
-        Route::get('{type}', 'SettingsController@adButtonsBanners');
+
         Route::post('createBtn', 'SettingsController@createBtnBanner');
         Route::get('deleteBtn/{id}', 'SettingsController@deleteBtnBanner');
 
@@ -291,6 +291,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         //Route::get('maintenance/{mode}', 'SettingsController@maintenance');
 
         Route::get('maintenance/{mode}', 'SettingsController@maintenance')->where('mode', 'down|up');
+
+        Route::get('{type}', 'SettingsController@adButtonsBanners')->where('type', 'buttons|banners');
 
         Route::get('/clear-cache', function() {
             Artisan::call('cache:clear');
