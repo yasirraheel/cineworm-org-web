@@ -21,6 +21,25 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
 
+    // Test endpoint to verify API is working
+    Route::get('test', function() {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'API is working',
+            'timestamp' => now(),
+            'server' => $_SERVER['SERVER_NAME'] ?? 'unknown'
+        ]);
+    });
+    
+    Route::post('test', function() {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'POST API is working',
+            'received_data' => request()->all(),
+            'timestamp' => now()
+        ]);
+    });
+
     Route::get('/', 'AndroidApiController@index');
     Route::post('app_details', 'AndroidApiController@app_details');
     Route::post('player_settings', 'AndroidApiController@player_settings');

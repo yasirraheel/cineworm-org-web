@@ -550,16 +550,44 @@ function grab_image($file_url,$save_to){
 }
 
 if (! function_exists('checkSignSalt')) {
-function checkSignSalt($data_info){
+    function checkSignSalt($data_info){
 
         $key="viaviweb";
 
-        $data_json = $data_info;
+        // Replace space with + to fix potential PHP form decoding issue
+        $data_json = str_replace(' ', '+', $data_info);
 
-        $data_arr = json_decode(urldecode(base64_decode($data_json)),true);
+        // Decode Base64
+        $decoded_json = base64_decode($data_json);
+        
+        if(!$decoded_json) {
+             $set['VIDEO_STREAMING_APP'][] = array("status" => -1, "message" => "Invalid base64 data.");
+             header( 'Content-Type: application/json; charset=utf-8' );
+             echo json_encode($set, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+             exit();
+        }
 
-        //echo $data_arr['salt'];
-        //exit;
+        // Decode JSON
+        $data_arr = json_decode($decoded_json, true);
+
+        // Fallback: try with urldecode if the first attempt failed (legacy support)
+        if (!$data_arr) {
+             $data_arr = json_decode(urldecode($decoded_json), true);
+        }
+
+        if (!$data_arr) {
+             $set['VIDEO_STREAMING_APP'][] = array("status" => -1, "message" => "Invalid JSON data.");
+             header( 'Content-Type: application/json; charset=utf-8' );
+             echo json_encode($set, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+             exit();
+        }
+
+        if(!isset($data_arr['sign']) || !isset($data_arr['salt'])) {
+             $set['VIDEO_STREAMING_APP'][] = array("status" => -1, "message" => "Missing sign or salt.");
+             header( 'Content-Type: application/json; charset=utf-8' );
+             echo json_encode($set, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+             exit();
+        }
 
         if($data_arr['sign'] == '' && $data_arr['salt'] == '' ){
             //$data['data'] = array("status" => -1, "message" => "Invalid sign salt.");

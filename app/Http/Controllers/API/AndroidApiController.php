@@ -68,11 +68,22 @@ class AndroidApiController extends MainAPIController
     }
     public function app_details()
     {
+        try {
+            \Log::info('app_details called', ['post_data' => $_POST]);
+            
+            if(!isset($_POST['data'])) {
+                \Log::error('app_details: No data in POST');
+                return \Response::json([
+                    'VIDEO_STREAMING_APP' => [['msg' => 'No data provided', 'success' => '0']],
+                    'status_code' => 400
+                ]);
+            }
 
-        $get_data=checkSignSalt($_POST['data']);
+            $get_data=checkSignSalt($_POST['data']);
+            \Log::info('app_details decoded data', ['get_data' => $get_data]);
 
-        if(isset($get_data['user_id']) && $get_data['user_id']!='')
-        {
+            if(isset($get_data['user_id']) && $get_data['user_id']!='')
+            {
             $user_id=$get_data['user_id'];
             $user_info = User::getUserInfo($user_id);
 
@@ -213,6 +224,7 @@ class AndroidApiController extends MainAPIController
 
         $response[] = array('app_package_name'=>$app_package_name,'app_name' => $app_name,'app_logo' => $app_logo,'app_version' => $app_version,'app_company' => $app_company,'app_email' => $app_email,'app_website' => $app_website,'app_contact' => $app_contact,'app_about' => $app_about,'app_privacy' => $app_privacy,'app_terms'=>$app_terms,'ads_list'=>$ads_obj,'app_update_hide_show' => $app_update_hide_show,'app_update_version_code' => $app_update_version_code,'app_update_desc' => $app_update_desc,'app_update_link' => $app_update_link,'app_update_cancel_option' => $app_update_cancel_option,'menu_shows'=>$menu_shows,'menu_movies'=>$menu_movies,'menu_sports'=>$menu_sports,'menu_livetv'=>$menu_livetv,'ad_on_off'=>$ad_on_off,'ad_url'=>$ad_url,'success'=>'1');
 
+        \Log::info('app_details success', ['response_size' => count($response)]);
         return \Response::json(array(
             'VIDEO_STREAMING_APP' => $response,
             'user_status' => $user_status,
@@ -220,6 +232,21 @@ class AndroidApiController extends MainAPIController
             'status_code' => 200
         ));
 
+        } catch (\Exception $e) {
+            \Log::error('app_details error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return \Response::json([
+                'VIDEO_STREAMING_APP' => [[
+                    'msg' => 'Server error: ' . $e->getMessage(),
+                    'success' => '0'
+                ]],
+                'status_code' => 500
+            ]);
+        }
     }
 
     public function player_settings()
@@ -1105,15 +1132,15 @@ class AndroidApiController extends MainAPIController
                 if(!empty($movies_info))
                 {
                     $lang_cat_id=$movies_info->movie_lang_id;
+                    $video_access= $movies_info->video_access;
                 }
                 else
                 {
                     $lang_cat_id='';
+                    $video_access= '';
                 }
 
                 $lang_cat_name =  Language::getLanguageInfo($lang_cat_id,'language_name');
-
-                $video_access= $movies_info->video_access;
             }
             else if($slider_data->slider_type=="Shows")
             {
@@ -1122,15 +1149,15 @@ class AndroidApiController extends MainAPIController
                 if(!empty($series_info))
                 {
                     $lang_cat_id=$series_info->series_lang_id;
+                    $video_access= $series_info->series_access;
                 }
                 else
                 {
                     $lang_cat_id='';
+                    $video_access= '';
                 }
 
                 $lang_cat_name =  Language::getLanguageInfo($lang_cat_id,'language_name');
-
-                $video_access= $series_info->series_access;
             }
             else if($slider_data->slider_type=="Sports")
             {
@@ -1139,15 +1166,15 @@ class AndroidApiController extends MainAPIController
                 if(!empty($sports_info))
                 {
                     $lang_cat_id=$sports_info->sports_cat_id;
+                    $video_access= $sports_info->video_access;
                 }
                 else
                 {
                     $lang_cat_id='';
+                    $video_access= '';
                 }
 
                 $lang_cat_name = SportsCategory::getSportsCategoryInfo($lang_cat_id,'category_name');
-
-                $video_access= $sports_info->video_access;
             }
             else if($slider_data->slider_type=="LiveTV")
             {
@@ -1156,15 +1183,15 @@ class AndroidApiController extends MainAPIController
                 if(!empty($livetv_info))
                 {
                     $lang_cat_id=$livetv_info->channel_cat_id;
+                    $video_access= $livetv_info->channel_access;
                 }
                 else
                 {
                     $lang_cat_id='';
+                    $video_access= '';
                 }
 
                 $lang_cat_name = TvCategory::getTvCategoryInfo($lang_cat_id,'category_name');
-
-                $video_access= $livetv_info->channel_access;
             }
             else
             {
