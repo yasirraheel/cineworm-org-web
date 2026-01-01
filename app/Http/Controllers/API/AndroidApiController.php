@@ -70,7 +70,7 @@ class AndroidApiController extends MainAPIController
     {
         try {
             \Log::info('app_details called', ['post_data' => $_POST]);
-            
+
             if(!isset($_POST['data'])) {
                 \Log::error('app_details: No data in POST');
                 return \Response::json([
@@ -5429,6 +5429,151 @@ class AndroidApiController extends MainAPIController
         return \Response::json(array(
             'VIDEO_STREAMING_APP' => $response,
             'load_more' => $load_more,
+            'status_code' => 200
+        ));
+    }
+
+    public function random_movie()
+    {
+        // Get a random movie from all active movies
+        $random_movie = Movies::where('status', 1)
+                              ->where('upcoming', 0)
+                              ->inRandomOrder()
+                              ->first();
+
+        if (!$random_movie) {
+            return \Response::json(array(
+                'VIDEO_STREAMING_APP' => array('msg' => 'No movies found', 'success' => '0'),
+                'status_code' => 404
+            ));
+        }
+
+        $movie_id = $random_movie->id;
+        $movie_title = stripslashes($random_movie->video_title);
+        $movie_image = URL::to('/' . $random_movie->video_image);
+        $movie_poster = URL::to('/' . $random_movie->video_image_thumb);
+        $movie_access = $random_movie->video_access;
+        $description = stripslashes($random_movie->video_description);
+        $duration = $random_movie->duration;
+        $release_date = isset($random_movie->release_date) ? date('M d Y', $random_movie->release_date) : '';
+        $imdb_rating = $random_movie->imdb_rating ? $random_movie->imdb_rating : "";
+        $video_type = $random_movie->video_type;
+
+        if ($video_type == "Local") {
+            $video_url = $random_movie->video_url ? URL::to('/' . $random_movie->video_url) : "";
+        } else {
+            $video_url = $random_movie->video_url ? $random_movie->video_url : "";
+        }
+
+        $video_url_480 = $random_movie->video_url_480 ? $random_movie->video_url_480 : '';
+        $video_url_720 = $random_movie->video_url_720 ? $random_movie->video_url_720 : '';
+        $video_url_1080 = $random_movie->video_url_1080 ? $random_movie->video_url_1080 : '';
+
+        $subtitle_language1 = $random_movie->subtitle_language1 ? $random_movie->subtitle_language1 : '';
+        $subtitle_url1 = $random_movie->subtitle_url1 ? $random_movie->subtitle_url1 : '';
+        $subtitle_language2 = $random_movie->subtitle_language2 ? $random_movie->subtitle_language2 : '';
+        $subtitle_url2 = $random_movie->subtitle_url2 ? $random_movie->subtitle_url2 : '';
+        $subtitle_language3 = $random_movie->subtitle_language3 ? $random_movie->subtitle_language3 : '';
+        $subtitle_url3 = $random_movie->subtitle_url3 ? $random_movie->subtitle_url3 : '';
+
+        $download_enable = $random_movie->download_enable ? 'true' : 'false';
+        $download_url = $random_movie->download_url ? $random_movie->download_url : "";
+
+        $movie_lang_id = $random_movie->movie_lang_id;
+
+        // Genres List
+        $genre_list = array();
+        $movies_genres_ids = $random_movie->movie_genre_id;
+        if ($movies_genres_ids) {
+            foreach (explode(',', $movies_genres_ids) as $genres_ids) {
+                $genre_name = Genres::getGenresInfo($genres_ids, 'genre_name');
+                $genre_list[] = array('genre_id' => $genres_ids, 'genre_name' => $genre_name);
+            }
+        }
+
+        $language_name = Language::getLanguageInfo($movie_lang_id, 'language_name');
+
+        // Actor List
+        $actor_list = array();
+        if (!is_null($random_movie->actor_id)) {
+            foreach (explode(',', $random_movie->actor_id) as $actor_ids) {
+                $ad_info = ActorDirector::where('id', $actor_ids)->first();
+                $ad_name = isset($ad_info->ad_name) ? $ad_info->ad_name : '';
+                $ad_image = isset($ad_info->ad_image) ? $ad_info->ad_image : '';
+
+                if ($ad_image) {
+                    $ad_image_url = URL::to('/' . $ad_image);
+                } else {
+                    $ad_image_url = URL::to('admin_assets/images/placeholder.png');
+                }
+
+                $actor_list[] = array('ad_id' => $actor_ids, 'ad_name' => $ad_name, 'ad_image' => $ad_image_url);
+            }
+        }
+
+        // Director List
+        $director_list = array();
+        if (!is_null($random_movie->director_id)) {
+            foreach (explode(',', $random_movie->director_id) as $director_ids) {
+                $ad_info = ActorDirector::where('id', $director_ids)->first();
+                $ad_name = isset($ad_info->ad_name) ? $ad_info->ad_name : '';
+                $ad_image = isset($ad_info->ad_image) ? $ad_info->ad_image : '';
+
+                if ($ad_image) {
+                    $ad_image_url = URL::to('/' . $ad_image);
+                } else {
+                    $ad_image_url = URL::to('admin_assets/images/placeholder.png');
+                }
+
+                $director_list[] = array('ad_id' => $director_ids, 'ad_name' => $ad_name, 'ad_image' => $ad_image_url);
+            }
+        }
+
+        $video_quality = $random_movie->video_quality ? 'true' : 'false';
+        $subtitle_on_off = $random_movie->subtitle_on_off ? 'true' : 'false';
+        $movies_trailer_url = $random_movie->trailer_url ? $random_movie->trailer_url : '';
+        $content_rating = $random_movie->content_rating ? $random_movie->content_rating : '';
+        $video_views = number_format_short($random_movie->views);
+        $upcoming = $random_movie->upcoming ? 'true' : 'false';
+
+        $response = array(
+            "movie_id" => $movie_id,
+            "content_rating" => $content_rating,
+            "movie_title" => $movie_title,
+            "movie_image" => $movie_image,
+            "movie_poster" => $movie_poster,
+            "movie_access" => $movie_access,
+            "description" => $description,
+            "movie_duration" => $duration,
+            "release_date" => $release_date,
+            "imdb_rating" => $imdb_rating,
+            "video_type" => $video_type,
+            "video_url" => $video_url,
+            'video_url_480' => $video_url_480,
+            'video_url_720' => $video_url_720,
+            'video_url_1080' => $video_url_1080,
+            "download_enable" => $download_enable,
+            "download_url" => $download_url,
+            'lang_id' => $movie_lang_id,
+            'language_name' => $language_name,
+            'genre_list' => $genre_list,
+            'subtitle_language1' => $subtitle_language1,
+            'subtitle_url1' => $subtitle_url1,
+            'subtitle_language2' => $subtitle_language2,
+            'subtitle_url2' => $subtitle_url2,
+            'subtitle_language3' => $subtitle_language3,
+            'subtitle_url3' => $subtitle_url3,
+            'video_quality' => $video_quality,
+            'subtitle_on_off' => $subtitle_on_off,
+            'movies_trailer_url' => $movies_trailer_url,
+            'views' => $video_views,
+            'actor_list' => $actor_list,
+            'director_list' => $director_list,
+            'upcoming' => $upcoming
+        );
+
+        return \Response::json(array(
+            'VIDEO_STREAMING_APP' => $response,
             'status_code' => 200
         ));
     }

@@ -31,7 +31,7 @@ Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
             'php_version' => phpversion()
         ]);
     });
-    
+
     // Test endpoint to verify API is working
     Route::get('test', function() {
         return response()->json([
@@ -41,7 +41,7 @@ Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
             'server' => $_SERVER['SERVER_NAME'] ?? 'unknown'
         ]);
     });
-    
+
     Route::post('test', function() {
         return response()->json([
             'status' => 'success',
@@ -93,6 +93,8 @@ Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
     Route::post('movies_by_language', 'AndroidApiController@movies_by_language');
     Route::post('movies_by_genre', 'AndroidApiController@movies_by_genre');
     Route::post('movies_details', 'AndroidApiController@movies_details');
+    Route::get('random_movie', 'AndroidApiController@random_movie');
+    Route::post('random_movie', 'AndroidApiController@random_movie');
 
     Route::post('sports_category', 'AndroidApiController@sports_category');
     Route::post('sports', 'AndroidApiController@sports');
