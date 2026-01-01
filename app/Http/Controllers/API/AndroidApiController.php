@@ -1105,15 +1105,15 @@ class AndroidApiController extends MainAPIController
                 if(!empty($movies_info))
                 {
                     $lang_cat_id=$movies_info->movie_lang_id;
+                    $video_access= $movies_info->video_access;
                 }
                 else
                 {
                     $lang_cat_id='';
+                    $video_access= '';
                 }
 
                 $lang_cat_name =  Language::getLanguageInfo($lang_cat_id,'language_name');
-
-                $video_access= $movies_info->video_access;
             }
             else if($slider_data->slider_type=="Shows")
             {
@@ -1122,15 +1122,15 @@ class AndroidApiController extends MainAPIController
                 if(!empty($series_info))
                 {
                     $lang_cat_id=$series_info->series_lang_id;
+                    $video_access= $series_info->series_access;
                 }
                 else
                 {
                     $lang_cat_id='';
+                    $video_access= '';
                 }
 
                 $lang_cat_name =  Language::getLanguageInfo($lang_cat_id,'language_name');
-
-                $video_access= $series_info->series_access;
             }
             else if($slider_data->slider_type=="Sports")
             {
@@ -1139,15 +1139,15 @@ class AndroidApiController extends MainAPIController
                 if(!empty($sports_info))
                 {
                     $lang_cat_id=$sports_info->sports_cat_id;
+                    $video_access= $sports_info->video_access;
                 }
                 else
                 {
                     $lang_cat_id='';
+                    $video_access= '';
                 }
 
                 $lang_cat_name = SportsCategory::getSportsCategoryInfo($lang_cat_id,'category_name');
-
-                $video_access= $sports_info->video_access;
             }
             else if($slider_data->slider_type=="LiveTV")
             {
@@ -1156,15 +1156,15 @@ class AndroidApiController extends MainAPIController
                 if(!empty($livetv_info))
                 {
                     $lang_cat_id=$livetv_info->channel_cat_id;
+                    $video_access= $livetv_info->channel_access;
                 }
                 else
                 {
                     $lang_cat_id='';
+                    $video_access= '';
                 }
 
                 $lang_cat_name = TvCategory::getTvCategoryInfo($lang_cat_id,'category_name');
-
-                $video_access= $livetv_info->channel_access;
             }
             else
             {
