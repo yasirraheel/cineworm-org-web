@@ -2053,6 +2053,11 @@ class AndroidApiController extends MainAPIController
         $season_id=$get_data['season_id'];
 
         $season_info = Season::where('id',$season_id)->first();
+
+        if(!$season_info) {
+            return response()->json(['status' => 'error', 'message' => 'Season not found'], 404);
+        }
+
         $season_trailer_url =$season_info->trailer_url?$season_info->trailer_url:'';
 
         $episode_list = Episodes::where('status',1)->where('episode_season_id',$season_id)->get();
@@ -2519,6 +2524,10 @@ class AndroidApiController extends MainAPIController
         $movie_id=$get_data['movie_id'];
         $movies_info = Movies::where('id',$movie_id)->first();
 
+        if(!$movies_info) {
+            return response()->json(['status' => 'error', 'message' => 'Movie not found'], 404);
+        }
+
         $movie_slug= $movies_info->video_slug;
 
         $movie_id= $movies_info->id;
@@ -2914,6 +2923,10 @@ class AndroidApiController extends MainAPIController
         $sport_id=$get_data['sport_id'];
         $sports_info = Sports::where('id',$sport_id)->first();
 
+        if(!$sports_info) {
+            return response()->json(['status' => 'error', 'message' => 'Sports video not found'], 404);
+        }
+
         $sports_slug=$sports_info->video_slug;
 
         $sport_id= $sports_info->id;
@@ -3231,6 +3244,10 @@ class AndroidApiController extends MainAPIController
         $live_tv_id=$get_data['tv_id'];
 
         $live_tv_info = LiveTV::where('id',$live_tv_id)->first();
+
+        if(!$live_tv_info) {
+            return response()->json(['status' => 'error', 'message' => 'Live TV channel not found'], 404);
+        }
 
         $tv_slug=$live_tv_info->channel_slug;
 
