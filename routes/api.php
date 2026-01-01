@@ -21,6 +21,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
 
+    // Simple test endpoint - no authentication needed
+    Route::get('simple-test', function() {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Server is reachable!',
+            'timestamp' => now()->toIso8601String(),
+            'server_name' => 'Cineworm API',
+            'php_version' => phpversion()
+        ]);
+    });
+    
     // Test endpoint to verify API is working
     Route::get('test', function() {
         return response()->json([
