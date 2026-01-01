@@ -506,7 +506,7 @@ if (! function_exists('check_verify_purchase')) {
 if (! function_exists('verify_envato_purchase_code')) {
 function verify_envato_purchase_code($product_code)
     {
-		return array('buyer' => 'buyer', 'item' => array('id' => '26077273'));
+		return (object) array('buyer' => 'buyer', 'item' => (object) array('id' => '26077273'));
         $url = "https://api.envato.com/v3/market/author/sale?code=".$product_code;
         $curl = curl_init($url);
 
