@@ -1420,7 +1420,7 @@ class AndroidApiController extends MainAPIController
                 {
                     $series_info = Series::where('id',$show_data)->first();
 
-                    if($series_info->status==1)
+                    if($series_info && $series_info->status==1)
                     {
                         $video_id=$series_info->id;
                         $video_type="Shows";
@@ -1473,7 +1473,7 @@ class AndroidApiController extends MainAPIController
                 {
                     $tv_info = LiveTV::where('id',$tv_data)->first();
 
-                    if($tv_info->status==1)
+                    if($tv_info && $tv_info->status==1)
                     {
                         $video_id=$tv_info->id;
                         $video_type="LiveTV";
