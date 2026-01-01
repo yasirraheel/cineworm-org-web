@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\OtpController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -102,10 +103,24 @@ Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
     Route::post('mollie_pay', 'AndroidApiController@mollie_pay');
     Route::post('mollie_payment_status', 'AndroidApiController@mollie_payment_status');
 
+    Route::post('paystack_token_get', 'AndroidApiController@paystack_token_get');
+
     Route::get('user_device_limit_reached', 'AndroidApiController@user_device_limit_reached');
     Route::get('user_active_device_list', 'AndroidApiController@user_active_device_list');
     Route::get('logout_user_remotely', 'AndroidApiController@logout_user_remotely');
     Route::get('check_user_remotely_logout_or_not', 'AndroidApiController@check_user_remotely_logout_or_not');
 
-    Route::get('random_video', 'AndroidApiController@random_video');
+    //New Filter
+    Route::post('lang_genre_cat_list', 'AndroidApiController@lang_genre_cat_list');
+    Route::post('movies_filter', 'AndroidApiController@movies_filter');
+    Route::post('shows_filter', 'AndroidApiController@shows_filter');
+    Route::post('sports_filter', 'AndroidApiController@sports_filter');
+    Route::post('livetv_filter', 'AndroidApiController@livetv_filter');
+
+
+    //OTP
+
+// Route::post('/otp_send', [OtpController::class, 'sendSmsRequest']);
+ Route::post('/otp_send', [OtpController::class, 'sendSmsRequest']);
+
 });
