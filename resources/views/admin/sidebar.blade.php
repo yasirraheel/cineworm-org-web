@@ -7,6 +7,9 @@
                     <li><a href="{{ URL::to('admin/dashboard') }}"
                             class="waves-effect {{ classActivePath('dashboard') }}"><i
                                 class="fa fa-dashboard"></i><span>{{ trans('words.dashboard_text') }}</span></a></li>
+                    <li class="{{ classActivePath('slider') }}"><a href="{{ URL::to('admin/slider') }}"
+                            class="{{ classActivePath('slider') }}"><i
+                                class="fa fa-sliders"></i><span>{{ trans('words.slider') }}</span></a></li>
                     <li><a href="{{ URL::to('admin/language') }}"
                             class="waves-effect {{ classActivePath('language') }}"><i
                                 class="fa fa-language"></i><span>{{ trans('words.language_text') }}</span></a></li>
@@ -14,6 +17,8 @@
                                 class="fa fa-list"></i><span>{{ trans('words.genres_text') }}</span></a></li>
                     <li><a href="{{ URL::to('admin/news_ticker') }}" class="waves-effect {{ classActivePath('news_ticker') }}"><i
                                 class="fa fa-newspaper-o"></i><span>News Ticker</span></a></li>
+                    <li><a href="{{ URL::to('admin/home_sections') }}" class="waves-effect {{ classActivePath('home_sections') }}"><i
+                                class="fa fa-home"></i><span>{{ trans('words.home_section') }}</span></a></li>
 
                     <li class="has_sub">
                         <a href="javascript:void(0);" class="waves-effect">
@@ -239,9 +244,6 @@
                         </a>
 
                     </li>
-                    <li class="{{ classActivePath('slider') }}"><a href="{{ URL::to('admin/slider') }}"
-                            class="{{ classActivePath('slider') }}"><i
-                                class="fa fa-sliders"></i><span>{{ trans('words.slider') }}</span></a></li>
 
                 </ul>
             </div>
