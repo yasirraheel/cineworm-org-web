@@ -21,6 +21,14 @@ use Illuminate\Support\Facades\Session;
     return view('welcome');
 });*/
 
+// PWA Routes
+Route::get('/manifest.json', 'ManifestController@generate')->name('pwa.manifest');
+Route::get('/sw.js', 'ManifestController@serviceWorker')->name('pwa.serviceworker');
+Route::get('/offline', function() {
+    $pwa_settings = \App\PwaSettings::getSettings();
+    return view('offline', compact('pwa_settings'));
+})->name('pwa.offline');
+
 // Temporary route to clear cache - REMOVE after use
 Route::get('/clear-all-cache', function() {
     try {
@@ -197,6 +205,11 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
 
         Route::get('menu_settings', 'SettingsController@menu_settings');
         Route::post('menu_settings', 'SettingsController@update_menu_settings');
+
+        Route::get('pwa_settings', 'PwaController@index');
+        Route::post('pwa_settings', 'PwaController@update');
+        Route::post('pwa_generate_icons', 'PwaController@generateIcons');
+        Route::delete('pwa_clear_cache', 'PwaController@clearCache');
 
         Route::get('player_settings', 'SettingsPlayerController@player_settings');
         Route::post('player_settings', 'SettingsPlayerController@update_player_settings');

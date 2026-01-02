@@ -174,6 +174,10 @@
                                     href="{{ URL::to('admin/menu_settings') }}"
                                     class="{{ classActivePath('menu_settings') }}"><i
                                         class="fa fa-list"></i><span>{{ trans('words.menu') }}</span></a></li>
+                            <li class="{{ classActivePath('pwa_settings') }}"><a
+                                    href="{{ URL::to('admin/pwa_settings') }}"
+                                    class="{{ classActivePath('pwa_settings') }}"><i
+                                        class="fa fa-mobile"></i><span>{{ trans('words.pwa_settings') }}</span></a></li>
                             <li class="{{ classActivePath('recaptcha_settings') }}"><a
                                     href="{{ URL::to('admin/recaptcha_settings') }}"
                                     class="{{ classActivePath('recaptcha_settings') }}"><i

@@ -42,6 +42,7 @@ return [
     'general' => 'General',
     'smtp_email' => 'Correo electrónico SMTP',
     'payment' => 'Pago',
+    'pwa_settings' => 'Configuración PWA',
 
     //Top Menu
     'profile' => 'Perfil', 

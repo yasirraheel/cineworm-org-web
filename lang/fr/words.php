@@ -42,6 +42,7 @@ return [
     'general' => 'Générale',
     'smtp_email' => 'SMTP Email',
     'payment' => 'Paiement',
+    'pwa_settings' => 'Paramètres PWA',
 
     //Top Menu
     'profile' => 'Profil', 

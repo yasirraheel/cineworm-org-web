@@ -85,6 +85,8 @@
       }
  </style>
 
+ @include('_particles.pwa_meta')
+
 </head>
 <body>
 
