@@ -90,6 +90,52 @@
 </footer>
 <!-- End Footer Area --> 
 
+@php
+    $pwa_settings = \App\PwaSettings::getSettings();
+@endphp
+
+@if($pwa_settings->pwa_enabled)
+<!-- PWA Install Banner -->
+<div id="pwa-install-banner" style="display:none; background: {{ $pwa_settings->theme_color }}; color: white; padding: 15px 20px; text-align: center; position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.3);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8 text-md-left text-center">
+                <i class="fa fa-mobile" style="font-size: 24px; margin-right: 10px; vertical-align: middle;"></i>
+                <strong style="font-size: 16px;">Install {{ $pwa_settings->app_name }}</strong>
+                <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Get faster access, offline viewing & more!</p>
+            </div>
+            <div class="col-md-4 text-md-right text-center" style="margin-top: 10px;">
+                <button id="pwa-install-button" style="background: white; color: {{ $pwa_settings->theme_color }}; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; margin-right: 10px; font-size: 14px;">
+                    <i class="fa fa-download"></i> Install App
+                </button>
+                <button onclick="document.getElementById('pwa-install-banner').style.display='none'; localStorage.setItem('pwa-banner-dismissed', Date.now());" style="background: transparent; color: white; border: 1px solid white; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 14px;">
+                    <i class="fa fa-times"></i> Later
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Check if banner was dismissed recently (within 7 days)
+    const dismissedTime = localStorage.getItem('pwa-banner-dismissed');
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    const shouldShowBanner = !dismissedTime || (Date.now() - parseInt(dismissedTime)) > sevenDays;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        if (shouldShowBanner) {
+            document.getElementById('pwa-install-banner').style.display = 'block';
+        }
+    });
+
+    // Hide banner after installation
+    window.addEventListener('appinstalled', () => {
+        document.getElementById('pwa-install-banner').style.display = 'none';
+        localStorage.removeItem('pwa-banner-dismissed');
+    });
+</script>
+@endif 
+
 <div id="logout_remotly" class="modal fade centered-modal in" role="dialog" aria-labelledby="logout_remotly" aria-hidden="true">  
     <div class="modal-dialog modal-dialog-centered modal-md">
        <div class="modal-content">
