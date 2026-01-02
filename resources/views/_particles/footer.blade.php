@@ -96,19 +96,176 @@
 
 @if($pwa_settings->pwa_enabled)
 <!-- PWA Install Banner -->
-<div id="pwa-install-banner" style="display:none; background: {{ $pwa_settings->theme_color }}; color: white; padding: 15px 20px; text-align: center; position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.3);">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8 text-md-left text-center">
-                <i class="fa fa-mobile" style="font-size: 24px; margin-right: 10px; vertical-align: middle;"></i>
-                <strong style="font-size: 16px;">Install {{ $pwa_settings->app_name }}</strong>
-                <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Get faster access, offline viewing & more!</p>
+<style>
+#pwa-install-banner {
+    display: none;
+    background: {{ $pwa_settings->theme_color }};
+    color: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    box-shadow: 0 -3px 15px rgba(0,0,0,0.3);
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.pwa-banner-content {
+    padding: 15px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pwa-banner-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.pwa-banner-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pwa-banner-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.pwa-banner-message h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pwa-banner-message p {
+    margin: 3px 0 0 0;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.pwa-banner-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.pwa-btn-install {
+    background: white;
+    color: {{ $pwa_settings->theme_color }};
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.pwa-btn-install:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.pwa-btn-later {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.5);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.pwa-btn-later:hover {
+    border-color: white;
+    background: rgba(255,255,255,0.1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .pwa-banner-inner {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .pwa-banner-text {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .pwa-banner-icon {
+        font-size: 28px;
+    }
+    
+    .pwa-banner-message h4 {
+        font-size: 15px;
+    }
+    
+    .pwa-banner-message p {
+        font-size: 12px;
+    }
+    
+    .pwa-banner-buttons {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .pwa-btn-install,
+    .pwa-btn-later {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pwa-banner-content {
+        padding: 12px 15px;
+    }
+    
+    .pwa-banner-icon {
+        font-size: 24px;
+    }
+    
+    .pwa-banner-message h4 {
+        font-size: 14px;
+    }
+    
+    .pwa-banner-message p {
+        font-size: 11px;
+    }
+}
+</style>
+
+<div id="pwa-install-banner">
+    <div class="pwa-banner-content">
+        <div class="pwa-banner-inner">
+            <div class="pwa-banner-text">
+                <div class="pwa-banner-icon">
+                    <i class="fa fa-mobile"></i>
+                </div>
+                <div class="pwa-banner-message">
+                    <h4>Install {{ $pwa_settings->app_name }}</h4>
+                    <p>Get faster access, offline viewing & more!</p>
+                </div>
             </div>
-            <div class="col-md-4 text-md-right text-center" style="margin-top: 10px;">
-                <button id="pwa-install-button" style="background: white; color: {{ $pwa_settings->theme_color }}; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; margin-right: 10px; font-size: 14px;">
+            <div class="pwa-banner-buttons">
+                <button id="pwa-install-button" class="pwa-btn-install">
                     <i class="fa fa-download"></i> Install App
                 </button>
-                <button onclick="document.getElementById('pwa-install-banner').style.display='none'; localStorage.setItem('pwa-banner-dismissed', Date.now());" style="background: transparent; color: white; border: 1px solid white; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 14px;">
+                <button onclick="document.getElementById('pwa-install-banner').style.display='none'; localStorage.setItem('pwa-banner-dismissed', Date.now());" class="pwa-btn-later">
                     <i class="fa fa-times"></i> Later
                 </button>
             </div>
