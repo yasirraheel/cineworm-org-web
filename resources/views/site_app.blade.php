@@ -285,7 +285,7 @@ $(document).ready(function() {
 
                     // Specific selector for Watch page
                     if ($container.length === 0) {
-                        $container = $('.video-posts-video .col-md-7');
+                        $container = $('.col-md-9.p-0');
                     }
 
                     // Fallback for different layouts
