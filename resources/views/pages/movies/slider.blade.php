@@ -20,7 +20,7 @@
 <style>
     .news-ticker-container {
         background: #1a1a1a;
-        height: 250px;
+        height: 200px;
         overflow-y: auto;
         padding: 15px;
         color: #fff;
@@ -87,7 +87,7 @@
 
     .pacman-game-wrapper {
         background: #000;
-        height: 300px; /* Adjusted height to fit with ticker under player */
+        height: 200px; /* Adjusted height to fit with ticker under player */
         border-radius: 5px;
         overflow: hidden;
         position: relative;
@@ -136,7 +136,7 @@
 
                     <div id="collapseNews" class="collapse show" aria-labelledby="headingNews">
                         <div class="card-body p-0">
-                            <div class="news-ticker-container" style="height: 300px; border: none; background: transparent;">
+                            <div class="news-ticker-container" style="height: 200px; border: none; background: transparent;">
                                 @if(isset($news_tickers) && count($news_tickers) > 0)
                                     @foreach($news_tickers as $news)
                                         <div class="news-item">
