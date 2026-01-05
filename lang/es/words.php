@@ -12,7 +12,7 @@ return [
     'remember_me' => 'Recuérdame',
     'login_text' => 'Iniciar sesión',
     'forgot_pass_text' => '¿Olvidaste tu contraseña?',
-    
+
     //Menu
     'dashboard_text' => 'Tablero',
     'language_text' => 'Idioma',
@@ -45,12 +45,12 @@ return [
     'pwa_settings' => 'Configuración PWA',
 
     //Top Menu
-    'profile' => 'Perfil', 
-    'logout' => 'Cerrar sesión', 
+    'profile' => 'Perfil',
+    'logout' => 'Cerrar sesión',
 
     //Footer
-    'copyright' => 'Derechos de autor', 
-    'all_rights' => 'Todos los derechos reservados', 
+    'copyright' => 'Derechos de autor',
+    'all_rights' => 'Todos los derechos reservados',
 
     //Common Text
     'save' => 'Salvar',
@@ -62,33 +62,33 @@ return [
     'remove' => 'Eliminar',
     'dlt_warning_text' => '¿Estás seguro?',
     'recommended_resolution' => 'Resolución recomendada',
-    'filter_by_lang' => 'Filtrar por idioma',  
+    'filter_by_lang' => 'Filtrar por idioma',
     'search_by_title' => 'Buscar por título ...',
     'select_lang' => 'Seleccione el idioma',
     'select_genres' => 'Seleccionar géneros ...',
     'select_show' => 'Seleccione Mostrar',
     'filter_by_show' => 'Filtrar por espectáculos',
-    'filter_by_cat' => 'Filtrar por categoría',  
+    'filter_by_cat' => 'Filtrar por categoría',
     'description' => 'Descripción',
     'release_date' => 'Fecha de lanzamiento',
     'duration' => 'Duración',
     'video_upload_type' => 'Tipo de carga de video',
     'video_file' => 'Archivo de vídeo',
     'video_url' => 'URL del vídeo',
-    'video_embed_code' => 'Código de inserción de video', 
+    'video_embed_code' => 'Código de inserción de video',
     'type' => 'Tipo',
-    'filter_by_plan' => 'Filtrar por plan', 
-    'title' => 'Título', 
+    'filter_by_plan' => 'Filtrar por plan',
+    'title' => 'Título',
 
 
     //Pages
-    'users_plan_statastics' => 'Estadísticas del plan de usuarios', 
-    'current_year' => 'Año corriente', 
+    'users_plan_statastics' => 'Estadísticas del plan de usuarios',
+    'current_year' => 'Año corriente',
     'this_year' => 'Este año',
-    'daily_revenue' => 'Ingresos diarios', 
-    'weekly_revenue' => 'Ingresos semanales', 
-    'monthly_revenue' => 'ganancia mensual', 
-    'yearly_revenue' => 'Ingresos anuales',  
+    'daily_revenue' => 'Ingresos diarios',
+    'weekly_revenue' => 'Ingresos semanales',
+    'monthly_revenue' => 'ganancia mensual',
+    'yearly_revenue' => 'Ingresos anuales',
 
     'add_language' => 'Agregar idioma',
     'edit_language' => 'Editar idioma',
@@ -109,8 +109,8 @@ return [
     'add_show' => 'Agregar espectáculo',
     'edit_show' => 'Editar espectáculo',
     'show_name' => 'Mostrar nombre',
-    'show_sort_info' => 'Ordenar información', 
-    'show_poster' => 'Mostrar póster',    
+    'show_sort_info' => 'Ordenar información',
+    'show_poster' => 'Mostrar póster',
 
     'add_season' => 'Agregar temporada',
     'edit_season' => 'Editar temporada',
@@ -176,7 +176,7 @@ return [
     'filter_by_gateway' => 'Filtrar por puerta de enlace',
     'search_by_payment_id_email' => 'Buscar por ID de pago O correo electrónico ...',
     'export_transactions' => 'Transacciones de exportación',
-    
+
     'default_timezone' => 'Zona horaria predeterminada',
     'default_language' => 'Idioma predeterminado',
     'site_style' => 'Diseño del sitio',
@@ -213,14 +213,14 @@ return [
     'my_subscription' => 'Mi suscripción',
     'current_plan' => 'Plan actual',
     'upgrade_plan' => 'Plan de actualización',
-    'last_invoice' => 'Última factura',    
-    'subscription_expires_on' => 'La suscripción caduca el', 
+    'last_invoice' => 'Última factura',
+    'subscription_expires_on' => 'La suscripción caduca el',
 
 
     //Other
     'share_text' => 'Compartir',
     'up_next' => 'Hasta la próxima',
-    'view_all' => 'Ver todo',   
+    'view_all' => 'Ver todo',
     'forgot_password' => 'Se te olvidó tu contraseña',
     'reset_password' => 'Restablecer la contraseña',
     'latest_movies' => 'Últimas películas',
@@ -284,7 +284,7 @@ return [
     'account_banned' => '¡Tu cuenta ha sido prohibida!',
     'account_created_successfully' => '¡Gracias! Tu cuenta ha sido creada satisfactoriamente.',
 
-    'gdpr_cookie_consent' => 'Consentimiento de cookies GDPR',    
+    'gdpr_cookie_consent' => 'Consentimiento de cookies GDPR',
     'gdpr_cookie_title' => 'Título de consentimiento de GDPR',
     'gdpr_cookie_text' => 'Texto de consentimiento de GDPR',
     'gdpr_cookie_url' => 'URL de privacidad de GDPR',
@@ -353,7 +353,7 @@ return [
     'notification_show_msg' => 'Para abrir directamente un programa único cuando haga clic en notificación',
     'notification_sport_msg' => 'Para abrir directamente un solo deporte cuando haga clic en notificación',
     'notification_tv_msg' => 'Para abrir directamente un solo televisor cuando haga clic en notificación',
-    
+
     'android_external_link' => 'Enlace externo',
     'optional' => 'Opcional',
     'or' => 'O',
@@ -440,7 +440,7 @@ return [
     'facebook_login' => 'Facebook Login',
     'facebook_app_id' => 'Facebook App ID',
     'facebook_secret' => 'Facebook Client Secret',
-    
+
     'tv_embed_code' => 'Código de inserción de TV',
     'youtube_url' => 'URL de YouTube',
     'server_1_url' => 'URL del servidor 1',
@@ -462,7 +462,7 @@ return [
     'trailer_url' => 'URL del tráiler',
     'watch_triler' => 'Ver el trailer',
 
-    'my_watchlist' => 'Mi lista de seguimiento',    
+    'my_watchlist' => 'Mi lista de seguimiento',
     'add_to_watchlist' => 'Añadir a lista de seguimiento',
     'remove_from_watchlist' => 'Eliminar de la lista de seguimiento',
     'add_watchlist_msg' => 'Añadida exitosamente a la lista de observación',
@@ -531,7 +531,7 @@ return [
 
     'category' => 'Categoría',
     'languages' => 'Idiomas',
-    
+
     'pay_with_instamojo' => 'Pagar con Instamojo',
     'pay_with_payu' => 'Pagar con Payu',
     'pay_with_mollie' => 'Pagar con Mollie',
@@ -560,7 +560,7 @@ return [
 
     'coupon_percentage' => 'Porcentaje de cupón',
     'coupon_applied' => 'Cupón aplicado',
-    
+
     'dlt_warning' => 'Estas segura',
     'dlt_confirm' => '¡Sí, bórralo!',
     'btn_cancel' => 'Cancelar',
@@ -597,9 +597,9 @@ return [
 
     'select_all' => 'Seleccionar todo',
     'delete' => 'Borrar',
-    'filter_by_genres' => 'Filtrar por géneros',  
-     
-    
+    'filter_by_genres' => 'Filtrar por géneros',
+
+
     'player_ad_settings' => 'Configuración de anuncios de jugadores',
     'vector_icons' => 'Iconos vectoriales',
     'player_default_ads' => 'Anuncios predeterminados',

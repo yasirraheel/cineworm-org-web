@@ -41,7 +41,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <h4 class="header-title mb-3">{{ trans('pwa.pwa_settings') }}</h4>
-                                
+
                                 @if (Session::has('flash_message'))
                                     <div class="alert alert-success">
                                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">

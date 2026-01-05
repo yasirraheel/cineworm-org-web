@@ -70,11 +70,11 @@ self.addEventListener('fetch', (event) => {
 async function cacheFirst(request) {
     const cache = await caches.open(CACHE_NAME);
     const cached = await cache.match(request);
-    
+
     if (cached) {
         return cached;
     }
-    
+
     try {
         const response = await fetch(request);
         if (response.status === 200) {
@@ -89,7 +89,7 @@ async function cacheFirst(request) {
 // Network First Strategy
 async function networkFirst(request) {
     const cache = await caches.open(CACHE_NAME);
-    
+
     try {
         const response = await fetch(request);
         if (response.status === 200) {
@@ -109,14 +109,14 @@ async function networkFirst(request) {
 async function staleWhileRevalidate(request) {
     const cache = await caches.open(CACHE_NAME);
     const cached = await cache.match(request);
-    
+
     const fetchPromise = fetch(request).then((response) => {
         if (response.status === 200) {
             cache.put(request, response.clone());
         }
         return response;
     });
-    
+
     return cached || fetchPromise;
 }
 
@@ -133,7 +133,7 @@ self.addEventListener('push', (event) => {
             primaryKey: 1
         }
     };
-    
+
     event.waitUntil(
         self.registration.showNotification('{{ $pwa_settings->app_name }}', options)
     );
@@ -142,7 +142,7 @@ self.addEventListener('push', (event) => {
 // Notification click event
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    
+
     event.waitUntil(
         clients.openWindow('/')
     );

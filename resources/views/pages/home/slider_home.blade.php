@@ -72,10 +72,10 @@
 </style>
 
 <div class="slider-area p-0">
-    <div class="container-fluid p-0">
-        <div class="row no-gutters m-0">
+    <div class="container-fluid px-0">
+        <div class="row no-gutters">
             <!-- Video Player Column -->
-            <div class="col-lg-8 col-md-12 p-0 m-0">
+            <div class="col-lg-9 col-md-12">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -92,7 +92,7 @@
             </div>
 
             <!-- News Ticker Column -->
-            <div class="col-lg-4 col-md-12 p-0 m-0">
+            <div class="col-lg-3 col-md-12">
                 <div class="news-ticker-container">
                     <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
                         Latest News

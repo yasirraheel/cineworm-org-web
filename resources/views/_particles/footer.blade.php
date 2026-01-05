@@ -282,11 +282,11 @@
         <button onclick="document.getElementById('pwa-ios-guide-modal').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">
             <i class="fa fa-times"></i>
         </button>
-        
+
         <h3 style="margin: 0 0 20px 0; color: #333; font-size: 20px; text-align: center;">
             <i class="fa fa-apple" style="color: #555;"></i> Install on iPhone/iPad
         </h3>
-        
+
         <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
             <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">
                 Follow these simple steps to install {{ $pwa_settings->app_name }} on your home screen using Safari browser:
@@ -367,7 +367,7 @@
     // Detect iOS devices
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
-    
+
     // Check if banner was dismissed recently (within 7 days)
     const dismissedTime = localStorage.getItem('pwa-banner-dismissed');
     const sevenDays = 7 * 24 * 60 * 60 * 1000;
@@ -385,11 +385,11 @@
             // Show iOS-specific banner
             document.getElementById('pwa-install-banner').style.display = 'block';
             document.getElementById('pwa-banner-desc').textContent = 'Install on your home screen for a better experience!';
-            
+
             // Hide standard install button, show guide button
             document.getElementById('pwa-install-button').style.display = 'none';
             document.getElementById('pwa-guide-button').style.display = 'inline-block';
-            
+
             // Add click handler for guide button
             document.getElementById('pwa-guide-button').addEventListener('click', function() {
                 document.getElementById('pwa-ios-guide-modal').style.display = 'block';
@@ -398,11 +398,11 @@
     } else {
         // Android/Desktop - Standard install prompt
         let deferredPrompt;
-        
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            
+
             if (shouldShowBanner) {
                 document.getElementById('pwa-install-banner').style.display = 'block';
             }
@@ -412,12 +412,12 @@
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                
+
                 if (outcome === 'accepted') {
                     document.getElementById('pwa-install-banner').style.display = 'none';
                     localStorage.removeItem('pwa-banner-dismissed');
                 }
-                
+
                 deferredPrompt = null;
             }
         });

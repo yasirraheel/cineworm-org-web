@@ -52,11 +52,11 @@ class PwaController extends MainAdminController
             if ($icon_192->isValid()) {
                 $icon_192_name = 'icon-192x192.' . $icon_192->getClientOriginalExtension();
                 $icon_192_path = $icon_path . $icon_192_name;
-                
+
                 $img = Image::make($icon_192);
                 $img->resize(192, 192);
                 $img->save($icon_192_path);
-                
+
                 $pwa_settings->icon_192 = $icon_192_path;
             }
         }
@@ -67,11 +67,11 @@ class PwaController extends MainAdminController
             if ($icon_512->isValid()) {
                 $icon_512_name = 'icon-512x512.' . $icon_512->getClientOriginalExtension();
                 $icon_512_path = $icon_path . $icon_512_name;
-                
+
                 $img = Image::make($icon_512);
                 $img->resize(512, 512);
                 $img->save($icon_512_path);
-                
+
                 $pwa_settings->icon_512 = $icon_512_path;
             }
         }
@@ -82,11 +82,11 @@ class PwaController extends MainAdminController
             if ($maskable_192->isValid()) {
                 $maskable_192_name = 'maskable-192x192.' . $maskable_192->getClientOriginalExtension();
                 $maskable_192_path = $icon_path . $maskable_192_name;
-                
+
                 $img = Image::make($maskable_192);
                 $img->resize(192, 192);
                 $img->save($maskable_192_path);
-                
+
                 $pwa_settings->maskable_icon_192 = $maskable_192_path;
             }
         }
@@ -97,11 +97,11 @@ class PwaController extends MainAdminController
             if ($maskable_512->isValid()) {
                 $maskable_512_name = 'maskable-512x512.' . $maskable_512->getClientOriginalExtension();
                 $maskable_512_path = $icon_path . $maskable_512_name;
-                
+
                 $img = Image::make($maskable_512);
                 $img->resize(512, 512);
                 $img->save($maskable_512_path);
-                
+
                 $pwa_settings->maskable_icon_512 = $maskable_512_path;
             }
         }
@@ -112,11 +112,11 @@ class PwaController extends MainAdminController
             if ($apple_icon->isValid()) {
                 $apple_icon_name = 'apple-touch-icon.' . $apple_icon->getClientOriginalExtension();
                 $apple_icon_path = $icon_path . $apple_icon_name;
-                
+
                 $img = Image::make($apple_icon);
                 $img->resize(180, 180);
                 $img->save($apple_icon_path);
-                
+
                 $pwa_settings->apple_touch_icon = $apple_icon_path;
             }
         }
@@ -127,11 +127,11 @@ class PwaController extends MainAdminController
             if ($notification_icon->isValid()) {
                 $notification_icon_name = 'notification-icon.' . $notification_icon->getClientOriginalExtension();
                 $notification_icon_path = $icon_path . $notification_icon_name;
-                
+
                 $img = Image::make($notification_icon);
                 $img->resize(96, 96);
                 $img->save($notification_icon_path);
-                
+
                 $pwa_settings->notification_icon = $notification_icon_path;
             }
         }
@@ -142,11 +142,11 @@ class PwaController extends MainAdminController
             if ($notification_badge->isValid()) {
                 $notification_badge_name = 'notification-badge.' . $notification_badge->getClientOriginalExtension();
                 $notification_badge_path = $icon_path . $notification_badge_name;
-                
+
                 $img = Image::make($notification_badge);
                 $img->resize(96, 96);
                 $img->save($notification_badge_path);
-                
+
                 $pwa_settings->notification_badge = $notification_badge_path;
             }
         }
@@ -158,11 +158,11 @@ class PwaController extends MainAdminController
                 if ($screenshot->isValid()) {
                     $screenshot_name = 'screenshot-' . time() . '-' . rand(1000, 9999) . '.' . $screenshot->getClientOriginalExtension();
                     $screenshot_path = $icon_path . $screenshot_name;
-                    
+
                     $img = Image::make($screenshot);
                     $img->resize(540, 720);
                     $img->save($screenshot_path);
-                    
+
                     $screenshots[] = $screenshot_path;
                 }
             }
@@ -183,22 +183,22 @@ class PwaController extends MainAdminController
                             'description' => $request->shortcut_descriptions[$index] ?? '',
                             'url' => $request->shortcut_urls[$index] ?? '/',
                         ];
-                        
+
                         // Handle shortcut icon upload
                         if ($request->hasFile('shortcut_icons.' . $index)) {
                             $shortcut_icon = $request->file('shortcut_icons.' . $index);
                             if ($shortcut_icon->isValid()) {
                                 $shortcut_icon_name = 'shortcut-' . $index . '-' . time() . '.' . $shortcut_icon->getClientOriginalExtension();
                                 $shortcut_icon_path = $icon_path . $shortcut_icon_name;
-                                
+
                                 $img = Image::make($shortcut_icon);
                                 $img->resize(96, 96);
                                 $img->save($shortcut_icon_path);
-                                
+
                                 $shortcut['icon'] = $shortcut_icon_path;
                             }
                         }
-                        
+
                         $shortcuts[] = $shortcut;
                     }
                 }
@@ -328,12 +328,12 @@ class PwaController extends MainAdminController
         }
 
         $pwa_settings = PwaSettings::getSettings();
-        
+
         // Increment cache version
         $version_parts = explode('.', str_replace('v', '', $pwa_settings->cache_version));
         $version_parts[count($version_parts) - 1] = (int)$version_parts[count($version_parts) - 1] + 1;
         $new_version = 'v' . implode('.', $version_parts);
-        
+
         $pwa_settings->cache_version = $new_version;
         $pwa_settings->save();
 

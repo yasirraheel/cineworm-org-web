@@ -56,15 +56,15 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
-        
+
         // Stash the event so it can be triggered later
         deferredPrompt = e;
-        
+
         // Show custom install button/banner if exists
         installButton = document.getElementById('pwa-install-button');
         if (installButton) {
             installButton.style.display = 'block';
-            
+
             installButton.addEventListener('click', async () => {
                 if (deferredPrompt) {
                     deferredPrompt.prompt();
@@ -103,7 +103,7 @@
     function subscribeUserToPush() {
         navigator.serviceWorker.ready.then(function(registration) {
             const vapidPublicKey = '{{ $pwa_settings->vapid_public_key }}';
-            
+
             registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)

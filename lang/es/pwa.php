@@ -6,7 +6,7 @@ return [
     'pwa_enable' => 'Activar PWA',
     'pwa_disabled' => 'Desactivado',
     'pwa_enabled' => 'Activado',
-    
+
     // Tabs
     'general_tab' => 'General',
     'appearance_tab' => 'Apariencia',
@@ -15,7 +15,7 @@ return [
     'notifications_tab' => 'Notificaciones Push',
     'shortcuts_tab' => 'Accesos Directos',
     'advanced_tab' => 'Avanzado',
-    
+
     // General Settings
     'app_name' => 'Nombre de la Aplicación',
     'app_short_name' => 'Nombre Corto',
@@ -27,7 +27,7 @@ return [
     'app_description_help' => 'Breve descripción de su aplicación',
     'start_url_help' => 'URL que se carga cuando se inicia la aplicación',
     'scope_help' => 'Alcance de navegación para la aplicación',
-    
+
     // Appearance
     'theme_color' => 'Color del Tema',
     'background_color' => 'Color de Fondo',
@@ -37,13 +37,13 @@ return [
     'background_color_help' => 'Color de fondo cuando se inicia la aplicación',
     'display_mode_help' => 'Cómo debe mostrarse la aplicación',
     'orientation_help' => 'Orientación de pantalla predeterminada',
-    
+
     // Display Modes
     'standalone' => 'Independiente',
     'fullscreen' => 'Pantalla Completa',
     'minimal_ui' => 'UI Mínima',
     'browser' => 'Navegador',
-    
+
     // Orientations
     'any' => 'Cualquiera',
     'portrait' => 'Vertical',
@@ -52,7 +52,7 @@ return [
     'portrait_secondary' => 'Vertical Secundario',
     'landscape_primary' => 'Horizontal Principal',
     'landscape_secondary' => 'Horizontal Secundario',
-    
+
     // Icons & Images
     'icon_192' => 'Icono 192x192',
     'icon_512' => 'Icono 512x512',
@@ -70,7 +70,7 @@ return [
     'apple_touch_icon_help' => 'Icono para pantalla de inicio de iOS (180x180)',
     'screenshots_help' => 'Capturas de pantalla de la aplicación (540x720 recomendado)',
     'auto_generate_help' => 'Sube una imagen para generar todos los tamaños de iconos',
-    
+
     // Offline
     'offline_page_enable' => 'Activar Página Sin Conexión',
     'offline_page_title' => 'Título de Página Sin Conexión',
@@ -82,12 +82,12 @@ return [
     'offline_page_message_help' => 'Mensaje mostrado en la página sin conexión',
     'cache_strategy_help' => 'Cómo debe almacenarse en caché el contenido',
     'cache_version_help' => 'Incrementar para forzar actualización de caché',
-    
+
     // Cache Strategies
     'cache_first' => 'Caché Primero',
     'network_first' => 'Red Primero',
     'stale_while_revalidate' => 'Antiguo Mientras Revalida',
-    
+
     // Push Notifications
     'push_enable' => 'Activar Notificaciones Push',
     'notification_icon' => 'Icono de Notificación',
@@ -98,7 +98,7 @@ return [
     'notification_icon_help' => 'Icono mostrado en notificaciones (96x96)',
     'notification_badge_help' => 'Icono de insignia para notificaciones (96x96)',
     'vapid_keys_help' => 'Requerido para notificaciones push web',
-    
+
     // Shortcuts
     'shortcuts_enable' => 'Activar Accesos Directos',
     'add_shortcut' => 'Agregar Acceso Directo',
@@ -109,7 +109,7 @@ return [
     'shortcut_url' => 'URL',
     'shortcut_icon' => 'Icono',
     'shortcuts_help' => 'Accesos directos de acceso rápido en el lanzador de aplicaciones',
-    
+
     // Advanced
     'categories' => 'Categorías',
     'related_apps' => 'Aplicaciones Relacionadas',
@@ -121,7 +121,7 @@ return [
     'categories_help' => 'Categorías PWA para tiendas de aplicaciones',
     'related_apps_help' => 'Aplicaciones nativas relacionadas con esta PWA (formato JSON)',
     'prefer_related_apps_help' => 'Sugerir aplicación nativa en lugar de PWA',
-    
+
     // Categories Options
     'books' => 'Libros',
     'business' => 'Negocios',
@@ -151,7 +151,7 @@ return [
     'travel' => 'Viajes',
     'utilities' => 'Utilidades',
     'weather' => 'Clima',
-    
+
     // Actions
     'save_settings' => 'Guardar Configuración',
     'test_install' => 'Probar Instalación PWA',
@@ -159,7 +159,7 @@ return [
     'upload' => 'Subir',
     'browse' => 'Examinar',
     'generate' => 'Generar',
-    
+
     // Messages
     'settings_saved' => 'Configuración PWA guardada exitosamente',
     'icons_generated' => 'Iconos generados exitosamente',
@@ -168,7 +168,7 @@ return [
     'file_size_error' => 'Tamaño de archivo demasiado grande',
     'file_type_error' => 'Tipo de archivo inválido',
     'fill_required_fields' => 'Por favor complete todos los campos requeridos',
-    
+
     // Info
     'pwa_info' => 'Progressive Web App (PWA) permite a los usuarios instalar su sitio web como una aplicación en sus dispositivos.',
     'manifest_url' => 'URL del Manifiesto',
@@ -176,5 +176,5 @@ return [
     'pwa_status' => 'Estado PWA',
     'installable' => 'Instalable',
     'not_installable' => 'No Instalable',
-    
+
 ];

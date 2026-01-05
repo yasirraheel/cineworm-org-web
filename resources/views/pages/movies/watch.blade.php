@@ -93,146 +93,69 @@
                 <div class="col-lg-12 col-md-12 col-sm-12">
                     <div class="video-posts-video">
 
-                        <div class="container-fluid px-0">
-        <div class="row no-gutters">
-            @php
-                $buttons = get_web_button_banner('buttons'); // Fetch all button components
-                $banners = get_web_button_banner('banners'); // Fetch all banner components
-            @endphp
+                        <div class="container">
+        <div class="row align-items-stretch">
+            <!-- Left Side Buttons -->
+            <div class="col-md-2 d-none d-md-flex justify-content-center align-items-center pe-md-5">
+                <div class="d-flex flex-column w-100">
+                    @php
+                        $buttons = get_web_button_banner('buttons'); // Fetch all button components
+                        $banners = get_web_button_banner('banners'); // Fetch all banner components
+                    @endphp
 
-            <!-- Video Player -->
-            <div class="col-md-8 p-0">
-
-                <!-- Player Footer Section Wrapper -->
-                <div class="player-footer-section">
-
-                    @if ($movies_info && $movies_info->video_url != '')
-                        @if ($movies_info->video_type == 'GoogleDrive')
-                            @include('pages.movies.player.google_drive_player')
-                        @else
-                            @include('pages.movies.player.other')
-                        @endif
-                    @else
-                        <div
-                            style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011;
-                                   border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">
-                            NO Source URL Set
-                        </div>
+                    @if ($buttons->isNotEmpty())
+                    @foreach ($buttons as $button)
+    <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
+        style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
+               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+               background-color: #{{ $button->color ? $button->color : '007bff' }};
+               font-family: 'Perpetua', serif; text-align: center;
+               text-decoration: none; color: #fff;
+               position: relative;
+               display: inline-block;
+               overflow: hidden;
+               border: 3px solid #00008B; /* Dark blue border before hover */
+               transition: all 0.3s ease-in-out;"
+        onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
+                     this.style.borderStyle='solid';
+                     this.style.borderWidth='3px';
+                     this.style.borderRadius='8px';
+                     this.style.borderColor='transparent';"
+        onmouseout="this.style.borderImage='none';
+                    this.style.borderColor='#00008B';
+                    this.style.borderStyle='solid';
+                    this.style.borderWidth='3px';
+                    this.style.borderRadius='8px';"
+        target="_blank">
+        {{ $button->title }}
+    </a>
+@endforeach
                     @endif
-
-                    <!-- Title and Action Buttons Row -->
-                    <div class="player-footer-top mt-3">
-                        <div class="video-title-section">
-                            <a href="{{ url('movies/details', ['slug' => $movies_info->video_slug, 'id' => $movies_info->id]) }}" class="video-title-link">
-                                <h3 class="video-title">{{ $movies_info->video_title }}</h3>
-                            </a>
-                        </div>
-
-                        <div class="action-buttons-section">
-                            @if ($movies_info->funding_url)
-                                <a href="{{ $movies_info->funding_url }}" target="_blank" class="action-btn donate-btn">
-                                    <i class="fas fa-donate"></i>
-                                    <span>Fund/Donate</span>
-                                </a>
-                            @endif
-
-                            @if ($movies_info->webpage_url)
-                                <a href="{{ $movies_info->webpage_url }}" target="_blank" class="action-btn webpage-btn">
-                                    <i class="fas fa-globe"></i>
-                                    <span>Webpage</span>
-                                </a>
-                            @endif
-
-                            @auth
-                                <form
-                                    action="{{ $user_has_liked ? route('movie-videos.unlike', $movies_info->id) : route('movie-videos.like', $movies_info->id) }}"
-                                    method="POST" class="like-form">
-                                    @csrf
-                                    <button type="submit" class="action-btn like-btn {{ $user_has_liked ? 'liked' : '' }}">
-                                        <i class="fas fa-heart"></i>
-                                        <span class="like-text">{{ $user_has_liked ? 'Unlike' : 'Like' }} ({{ $movies_info->likes }})</span>
-                                    </button>
-                                </form>
-                            @endauth
-
-                            <button class="action-btn share-btn" data-bs-toggle="modal" data-bs-target="#social-media">
-                                <i class="fas fa-share-alt"></i>
-                                <span>{{ trans('words.share_text') }}</span>
-                            </button>
-
-                            <a href="{{ $random_movie ? url('movies/'.$random_movie->video_slug.'/'.$random_movie->id) : URL::to('/') }}" class="action-btn next-btn" id="footer-next-btn">
-                                <i class="fas fa-step-forward"></i>
-                                <span>Next</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Video Info Meta Row -->
-                    <div class="player-footer-meta">
-                        <div class="meta-item">
-                            <i class="fa fa-eye"></i>
-                            <span>{{ number_format_short($movies_info->views) }} {{ trans('words.video_views') }}</span>
-                        </div>
-
-                        @if ($movies_info->release_date)
-                            <div class="meta-item">
-                                <i class="fa fa-calendar-alt"></i>
-                                <span>{{ date('M d, Y', $movies_info->release_date) }}</span>
-                            </div>
-                        @endif
-
-                        @if ($movies_info->duration)
-                            <div class="meta-item">
-                                <i class="fa fa-clock"></i>
-                                <span>{{ $movies_info->duration }}</span>
-                            </div>
-                        @endif
-
-                        @if ($movies_info->imdb_rating)
-                            <div class="meta-item imdb-rating">
-                                <img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb" class="imdb-logo" />
-                                <span>{{ $movies_info->imdb_rating }}</span>
-                            </div>
-                        @endif
-                    </div>
                 </div>
             </div>
 
+            <!-- Video Player -->
+            <div class="col-md-7 px-md-5">
+                @if ($movies_info && $movies_info->video_url != '')
+                    @if ($movies_info->video_type == 'GoogleDrive')
+                        @include('pages.movies.player.google_drive_player')
+                        @else
+                         @include('pages.movies.player.other')
+                    @endif
+
+                @else
+                    <div
+                        style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011;
+                               border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">
+                        NO Source URL Set
+                    </div>
+                @endif
+            </div>
+
             <!-- Right Side News Ticker and Banners -->
-            <div class="col-md-4 d-none d-md-flex flex-column justify-content-start p-0">
+            <div class="col-md-3 d-none d-md-flex flex-column justify-content-start ps-md-5">
 
                 @include('pages.home.news_ticker')
-
-                <div class="sidebar-buttons-container mt-3">
-                    @if ($buttons->isNotEmpty())
-                        @foreach ($buttons as $button)
-                            <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
-                                style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
-                                       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-                                       background-color: #{{ $button->color ? $button->color : '007bff' }};
-                                       font-family: 'Perpetua', serif; text-align: center;
-                                       text-decoration: none; color: #fff;
-                                       position: relative;
-                                       display: inline-block;
-                                       overflow: hidden;
-                                       border: 3px solid #00008B; /* Dark blue border before hover */
-                                       transition: all 0.3s ease-in-out;"
-                                onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
-                                             this.style.borderStyle='solid';
-                                             this.style.borderWidth='3px';
-                                             this.style.borderRadius='8px';
-                                             this.style.borderColor='transparent';"
-                                onmouseout="this.style.borderImage='none';
-                                            this.style.borderColor='#00008B';
-                                            this.style.borderStyle='solid';
-                                            this.style.borderWidth='3px';
-                                            this.style.borderRadius='8px';"
-                                target="_blank">
-                                {{ $button->title }}
-                            </a>
-                        @endforeach
-                    @endif
-                </div>
 
                 <div class="sidebar-banners-container mt-3">
                     @if ($banners->isNotEmpty())
@@ -253,6 +176,83 @@
             </div>
 
             <!-- Player Footer Section -->
+            <div class="player-footer-section">
+                <!-- Title and Action Buttons Row -->
+                <div class="player-footer-top">
+                    <div class="video-title-section">
+                        <a href="{{ url('movies/details', ['slug' => $movies_info->video_slug, 'id' => $movies_info->id]) }}" class="video-title-link">
+                            <h3 class="video-title">{{ $movies_info->video_title }}</h3>
+                        </a>
+                    </div>
+
+                    <div class="action-buttons-section">
+                        @if ($movies_info->funding_url)
+                            <a href="{{ $movies_info->funding_url }}" target="_blank" class="action-btn donate-btn">
+                                <i class="fas fa-donate"></i>
+                                <span>Fund/Donate</span>
+                            </a>
+                        @endif
+
+                        @if ($movies_info->webpage_url)
+                            <a href="{{ $movies_info->webpage_url }}" target="_blank" class="action-btn webpage-btn">
+                                <i class="fas fa-globe"></i>
+                                <span>Webpage</span>
+                            </a>
+                        @endif
+
+                        @auth
+                            <form
+                                action="{{ $user_has_liked ? route('movie-videos.unlike', $movies_info->id) : route('movie-videos.like', $movies_info->id) }}"
+                                method="POST" class="like-form">
+                                @csrf
+                                <button type="submit" class="action-btn like-btn {{ $user_has_liked ? 'liked' : '' }}">
+                                    <i class="fas fa-heart"></i>
+                                    <span class="like-text">{{ $user_has_liked ? 'Unlike' : 'Like' }} ({{ $movies_info->likes }})</span>
+                                </button>
+                            </form>
+                        @endauth
+
+                        <button class="action-btn share-btn" data-bs-toggle="modal" data-bs-target="#social-media">
+                            <i class="fas fa-share-alt"></i>
+                            <span>{{ trans('words.share_text') }}</span>
+                        </button>
+
+                        <a href="{{ $random_movie ? url('movies/'.$random_movie->video_slug.'/'.$random_movie->id) : URL::to('/') }}" class="action-btn next-btn" id="footer-next-btn">
+                            <i class="fas fa-step-forward"></i>
+                            <span>Next</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Video Info Meta Row -->
+                <div class="player-footer-meta">
+                    <div class="meta-item">
+                        <i class="fa fa-eye"></i>
+                        <span>{{ number_format_short($movies_info->views) }} {{ trans('words.video_views') }}</span>
+                    </div>
+
+                    @if ($movies_info->release_date)
+                        <div class="meta-item">
+                            <i class="fa fa-calendar-alt"></i>
+                            <span>{{ date('M d, Y', $movies_info->release_date) }}</span>
+                        </div>
+                    @endif
+
+                    @if ($movies_info->duration)
+                        <div class="meta-item">
+                            <i class="fa fa-clock"></i>
+                            <span>{{ $movies_info->duration }}</span>
+                        </div>
+                    @endif
+
+                    @if ($movies_info->imdb_rating)
+                        <div class="meta-item imdb-rating">
+                            <img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb" class="imdb-logo" />
+                            <span>{{ $movies_info->imdb_rating }}</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
 
             <style>
             /* Player Footer Section */
