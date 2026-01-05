@@ -448,6 +448,52 @@ $(document).ready(function() {
         loadRandomVideo();
         return false;
     });
+
+    // Handle DW News Link Click (In-place loading)
+    $(document).on('click', '.read-dw-news', function(e) {
+        e.preventDefault();
+        var link = $(this).data('link');
+
+        // Find the parent container
+        var container = $(this).closest('.news-ticker-container');
+        var listView = container.find('#news-list-view');
+        var detailView = container.find('#news-detail-view');
+        var contentBody = container.find('#news-content-body');
+
+        // Hide list, show detail
+        listView.hide();
+        detailView.css('display', 'flex');
+        contentBody.html('<div class="text-center p-4"><i class="fa fa-spinner fa-spin fa-2x"></i><p>Loading news...</p></div>');
+
+        // Fetch content via AJAX
+        $.ajax({
+            url: '{{ url("ajax/get_news_content") }}',
+            data: { url: link },
+            success: function(res) {
+                if(res.content) {
+                    contentBody.html(res.content);
+                    // Add some basic styling to the loaded content
+                    contentBody.find('img').css({'max-width': '100%', 'height': 'auto', 'border-radius': '5px'});
+                    contentBody.find('a').css('color', '#fe8805');
+                } else {
+                    contentBody.html('<p class="text-danger" style="padding: 15px;">Could not load full content. <br><a href="'+link+'" target="_blank" style="color: #fe8805;">Click here to read on DW.com</a></p>');
+                }
+            },
+            error: function() {
+                 contentBody.html('<p class="text-danger" style="padding: 15px;">Failed to load news. <br><a href="'+link+'" target="_blank" style="color: #fe8805;">Click here to read on DW.com</a></p>');
+            }
+        });
+    });
+
+    // Handle Back Button Click
+    $(document).on('click', '#back-to-news-list', function() {
+        var container = $(this).closest('.news-ticker-container');
+        var listView = container.find('#news-list-view');
+        var detailView = container.find('#news-detail-view');
+
+        detailView.hide();
+        listView.show();
+    });
 });
 </script>
 

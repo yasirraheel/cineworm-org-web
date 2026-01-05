@@ -214,52 +214,59 @@
 
                     <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" style="overflow: hidden; flex-grow: 1;">
                         <div class="card-body p-0" style="height: 100%; display: flex; flex-direction: column;">
-                            <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto;">
-                                @php
-                                    $has_news = false;
-                                @endphp
+                            <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto; position: relative;">
+                                <div id="news-list-view">
+                                    @php
+                                        $has_news = false;
+                                    @endphp
 
-                                @if(isset($news_tickers) && count($news_tickers) > 0)
-                                    @php $has_news = true; @endphp
-                                    @foreach($news_tickers as $news)
-                                        <div class="news-item">
-                                            <div class="news-headline">
-                                                @if($news->is_breaking)
-                                                    <span class="breaking-badge">BREAKING</span>
-                                                @endif
-                                                {{ $news->headline }}
+                                    @if(isset($news_tickers) && count($news_tickers) > 0)
+                                        @php $has_news = true; @endphp
+                                        @foreach($news_tickers as $news)
+                                            <div class="news-item">
+                                                <div class="news-headline">
+                                                    @if($news->is_breaking)
+                                                        <span class="breaking-badge">BREAKING</span>
+                                                    @endif
+                                                    {{ $news->headline }}
+                                                </div>
+                                                <div class="news-details">
+                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                                </div>
+                                                <span class="news-time">
+                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                                </span>
                                             </div>
-                                            <div class="news-details">
-                                                {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
-                                            </div>
-                                            <span class="news-time">
-                                                <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
-                                            </span>
-                                        </div>
-                                    @endforeach
-                                @endif
+                                        @endforeach
+                                    @endif
 
-                                @if(isset($rss_news) && count($rss_news) > 0)
-                                    @php $has_news = true; @endphp
-                                    @foreach($rss_news as $news)
-                                        <div class="news-item">
-                                            <div class="news-headline">
-                                                <span class="breaking-badge" style="background: #007bff;">WORLD NEWS</span>
-                                                {{ $news['headline'] }}
+                                    @if(isset($rss_news) && count($rss_news) > 0)
+                                        @php $has_news = true; @endphp
+                                        @foreach($rss_news as $news)
+                                            <div class="news-item">
+                                                <div class="news-headline">
+                                                    <span class="breaking-badge" style="background: #007bff;">WORLD NEWS</span>
+                                                    {{ $news['headline'] }}
+                                                </div>
+                                                <div class="news-details">
+                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news['details']), 150) !!}
+                                                </div>
+                                                <span class="news-time">
+                                                    <i class="fa fa-clock-o"></i> {{ $news['created_at'] }}
+                                                </span>
+                                                <a href="#" class="read-dw-news" data-link="{{ $news['link'] }}" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read Full Story</a>
                                             </div>
-                                            <div class="news-details">
-                                                {!! \Illuminate\Support\Str::limit(strip_tags($news['details']), 150) !!}
-                                            </div>
-                                            <span class="news-time">
-                                                <i class="fa fa-clock-o"></i> {{ $news['created_at'] }}
-                                            </span>
-                                        </div>
-                                    @endforeach
-                                @endif
+                                        @endforeach
+                                    @endif
 
-                                @if(!$has_news)
-                                    <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
-                                @endif
+                                    @if(!$has_news)
+                                        <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
+                                    @endif
+                                </div>
+                                <div id="news-detail-view" style="display: none; height: 100%; flex-direction: column;">
+                                    <button class="btn btn-sm btn-secondary mb-2" id="back-to-news-list" style="align-self: flex-start; margin-bottom: 10px;"><i class="fa fa-arrow-left"></i> Back to News</button>
+                                    <div id="news-content-body" style="flex-grow: 1; overflow-y: auto;"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
