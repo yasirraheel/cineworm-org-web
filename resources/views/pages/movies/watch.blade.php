@@ -1,3 +1,9 @@
+@php
+    if(!isset($news_tickers)){
+        $news_tickers = \App\Models\NewsTicker::where('status', 1)->orderBy('id', 'DESC')->get();
+    }
+@endphp
+
 @extends('site_app')
 
 @if ($movies_info->seo_title)
@@ -31,12 +37,25 @@
 
     <style>
         .news-ticker-container {
-            background: #1a1a1a;
-            overflow-y: auto;
-            padding: 15px;
-            color: #fff;
-            border-radius: 5px;
-        }
+                max-height: 250px;
+                overflow-y: auto;
+                padding: 10px;
+                background: #111;
+                color: #fff;
+            }
+
+            .news-ticker-container::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .news-ticker-container::-webkit-scrollbar-thumb {
+                background: #333;
+                border-radius: 3px;
+            }
+
+            .news-ticker-container::-webkit-scrollbar-track {
+                background: #111;
+            }
         .news-item {
             margin-bottom: 20px;
             border-bottom: 1px solid #333;
@@ -62,6 +81,16 @@
             margin-top: 5px;
             display: block;
         }
+        .breaking-badge {
+            background-color: #e50914;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
         /* Scrollbar styling */
         .news-ticker-container::-webkit-scrollbar {
             width: 6px;
@@ -70,11 +99,35 @@
             background: #111;
         }
         .news-ticker-container::-webkit-scrollbar-thumb {
-            background: #444;
+            background: #333;
             border-radius: 3px;
         }
         .news-ticker-container::-webkit-scrollbar-thumb:hover {
             background: #666;
+        }
+
+        /* Pacman Game Container Styling */
+        .pacman-game-container {
+            background: #1a1a1a;
+            flex: 1;
+            overflow: hidden;
+            padding: 0;
+            color: #fff;
+        }
+
+        .pacman-game-wrapper {
+            background: #000;
+            height: 100%;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pacman-game-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
         }
 
         @media (max-width: 767px) {
@@ -82,80 +135,135 @@
                 height: 300px;
                 margin-top: 15px;
             }
+            .pacman-game-wrapper {
+                height: 300px;
+            }
         }
     </style>
 
     <!-- Start Page Content Area -->
     <div class="page-content-area vfx-item-ptb pt-0">
 
-        <div class="container-fluid bg-dark video-player-base">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12">
-                    <div class="video-posts-video">
+        <div class="container-fluid px-0 bg-dark video-player-base">
+            <div class="row no-gutters align-items-stretch">
+                <!-- Video Player -->
+                <div class="col-md-9 p-0">
+                    @if ($movies_info && $movies_info->video_url != '')
+                        @if ($movies_info->video_type == 'GoogleDrive')
+                            @include('pages.movies.player.google_drive_player')
+                            @else
+                             @include('pages.movies.player.other')
+                        @endif
 
-                        <div class="container">
-        <div class="row align-items-stretch">
-            <!-- Left Side Buttons -->
-            <div class="col-md-2 d-none d-md-flex justify-content-center align-items-center pe-md-5">
-                <div class="d-flex flex-column w-100">
+                    @else
+                        <div
+                            style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011;
+                                   border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">
+                            NO Source URL Set
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Right Side News Ticker and Banners -->
+                <div class="col-md-3 d-none d-md-flex flex-column justify-content-start" style="max-height: 100%;">
                     @php
                         $buttons = get_web_button_banner('buttons'); // Fetch all button components
                         $banners = get_web_button_banner('banners'); // Fetch all banner components
                     @endphp
 
                     @if ($buttons->isNotEmpty())
-                    @foreach ($buttons as $button)
-    <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
-        style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
-               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-               background-color: #{{ $button->color ? $button->color : '007bff' }};
-               font-family: 'Perpetua', serif; text-align: center;
-               text-decoration: none; color: #fff;
-               position: relative;
-               display: inline-block;
-               overflow: hidden;
-               border: 3px solid #00008B; /* Dark blue border before hover */
-               transition: all 0.3s ease-in-out;"
-        onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
-                     this.style.borderStyle='solid';
-                     this.style.borderWidth='3px';
-                     this.style.borderRadius='8px';
-                     this.style.borderColor='transparent';"
-        onmouseout="this.style.borderImage='none';
-                    this.style.borderColor='#00008B';
-                    this.style.borderStyle='solid';
-                    this.style.borderWidth='3px';
-                    this.style.borderRadius='8px';"
-        target="_blank">
-        {{ $button->title }}
-    </a>
-@endforeach
-                    @endif
-                </div>
-            </div>
-
-            <!-- Video Player -->
-            <div class="col-md-7 px-md-5">
-                @if ($movies_info && $movies_info->video_url != '')
-                    @if ($movies_info->video_type == 'GoogleDrive')
-                        @include('pages.movies.player.google_drive_player')
-                        @else
-                         @include('pages.movies.player.other')
+                        <div class="sidebar-buttons-container mb-3 px-2 pt-2">
+                            @foreach ($buttons as $button)
+                                <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-2"
+                                    style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
+                                           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                                           background-color: #{{ $button->color ? $button->color : '007bff' }};
+                                           font-family: 'Perpetua', serif; text-align: center;
+                                           text-decoration: none; color: #fff;
+                                           position: relative;
+                                           display: inline-block;
+                                           overflow: hidden;
+                                           border: 3px solid #00008B; /* Dark blue border before hover */
+                                           transition: all 0.3s ease-in-out;"
+                                    onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
+                                                 this.style.borderStyle='solid';
+                                                 this.style.borderWidth='3px';
+                                                 this.style.borderRadius='8px';
+                                                 this.style.borderColor='transparent';"
+                                    onmouseout="this.style.borderImage='none';
+                                                this.style.borderColor='#00008B';
+                                                this.style.borderStyle='solid';
+                                                this.style.borderWidth='3px';
+                                                this.style.borderRadius='8px';"
+                                    target="_blank">
+                                    {{ $button->title }}
+                                </a>
+                            @endforeach
+                        </div>
                     @endif
 
-                @else
-                    <div
-                        style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011;
-                               border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">
-                        NO Source URL Set
+                    <!-- News Ticker Section -->
+                <div class="card bg-dark text-white border-0 mb-2" style="max-height: 350px; display: flex; flex-direction: column;">
+                    <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333; flex-shrink: 0;">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
+                                <i class="fa fa-newspaper-o mr-2"></i> Latest News
+                            </button>
+                        </h5>
                     </div>
-                @endif
-            </div>
 
-            <!-- Right Side News Ticker and Banners -->
-            <div class="col-md-3 d-none d-md-flex flex-column justify-content-start ps-md-5">
+                    <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" style="overflow: hidden; flex-grow: 1;">
+                        <div class="card-body p-0" style="height: 100%; display: flex; flex-direction: column;">
+                            <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto;">
+                                @if(isset($news_tickers) && count($news_tickers) > 0)
+                                    @foreach($news_tickers as $news)
+                                        <div class="news-item">
+                                            <div class="news-headline">
+                                                @if($news->is_breaking)
+                                                    <span class="breaking-badge">BREAKING</span>
+                                                @endif
+                                                {{ $news->headline }}
+                                            </div>
+                                            <div class="news-details">
+                                                {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                            </div>
+                                            <span class="news-time">
+                                                <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                @include('pages.home.news_ticker')
+                <!-- Game Section -->
+                <div class="card bg-dark text-white border-0 mb-2" style="flex-shrink: 0;">
+                    <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333; border-top: 1px solid #333;">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseGame" aria-expanded="true" aria-controls="collapseGame">
+                                <i class="fa fa-gamepad mr-2"></i> Games
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapseGame" class="collapse show" aria-labelledby="headingGame">
+                        <div class="card-body p-0">
+                            <div class="pacman-game-container">
+                                <div class="pacman-game-wrapper" style="height: 200px;">
+                                    <iframe
+                                        src="https://pacman.platzh1rsch.ch/"
+                                        style="width: 100%; height: 100%; border: none;"
+                                        allowfullscreen
+                                        title="Pacman Game">
+                                    </iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="sidebar-banners-container mt-3">
                     @if ($banners->isNotEmpty())
@@ -174,6 +282,7 @@
                     @endif
                 </div>
             </div>
+        </div>
 
             <!-- Player Footer Section -->
             <div class="player-footer-section">
@@ -258,10 +367,11 @@
             /* Player Footer Section */
             .player-footer-section {
                 background: linear-gradient(135deg, #0d0620 0%, #1a0d33 100%);
-                border-radius: 8px;
-                margin-top: 8px;
+                border-radius: 0;
+                margin-top: 0;
                 padding: 20px 25px;
                 box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+                width: 100%;
             }
 
             /* Player Footer Top Section */
@@ -524,11 +634,6 @@
 @endif
 
     </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="vfx-tabs-item mt-30">
                         <input checked="checked" id="tab1" type="radio" name="pct" />

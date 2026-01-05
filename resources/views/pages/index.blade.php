@@ -6,7 +6,7 @@
 @endif
 @section('content')
 
-    @include('pages.home.slider')
+    @include('pages.movies.slider')
 @if(request()->getHost() != 'home.cineworm.org')
 
 @if (get_web_banner('home_top') != '')

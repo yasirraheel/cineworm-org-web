@@ -1,3 +1,9 @@
+@php
+    if(!isset($news_tickers)){
+        $news_tickers = \App\Models\NewsTicker::where('status', 1)->orderBy('id', 'DESC')->get();
+    }
+@endphp
+
 @extends('site_app')
 
 
@@ -105,6 +111,29 @@
             background: #666;
         }
 
+        .pacman-game-container {
+            background: #1a1a1a;
+            flex: 1;
+            overflow: hidden;
+            padding: 0;
+            color: #fff;
+        }
+
+        .pacman-game-wrapper {
+            background: #000;
+            height: 100%;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pacman-game-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
         @media (max-width: 767px) {
             .news-ticker-container {
                 height: 300px;
@@ -116,20 +145,36 @@
     <!-- Start Page Content Area -->
     <div class="page-content-area vfx-item-ptb pt-0">
 
-        <div class="container-fluid bg-dark video-player-base">
-            <div class="container">
-                <div class="row align-items-stretch">
-                    <!-- Left Side Buttons -->
-                    <div class="col-md-2 d-none d-md-flex justify-content-center align-items-center pe-md-5">
-                        <div class="d-flex flex-column w-100">
-                            @php
-                                $buttons = get_web_button_banner('buttons');
-                                $banners = get_web_button_banner('banners');
-                            @endphp
+        <div class="container-fluid bg-dark video-player-base px-0">
+            <div class="row no-gutters align-items-stretch">
+                    <!-- Video Player -->
+                    <div class="col-md-9 p-0">
+                        @if ($tv_info->channel_url != '')
+                            {{-- @dd($tv_info->channel_url) --}}
+                            @if ($tv_info->channel_url_type == 'Embed')
+                                @include('pages.livetv.player.embed')
+                            @else
+                                @include('pages.livetv.player.other')
+                            @endif
+                        @else
+                            <div
+                                style="text-align: center;padding: 70px 30px;font-size: 24px; font-weight: 700; background: #101011;border-radius: 10px;margin-top: 15px;min-height: 280px;
+                            line-height: 6;">
+                                NO Source URL Set</div>
+                        @endif
+                    </div>
 
-                            @if ($buttons->isNotEmpty())
+                    <!-- Right Side News Ticker and Banners -->
+                    <div class="col-md-3 d-none d-md-flex flex-column justify-content-start" style="max-height: 100%;">
+                        @php
+                            $buttons = get_web_button_banner('buttons');
+                            $banners = get_web_button_banner('banners');
+                        @endphp
+
+                        @if ($buttons->isNotEmpty())
+                            <div class="sidebar-buttons-container mb-3 px-2 pt-2">
                                 @foreach ($buttons as $button)
-                                    <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
+                                    <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-2"
                                         style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
                                                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
                                                background-color: #{{ $button->color ? $button->color : '007bff' }};
@@ -154,31 +199,71 @@
                                         {{ $button->title }}
                                     </a>
                                 @endforeach
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Video Player -->
-                    <div class="col-md-7 px-md-5">
-                        @if ($tv_info->channel_url != '')
-                            {{-- @dd($tv_info->channel_url) --}}
-                            @if ($tv_info->channel_url_type == 'Embed')
-                                @include('pages.livetv.player.embed')
-                            @else
-                                @include('pages.livetv.player.other')
-                            @endif
-                        @else
-                            <div
-                                style="text-align: center;padding: 70px 30px;font-size: 24px; font-weight: 700; background: #101011;border-radius: 10px;margin-top: 15px;min-height: 280px;
-                            line-height: 6;">
-                                NO Source URL Set</div>
+                            </div>
                         @endif
-                    </div>
 
-                    <!-- Right Side News Ticker and Banners -->
-                    <div class="col-md-3 d-none d-md-flex flex-column justify-content-start ps-md-5">
+                        <!-- News Ticker Section -->
+                        <div class="card bg-dark text-white border-0 mb-2" style="max-height: 350px; display: flex; flex-direction: column;">
+                            <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333; flex-shrink: 0;">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
+                                        <i class="fa fa-newspaper-o mr-2"></i> Latest News
+                                    </button>
+                                </h5>
+                            </div>
 
-                        @include('pages.home.news_ticker')
+                            <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" style="overflow: hidden; flex-grow: 1;">
+                                <div class="card-body p-0" style="height: 100%; display: flex; flex-direction: column;">
+                                    <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto;">
+                                        @if(isset($news_tickers) && count($news_tickers) > 0)
+                                            @foreach($news_tickers as $news)
+                                                <div class="news-item">
+                                                    <div class="news-headline">
+                                                        @if($news->is_breaking)
+                                                            <span class="breaking-badge">BREAKING</span>
+                                                        @endif
+                                                        {{ $news->headline }}
+                                                    </div>
+                                                    <div class="news-details">
+                                                        {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                                    </div>
+                                                    <span class="news-time">
+                                                        <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                                    </span>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Game Section -->
+                        <div class="card bg-dark text-white border-0 mb-2" style="flex-shrink: 0;">
+                            <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333; border-top: 1px solid #333;">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseGame" aria-expanded="true" aria-controls="collapseGame">
+                                        <i class="fa fa-gamepad mr-2"></i> Games
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseGame" class="collapse show" aria-labelledby="headingGame">
+                                <div class="card-body p-0">
+                                    <div class="pacman-game-container">
+                                        <div class="pacman-game-wrapper" style="height: 200px;">
+                                            <iframe
+                                                src="https://pacman.platzh1rsch.ch/"
+                                                style="width: 100%; height: 100%; border: none;"
+                                                allowfullscreen
+                                                title="Pacman Game">
+                                            </iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="sidebar-banners-container mt-3">
                             @if ($banners->isNotEmpty())
@@ -239,10 +324,11 @@
                     /* Player Footer Section */
                     .player-footer-section {
                         background: linear-gradient(135deg, #0d0620 0%, #1a0d33 100%);
-                        border-radius: 8px;
-                        margin-top: 8px;
+                        border-radius: 0;
+                        margin-top: 0;
                         padding: 20px 25px;
                         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+                        width: 100%;
                     }
 
                     /* Player Footer Top Section */
