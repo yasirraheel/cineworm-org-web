@@ -69,7 +69,7 @@
     <div class="container-fluid px-0">
         <div class="row no-gutters">
             <!-- Video Player Column -->
-            <div class="col-lg-12 col-md-12" style="padding: 0;">
+            <div class="col-lg-9 col-md-12" style="padding: 0;">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -83,33 +83,67 @@
                         NO Source URL Set
                     </div>
                 @endif
-            
-                <!-- News Ticker -->
-                <div class="news-ticker-container">
-                    <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
-                        Latest News
-                    </h4>
+            </div>
 
-                    @if(isset($news_tickers) && count($news_tickers) > 0)
-                        @foreach($news_tickers as $news)
-                            <div class="news-item">
-                                <div class="news-headline">
-                                    @if($news->is_breaking)
-                                        <span class="breaking-badge">BREAKING</span>
+            <!-- Right Sidebar (Accordion) -->
+            <div class="col-lg-3 col-md-12 bg-dark" style="padding: 0; border-left: 1px solid #333;">
+                <div id="sidebarAccordion">
+                    <!-- News Ticker Item -->
+                    <div class="card bg-dark text-white border-0">
+                        <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333;">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
+                                    <i class="fa fa-newspaper-o mr-2"></i> Latest News
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" data-parent="#sidebarAccordion">
+                            <div class="card-body p-0">
+                                <div class="news-ticker-container" style="height: 400px; border: none; background: transparent;">
+                                    @if(isset($news_tickers) && count($news_tickers) > 0)
+                                        @foreach($news_tickers as $news)
+                                            <div class="news-item">
+                                                <div class="news-headline">
+                                                    @if($news->is_breaking)
+                                                        <span class="breaking-badge">BREAKING</span>
+                                                    @endif
+                                                    {{ $news->headline }}
+                                                </div>
+                                                <div class="news-details">
+                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                                </div>
+                                                <span class="news-time">
+                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
                                     @endif
-                                    {{ $news->headline }}
                                 </div>
-                                <div class="news-details">
-                                    {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
-                                </div>
-                                <span class="news-time">
-                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
-                                </span>
                             </div>
-                        @endforeach
-                    @else
-                        <p style="color: #888;">No news updates at the moment.</p>
-                    @endif
+                        </div>
+                    </div>
+
+                    <!-- Game Item -->
+                    <div class="card bg-dark text-white border-0">
+                        <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333;">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseGame" aria-expanded="false" aria-controls="collapseGame">
+                                    <i class="fa fa-gamepad mr-2"></i> Games
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-parent="#sidebarAccordion">
+                            <div class="card-body p-3 text-center">
+                                <div style="padding: 20px; color: #888;">
+                                    <i class="fa fa-gamepad fa-3x mb-3"></i>
+                                    <p>Game content coming soon...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
