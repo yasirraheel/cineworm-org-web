@@ -166,7 +166,7 @@
                 <div class="card bg-dark text-white border-0">
                     <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333; border-top: 1px solid #333;">
                         <h5 class="mb-0">
-                            <button class="btn btn-link collapsed text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseGame" aria-expanded="true" aria-controls="collapseGame">
+                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseGame" aria-expanded="true" aria-controls="collapseGame">
                                 <i class="fa fa-gamepad mr-2"></i> Games
                             </button>
                         </h5>
