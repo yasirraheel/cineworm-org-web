@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Customized Video Player</title>
     <!-- Include Plyr CSS -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css">
     <!-- Include your custom CSS -->
@@ -31,11 +22,8 @@
             height: 100%;
         }
     </style>
-</head>
-<body>
-    <div class="slider-area">
-        <div id="viavi_player"></div>
-    </div>
+
+    <div id="viavi_player"></div>
 
     <!-- Include jQuery if not already included -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
