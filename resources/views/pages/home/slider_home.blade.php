@@ -63,6 +63,29 @@
         background: #666;
     }
 
+    /* Pacman Game Container Styling */
+    .pacman-game-container {
+        background: #1a1a1a;
+        height: 100%;
+        overflow: hidden;
+        padding: 0;
+        color: #fff;
+    }
+
+    .pacman-game-wrapper {
+        background: #000;
+        height: 400px; /* Fixed height for consistency with ticker */
+        border-radius: 5px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .pacman-game-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
 </style>
 
 <div class="slider-area p-0">
@@ -136,10 +159,16 @@
                             </h5>
                         </div>
                         <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-parent="#sidebarAccordion">
-                            <div class="card-body p-3 text-center">
-                                <div style="padding: 20px; color: #888;">
-                                    <i class="fa fa-gamepad fa-3x mb-3"></i>
-                                    <p>Game content coming soon...</p>
+                            <div class="card-body p-0">
+                                <div class="pacman-game-container">
+                                    <div class="pacman-game-wrapper">
+                                        <iframe
+                                            src="https://pacman.platzh1rsch.ch/"
+                                            style="width: 100%; height: 100%; border: none;"
+                                            allowfullscreen
+                                            title="Pacman Game">
+                                        </iframe>
+                                    </div>
                                 </div>
                             </div>
                         </div>
