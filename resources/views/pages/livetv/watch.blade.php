@@ -215,7 +215,12 @@
                             <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" style="overflow: hidden; flex-grow: 1;">
                                 <div class="card-body p-0" style="height: 100%; display: flex; flex-direction: column;">
                                     <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto;">
+                                        @php
+                                            $has_news = false;
+                                        @endphp
+
                                         @if(isset($news_tickers) && count($news_tickers) > 0)
+                                            @php $has_news = true; @endphp
                                             @foreach($news_tickers as $news)
                                                 <div class="news-item">
                                                     <div class="news-headline">
@@ -232,7 +237,28 @@
                                                     </span>
                                                 </div>
                                             @endforeach
-                                        @else
+                                        @endif
+
+                                        @if(isset($rss_news) && count($rss_news) > 0)
+                                            @php $has_news = true; @endphp
+                                            @foreach($rss_news as $news)
+                                                <div class="news-item">
+                                                    <div class="news-headline">
+                                                        <span class="breaking-badge" style="background: #007bff;">WORLD NEWS</span>
+                                                        {{ $news['headline'] }}
+                                                    </div>
+                                                    <div class="news-details">
+                                                        {!! \Illuminate\Support\Str::limit(strip_tags($news['details']), 150) !!}
+                                                    </div>
+                                                    <span class="news-time">
+                                                        <i class="fa fa-clock-o"></i> {{ $news['created_at'] }}
+                                                    </span>
+                                                    <a href="{{ $news['link'] }}" target="_blank" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read more on DW</a>
+                                                </div>
+                                            @endforeach
+                                        @endif
+
+                                        @if(!$has_news)
                                             <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
                                         @endif
                                     </div>
