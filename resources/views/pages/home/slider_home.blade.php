@@ -7,10 +7,11 @@
 <style>
     .news-ticker-container {
         background: #1a1a1a;
-        height: 100%;
+        height: 250px;
         overflow-y: auto;
         padding: 15px;
         color: #fff;
+        margin-top: 0;
     }
     .news-item {
         margin-bottom: 20px;
@@ -62,20 +63,13 @@
         background: #666;
     }
 
-    @media (max-width: 991px) {
-        .news-ticker-container {
-            height: 300px; /* Fixed height for mobile/tablet below player */
-            margin-top: 20px;
-        }
-    }
-
 </style>
 
 <div class="slider-area p-0">
     <div class="container-fluid px-0">
         <div class="row no-gutters">
             <!-- Video Player Column -->
-            <div class="col-lg-9 col-md-12" style="padding-left: 0;">
+            <div class="col-lg-12 col-md-12" style="padding-left: 0;">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -89,10 +83,8 @@
                         NO Source URL Set
                     </div>
                 @endif
-            </div>
-
-            <!-- News Ticker Column -->
-            <div class="col-lg-3 col-md-12">
+            
+                <!-- News Ticker -->
                 <div class="news-ticker-container">
                     <h4 style="color: #fff; border-bottom: 2px solid #e50914; padding-bottom: 10px; margin-bottom: 15px;">
                         Latest News
