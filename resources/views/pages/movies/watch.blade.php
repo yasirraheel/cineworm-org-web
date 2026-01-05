@@ -95,47 +95,13 @@
 
                         <div class="container">
         <div class="row align-items-stretch">
-            <!-- Left Side Buttons -->
-            <div class="col-md-2 d-none d-md-flex justify-content-center align-items-center pe-md-5">
-                <div class="d-flex flex-column w-100">
-                    @php
-                        $buttons = get_web_button_banner('buttons'); // Fetch all button components
-                        $banners = get_web_button_banner('banners'); // Fetch all banner components
-                    @endphp
-
-                    @if ($buttons->isNotEmpty())
-                    @foreach ($buttons as $button)
-    <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
-        style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
-               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-               background-color: #{{ $button->color ? $button->color : '007bff' }};
-               font-family: 'Perpetua', serif; text-align: center;
-               text-decoration: none; color: #fff;
-               position: relative;
-               display: inline-block;
-               overflow: hidden;
-               border: 3px solid #00008B; /* Dark blue border before hover */
-               transition: all 0.3s ease-in-out;"
-        onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
-                     this.style.borderStyle='solid';
-                     this.style.borderWidth='3px';
-                     this.style.borderRadius='8px';
-                     this.style.borderColor='transparent';"
-        onmouseout="this.style.borderImage='none';
-                    this.style.borderColor='#00008B';
-                    this.style.borderStyle='solid';
-                    this.style.borderWidth='3px';
-                    this.style.borderRadius='8px';"
-        target="_blank">
-        {{ $button->title }}
-    </a>
-@endforeach
-                    @endif
-                </div>
-            </div>
-
+            @php
+                $buttons = get_web_button_banner('buttons'); // Fetch all button components
+                $banners = get_web_button_banner('banners'); // Fetch all banner components
+            @endphp
+            
             <!-- Video Player -->
-            <div class="col-md-7 px-md-5">
+            <div class="col-md-8 px-md-5">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -153,9 +119,40 @@
             </div>
 
             <!-- Right Side News Ticker and Banners -->
-            <div class="col-md-3 d-none d-md-flex flex-column justify-content-start ps-md-5">
+            <div class="col-md-4 d-none d-md-flex flex-column justify-content-start ps-md-5">
 
                 @include('pages.home.news_ticker')
+                
+                <div class="sidebar-buttons-container mt-3">
+                    @if ($buttons->isNotEmpty())
+                        @foreach ($buttons as $button)
+                            <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-4"
+                                style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
+                                       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                                       background-color: #{{ $button->color ? $button->color : '007bff' }};
+                                       font-family: 'Perpetua', serif; text-align: center;
+                                       text-decoration: none; color: #fff;
+                                       position: relative;
+                                       display: inline-block;
+                                       overflow: hidden;
+                                       border: 3px solid #00008B; /* Dark blue border before hover */
+                                       transition: all 0.3s ease-in-out;"
+                                onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
+                                             this.style.borderStyle='solid';
+                                             this.style.borderWidth='3px';
+                                             this.style.borderRadius='8px';
+                                             this.style.borderColor='transparent';"
+                                onmouseout="this.style.borderImage='none';
+                                            this.style.borderColor='#00008B';
+                                            this.style.borderStyle='solid';
+                                            this.style.borderWidth='3px';
+                                            this.style.borderRadius='8px';"
+                                target="_blank">
+                                {{ $button->title }}
+                            </a>
+                        @endforeach
+                    @endif
+                </div>
 
                 <div class="sidebar-banners-container mt-3">
                     @if ($banners->isNotEmpty())
