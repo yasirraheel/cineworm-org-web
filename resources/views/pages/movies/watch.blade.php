@@ -93,15 +93,15 @@
                 <div class="col-lg-12 col-md-12 col-sm-12">
                     <div class="video-posts-video">
 
-                        <div class="container">
-        <div class="row align-items-stretch">
+                        <div class="container-fluid px-0">
+        <div class="row no-gutters">
             @php
                 $buttons = get_web_button_banner('buttons'); // Fetch all button components
                 $banners = get_web_button_banner('banners'); // Fetch all banner components
             @endphp
-            
+
             <!-- Video Player -->
-            <div class="col-md-8 px-md-5">
+            <div class="col-md-8 p-0">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')
@@ -119,10 +119,10 @@
             </div>
 
             <!-- Right Side News Ticker and Banners -->
-            <div class="col-md-4 d-none d-md-flex flex-column justify-content-start ps-md-5">
+            <div class="col-md-4 d-none d-md-flex flex-column justify-content-start p-0">
 
                 @include('pages.home.news_ticker')
-                
+
                 <div class="sidebar-buttons-container mt-3">
                     @if ($buttons->isNotEmpty())
                         @foreach ($buttons as $button)
