@@ -82,7 +82,7 @@
 
         .pacman-game-wrapper {
             background: #000;
-            height: 400px; /* Fixed height for consistency with ticker */
+            height: 250px; /* Reduced height to fit with news under player */
             border-radius: 5px;
             overflow: hidden;
             position: relative;
@@ -117,7 +117,7 @@
                 </div>
 
                 <!-- Right Sidebar -->
-                <div class="col-lg-3 col-md-12 bg-dark" style="padding: 0; border-left: 1px solid #333;">
+                <div class="col-lg-3 col-md-12 bg-dark" style="padding: 0; border-left: 1px solid #333; max-height: 100%; overflow-y: auto;">
 
                     <!-- News Ticker Section -->
                     <div class="card bg-dark text-white border-0 mb-2">
@@ -131,7 +131,7 @@
 
                         <div id="collapseNews" class="collapse show" aria-labelledby="headingNews">
                             <div class="card-body p-0">
-                                <div class="news-ticker-container" style="height: 400px; border: none; background: transparent;">
+                                <div class="news-ticker-container" style="height: 250px; border: none; background: transparent;">
                                     @if(isset($news_tickers) && count($news_tickers) > 0)
                                         @foreach($news_tickers as $news)
                                             <div class="news-item">
@@ -146,6 +146,22 @@
                                                 </div>
                                                 <span class="news-time">
                                                     <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    @elseif(isset($rss_news) && count($rss_news) > 0)
+                                        @foreach($rss_news as $news)
+                                            <div class="news-item">
+                                                <div class="news-headline">
+                                                    <a href="{{ $news['link'] }}" target="_blank" style="color: #e50914; text-decoration: none;">
+                                                        {{ $news['headline'] }}
+                                                    </a>
+                                                </div>
+                                                <div class="news-details">
+                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news['details']), 150) !!}
+                                                </div>
+                                                <span class="news-time">
+                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news['created_at'])->diffForHumans() }}
                                                 </span>
                                             </div>
                                         @endforeach
