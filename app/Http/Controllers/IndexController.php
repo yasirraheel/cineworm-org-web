@@ -187,11 +187,7 @@ class IndexController extends Controller
              \Log::error("RSS Fetch Error: " . $e->getMessage());
         }
 
-        if(request()->getHost() != 'home.cineworm.org'){
-            return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers', 'rss_news'));
-
-        }
-        return view('pages.index_home', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers', 'rss_news'));
+        return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers', 'rss_news'));
     }
 
     public function getRandomMovie(Request $request)
