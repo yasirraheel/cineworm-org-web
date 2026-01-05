@@ -75,7 +75,7 @@
     <div class="container-fluid px-0">
         <div class="row no-gutters">
             <!-- Video Player Column -->
-            <div class="col-lg-9 col-md-12">
+            <div class="col-lg-9 col-md-12" style="padding-left: 0;">
                 @if ($movies_info && $movies_info->video_url != '')
                     @if ($movies_info->video_type == 'GoogleDrive')
                         @include('pages.movies.player.google_drive_player')

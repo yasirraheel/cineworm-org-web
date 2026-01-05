@@ -18,7 +18,7 @@
             max-width: 100%;
             height: auto;
             aspect-ratio: 16 / 9;
-            margin: auto;
+            margin: 0;
         }
         .plyr__video-embed {
             position: relative;

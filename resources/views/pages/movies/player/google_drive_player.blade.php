@@ -10,7 +10,7 @@
         .video-container {
             width: 100%;
             max-width: 100%;
-            margin: 0 auto;
+            margin: 0;
             position: relative;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
