@@ -253,7 +253,6 @@
                                             <span class="news-time">
                                                 <i class="fa fa-clock-o"></i> {{ $news['created_at'] }}
                                             </span>
-                                            <a href="{{ $news['link'] }}" target="_blank" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read more on DW</a>
                                         </div>
                                     @endforeach
                                 @endif
