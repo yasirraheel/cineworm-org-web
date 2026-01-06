@@ -192,7 +192,7 @@
                 <div class="card bg-dark text-white border-0 mb-2" style="max-height: 350px; display: flex; flex-direction: column;">
                     <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333; flex-shrink: 0;">
                         <h5 class="mb-0">
-                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
+                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" onclick="toggleSection('news')">
                                 <i class="fa fa-newspaper-o mr-2"></i> Latest News
                             </button>
                         </h5>
@@ -262,12 +262,12 @@
                 <div class="card bg-dark text-white border-0 mb-2" style="flex-shrink: 0;">
                     <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333; border-top: 1px solid #333;">
                         <h5 class="mb-0">
-                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseGame" aria-expanded="true" aria-controls="collapseGame">
+                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" onclick="toggleSection('game')">
                                 <i class="fa fa-gamepad mr-2"></i> Games
                             </button>
                         </h5>
                     </div>
-                    <div id="collapseGame" class="collapse show" aria-labelledby="headingGame">
+                    <div id="collapseGame" class="collapse" style="overflow: hidden; transition: height 0.3s ease;">
                         <div class="card-body p-0">
                             <div class="pacman-game-container">
                                 <div class="pacman-game-wrapper" style="height: 200px;">
@@ -284,7 +284,11 @@
                 </div>
 
                 <script>
-                    function toggleSection(section) {
+                    function toggleSection(section, event) {
+                        if (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
                         const newsCollapse = document.getElementById('collapseNews');
                         const gameCollapse = document.getElementById('collapseGame');
 

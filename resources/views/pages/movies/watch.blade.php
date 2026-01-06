@@ -298,7 +298,11 @@
                 </div>
 
                 <script>
-                    function toggleSection(section) {
+                    function toggleSection(section, event) {
+                        if (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
                         const newsCollapse = document.getElementById('collapseNews');
                         const gameCollapse = document.getElementById('collapseGame');
 
