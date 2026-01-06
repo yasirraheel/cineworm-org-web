@@ -245,6 +245,30 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Game Section -->
+                    <div class="card bg-dark text-white border-0 mb-2" style="flex-shrink: 0;">
+                        <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333; border-top: 1px solid #333;">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGame" aria-expanded="false" aria-controls="collapseGame">
+                                    <i class="fa fa-gamepad mr-2"></i> Games
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-bs-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
+                            <div class="card-body p-0">
+                                <div class="pacman-game-container">
+                                    <div class="pacman-game-wrapper" style="height: 100%;">
+                                        <iframe
+                                            src="https://pacman.platzh1rsch.ch/"
+                                            style="width: 100%; height: 100%; border: none;"
+                                            allowfullscreen
+                                            title="Pacman Game">
+                                        </iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1182,42 +1206,60 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Match news ticker height with player height
-        function matchTickerToPlayerHeight() {
-            // Check if news section is visible
-            var newsCollapse = document.getElementById('collapseNews');
-            if (newsCollapse && !newsCollapse.classList.contains('show')) return;
-
-            // Only apply on desktop (md and above)
-            if (window.innerWidth >= 768) {
-                    var player = document.getElementById('main-player-column');
+            // Match news ticker/game height with player height
+            function matchHeightToPlayer() {
+                // Only apply on desktop (md and above)
+                if (window.innerWidth < 768) {
+                     // Reset heights on mobile
                     var ticker = document.querySelector('.news-ticker-container');
+                    if (ticker) ticker.style.height = '';
 
-                    if (player && ticker) {
-                        var playerHeight = player.offsetHeight;
-                        ticker.style.height = playerHeight + 'px';
-                    }
-                } else {
-                    // Reset height on mobile
+                    var gameWrapper = document.querySelector('.pacman-game-wrapper');
+                    if (gameWrapper) gameWrapper.style.height = '300px'; // Default mobile height
+                    return;
+                }
+
+                var player = document.getElementById('main-player-column');
+                if (!player) return;
+
+                var playerHeight = player.offsetHeight;
+
+                // Adjust News Ticker if visible
+                var newsCollapse = document.getElementById('collapseNews');
+                if (newsCollapse && newsCollapse.classList.contains('show')) {
                     var ticker = document.querySelector('.news-ticker-container');
                     if (ticker) {
-                        ticker.style.height = '';
+                        ticker.style.height = playerHeight + 'px';
+                    }
+                }
+
+                // Adjust Game if visible
+                var gameCollapse = document.getElementById('collapseGame');
+                if (gameCollapse && gameCollapse.classList.contains('show')) {
+                    var gameWrapper = document.querySelector('.pacman-game-wrapper');
+                    if (gameWrapper) {
+                        gameWrapper.style.height = playerHeight + 'px';
                     }
                 }
             }
 
-            // Call on load, resize, and periodically to catch player initialization
-            window.addEventListener('resize', matchTickerToPlayerHeight);
-            window.addEventListener('load', matchTickerToPlayerHeight);
+            // Call on load, resize, and periodically
+            window.addEventListener('resize', matchHeightToPlayer);
+            window.addEventListener('load', matchHeightToPlayer);
 
-            // Check periodically for the first few seconds after page load (player takes time to initialize)
+            // Listen for accordion changes
+            var accordions = document.querySelectorAll('.collapse');
+            accordions.forEach(function(acc) {
+                acc.addEventListener('shown.bs.collapse', matchHeightToPlayer);
+                acc.addEventListener('hidden.bs.collapse', matchHeightToPlayer);
+            });
+
+            // Check periodically for initialization
             var attempts = 0;
             var checkInterval = setInterval(function() {
-                matchTickerToPlayerHeight();
+                matchHeightToPlayer();
                 attempts++;
-                if (attempts > 20) { // Stop after ~10 seconds
-                    clearInterval(checkInterval);
-                }
+                if (attempts > 20) clearInterval(checkInterval);
             }, 500);
 
             // Auto-scroll news ticker
@@ -1225,14 +1267,13 @@
                 var ticker = document.querySelector('.news-ticker-container');
                 if (!ticker) return;
 
-                var scrollSpeed = 1; // pixels per interval
-                var scrollInterval = 50; // milliseconds
-                var pauseAtEnd = 2000; // pause at end before restarting (ms)
-                var pauseAtTop = 3000; // pause at top before starting (ms)
+                var scrollSpeed = 1;
+                var scrollInterval = 50;
+                var pauseAtEnd = 2000;
+                var pauseAtTop = 3000;
                 var isScrolling = false;
                 var hasStarted = false;
 
-                // Pause at top before starting
                 setTimeout(function() {
                     hasStarted = true;
                     startScrolling();
@@ -1254,43 +1295,23 @@
                             return;
                         }
 
-                        // Check if we've reached the bottom
                         if (ticker.scrollTop + ticker.clientHeight >= ticker.scrollHeight - 5) {
                             clearInterval(scrollTimer);
                             isScrolling = false;
-
-                            // Pause at bottom, then scroll back to top
                             setTimeout(function() {
-                                ticker.scrollTo({
-                                    top: 0,
-                                    behavior: 'smooth'
-                                });
-
-                                // Wait for smooth scroll to complete, then restart
-                                setTimeout(function() {
-                                    startScrolling();
-                                }, pauseAtTop);
+                                ticker.scrollTo({ top: 0, behavior: 'smooth' });
+                                setTimeout(function() { startScrolling(); }, pauseAtTop);
                             }, pauseAtEnd);
                         } else {
-                            // Scroll down smoothly
                             ticker.scrollTop += scrollSpeed;
                         }
                     }, scrollInterval);
                 }
 
-                // Pause scrolling on hover
-                ticker.addEventListener('mouseenter', function() {
-                    scrollSpeed = 0;
-                });
-
-                ticker.addEventListener('mouseleave', function() {
-                    if (hasStarted) {
-                        scrollSpeed = 1;
-                    }
-                });
+                ticker.addEventListener('mouseenter', function() { scrollSpeed = 0; });
+                ticker.addEventListener('mouseleave', function() { if (hasStarted) scrollSpeed = 1; });
             }
 
-            // Initialize auto-scroll
             autoScrollTicker();
         });
     </script>
