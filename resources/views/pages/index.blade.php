@@ -179,17 +179,17 @@
                     <!-- News Ticker Section -->
                 <div id="watchAccordion">
                     <!-- Headers Wrapper -->
-                    <div class="card bg-dark text-white border-0 mb-2">
+                    <div class="card bg-dark text-white border-0 mb-2" id="accordionHeaders">
                         <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333;">
                             <h5 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
                                     <i class="fa fa-newspaper-o mr-2"></i> Latest News
                                 </button>
                             </h5>
                         </div>
                         <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333;">
                             <h5 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGame" aria-expanded="false" aria-controls="collapseGame">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseGame" aria-expanded="false" aria-controls="collapseGame">
                                     <i class="fa fa-gamepad mr-2"></i> Games
                                 </button>
                             </h5>
@@ -197,7 +197,7 @@
                     </div>
 
                     <!-- News Content -->
-                    <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" data-bs-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
+                    <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" data-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
                         <div class="card bg-dark text-white border-0 mb-2" style="height: 100%;">
                             <div class="card-body p-0" style="height: 100%; display: flex; flex-direction: column;">
                             <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto; position: relative;">
@@ -259,7 +259,7 @@
                     </div>
 
                     <!-- Game Content -->
-                    <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-bs-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
+                    <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
                         <div class="card bg-dark text-white border-0 mb-2">
                             <div class="card-body p-0">
                                 <div class="pacman-game-container">
@@ -334,7 +334,7 @@
                             </form>
                         @endauth
 
-                        <button class="action-btn share-btn" data-bs-toggle="modal" data-bs-target="#social-media">
+                        <button class="action-btn share-btn" data-toggle="modal" data-target="#social-media">
                             <i class="fas fa-share-alt"></i>
                             <span>{{ trans('words.share_text') }}</span>
                         </button>
@@ -1230,12 +1230,35 @@
 
                 var playerHeight = player.offsetHeight;
 
+                // Calculate available height for content
+                var sidebarButtons = document.querySelector('.sidebar-buttons-container');
+                var buttonsHeight = sidebarButtons ? sidebarButtons.offsetHeight : 0;
+                // Add margin bottom of buttons
+                if (sidebarButtons) {
+                     var style = window.getComputedStyle(sidebarButtons);
+                     buttonsHeight += parseInt(style.marginBottom) || 0;
+                }
+
+                var headers = document.getElementById('accordionHeaders');
+                var headersHeight = headers ? headers.offsetHeight : 0;
+                // Add margin bottom of headers
+                if (headers) {
+                     var style = window.getComputedStyle(headers);
+                     headersHeight += parseInt(style.marginBottom) || 0;
+                }
+
+                // Available height for the collapsible content
+                var availableHeight = playerHeight - buttonsHeight - headersHeight;
+
+                // Ensure non-negative
+                if (availableHeight < 200) availableHeight = 200; // Minimum safety height
+
                 // Adjust News Ticker if visible
                 var newsCollapse = document.getElementById('collapseNews');
                 if (newsCollapse && newsCollapse.classList.contains('show')) {
                     var ticker = document.querySelector('.news-ticker-container');
                     if (ticker) {
-                        ticker.style.height = playerHeight + 'px';
+                        ticker.style.height = availableHeight + 'px';
                     }
                 }
 
@@ -1244,7 +1267,7 @@
                 if (gameCollapse && gameCollapse.classList.contains('show')) {
                     var gameWrapper = document.querySelector('.pacman-game-wrapper');
                     if (gameWrapper) {
-                        gameWrapper.style.height = playerHeight + 'px';
+                        gameWrapper.style.height = availableHeight + 'px';
                     }
                 }
             }
