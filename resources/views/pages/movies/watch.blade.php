@@ -204,16 +204,16 @@
 
                     <!-- News Ticker Section -->
                 <div id="watchAccordion">
-                    <div class="card bg-dark text-white border-0 mb-2" style="max-height: 350px; display: flex; flex-direction: column;">
+                    <div class="card bg-dark text-white border-0 mb-2" style="display: flex; flex-direction: column;">
                         <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333; flex-shrink: 0;">
                             <h5 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
                                     <i class="fa fa-newspaper-o mr-2"></i> Latest News
                                 </button>
                             </h5>
                         </div>
 
-                        <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" data-parent="#watchAccordion" style="overflow: hidden; flex-grow: 1; transition: height 0.3s ease;">
+                        <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" data-bs-parent="#watchAccordion" style="overflow: hidden; flex-grow: 1; transition: height 0.3s ease;">
                             <div class="card-body p-0" style="height: 100%; display: flex; flex-direction: column;">
                             <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto; position: relative;">
                                 <div id="news-list-view">
@@ -277,12 +277,12 @@
                 <div class="card bg-dark text-white border-0 mb-2" style="flex-shrink: 0;">
                     <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333; border-top: 1px solid #333;">
                         <h5 class="mb-0">
-                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseGame" aria-expanded="false" aria-controls="collapseGame">
+                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGame" aria-expanded="false" aria-controls="collapseGame">
                                 <i class="fa fa-gamepad mr-2"></i> Games
                             </button>
                         </h5>
                     </div>
-                    <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
+                    <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-bs-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
                         <div class="card-body p-0">
                             <div class="pacman-game-container">
                                 <div class="pacman-game-wrapper" style="height: 200px;">
