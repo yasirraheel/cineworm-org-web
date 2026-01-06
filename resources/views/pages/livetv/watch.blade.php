@@ -206,68 +206,68 @@
                         <div class="card bg-dark text-white border-0 mb-2" style="max-height: 350px; display: flex; flex-direction: column;">
                             <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333; flex-shrink: 0;">
                                 <h5 class="mb-0">
-                                    <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
+                                    <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" onclick="toggleSection('news')">
                                         <i class="fa fa-newspaper-o mr-2"></i> Latest News
                                     </button>
                                 </h5>
                             </div>
 
-                            <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" style="overflow: hidden; flex-grow: 1;">
+                            <div id="collapseNews" class="collapse show" style="overflow: hidden; flex-grow: 1; transition: height 0.3s ease;">
                                 <div class="card-body p-0" style="height: 100%; display: flex; flex-direction: column;">
-                            <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto; position: relative;">
-                                <div id="news-list-view">
-                                    @php
-                                        $has_news = false;
-                                    @endphp
+                                    <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto; position: relative;">
+                                        <div id="news-list-view">
+                                            @php
+                                                $has_news = false;
+                                            @endphp
 
-                                    @if(isset($news_tickers) && count($news_tickers) > 0)
-                                        @php $has_news = true; @endphp
-                                        @foreach($news_tickers as $news)
-                                            <div class="news-item">
-                                                <div class="news-headline">
-                                                    @if($news->is_breaking)
-                                                        <span class="breaking-badge">BREAKING</span>
-                                                    @endif
-                                                    {{ $news->headline }}
-                                                </div>
-                                                <div class="news-details">
-                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
-                                                </div>
-                                                <span class="news-time">
-                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
-                                                </span>
-                                            </div>
-                                        @endforeach
-                                    @endif
+                                            @if(isset($news_tickers) && count($news_tickers) > 0)
+                                                @php $has_news = true; @endphp
+                                                @foreach($news_tickers as $news)
+                                                    <div class="news-item">
+                                                        <div class="news-headline">
+                                                            @if($news->is_breaking)
+                                                                <span class="breaking-badge">BREAKING</span>
+                                                            @endif
+                                                            {{ $news->headline }}
+                                                        </div>
+                                                        <div class="news-details">
+                                                            {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                                        </div>
+                                                        <span class="news-time">
+                                                            <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
+                                                        </span>
+                                                    </div>
+                                                @endforeach
+                                            @endif
 
-                                    @if(isset($rss_news) && count($rss_news) > 0)
-                                        @php $has_news = true; @endphp
-                                        @foreach($rss_news as $news)
-                                            <div class="news-item">
-                                                <div class="news-headline">
-                                                    <span class="breaking-badge" style="background: #007bff;">WORLD NEWS</span>
-                                                    {{ $news['headline'] }}
-                                                </div>
-                                                <div class="news-details">
-                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news['details']), 150) !!}
-                                                </div>
-                                                <span class="news-time">
-                                                    <i class="fa fa-clock-o"></i> {{ $news['created_at'] }}
-                                                </span>
-                                                <a href="#" class="read-dw-news" data-link="{{ $news['link'] }}" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read Full Story</a>
-                                            </div>
-                                        @endforeach
-                                    @endif
+                                            @if(isset($rss_news) && count($rss_news) > 0)
+                                                @php $has_news = true; @endphp
+                                                @foreach($rss_news as $news)
+                                                    <div class="news-item">
+                                                        <div class="news-headline">
+                                                            <span class="breaking-badge" style="background: #007bff;">WORLD NEWS</span>
+                                                            {{ $news['headline'] }}
+                                                        </div>
+                                                        <div class="news-details">
+                                                            {!! \Illuminate\Support\Str::limit(strip_tags($news['details']), 150) !!}
+                                                        </div>
+                                                        <span class="news-time">
+                                                            <i class="fa fa-clock-o"></i> {{ $news['created_at'] }}
+                                                        </span>
+                                                        <a href="#" class="read-dw-news" data-link="{{ $news['link'] }}" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read Full Story</a>
+                                                    </div>
+                                                @endforeach
+                                            @endif
 
-                                    @if(!$has_news)
-                                        <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
-                                    @endif
-                                </div>
-                                <div id="news-detail-view" style="display: none; height: 100%; flex-direction: column;">
-                                    <button class="btn btn-sm btn-secondary mb-2" id="back-to-news-list" style="align-self: flex-start; margin-bottom: 10px;"><i class="fa fa-arrow-left"></i> Back to News</button>
-                                    <div id="news-content-body" style="flex-grow: 1; overflow-y: auto;"></div>
-                                </div>
-                            </div>
+                                            @if(!$has_news)
+                                                <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
+                                            @endif
+                                        </div>
+                                        <div id="news-detail-view" style="display: none; height: 100%; flex-direction: column;">
+                                            <button class="btn btn-sm btn-secondary mb-2" id="back-to-news-list" style="align-self: flex-start; margin-bottom: 10px;"><i class="fa fa-arrow-left"></i> Back to News</button>
+                                            <div id="news-content-body" style="flex-grow: 1; overflow-y: auto;"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -276,12 +276,12 @@
                         <div class="card bg-dark text-white border-0 mb-2" style="flex-shrink: 0;">
                             <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333; border-top: 1px solid #333;">
                                 <h5 class="mb-0">
-                                    <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" data-toggle="collapse" data-target="#collapseGame" aria-expanded="true" aria-controls="collapseGame">
+                                    <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" onclick="toggleSection('game')">
                                         <i class="fa fa-gamepad mr-2"></i> Games
                                     </button>
                                 </h5>
                             </div>
-                            <div id="collapseGame" class="collapse show" aria-labelledby="headingGame">
+                            <div id="collapseGame" class="collapse" style="overflow: hidden; transition: height 0.3s ease;">
                                 <div class="card-body p-0">
                                     <div class="pacman-game-container">
                                         <div class="pacman-game-wrapper" style="height: 200px;">
@@ -296,6 +296,27 @@
                                 </div>
                             </div>
                         </div>
+
+                        <script>
+                            function toggleSection(section) {
+                                const newsCollapse = document.getElementById('collapseNews');
+                                const gameCollapse = document.getElementById('collapseGame');
+
+                                if (section === 'news') {
+                                    if (!newsCollapse.classList.contains('show')) {
+                                        // Open News, Close Game
+                                        $(gameCollapse).collapse('hide');
+                                        $(newsCollapse).collapse('show');
+                                    }
+                                } else if (section === 'game') {
+                                    if (!gameCollapse.classList.contains('show')) {
+                                        // Open Game, Close News
+                                        $(newsCollapse).collapse('hide');
+                                        $(gameCollapse).collapse('show');
+                                    }
+                                }
+                            }
+                        </script>
 
                         <div class="sidebar-banners-container mt-3">
                             @if ($banners->isNotEmpty())

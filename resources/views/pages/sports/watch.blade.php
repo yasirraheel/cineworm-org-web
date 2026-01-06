@@ -283,6 +283,27 @@
                     </div>
                 </div>
 
+                <script>
+                    function toggleSection(section) {
+                        const newsCollapse = document.getElementById('collapseNews');
+                        const gameCollapse = document.getElementById('collapseGame');
+
+                        if (section === 'news') {
+                            if (!newsCollapse.classList.contains('show')) {
+                                // Open News, Close Game
+                                $(gameCollapse).collapse('hide');
+                                $(newsCollapse).collapse('show');
+                            }
+                        } else if (section === 'game') {
+                            if (!gameCollapse.classList.contains('show')) {
+                                // Open Game, Close News
+                                $(newsCollapse).collapse('hide');
+                                $(gameCollapse).collapse('show');
+                            }
+                        }
+                    }
+                </script>
+
                 <div class="sidebar-banners-container mt-3">
                     @if ($banners->isNotEmpty())
                         @foreach ($banners as $banner)
