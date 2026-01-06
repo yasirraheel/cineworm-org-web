@@ -11,7 +11,7 @@
 
     <style>
         .news-ticker-container {
-                max-height: 250px;
+                max-height: 550px;
                 overflow-y: auto;
                 padding: 10px;
                 background: #111;
@@ -39,18 +39,18 @@
             border-bottom: none;
         }
         .news-headline {
-            font-size: 15px;
+            font-size: 18px;
             font-weight: bold;
             margin-bottom: 5px;
             color: #e50914;
         }
         .news-details {
-            font-size: 13px;
+            font-size: 15px;
             color: #ccc;
             line-height: 1.4;
         }
         .news-time {
-            font-size: 11px;
+            font-size: 13px;
             color: #888;
             margin-top: 5px;
             display: block;
