@@ -720,12 +720,18 @@
                 isScrolling = true;
 
                 var scrollTimer = setInterval(function() {
-                    if (!ticker) {
-                        clearInterval(scrollTimer);
-                        return;
-                    }
+                        if (!ticker) {
+                            clearInterval(scrollTimer);
+                            return;
+                        }
 
-                    // Check if we've reached the bottom
+                        // Check if news section is visible
+                        var newsCollapse = document.getElementById('collapseNews');
+                        if (newsCollapse && !newsCollapse.classList.contains('show')) {
+                            return;
+                        }
+
+                        // Check if we've reached the bottom
                     if (ticker.scrollTop + ticker.clientHeight >= ticker.scrollHeight - 5) {
                         clearInterval(scrollTimer);
                         isScrolling = false;

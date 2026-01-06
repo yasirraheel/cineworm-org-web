@@ -860,9 +860,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Match news ticker height with player height
-            function matchTickerToPlayerHeight() {
-                // Only apply on desktop (md and above)
-                if (window.innerWidth >= 768) {
+        function matchTickerToPlayerHeight() {
+            // Check if news section is visible
+            var newsCollapse = document.getElementById('collapseNews');
+            if (newsCollapse && !newsCollapse.classList.contains('show')) return;
+
+            // Only apply on desktop (md and above)
+            if (window.innerWidth >= 768) {
                     var player = document.getElementById('viavi_player');
                     var ticker = document.querySelector('.news-ticker-container');
 
@@ -918,6 +922,12 @@
                     var scrollTimer = setInterval(function() {
                         if (!ticker) {
                             clearInterval(scrollTimer);
+                            return;
+                        }
+
+                        // Check if news section is visible
+                        var newsCollapse = document.getElementById('collapseNews');
+                        if (newsCollapse && !newsCollapse.classList.contains('show')) {
                             return;
                         }
 
