@@ -188,24 +188,6 @@
 
                     <!-- News Ticker Section -->
                 <div id="watchAccordion">
-                    <!-- Headers Wrapper -->
-                    <div class="card bg-dark text-white border-0 mb-2" id="accordionHeaders">
-                        <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333;">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold active-toggle-btn" type="button" onclick="toggleSection('news')" id="newsToggleBtn">
-                                    <i class="fa fa-newspaper-o mr-2"></i> Latest News
-                                </button>
-                            </h5>
-                        </div>
-                        <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333;">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" onclick="toggleSection('game')" id="gameToggleBtn">
-                                    <i class="fa fa-gamepad mr-2"></i> Games
-                                </button>
-                            </h5>
-                        </div>
-                    </div>
-
                     <!-- News Content -->
                     <div id="collapseNews" class="toggle-content" style="display: block; overflow: hidden;">
                         <div class="card bg-dark text-white border-0 mb-2" style="height: 100%;">
@@ -283,6 +265,24 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Toggle Buttons at Bottom -->
+                    <div class="card bg-dark text-white border-0 mt-2" id="accordionHeaders">
+                        <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333;">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold active-toggle-btn" type="button" onclick="toggleSection('news')" id="newsToggleBtn">
+                                    <i class="fa fa-newspaper-o mr-2"></i> Latest News
+                                </button>
+                            </h5>
+                        </div>
+                        <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333;">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" onclick="toggleSection('game')" id="gameToggleBtn">
+                                    <i class="fa fa-gamepad mr-2"></i> Games
+                                </button>
+                            </h5>
                         </div>
                     </div>
                 </div>
@@ -1278,16 +1278,17 @@
                      buttonsHeight += parseInt(style.marginBottom) || 0;
                 }
 
-                var headers = document.getElementById('accordionHeaders');
-                var headersHeight = headers ? headers.offsetHeight : 0;
-                // Add margin bottom of headers
-                if (headers) {
-                     var style = window.getComputedStyle(headers);
-                     headersHeight += parseInt(style.marginBottom) || 0;
+                // Toggle buttons are now at the bottom
+                var toggleButtons = document.getElementById('accordionHeaders');
+                var toggleButtonsHeight = toggleButtons ? toggleButtons.offsetHeight : 0;
+                // Add margin top of toggle buttons
+                if (toggleButtons) {
+                     var style = window.getComputedStyle(toggleButtons);
+                     toggleButtonsHeight += parseInt(style.marginTop) || 0;
                 }
 
                 // Available height for the collapsible content
-                var availableHeight = playerHeight - buttonsHeight - headersHeight;
+                var availableHeight = playerHeight - buttonsHeight - toggleButtonsHeight;
 
                 // Ensure non-negative
                 if (availableHeight < 200) availableHeight = 200; // Minimum safety height
