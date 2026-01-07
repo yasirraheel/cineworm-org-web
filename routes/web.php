@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\GameRoomController;
 use App\Http\Controllers\MoviesController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -559,9 +560,9 @@ Route::get('/maintenance_up', function () {
 
 // Game Remote Control Routes
 Route::prefix('game')->group(function () {
-    Route::get('/remote-control', 'GameRoomController@showRemoteControl')->name('game.remote');
-    Route::post('/generate-room', 'GameRoomController@generateRoomCode')->name('game.generate');
-    Route::post('/verify-room', 'GameRoomController@verifyRoomCode')->name('game.verify');
-    Route::post('/control', 'GameRoomController@sendControl')->name('game.control');
-    Route::get('/controls', 'GameRoomController@getControls')->name('game.controls');
+    Route::get('/remote-control', [GameRoomController::class, 'showRemoteControl'])->name('game.remote');
+    Route::post('/generate-room', [GameRoomController::class, 'generateRoomCode'])->name('game.generate');
+    Route::post('/verify-room', [GameRoomController::class, 'verifyRoomCode'])->name('game.verify');
+    Route::post('/control', [GameRoomController::class, 'sendControl'])->name('game.control');
+    Route::get('/controls', [GameRoomController::class, 'getControls'])->name('game.controls');
 });
