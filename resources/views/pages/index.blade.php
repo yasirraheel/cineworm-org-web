@@ -309,10 +309,9 @@
                                     <div class="pacman-game-wrapper" style="height: 100%;">
                                         <iframe
                                             id="pacmanGameFrame"
-                                            src="https://pacman.platzh1rsch.ch/"
+                                            src="{{ url('/games/pacman/index.html') }}"
                                             style="width: 100%; height: 100%; border: none;"
-                                            sandbox="allow-scripts allow-same-origin allow-forms"
-                                            allowfullscreen
+                                            allow="fullscreen"
                                             title="Pacman Game">
                                         </iframe>
                                     </div>
