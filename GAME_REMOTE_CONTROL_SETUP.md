@@ -1,183 +1,41 @@
 # Pacman Mobile Remote Control - Installation Guide
 
-This guide will help you set up the mobile remote control feature for the Pacman game.
+This guide will help you set up the mobile remote control feature for the Pacman game using a polling-based approach (no additional packages required).
 
 ## Prerequisites
 - PHP >= 7.3
-- Composer installed
 - Laravel application running
-- Access to server terminal
+- Laravel Cache configured (file, redis, or memcached)
 
 ---
 
-## Step 1: Install Required Packages
+## Overview
 
-Run the following command on your server:
-
-```bash
-composer require beyondcode/laravel-websockets pusher/pusher-php-server laravel/echo
-```
-
-This installs:
-- `beyondcode/laravel-websockets` - WebSocket server for Laravel
-- `pusher/pusher-php-server` - Pusher protocol implementation
-- `laravel/echo` - Client-side broadcasting (if not already installed)
+This feature uses a **polling-based system** instead of WebSockets, which means:
+- ✅ No additional Composer packages required
+- ✅ No WebSocket server to manage
+- ✅ Works with existing Laravel cache
+- ✅ Simple to deploy and maintain
 
 ---
 
-## Step 2: Publish Configuration Files
+## Step 1: Verify Files Are in Place
 
-Publish the WebSocket configuration:
+The following files should already be created in your Laravel project:
 
-```bash
-php artisan vendor:publish --provider="BeyondCode\LaravelWebSockets\WebSocketsServiceProvider" --tag="migrations"
-php artisan vendor:publish --provider="BeyondCode\LaravelWebSockets\WebSocketsServiceProvider" --tag="config"
-```
+### Backend Files:
+- `app/Http/Controllers/GameRoomController.php` - Controller for room management and game controls
+- Routes added to `routes/web.php` for game endpoints
 
-Run the migration:
-
-```bash
-php artisan migrate
-```
+### Frontend Files:
+- `resources/views/pages/remote_control.blade.php` - Mobile control interface
+- `resources/views/pages/index.blade.php` - Updated with room code display and polling logic
 
 ---
 
-## Step 3: Update Environment Variables
+## Step 2: Clear Cache
 
-Add/update the following in your `.env` file:
-
-```env
-BROADCAST_DRIVER=pusher
-
-PUSHER_APP_ID=local
-PUSHER_APP_KEY=local
-PUSHER_APP_SECRET=local
-PUSHER_APP_CLUSTER=mt1
-
-# WebSocket Settings
-PUSHER_HOST=127.0.0.1
-PUSHER_PORT=6001
-PUSHER_SCHEME=http
-```
-
-**Important:** Replace `127.0.0.1` with your actual server IP or domain if accessing from different devices.
-
----
-
-## Step 4: Update Broadcasting Configuration
-
-Edit `config/broadcasting.php`:
-
-Find the `pusher` connection and update it:
-
-```php
-'pusher' => [
-    'driver' => 'pusher',
-    'key' => env('PUSHER_APP_KEY'),
-    'secret' => env('PUSHER_APP_SECRET'),
-    'app_id' => env('PUSHER_APP_ID'),
-    'options' => [
-        'cluster' => env('PUSHER_APP_CLUSTER'),
-        'host' => env('PUSHER_HOST', '127.0.0.1'),
-        'port' => env('PUSHER_PORT', 6001),
-        'scheme' => env('PUSHER_SCHEME', 'http'),
-        'encrypted' => false,
-        'useTLS' => false,
-    ],
-],
-```
-
----
-
-## Step 5: Update WebSocket Configuration
-
-Edit `config/websockets.php`:
-
-Update the apps section:
-
-```php
-'apps' => [
-    [
-        'id' => env('PUSHER_APP_ID'),
-        'name' => env('APP_NAME'),
-        'key' => env('PUSHER_APP_KEY'),
-        'secret' => env('PUSHER_APP_SECRET'),
-        'path' => env('PUSHER_APP_PATH'),
-        'capacity' => null,
-        'enable_client_messages' => true,
-        'enable_statistics' => true,
-    ],
-],
-```
-
-Set allowed origins (for CORS):
-
-```php
-'allowed_origins' => [
-    '*', // Allow all origins (change to your domain in production)
-],
-```
-
----
-
-## Step 6: Install JavaScript Dependencies
-
-Add Laravel Echo and Pusher.js to your `resources/views/site_app.blade.php` **before the closing `</body>` tag**:
-
-```html
-<!-- Add before closing </body> tag -->
-<script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.0/dist/echo.min.js"></script>
-<script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
-
-<script>
-    window.Echo = new Echo({
-        broadcaster: 'pusher',
-        key: '{{ env("PUSHER_APP_KEY") }}',
-        wsHost: '{{ env("PUSHER_HOST") }}',
-        wsPort: {{ env("PUSHER_PORT", 6001) }},
-        wssPort: {{ env("PUSHER_PORT", 6001) }},
-        forceTLS: false,
-        encrypted: false,
-        disableStats: true,
-        enabledTransports: ['ws', 'wss'],
-    });
-</script>
-```
-
-**Alternative:** If using npm/yarn, install via package manager:
-
-```bash
-npm install --save laravel-echo pusher-js
-# or
-yarn add laravel-echo pusher-js
-```
-
-Then add to your `resources/js/app.js`:
-
-```javascript
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
-
-window.Pusher = Pusher;
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: process.env.MIX_PUSHER_APP_KEY,
-    wsHost: process.env.MIX_PUSHER_HOST,
-    wsPort: process.env.MIX_PUSHER_PORT ?? 6001,
-    wssPort: process.env.MIX_PUSHER_PORT ?? 6001,
-    forceTLS: false,
-    encrypted: false,
-    disableStats: true,
-    enabledTransports: ['ws', 'wss'],
-});
-```
-
----
-
-## Step 7: Clear Cache
-
-Clear all caches:
+Clear all caches to ensure fresh configuration:
 
 ```bash
 php artisan config:clear
@@ -188,156 +46,287 @@ php artisan view:clear
 
 ---
 
-## Step 8: Start WebSocket Server
+## Step 3: Test the Feature
 
-Start the WebSocket server:
+### On PC/Desktop:
 
-```bash
-php artisan websockets:serve
-```
+1. Open your homepage: `http://yoursite.com`
+2. Click the **"Games"** button to show the Pacman game
+3. You should see a **4-digit room code** displayed above the game in a purple gradient box
+4. Note this room code (e.g., "1234")
 
-This should output:
-```
-Starting the WebSocket server on port 6001...
-```
+### On Mobile:
 
-**For Production:** Use a process manager like Supervisor to keep the WebSocket server running.
-
-### Supervisor Configuration Example:
-
-Create `/etc/supervisor/conf.d/websockets.conf`:
-
-```ini
-[program:websockets]
-command=php /path/to/your/project/artisan websockets:serve
-numprocs=1
-autostart=true
-autorestart=true
-user=www-data
-redirect_stderr=true
-stdout_logfile=/path/to/your/project/storage/logs/websockets.log
-```
-
-Then:
-```bash
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl start websockets
-```
+1. Open `http://yoursite.com/game/remote-control` on your mobile device
+2. Enter the 4-digit room code shown on the PC
+3. Click **"Connect"**
+4. You should see the D-pad controller
+5. Use the arrow buttons (▲ ▼ ◄ ►) to control the game on the PC
 
 ---
 
-## Step 9: Test the Feature
+## How It Works
 
-1. **On PC/Desktop:**
-   - Open your homepage: `http://yoursite.com`
-   - Click the "Games" button to show the Pacman game
-   - You should see a 4-digit room code displayed above the game
+### 1. Room Code Generation
+- When user clicks "Games" button, a 4-digit room code is generated via AJAX
+- Room code is stored in Laravel cache for 1 hour
+- Room code is displayed above the Pacman game
 
-2. **On Mobile:**
-   - Open `http://yoursite.com/game/remote-control` on your mobile device
-   - Enter the 4-digit room code shown on the PC
-   - Click "Connect"
-   - Use the D-pad buttons to control the game on the PC
+### 2. Mobile Connection
+- Mobile user enters room code on `/game/remote-control`
+- System verifies room code exists in cache
+- Mobile shows D-pad controller interface
+
+### 3. Control Flow (Polling-Based)
+```
+Mobile Device                    Laravel Server                PC Browser
+     |                                 |                            |
+     |--[1] POST /game/control ------->|                            |
+     |    (direction: up, action: press)|                           |
+     |                                 |                            |
+     |                    [2] Store in Cache                        |
+     |                    (game_control_1234)                       |
+     |                                 |                            |
+     |                                 |<--[3] GET /game/controls---|
+     |                                 |    (room_code=1234)        |
+     |                                 |                            |
+     |                                 |--[4] Return controls------>|
+     |                                 |                            |
+     |                                 |         [5] Simulate Keypress
+     |                                 |         (Arrow Up KeyDown)
+```
+
+**Step by step:**
+1. Mobile user presses D-pad button → POST to `/game/control`
+2. Server stores control in cache with timestamp (expires in 2 seconds)
+3. PC browser polls `/game/controls` every 100ms
+4. Server returns controls newer than last timestamp
+5. JavaScript simulates keyboard event for Pacman iframe
+6. Game responds to the control input
+
+---
+
+## Configuration Details
+
+### Cache Settings
+
+Controls are stored in Laravel cache with these settings:
+- **Key format:** `game_control_{room_code}`
+- **Expiry:** 2 seconds (prevents stale controls)
+- **Max controls stored:** 10 most recent
+- **Polling interval:** 100ms (responsive controls)
+
+### Room Code Settings
+
+Room codes are stored with:
+- **Key format:** `game_room_{room_code}`
+- **Expiry:** 1 hour (3600 seconds)
+- **Format:** 4-digit numeric code (1000-9999)
 
 ---
 
 ## Troubleshooting
 
-### WebSocket server not starting
-- Check if port 6001 is available: `netstat -tulpn | grep 6001`
-- Make sure no firewall is blocking port 6001
-- Try a different port in `.env` and `config/websockets.php`
+### Room code shows "----" or "ERROR"
+**Possible causes:**
+- JavaScript error in browser console
+- Route not registered properly
+- CSRF token mismatch
 
-### Cannot connect from mobile
-- Ensure mobile and PC are on the same network (or use public IP)
-- Update `PUSHER_HOST` in `.env` to your server's IP or domain
-- Check CORS settings in `config/websockets.php`
+**Solutions:**
+```bash
+# Clear caches
+php artisan route:clear
+php artisan view:clear
+
+# Check routes exist
+php artisan route:list | grep game
+
+# Check Laravel logs
+tail -f storage/logs/laravel.log
+```
+
+### Cannot connect from mobile - "Invalid room code"
+**Possible causes:**
+- Room code expired (1 hour timeout)
+- Cache not working
+- Room code entered incorrectly
+
+**Solutions:**
+```bash
+# Test cache is working
+php artisan tinker
+>>> Cache::put('test', 'value', 60);
+>>> Cache::get('test');
+
+# Check cache driver in .env
+cat .env | grep CACHE_DRIVER
+```
 
 ### Controls not working
-- Check browser console for JavaScript errors
-- Verify Laravel Echo is loaded (check Network tab)
-- Ensure the iframe allows keyboard events (sandbox attributes)
+**Possible causes:**
+- Iframe sandbox restrictions too strict
+- Polling not running
+- JavaScript errors
 
-### "Invalid room code" error
-- Verify cache is working: `php artisan cache:clear`
-- Check Laravel logs: `storage/logs/laravel.log`
-- Ensure room code is generated when clicking "Games" button
+**Solutions:**
+1. Open browser console (F12) on PC
+2. Check for JavaScript errors
+3. Verify polling is running (should see network requests every 100ms to `/game/controls`)
+4. Check iframe has ID `pacmanGameFrame`
+
+### Controls are laggy
+**Possible causes:**
+- Polling interval too slow
+- Server response time slow
+- Network latency
+
+**Solutions:**
+- Adjust polling interval in `index.blade.php` (line 1488): Change `100` to `50` for faster polling
+- Check server cache driver (Redis/Memcached is faster than file cache)
+- Ensure mobile and PC are on same local network
+
+### "Invalid room code" on mobile but code is correct
+**Possible causes:**
+- Room expired (check if more than 1 hour passed)
+- Cache was cleared
+- Different server/domain
+
+**Solutions:**
+- Click "Games" button again on PC to generate new room code
+- Verify mobile is accessing same domain as PC
+- Check Laravel session/cache configuration
 
 ---
 
-## WebSocket Dashboard (Optional)
+## API Endpoints
 
-Access the WebSocket dashboard to monitor connections:
+The following routes are registered:
 
+```php
+GET  /game/remote-control          - Mobile controller page
+POST /game/generate-room           - Generate new room code
+POST /game/verify-room             - Verify room code exists
+POST /game/control                 - Send control input (mobile)
+GET  /game/controls                - Poll for controls (PC)
 ```
-http://yoursite.com/laravel-websockets
+
+### Example API Usage
+
+**Generate Room:**
+```bash
+curl -X POST http://yoursite.com/game/generate-room \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-TOKEN: your-token"
+
+# Response:
+# {"success":true,"room_code":"1234"}
 ```
+
+**Send Control:**
+```bash
+curl -X POST http://yoursite.com/game/control \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-TOKEN: your-token" \
+  -d '{"room_code":"1234","direction":"up","action":"press"}'
+
+# Response:
+# {"success":true,"message":"Control sent"}
+```
+
+**Poll Controls:**
+```bash
+curl "http://yoursite.com/game/controls?room_code=1234&last_timestamp=0"
+
+# Response:
+# {"success":true,"controls":[{"direction":"up","action":"press","timestamp":1234567890.123}]}
+```
+
+---
+
+## Performance Considerations
+
+### Polling Frequency
+- **Default:** 100ms (10 requests/second)
+- **Recommended range:** 50ms - 200ms
+- **Lower = more responsive but higher server load**
+
+### Cache Driver Recommendations
+- **Best:** Redis or Memcached (in-memory, fast)
+- **Good:** Database cache (persistent but slower)
+- **OK:** File cache (works but not ideal for production)
+
+Update `.env`:
+```env
+CACHE_DRIVER=redis  # or memcached, file, database
+```
+
+### Scaling Considerations
+- Each active game room generates ~10 requests/second from PC
+- Mobile generates requests only when buttons are pressed
+- Use Redis/Memcached for production with multiple concurrent users
 
 ---
 
 ## Security Considerations
 
-### For Production:
+### Rate Limiting (Recommended for Production)
 
-1. **Use HTTPS/WSS:**
-   - Update `PUSHER_SCHEME=https` in `.env`
-   - Configure SSL for WebSocket server
+Add to `app/Http/Controllers/GameRoomController.php`:
 
-2. **Restrict Origins:**
-   - Update `allowed_origins` in `config/websockets.php` to your domain only
+```php
+public function __construct()
+{
+    $this->middleware('throttle:60,1')->only(['sendControl']);
+    $this->middleware('throttle:600,1')->only(['getControls']);
+}
+```
 
-3. **Rate Limiting:**
-   - Add rate limiting to game control routes to prevent abuse
+This limits:
+- Control sending to 60 requests per minute per IP
+- Control polling to 600 requests per minute per IP (10/second)
 
-4. **Room Code Expiry:**
-   - Room codes automatically expire after 1 hour (configured in Cache)
+### CSRF Protection
+All POST endpoints are protected by Laravel's CSRF middleware. The mobile interface includes the CSRF token automatically.
+
+### Room Code Expiry
+Room codes automatically expire after 1 hour. Users must click "Games" button again to generate a new code.
 
 ---
 
 ## Files Created/Modified
 
 ### New Files:
-- `app/Events/GameControlEvent.php` - WebSocket event for game controls
-- `app/Http/Controllers/GameRoomController.php` - Controller for room management
+- `app/Http/Controllers/GameRoomController.php` - Room and control management
 - `resources/views/pages/remote_control.blade.php` - Mobile control interface
 - `GAME_REMOTE_CONTROL_SETUP.md` - This installation guide
 
 ### Modified Files:
 - `routes/web.php` - Added game control routes
-- `resources/views/pages/index.blade.php` - Added room code display and WebSocket listener
+- `resources/views/pages/index.blade.php` - Added room code display and polling logic
 
 ---
 
-## How It Works
+## Advantages of Polling Approach
 
-1. **Room Code Generation:**
-   - When user clicks "Games" button, a 4-digit room code is generated
-   - Room code is stored in Laravel cache for 1 hour
-   - Room code is displayed above the Pacman game
-
-2. **Mobile Connection:**
-   - Mobile user enters room code on `/game/remote-control`
-   - System verifies room code exists
-   - Mobile connects to WebSocket channel: `game-room.{code}`
-
-3. **Control Flow:**
-   - Mobile user presses D-pad button
-   - POST request sent to `/game/control` with direction and action
-   - Server broadcasts event to WebSocket channel
-   - PC browser receives event via Laravel Echo
-   - JavaScript simulates keyboard event for Pacman iframe
-   - Game responds to the control input
+✅ **No Dependencies:** Works with base Laravel installation
+✅ **Simple Deployment:** No WebSocket server to maintain
+✅ **Easy Debugging:** Standard HTTP requests visible in browser dev tools
+✅ **Firewall Friendly:** Uses standard HTTP (no special ports)
+✅ **Scalable:** Can add rate limiting and caching easily
+✅ **Reliable:** No WebSocket connection drops or reconnection logic needed
 
 ---
 
 ## Support
 
-If you encounter any issues, check:
-1. Laravel logs: `storage/logs/laravel.log`
-2. WebSocket logs: Check supervisor logs or console output
-3. Browser console: Look for JavaScript errors
-4. Network tab: Verify WebSocket connection established
+If you encounter any issues:
+
+1. **Check Laravel logs:** `storage/logs/laravel.log`
+2. **Check browser console:** Open DevTools (F12) and look for errors
+3. **Check network tab:** Verify requests to `/game/controls` are happening every 100ms
+4. **Test cache:** Use `php artisan tinker` to test cache operations
+5. **Verify routes:** Run `php artisan route:list | grep game`
 
 ---
 

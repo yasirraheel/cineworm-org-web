@@ -59,16 +59,60 @@ class GameRoomController extends Controller
             ], 404);
         }
 
-        // Broadcast the control event
-        event(new GameControlEvent(
-            $validated['room_code'],
-            $validated['direction'],
-            $validated['action']
-        ));
+        // Store control in cache with 1 second expiry (polling-based)
+        $controlKey = 'game_control_' . $validated['room_code'];
+
+        // Get existing controls or create new array
+        $controls = Cache::get($controlKey, []);
+
+        // Add new control with timestamp
+        $controls[] = [
+            'direction' => $validated['direction'],
+            'action' => $validated['action'],
+            'timestamp' => microtime(true)
+        ];
+
+        // Keep only last 10 controls
+        if (count($controls) > 10) {
+            $controls = array_slice($controls, -10);
+        }
+
+        // Store for 2 seconds
+        Cache::put($controlKey, $controls, 2);
 
         return response()->json([
             'success' => true,
             'message' => 'Control sent'
+        ]);
+    }
+
+    /**
+     * Get pending controls for a room (polling endpoint)
+     */
+    public function getControls(Request $request)
+    {
+        $roomCode = $request->input('room_code');
+        $lastTimestamp = $request->input('last_timestamp', 0);
+
+        if (!$roomCode || !Cache::has('game_room_' . $roomCode)) {
+            return response()->json([
+                'success' => false,
+                'controls' => []
+            ]);
+        }
+
+        // Get controls from cache
+        $controlKey = 'game_control_' . $roomCode;
+        $controls = Cache::get($controlKey, []);
+
+        // Filter controls newer than last timestamp
+        $newControls = array_filter($controls, function($control) use ($lastTimestamp) {
+            return $control['timestamp'] > $lastTimestamp;
+        });
+
+        return response()->json([
+            'success' => true,
+            'controls' => array_values($newControls)
         ]);
     }
 

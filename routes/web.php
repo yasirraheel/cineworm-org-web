@@ -563,4 +563,5 @@ Route::prefix('game')->group(function () {
     Route::post('/generate-room', 'GameRoomController@generateRoomCode')->name('game.generate');
     Route::post('/verify-room', 'GameRoomController@verifyRoomCode')->name('game.verify');
     Route::post('/control', 'GameRoomController@sendControl')->name('game.control');
+    Route::get('/controls', 'GameRoomController@getControls')->name('game.controls');
 });

@@ -1426,7 +1426,8 @@
 
             // ========== Game Remote Control Setup ==========
             let gameRoomCode = null;
-            let echoInstance = null;
+            let lastControlTimestamp = 0;
+            let pollingInterval = null;
 
             // Generate room code when game section is shown
             document.getElementById('gameToggleBtn').addEventListener('click', function() {
@@ -1449,7 +1450,7 @@
                     if (data.success) {
                         gameRoomCode = data.room_code;
                         document.getElementById('gameRoomCode').textContent = gameRoomCode;
-                        setupWebSocketListener();
+                        startControlPolling();
                     }
                 } catch (error) {
                     console.error('Failed to generate room code:', error);
@@ -1457,24 +1458,43 @@
                 }
             }
 
-            function setupWebSocketListener() {
-                // Check if Laravel Echo is available
-                if (typeof Echo === 'undefined') {
-                    console.warn('Laravel Echo not loaded. WebSocket features disabled.');
-                    return;
+            function startControlPolling() {
+                // Stop any existing polling
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
                 }
 
-                try {
-                    // Listen for game control events
-                    Echo.channel('game-room.' + gameRoomCode)
-                        .listen('.game.control', (event) => {
-                            console.log('Control received:', event);
-                            simulateKeypress(event.direction, event.action);
-                        });
-                } catch (error) {
-                    console.error('WebSocket setup error:', error);
-                }
+                // Poll for new controls every 100ms
+                pollingInterval = setInterval(async () => {
+                    try {
+                        const response = await fetch('{{ route("game.controls") }}?room_code=' + gameRoomCode + '&last_timestamp=' + lastControlTimestamp);
+                        const data = await response.json();
+
+                        if (data.success && data.controls && data.controls.length > 0) {
+                            // Process each control
+                            data.controls.forEach(control => {
+                                console.log('Control received:', control);
+                                simulateKeypress(control.direction, control.action);
+
+                                // Update last timestamp
+                                if (control.timestamp > lastControlTimestamp) {
+                                    lastControlTimestamp = control.timestamp;
+                                }
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Polling error:', error);
+                    }
+                }, 100); // Poll every 100ms for responsive controls
             }
+
+            // Stop polling when game section is hidden
+            document.getElementById('newsToggleBtn').addEventListener('click', function() {
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+            });
 
             function simulateKeypress(direction, action) {
                 const iframe = document.getElementById('pacmanGameFrame');
