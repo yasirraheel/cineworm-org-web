@@ -1571,15 +1571,31 @@
                 }
 
                 function handleKeyDown(e) {
-                    if (e.keyCode === 37) pacman.nextDirection = { x: -1, y: 0 };
-                    if (e.keyCode === 38) pacman.nextDirection = { x: 0, y: -1 };
-                    if (e.keyCode === 39) pacman.nextDirection = { x: 1, y: 0 };
-                    if (e.keyCode === 40) pacman.nextDirection = { x: 0, y: 1 };
-                    if (e.keyCode === 32 && !gameRunning) resetGame();
-                    e.preventDefault();
+                    if (e.keyCode === 37) { // Left arrow
+                        pacman.nextDirection = { x: -1, y: 0 };
+                        e.preventDefault();
+                    }
+                    if (e.keyCode === 38) { // Up arrow
+                        pacman.nextDirection = { x: 0, y: -1 };
+                        e.preventDefault();
+                    }
+                    if (e.keyCode === 39) { // Right arrow
+                        pacman.nextDirection = { x: 1, y: 0 };
+                        e.preventDefault();
+                    }
+                    if (e.keyCode === 40) { // Down arrow
+                        pacman.nextDirection = { x: 0, y: 1 };
+                        e.preventDefault();
+                    }
+                    if (e.keyCode === 32 && !gameRunning) { // Space to restart
+                        resetGame();
+                        e.preventDefault();
+                    }
                 }
 
+                // Add keyboard listener
                 document.addEventListener('keydown', handleKeyDown);
+                console.log('Pacman game initialized - use arrow keys to play');
 
                 function isWall(x, y) {
                     if (y < 0 || y >= ROWS || x < 0 || x >= COLS) return true;
@@ -1721,19 +1737,23 @@
                 let lastTime = 0;
                 function gameLoop(timestamp) {
                     const deltaTime = timestamp - lastTime;
-                    lastTime = timestamp;
+
                     if (gameRunning && deltaTime > 100) {
-                        ctx.fillStyle = '#000';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        lastTime = timestamp;
                         movePacman();
                         moveGhosts();
                         checkCollisions();
-                        drawMaze();
-                        drawPellets();
-                        drawPacman();
-                        drawGhosts();
-                        updateScore();
                     }
+
+                    // Always render, even if not moving
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    drawMaze();
+                    drawPellets();
+                    drawPacman();
+                    drawGhosts();
+                    updateScore();
+
                     requestAnimationFrame(gameLoop);
                 }
 
@@ -1756,6 +1776,7 @@
                 }
 
                 initPellets();
+                lastTime = performance.now(); // Initialize lastTime
                 requestAnimationFrame(gameLoop);
 
                 // Store game reference for remote control
