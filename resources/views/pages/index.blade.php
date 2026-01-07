@@ -1564,6 +1564,9 @@
                     powerPellets = [];
                     for (let y = 0; y < ROWS; y++) {
                         for (let x = 0; x < COLS; x++) {
+                            // Skip pacman's starting position to avoid instant score
+                            if (x === pacman.x && y === pacman.y) continue;
+
                             if (maze[y][x] === 0) pellets.push({ x, y });
                             else if (maze[y][x] === 3) powerPellets.push({ x, y });
                         }
@@ -1603,19 +1606,26 @@
                 }
 
                 function movePacman() {
+                    // Change direction if next direction is valid
                     const nextX = pacman.x + pacman.nextDirection.x;
                     const nextY = pacman.y + pacman.nextDirection.y;
                     if (!isWall(nextX, nextY)) pacman.direction = { ...pacman.nextDirection };
 
+                    // Move in current direction
                     const newX = pacman.x + pacman.direction.x;
                     const newY = pacman.y + pacman.direction.y;
                     if (!isWall(newX, newY)) {
                         pacman.x = newX;
                         pacman.y = newY;
+                        // Wrap around edges
                         if (pacman.x < 0) pacman.x = COLS - 1;
                         if (pacman.x >= COLS) pacman.x = 0;
                     }
-                    pacman.mouth = (pacman.mouth + 0.3) % (Math.PI * 2);
+
+                    // Animate mouth only when moving
+                    if (pacman.direction.x !== 0 || pacman.direction.y !== 0) {
+                        pacman.mouth = (pacman.mouth + 0.2) % (Math.PI * 2);
+                    }
                 }
 
                 function moveGhosts() {
@@ -1624,16 +1634,23 @@
                             { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }
                         ].filter(dir => !isWall(ghost.x + dir.x, ghost.y + dir.y));
 
-                        if (Math.random() < 0.1 && possibleDirections.length > 0) {
+                        // Change direction occasionally (8% chance per move)
+                        if (Math.random() < 0.08 && possibleDirections.length > 0) {
                             ghost.direction = possibleDirections[Math.floor(Math.random() * possibleDirections.length)];
                         }
 
+                        // Try to move in current direction
                         const newX = ghost.x + ghost.direction.x;
                         const newY = ghost.y + ghost.direction.y;
                         if (!isWall(newX, newY)) {
                             ghost.x = newX;
                             ghost.y = newY;
+                        } else if (possibleDirections.length > 0) {
+                            // Hit a wall, pick a random valid direction
+                            ghost.direction = possibleDirections[Math.floor(Math.random() * possibleDirections.length)];
                         }
+
+                        // Wrap around edges
                         if (ghost.x < 0) ghost.x = COLS - 1;
                         if (ghost.x >= COLS) ghost.x = 0;
                     });
@@ -1735,24 +1752,27 @@
                 }
 
                 let lastTime = 0;
+                const GAME_SPEED = 150; // Milliseconds between moves (slower = easier)
+
                 function gameLoop(timestamp) {
                     const deltaTime = timestamp - lastTime;
 
-                    if (gameRunning && deltaTime > 100) {
+                    // Only update game logic at fixed intervals
+                    if (gameRunning && deltaTime >= GAME_SPEED) {
                         lastTime = timestamp;
                         movePacman();
                         moveGhosts();
                         checkCollisions();
+                        updateScore();
                     }
 
-                    // Always render, even if not moving
+                    // Always render for smooth display
                     ctx.fillStyle = '#000';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     drawMaze();
                     drawPellets();
                     drawPacman();
                     drawGhosts();
-                    updateScore();
 
                     requestAnimationFrame(gameLoop);
                 }
