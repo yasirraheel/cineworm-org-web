@@ -309,6 +309,10 @@ $(document).ready(function() {
 
                     var containerElement = $container[0];
 
+                    // Save the player buttons HTML before replacing content
+                    var $playerButtons = $container.find('.player-buttons-container');
+                    var savedButtonsHtml = $playerButtons.length > 0 ? $playerButtons[0].outerHTML : '';
+
                     // Create a temporary div to parse the HTML
                     var $temp = $('<div>').html(response.playerHtml);
 
@@ -324,6 +328,11 @@ $(document).ready(function() {
 
                     // Set HTML without scripts first
                     containerElement.innerHTML = $temp.html();
+
+                    // Restore the player buttons at the top if they existed
+                    if (savedButtonsHtml) {
+                        $container.prepend(savedButtonsHtml);
+                    }
 
                     // Update Footer if provided
                     if (response.footerHtml) {
