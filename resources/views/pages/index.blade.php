@@ -20,6 +20,40 @@
             transition: opacity 0.3s ease;
         }
 
+        /* Player Buttons Styling */
+        .player-buttons-container {
+            background: linear-gradient(135deg, #0d0620 0%, #1a0d33 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Desktop: Horizontal layout */
+        @media (min-width: 768px) {
+            .player-buttons-container {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .player-buttons-container .btn {
+                flex: 0 1 auto;
+                min-width: 120px;
+            }
+        }
+
+        /* Mobile: Vertical stack */
+        @media (max-width: 767px) {
+            .player-buttons-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .player-buttons-container .btn {
+                width: 100%;
+            }
+        }
+
         .news-ticker-container {
                 max-height: 550px;
                 overflow-y: auto;
@@ -132,34 +166,16 @@
             <div class="row no-gutters align-items-stretch">
                 <!-- Video Player -->
                 <div class="col-md-9 p-0" id="main-player-column">
-                    @if ($movies_info && $movies_info->video_url != '')
-                        @if ($movies_info->video_type == 'GoogleDrive')
-                            @include('pages.movies.player.google_drive_player')
-                            @else
-                             @include('pages.movies.player.other')
-                        @endif
-
-                    @else
-                        <div
-                            style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011;
-                                   border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">
-                            NO Source URL Set
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Right Side News Ticker and Banners -->
-                <div class="col-md-3 d-none d-md-flex flex-column justify-content-start" style="max-height: 100%;">
                     @php
                         $buttons = get_web_button_banner('buttons'); // Fetch all button components
                         $banners = get_web_button_banner('banners'); // Fetch all banner components
                     @endphp
 
                     @if ($buttons->isNotEmpty())
-                        <div class="sidebar-buttons-container mb-3 px-2 pt-2">
+                        <div class="player-buttons-container mb-2 px-3 py-2">
                             @foreach ($buttons as $button)
-                                <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-2"
-                                    style="padding: 6px; font-size: 14px; font-weight: bold; border-radius: 8px;
+                                <a href="{{ $button->link ?? '#' }}" class="btn btn-primary mb-2 flex-shrink-0"
+                                    style="padding: 8px 16px; font-size: 14px; font-weight: bold; border-radius: 8px;
                                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
                                            background-color: #{{ $button->color ? $button->color : '007bff' }};
                                            font-family: 'Perpetua', serif; text-align: center;
@@ -167,7 +183,7 @@
                                            position: relative;
                                            display: inline-block;
                                            overflow: hidden;
-                                           border: 3px solid #00008B; /* Dark blue border before hover */
+                                           border: 3px solid #00008B;
                                            transition: all 0.3s ease-in-out;"
                                     onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
                                                  this.style.borderStyle='solid';
@@ -186,6 +202,24 @@
                         </div>
                     @endif
 
+                    @if ($movies_info && $movies_info->video_url != '')
+                        @if ($movies_info->video_type == 'GoogleDrive')
+                            @include('pages.movies.player.google_drive_player')
+                            @else
+                             @include('pages.movies.player.other')
+                        @endif
+
+                    @else
+                        <div
+                            style="text-align: center; padding: 70px 30px; font-size: 24px; font-weight: 700; background: #101011;
+                                   border-radius: 10px; margin-top: 15px; min-height: 280px; line-height: 6;">
+                            NO Source URL Set
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Right Side News Ticker and Banners -->
+                <div class="col-md-3 d-none d-md-flex flex-column justify-content-start" style="max-height: 100%;">
                     <!-- News Ticker Section -->
                 <div id="watchAccordion">
                     <!-- News Content -->
@@ -1270,13 +1304,8 @@
                 var playerHeight = player.offsetHeight;
 
                 // Calculate available height for content
-                var sidebarButtons = document.querySelector('.sidebar-buttons-container');
-                var buttonsHeight = sidebarButtons ? sidebarButtons.offsetHeight : 0;
-                // Add margin bottom of buttons
-                if (sidebarButtons) {
-                     var style = window.getComputedStyle(sidebarButtons);
-                     buttonsHeight += parseInt(style.marginBottom) || 0;
-                }
+                // Buttons moved to player column, no longer in sidebar
+                var buttonsHeight = 0;
 
                 // Toggle buttons are now at the bottom
                 var toggleButtons = document.getElementById('accordionHeaders');
