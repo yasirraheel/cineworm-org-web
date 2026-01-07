@@ -305,16 +305,11 @@
                                 </div>
                             </div>
                             <div class="card-body p-0">
-                                <div class="pacman-game-container">
-                                    <div class="pacman-game-wrapper" style="height: 100%;">
-                                        <iframe
-                                            id="pacmanGameFrame"
-                                            src="{{ url('/games/pacman/index.html') }}"
-                                            style="width: 100%; height: 100%; border: none;"
-                                            allow="fullscreen"
-                                            title="Pacman Game">
-                                        </iframe>
-                                    </div>
+                                <div class="pacman-game-container" style="display: flex; flex-direction: column; align-items: center; padding: 10px; background: #000;">
+                                    <div id="pacmanScore" style="color: #fff; font-size: 18px; margin-bottom: 8px;">Score: 0 | Lives: 3</div>
+                                    <canvas id="pacmanGameCanvas"></canvas>
+                                    <div id="pacmanGameOver" style="display: none; color: #ff0; font-size: 24px; margin-top: 15px;">GAME OVER! Press SPACE to restart</div>
+                                    <div style="color: #fff; margin-top: 8px; font-size: 12px;">Use Arrow Keys or Mobile Remote</div>
                                 </div>
                             </div>
                         </div>
@@ -1495,95 +1490,293 @@
                 }
             });
 
-            function simulateKeypress(direction, action) {
-                const iframe = document.getElementById('pacmanGameFrame');
-                if (!iframe) return;
+            // ========== Pacman Game Code ==========
+            let pacmanGame = null;
 
-                // Map directions to arrow keys
-                const keyMap = {
-                    'up': 38,
-                    'down': 40,
-                    'left': 37,
-                    'right': 39
+            function initPacmanGame() {
+                if (pacmanGame) return; // Already initialized
+
+                const canvas = document.getElementById('pacmanGameCanvas');
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                const scoreElement = document.getElementById('pacmanScore');
+                const gameOverElement = document.getElementById('pacmanGameOver');
+
+                // Game settings
+                const CELL_SIZE = 20;
+                const COLS = 19;
+                const ROWS = 21;
+                canvas.width = COLS * CELL_SIZE;
+                canvas.height = ROWS * CELL_SIZE;
+
+                // Game state
+                let score = 0;
+                let lives = 3;
+                let gameRunning = true;
+                let pellets = [];
+                let powerPellets = [];
+
+                // Pacman
+                let pacman = {
+                    x: 9,
+                    y: 15,
+                    direction: { x: 0, y: 0 },
+                    nextDirection: { x: 0, y: 0 },
+                    mouth: 0
                 };
 
+                // Ghosts
+                let ghosts = [
+                    { x: 9, y: 9, color: '#f00', direction: { x: 1, y: 0 } },
+                    { x: 8, y: 9, color: '#ffc0cb', direction: { x: -1, y: 0 } },
+                    { x: 10, y: 9, color: '#0ff', direction: { x: 0, y: 1 } },
+                    { x: 9, y: 10, color: '#ffa500', direction: { x: 0, y: -1 } }
+                ];
+
+                // Maze layout
+                const maze = [
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+                    [1,3,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,3,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
+                    [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+                    [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
+                    [1,1,1,1,0,1,2,2,2,2,2,2,2,1,0,1,1,1,1],
+                    [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
+                    [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
+                    [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+                    [1,1,1,1,0,1,2,2,2,2,2,2,2,1,0,1,1,1,1],
+                    [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+                    [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+                    [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+                    [1,3,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,3,1],
+                    [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
+                    [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+                    [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                ];
+
+                function initPellets() {
+                    pellets = [];
+                    powerPellets = [];
+                    for (let y = 0; y < ROWS; y++) {
+                        for (let x = 0; x < COLS; x++) {
+                            if (maze[y][x] === 0) pellets.push({ x, y });
+                            else if (maze[y][x] === 3) powerPellets.push({ x, y });
+                        }
+                    }
+                }
+
+                function handleKeyDown(e) {
+                    if (e.keyCode === 37) pacman.nextDirection = { x: -1, y: 0 };
+                    if (e.keyCode === 38) pacman.nextDirection = { x: 0, y: -1 };
+                    if (e.keyCode === 39) pacman.nextDirection = { x: 1, y: 0 };
+                    if (e.keyCode === 40) pacman.nextDirection = { x: 0, y: 1 };
+                    if (e.keyCode === 32 && !gameRunning) resetGame();
+                    e.preventDefault();
+                }
+
+                document.addEventListener('keydown', handleKeyDown);
+
+                function isWall(x, y) {
+                    if (y < 0 || y >= ROWS || x < 0 || x >= COLS) return true;
+                    return maze[y][x] === 1;
+                }
+
+                function movePacman() {
+                    const nextX = pacman.x + pacman.nextDirection.x;
+                    const nextY = pacman.y + pacman.nextDirection.y;
+                    if (!isWall(nextX, nextY)) pacman.direction = { ...pacman.nextDirection };
+
+                    const newX = pacman.x + pacman.direction.x;
+                    const newY = pacman.y + pacman.direction.y;
+                    if (!isWall(newX, newY)) {
+                        pacman.x = newX;
+                        pacman.y = newY;
+                        if (pacman.x < 0) pacman.x = COLS - 1;
+                        if (pacman.x >= COLS) pacman.x = 0;
+                    }
+                    pacman.mouth = (pacman.mouth + 0.3) % (Math.PI * 2);
+                }
+
+                function moveGhosts() {
+                    ghosts.forEach(ghost => {
+                        const possibleDirections = [
+                            { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }
+                        ].filter(dir => !isWall(ghost.x + dir.x, ghost.y + dir.y));
+
+                        if (Math.random() < 0.1 && possibleDirections.length > 0) {
+                            ghost.direction = possibleDirections[Math.floor(Math.random() * possibleDirections.length)];
+                        }
+
+                        const newX = ghost.x + ghost.direction.x;
+                        const newY = ghost.y + ghost.direction.y;
+                        if (!isWall(newX, newY)) {
+                            ghost.x = newX;
+                            ghost.y = newY;
+                        }
+                        if (ghost.x < 0) ghost.x = COLS - 1;
+                        if (ghost.x >= COLS) ghost.x = 0;
+                    });
+                }
+
+                function checkCollisions() {
+                    pellets = pellets.filter(p => !(p.x === pacman.x && p.y === pacman.y && (score += 10, false)));
+                    powerPellets = powerPellets.filter(p => !(p.x === pacman.x && p.y === pacman.y && (score += 50, false)));
+
+                    ghosts.forEach(ghost => {
+                        if (Math.abs(ghost.x - pacman.x) < 0.5 && Math.abs(ghost.y - pacman.y) < 0.5) {
+                            lives--;
+                            if (lives > 0) {
+                                pacman.x = 9;
+                                pacman.y = 15;
+                                pacman.direction = { x: 0, y: 0 };
+                            } else {
+                                gameRunning = false;
+                                gameOverElement.style.display = 'block';
+                            }
+                        }
+                    });
+
+                    if (pellets.length === 0 && powerPellets.length === 0) {
+                        score += 1000;
+                        initPellets();
+                    }
+                }
+
+                function drawMaze() {
+                    ctx.fillStyle = '#00f';
+                    for (let y = 0; y < ROWS; y++) {
+                        for (let x = 0; x < COLS; x++) {
+                            if (maze[y][x] === 1) ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        }
+                    }
+                }
+
+                function drawPellets() {
+                    ctx.fillStyle = '#fff';
+                    pellets.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x * CELL_SIZE + CELL_SIZE / 2, p.y * CELL_SIZE + CELL_SIZE / 2, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    powerPellets.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x * CELL_SIZE + CELL_SIZE / 2, p.y * CELL_SIZE + CELL_SIZE / 2, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                }
+
+                function drawPacman() {
+                    ctx.fillStyle = '#ff0';
+                    ctx.beginPath();
+                    const centerX = pacman.x * CELL_SIZE + CELL_SIZE / 2;
+                    const centerY = pacman.y * CELL_SIZE + CELL_SIZE / 2;
+                    const radius = CELL_SIZE / 2 - 2;
+                    let startAngle = 0.2 + Math.sin(pacman.mouth) * 0.3;
+                    let endAngle = Math.PI * 2 - 0.2 - Math.sin(pacman.mouth) * 0.3;
+                    if (pacman.direction.x < 0) { startAngle += Math.PI; endAngle += Math.PI; }
+                    else if (pacman.direction.y > 0) { startAngle += Math.PI / 2; endAngle += Math.PI / 2; }
+                    else if (pacman.direction.y < 0) { startAngle += Math.PI * 1.5; endAngle += Math.PI * 1.5; }
+                    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    ctx.lineTo(centerX, centerY);
+                    ctx.fill();
+                }
+
+                function drawGhosts() {
+                    ghosts.forEach(ghost => {
+                        const centerX = ghost.x * CELL_SIZE + CELL_SIZE / 2;
+                        const centerY = ghost.y * CELL_SIZE + CELL_SIZE / 2;
+                        const radius = CELL_SIZE / 2 - 2;
+                        ctx.fillStyle = ghost.color;
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY - 2, radius, Math.PI, 0);
+                        ctx.lineTo(centerX + radius, centerY + radius);
+                        ctx.lineTo(centerX + radius - 4, centerY + radius - 4);
+                        ctx.lineTo(centerX, centerY + radius);
+                        ctx.lineTo(centerX - radius + 4, centerY + radius - 4);
+                        ctx.lineTo(centerX - radius, centerY + radius);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.fillStyle = '#fff';
+                        ctx.beginPath();
+                        ctx.arc(centerX - 4, centerY - 2, 3, 0, Math.PI * 2);
+                        ctx.arc(centerX + 4, centerY - 2, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#000';
+                        ctx.beginPath();
+                        ctx.arc(centerX - 4, centerY - 2, 1.5, 0, Math.PI * 2);
+                        ctx.arc(centerX + 4, centerY - 2, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                }
+
+                function updateScore() {
+                    scoreElement.textContent = `Score: ${score} | Lives: ${lives}`;
+                }
+
+                let lastTime = 0;
+                function gameLoop(timestamp) {
+                    const deltaTime = timestamp - lastTime;
+                    lastTime = timestamp;
+                    if (gameRunning && deltaTime > 100) {
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        movePacman();
+                        moveGhosts();
+                        checkCollisions();
+                        drawMaze();
+                        drawPellets();
+                        drawPacman();
+                        drawGhosts();
+                        updateScore();
+                    }
+                    requestAnimationFrame(gameLoop);
+                }
+
+                function resetGame() {
+                    score = 0;
+                    lives = 3;
+                    gameRunning = true;
+                    gameOverElement.style.display = 'none';
+                    pacman.x = 9;
+                    pacman.y = 15;
+                    pacman.direction = { x: 0, y: 0 };
+                    pacman.nextDirection = { x: 0, y: 0 };
+                    ghosts = [
+                        { x: 9, y: 9, color: '#f00', direction: { x: 1, y: 0 } },
+                        { x: 8, y: 9, color: '#ffc0cb', direction: { x: -1, y: 0 } },
+                        { x: 10, y: 9, color: '#0ff', direction: { x: 0, y: 1 } },
+                        { x: 9, y: 10, color: '#ffa500', direction: { x: 0, y: -1 } }
+                    ];
+                    initPellets();
+                }
+
+                initPellets();
+                requestAnimationFrame(gameLoop);
+
+                // Store game reference for remote control
+                pacmanGame = { handleKeyDown, pacman };
+            }
+
+            // Initialize game when Games section is shown
+            document.getElementById('gameToggleBtn').addEventListener('click', function() {
+                setTimeout(() => initPacmanGame(), 100);
+            });
+
+            function simulateKeypress(direction, action) {
+                if (!pacmanGame) return;
+
+                const keyMap = { 'up': 38, 'down': 40, 'left': 37, 'right': 39 };
                 const keyCode = keyMap[direction];
                 if (!keyCode) return;
 
-                const eventType = action === 'press' ? 'keydown' : 'keyup';
-
-                // Focus the iframe first to ensure it receives events
-                try {
-                    iframe.focus();
-                    iframe.contentWindow.focus();
-                } catch (e) {
-                    console.log('Could not focus iframe:', e);
-                }
-
-                // Method 1: Try dispatching to iframe's window directly
-                try {
-                    const iframeWindow = iframe.contentWindow;
-                    const event = new KeyboardEvent(eventType, {
-                        key: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
-                        code: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
-                        keyCode: keyCode,
-                        which: keyCode,
-                        bubbles: true,
-                        cancelable: true,
-                        view: iframeWindow
-                    });
-
-                    // Try dispatching to iframe window
-                    iframeWindow.dispatchEvent(event);
-                    return; // Success, exit function
-                } catch (error) {
-                    console.log('Method 1 failed (expected for cross-origin):', error.message);
-                }
-
-                // Method 2: Try using legacy initKeyEvent (deprecated but sometimes works)
-                try {
-                    const event = document.createEvent('KeyboardEvent');
-                    if (event.initKeyEvent) {
-                        event.initKeyEvent(
-                            eventType,
-                            true, // bubbles
-                            true, // cancelable
-                            iframe.contentWindow, // view
-                            false, // ctrlKey
-                            false, // altKey
-                            false, // shiftKey
-                            false, // metaKey
-                            keyCode,
-                            0
-                        );
-                        iframe.contentWindow.dispatchEvent(event);
-                        return; // Success
-                    }
-                } catch (error) {
-                    console.log('Method 2 failed:', error.message);
-                }
-
-                // Method 3: Focus iframe and simulate real key press on window
-                // This works for some games that listen to window events
-                try {
-                    iframe.focus();
-
-                    // Create event with all possible properties
-                    const event = new KeyboardEvent(eventType, {
-                        key: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
-                        code: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
-                        keyCode: keyCode,
-                        which: keyCode,
-                        charCode: 0,
-                        bubbles: true,
-                        cancelable: true,
-                        composed: true
-                    });
-
-                    // Dispatch to focused iframe
-                    iframe.dispatchEvent(event);
-                } catch (error) {
-                    console.error('All methods failed:', error);
+                if (action === 'press') {
+                    const event = { keyCode, preventDefault: () => {} };
+                    pacmanGame.handleKeyDown(event);
                 }
             }
         });

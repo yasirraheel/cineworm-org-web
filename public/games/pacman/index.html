@@ -15,11 +15,13 @@
             background: #000;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             min-height: 100vh;
             font-family: Arial, sans-serif;
             overflow: hidden;
+            margin: 0;
+            padding: 10px 0;
         }
 
         #gameCanvas {
@@ -137,7 +139,8 @@
 
         // Keyboard controls
         const keys = {};
-        document.addEventListener('keydown', (e) => {
+
+        function handleKeyDown(e) {
             keys[e.keyCode] = true;
 
             if (e.keyCode === 37) pacman.nextDirection = { x: -1, y: 0 }; // Left
@@ -148,11 +151,20 @@
             if (e.keyCode === 32 && !gameRunning) { // Space to restart
                 resetGame();
             }
-        });
 
-        document.addEventListener('keyup', (e) => {
+            e.preventDefault(); // Prevent page scrolling
+        }
+
+        function handleKeyUp(e) {
             keys[e.keyCode] = false;
-        });
+            e.preventDefault();
+        }
+
+        // Listen on both document and window for iframe compatibility
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
 
         // Check if position is valid
         function isWall(x, y) {
