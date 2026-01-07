@@ -1511,35 +1511,80 @@
                 const keyCode = keyMap[direction];
                 if (!keyCode) return;
 
+                const eventType = action === 'press' ? 'keydown' : 'keyup';
+
+                // Focus the iframe first to ensure it receives events
+                try {
+                    iframe.focus();
+                    iframe.contentWindow.focus();
+                } catch (e) {
+                    console.log('Could not focus iframe:', e);
+                }
+
+                // Method 1: Try dispatching to iframe's window directly
                 try {
                     const iframeWindow = iframe.contentWindow;
-                    const eventType = action === 'press' ? 'keydown' : 'keyup';
-
-                    // Create keyboard event
                     const event = new KeyboardEvent(eventType, {
                         key: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
                         code: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
                         keyCode: keyCode,
                         which: keyCode,
                         bubbles: true,
-                        cancelable: true
+                        cancelable: true,
+                        view: iframeWindow
                     });
 
-                    // Dispatch to iframe's document
-                    iframeWindow.document.dispatchEvent(event);
+                    // Try dispatching to iframe window
+                    iframeWindow.dispatchEvent(event);
+                    return; // Success, exit function
                 } catch (error) {
-                    console.error('Error simulating keypress:', error);
-                    // Iframe might have different origin, try alternative method
-                    try {
-                        const event = new KeyboardEvent(action === 'press' ? 'keydown' : 'keyup', {
-                            keyCode: keyCode,
-                            which: keyCode,
-                            bubbles: true
-                        });
-                        document.dispatchEvent(event);
-                    } catch (e) {
-                        console.error('Alternative keypress failed:', e);
+                    console.log('Method 1 failed (expected for cross-origin):', error.message);
+                }
+
+                // Method 2: Try using legacy initKeyEvent (deprecated but sometimes works)
+                try {
+                    const event = document.createEvent('KeyboardEvent');
+                    if (event.initKeyEvent) {
+                        event.initKeyEvent(
+                            eventType,
+                            true, // bubbles
+                            true, // cancelable
+                            iframe.contentWindow, // view
+                            false, // ctrlKey
+                            false, // altKey
+                            false, // shiftKey
+                            false, // metaKey
+                            keyCode,
+                            0
+                        );
+                        iframe.contentWindow.dispatchEvent(event);
+                        return; // Success
                     }
+                } catch (error) {
+                    console.log('Method 2 failed:', error.message);
+                }
+
+                // Method 3: Focus iframe and simulate real key press on window
+                // This works for some games that listen to window events
+                try {
+                    iframe.focus();
+
+                    // Create event with all possible properties
+                    const event = new KeyboardEvent(eventType, {
+                        key: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
+                        code: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
+                        keyCode: keyCode,
+                        which: keyCode,
+                        charCode: 0,
+                        bubbles: true,
+                        cancelable: true,
+                        composed: true
+                    });
+
+                    // Dispatch to focused iframe
+                    iframe.dispatchEvent(event);
+                } catch (error) {
+                    console.error('All methods failed:', error);
                 }
             }
         });
