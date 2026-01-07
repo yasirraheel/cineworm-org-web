@@ -556,3 +556,11 @@ Route::get('/maintenance_up', function () {
     $exitCode = \Artisan::call('up');
     return '<h1>Site Up</h1>';
 });
+
+// Game Remote Control Routes
+Route::prefix('game')->group(function () {
+    Route::get('/remote-control', 'GameRoomController@showRemoteControl')->name('game.remote');
+    Route::post('/generate-room', 'GameRoomController@generateRoomCode')->name('game.generate');
+    Route::post('/verify-room', 'GameRoomController@verifyRoomCode')->name('game.verify');
+    Route::post('/control', 'GameRoomController@sendControl')->name('game.control');
+});

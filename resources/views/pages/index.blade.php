@@ -287,10 +287,20 @@
                     <!-- Game Content -->
                     <div id="collapseGame" class="toggle-content" style="display: none; overflow: hidden;">
                         <div class="card bg-dark text-white border-0 mb-2">
+                            <!-- Remote Control Info -->
+                            <div class="remote-control-info" style="padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); text-align: center;">
+                                <div style="font-size: 14px; margin-bottom: 5px;">📱 Mobile Control</div>
+                                <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">Room Code:</div>
+                                <div id="gameRoomCode" style="font-size: 32px; font-weight: bold; letter-spacing: 8px;">----</div>
+                                <div style="font-size: 11px; margin-top: 8px; opacity: 0.8;">
+                                    Open <span style="font-weight: bold;">{{ url('/game/remote-control') }}</span> on your phone
+                                </div>
+                            </div>
                             <div class="card-body p-0">
                                 <div class="pacman-game-container">
                                     <div class="pacman-game-wrapper" style="height: 100%;">
                                         <iframe
+                                            id="pacmanGameFrame"
                                             src="https://pacman.platzh1rsch.ch/"
                                             style="width: 100%; height: 100%; border: none;"
                                             sandbox="allow-scripts allow-same-origin allow-forms"
@@ -1405,6 +1415,105 @@
             }
 
             autoScrollTicker();
+
+            // ========== Game Remote Control Setup ==========
+            let gameRoomCode = null;
+            let echoInstance = null;
+
+            // Generate room code when game section is shown
+            document.getElementById('gameToggleBtn').addEventListener('click', function() {
+                if (!gameRoomCode) {
+                    generateGameRoom();
+                }
+            });
+
+            async function generateGameRoom() {
+                try {
+                    const response = await fetch('{{ route("game.generate") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        gameRoomCode = data.room_code;
+                        document.getElementById('gameRoomCode').textContent = gameRoomCode;
+                        setupWebSocketListener();
+                    }
+                } catch (error) {
+                    console.error('Failed to generate room code:', error);
+                    document.getElementById('gameRoomCode').textContent = 'ERROR';
+                }
+            }
+
+            function setupWebSocketListener() {
+                // Check if Laravel Echo is available
+                if (typeof Echo === 'undefined') {
+                    console.warn('Laravel Echo not loaded. WebSocket features disabled.');
+                    return;
+                }
+
+                try {
+                    // Listen for game control events
+                    Echo.channel('game-room.' + gameRoomCode)
+                        .listen('.game.control', (event) => {
+                            console.log('Control received:', event);
+                            simulateKeypress(event.direction, event.action);
+                        });
+                } catch (error) {
+                    console.error('WebSocket setup error:', error);
+                }
+            }
+
+            function simulateKeypress(direction, action) {
+                const iframe = document.getElementById('pacmanGameFrame');
+                if (!iframe) return;
+
+                // Map directions to arrow keys
+                const keyMap = {
+                    'up': 38,
+                    'down': 40,
+                    'left': 37,
+                    'right': 39
+                };
+
+                const keyCode = keyMap[direction];
+                if (!keyCode) return;
+
+                try {
+                    const iframeWindow = iframe.contentWindow;
+                    const eventType = action === 'press' ? 'keydown' : 'keyup';
+
+                    // Create keyboard event
+                    const event = new KeyboardEvent(eventType, {
+                        key: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
+                        code: 'Arrow' + direction.charAt(0).toUpperCase() + direction.slice(1),
+                        keyCode: keyCode,
+                        which: keyCode,
+                        bubbles: true,
+                        cancelable: true
+                    });
+
+                    // Dispatch to iframe's document
+                    iframeWindow.document.dispatchEvent(event);
+                } catch (error) {
+                    console.error('Error simulating keypress:', error);
+                    // Iframe might have different origin, try alternative method
+                    try {
+                        const event = new KeyboardEvent(action === 'press' ? 'keydown' : 'keyup', {
+                            keyCode: keyCode,
+                            which: keyCode,
+                            bubbles: true
+                        });
+                        document.dispatchEvent(event);
+                    } catch (e) {
+                        console.error('Alternative keypress failed:', e);
+                    }
+                }
+            }
         });
     </script>
 @endsection
