@@ -293,6 +293,7 @@
                                         <iframe
                                             src="https://pacman.platzh1rsch.ch/"
                                             style="width: 100%; height: 100%; border: none;"
+                                            sandbox="allow-scripts allow-same-origin allow-forms"
                                             allowfullscreen
                                             title="Pacman Game">
                                         </iframe>
