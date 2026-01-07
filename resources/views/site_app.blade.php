@@ -5,6 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="author" content="">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>@yield('head_title', getcong('site_name'))</title>
 <meta name="description" content="@yield('head_description', getcong('site_description'))" />
 <meta name="keywords" content="@yield('head_keywords', getcong('site_keywords'))" />
