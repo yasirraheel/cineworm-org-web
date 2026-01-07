@@ -10,6 +10,16 @@
     <script type="text/javascript" src="{{ URL::asset('site_assets/player/java/' . $FWDEVPlayer) }}"></script>
 
     <style>
+        /* Toggle Button Active State */
+        .active-toggle-btn {
+            background: rgba(254, 136, 5, 0.2) !important;
+            border-left: 3px solid #fe8805 !important;
+        }
+
+        .toggle-content {
+            transition: opacity 0.3s ease;
+        }
+
         .news-ticker-container {
                 max-height: 550px;
                 overflow-y: auto;
@@ -182,14 +192,14 @@
                     <div class="card bg-dark text-white border-0 mb-2" id="accordionHeaders">
                         <div class="card-header p-2" id="headingNews" style="background: #111; border-bottom: 1px solid #333;">
                             <h5 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseNews" aria-expanded="true" aria-controls="collapseNews">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold active-toggle-btn" type="button" onclick="toggleSection('news')" id="newsToggleBtn">
                                     <i class="fa fa-newspaper-o mr-2"></i> Latest News
                                 </button>
                             </h5>
                         </div>
                         <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333;">
                             <h5 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseGame" aria-expanded="false" aria-controls="collapseGame">
+                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" onclick="toggleSection('game')" id="gameToggleBtn">
                                     <i class="fa fa-gamepad mr-2"></i> Games
                                 </button>
                             </h5>
@@ -197,7 +207,7 @@
                     </div>
 
                     <!-- News Content -->
-                    <div id="collapseNews" class="collapse show" aria-labelledby="headingNews" data-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
+                    <div id="collapseNews" class="toggle-content" style="display: block; overflow: hidden;">
                         <div class="card bg-dark text-white border-0 mb-2" style="height: 100%;">
                             <div class="card-body p-0" style="height: 100%; display: flex; flex-direction: column;">
                             <div class="news-ticker-container" style="flex-grow: 1; overflow-y: auto; position: relative;">
@@ -259,7 +269,7 @@
                     </div>
 
                     <!-- Game Content -->
-                    <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
+                    <div id="collapseGame" class="toggle-content" style="display: none; overflow: hidden;">
                         <div class="card bg-dark text-white border-0 mb-2">
                             <div class="card-body p-0">
                                 <div class="pacman-game-container">
@@ -1211,9 +1221,38 @@
 
 
     <script>
+        // Toggle function for News and Games
+        function toggleSection(section) {
+            var newsSection = document.getElementById('collapseNews');
+            var gameSection = document.getElementById('collapseGame');
+            var newsBtn = document.getElementById('newsToggleBtn');
+            var gameBtn = document.getElementById('gameToggleBtn');
+
+            if (section === 'news') {
+                // Show news, hide game
+                newsSection.style.display = 'block';
+                gameSection.style.display = 'none';
+                newsBtn.classList.add('active-toggle-btn');
+                gameBtn.classList.remove('active-toggle-btn');
+            } else if (section === 'game') {
+                // Show game, hide news
+                newsSection.style.display = 'none';
+                gameSection.style.display = 'block';
+                newsBtn.classList.remove('active-toggle-btn');
+                gameBtn.classList.add('active-toggle-btn');
+            }
+
+            // Recalculate heights after toggle
+            setTimeout(function() {
+                if (typeof matchHeightToPlayer === 'function') {
+                    matchHeightToPlayer();
+                }
+            }, 100);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Match news ticker/game height with player height
-            function matchHeightToPlayer() {
+            window.matchHeightToPlayer = function() {
                 // Only apply on desktop (md and above)
                 if (window.innerWidth < 768) {
                      // Reset heights on mobile
@@ -1255,7 +1294,7 @@
 
                 // Adjust News Ticker if visible
                 var newsCollapse = document.getElementById('collapseNews');
-                if (newsCollapse && newsCollapse.classList.contains('show')) {
+                if (newsCollapse && newsCollapse.style.display !== 'none') {
                     var ticker = document.querySelector('.news-ticker-container');
                     if (ticker) {
                         ticker.style.height = availableHeight + 'px';
@@ -1264,7 +1303,7 @@
 
                 // Adjust Game if visible
                 var gameCollapse = document.getElementById('collapseGame');
-                if (gameCollapse && gameCollapse.classList.contains('show')) {
+                if (gameCollapse && gameCollapse.style.display !== 'none') {
                     var gameWrapper = document.querySelector('.pacman-game-wrapper');
                     if (gameWrapper) {
                         gameWrapper.style.height = availableHeight + 'px';
@@ -1275,13 +1314,6 @@
             // Call on load, resize, and periodically
             window.addEventListener('resize', matchHeightToPlayer);
             window.addEventListener('load', matchHeightToPlayer);
-
-            // Listen for accordion changes
-            var accordions = document.querySelectorAll('.collapse');
-            accordions.forEach(function(acc) {
-                acc.addEventListener('shown.bs.collapse', matchHeightToPlayer);
-                acc.addEventListener('hidden.bs.collapse', matchHeightToPlayer);
-            });
 
             // Check periodically for initialization
             var attempts = 0;
@@ -1320,7 +1352,7 @@
 
                         // Check if news section is visible
                         var newsCollapse = document.getElementById('collapseNews');
-                        if (newsCollapse && !newsCollapse.classList.contains('show')) {
+                        if (newsCollapse && newsCollapse.style.display === 'none') {
                             return;
                         }
 
