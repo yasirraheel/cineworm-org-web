@@ -47,10 +47,18 @@
             .player-buttons-container {
                 flex-direction: column;
                 gap: 8px;
+                padding: 10px 15px !important;
+                margin-bottom: 10px !important;
             }
 
             .player-buttons-container .btn {
-                width: 100%;
+                width: 100% !important;
+                padding: 12px 16px !important;
+                font-size: 13px !important;
+                min-width: unset !important;
+                white-space: normal !important;
+                text-align: center !important;
+                line-height: 1.4 !important;
             }
         }
 
