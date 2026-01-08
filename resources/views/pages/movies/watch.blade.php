@@ -37,11 +37,11 @@
 
     <style>
         .news-ticker-container {
-                max-height: 250px;
                 overflow-y: auto;
                 padding: 10px;
                 background: #111;
                 color: #fff;
+                height: 100%;
             }
 
             .news-ticker-container::-webkit-scrollbar {
@@ -106,37 +106,10 @@
             background: #666;
         }
 
-        /* Pacman Game Container Styling */
-        .pacman-game-container {
-            background: #1a1a1a;
-            flex: 1;
-            overflow: hidden;
-            padding: 0;
-            color: #fff;
-        }
-
-        .pacman-game-wrapper {
-            background: #000;
-            height: 100%;
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .pacman-game-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-
         @media (max-width: 767px) {
             .news-ticker-container {
                 height: 300px;
                 margin-top: 15px;
-            }
-            .pacman-game-wrapper {
-                height: 300px;
             }
         }
     </style>
@@ -267,31 +240,6 @@
                                 <div id="news-detail-view" style="display: none; height: 100%; flex-direction: column;">
                                     <button class="btn btn-sm btn-secondary mb-2" id="back-to-news-list" style="align-self: flex-start; margin-bottom: 10px;"><i class="fa fa-arrow-left"></i> Back to News</button>
                                     <div id="news-content-body" style="flex-grow: 1; overflow-y: auto;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Game Section -->
-                <div class="card bg-dark text-white border-0 mb-2" style="flex-shrink: 0;">
-                    <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333; border-top: 1px solid #333;">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGame" aria-expanded="false" aria-controls="collapseGame">
-                                <i class="fa fa-gamepad mr-2"></i> Games
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapseGame" class="collapse" aria-labelledby="headingGame" data-bs-parent="#watchAccordion" style="overflow: hidden; transition: height 0.3s ease;">
-                        <div class="card-body p-0">
-                            <div class="pacman-game-container">
-                                <div class="pacman-game-wrapper" style="height: 200px;">
-                                    <iframe
-                                        src="https://pacman.platzh1rsch.ch/"
-                                        style="width: 100%; height: 100%; border: none;"
-                                        allowfullscreen
-                                        title="Pacman Game">
-                                    </iframe>
                                 </div>
                             </div>
                         </div>
