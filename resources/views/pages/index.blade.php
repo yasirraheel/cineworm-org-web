@@ -297,13 +297,12 @@
                         <div class="card bg-dark text-white border-0 mb-2">
                             <div class="card-body p-0">
                                 <div class="pacman-game-container">
-                                    <div class="pacman-game-wrapper">
-                                        <iframe
-                                            src="https://pacman.platzh1rsch.ch/"
-                                            style="width: 100%; height: 100%; border: none;"
-                                            allowfullscreen
-                                            title="Pacman Game">
-                                        </iframe>
+                                    <div class="pacman-game-wrapper" id="pacman-game-wrapper">
+                                        <!-- Game will be loaded here dynamically -->
+                                        <div style="text-align: center; padding: 50px; color: #fff;">
+                                            <i class="fa fa-spinner fa-spin" style="font-size: 48px; margin-bottom: 20px;"></i>
+                                            <p>Loading Game...</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1285,6 +1284,9 @@
 
 
     <script>
+        // Track if game has been loaded
+        let gameLoaded = false;
+
         // Toggle function for News and Games
         function toggleSection(section) {
             var newsSection = document.getElementById('collapseNews');
@@ -1304,6 +1306,12 @@
                 gameSection.style.display = 'block';
                 newsBtn.classList.remove('active-toggle-btn');
                 gameBtn.classList.add('active-toggle-btn');
+
+                // Load game dynamically on first click
+                if (!gameLoaded) {
+                    loadPacmanGame();
+                    gameLoaded = true;
+                }
             }
 
             // Recalculate heights after toggle
@@ -1312,6 +1320,25 @@
                     matchHeightToPlayer();
                 }
             }, 100);
+        }
+
+        // Function to load Pacman game dynamically
+        function loadPacmanGame() {
+            var gameWrapper = document.getElementById('pacman-game-wrapper');
+            if (gameWrapper) {
+                // Create iframe element
+                var iframe = document.createElement('iframe');
+                iframe.src = 'https://pacman.platzh1rsch.ch/';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.setAttribute('allowfullscreen', '');
+                iframe.setAttribute('title', 'Pacman Game');
+
+                // Clear loading message and append iframe
+                gameWrapper.innerHTML = '';
+                gameWrapper.appendChild(iframe);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1434,6 +1461,53 @@
             }
 
             autoScrollTicker();
+
+            // AJAX Like Button Handler
+            const likeForm = document.querySelector('.like-form');
+            if (likeForm) {
+                likeForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const form = this;
+                    const button = form.querySelector('.like-btn');
+                    const likeText = form.querySelector('.like-text');
+                    const formData = new FormData(form);
+
+                    // Disable button during request
+                    button.disabled = true;
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Toggle liked state
+                            button.classList.toggle('liked');
+
+                            // Update like count and text
+                            if (data.liked) {
+                                likeText.textContent = 'Unlike (' + data.likes + ')';
+                                form.action = form.action.replace('/like/', '/unlike/');
+                            } else {
+                                likeText.textContent = 'Like (' + data.likes + ')';
+                                form.action = form.action.replace('/unlike/', '/like/');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    })
+                    .finally(() => {
+                        // Re-enable button
+                        button.disabled = false;
+                    });
+                });
+            }
         });
     </script>
 @endsection

@@ -73,3 +73,54 @@
         </a>
     </div>
 </div>
+
+<script>
+// AJAX Like Button Handler for dynamically loaded content
+(function() {
+    const likeForm = document.querySelector('.like-form');
+    if (likeForm) {
+        likeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const form = this;
+            const button = form.querySelector('.like-btn');
+            const likeText = form.querySelector('.like-text');
+            const formData = new FormData(form);
+
+            // Disable button during request
+            button.disabled = true;
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Toggle liked state
+                    button.classList.toggle('liked');
+
+                    // Update like count and text
+                    if (data.liked) {
+                        likeText.textContent = 'Unlike (' + data.likes + ')';
+                        form.action = form.action.replace('/like/', '/unlike/');
+                    } else {
+                        likeText.textContent = 'Like (' + data.likes + ')';
+                        form.action = form.action.replace('/unlike/', '/like/');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                // Re-enable button
+                button.disabled = false;
+            });
+        });
+    }
+})();
+</script>
