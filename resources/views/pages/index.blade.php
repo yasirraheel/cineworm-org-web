@@ -1542,67 +1542,6 @@
                     });
                 });
             }
-
-            // Auto-play next video when current video ends
-            function setupAutoPlayNext() {
-                console.log('Setting up auto-play next video functionality');
-
-                // Check for video element periodically until it's found
-                var checkInterval = setInterval(function() {
-                    // Try to find the video element (works with HTML5 video players)
-                    var videoElement = document.querySelector('#viavi_player video, #viavi_player iframe');
-
-                    if (videoElement) {
-                        console.log('Video element found, adding ended event listener');
-                        clearInterval(checkInterval);
-
-                        // For HTML5 video element
-                        if (videoElement.tagName === 'VIDEO') {
-                            videoElement.addEventListener('ended', function() {
-                                console.log('Video ended, loading next random video');
-                                if (typeof window.loadRandomVideo === 'function') {
-                                    setTimeout(function() {
-                                        window.loadRandomVideo();
-                                    }, 1000); // Wait 1 second before loading next video
-                                } else {
-                                    console.error('loadRandomVideo function not found');
-                                }
-                            });
-                        }
-                        // For iframe embeds (YouTube, etc.) - use postMessage listener
-                        else if (videoElement.tagName === 'IFRAME') {
-                            console.log('iframe player detected, setting up message listener');
-                            window.addEventListener('message', function(event) {
-                                // YouTube iframe API
-                                if (event.data && typeof event.data === 'string') {
-                                    try {
-                                        var data = JSON.parse(event.data);
-                                        if (data.event === 'onStateChange' && data.info === 0) {
-                                            // 0 = ended
-                                            console.log('YouTube video ended, loading next');
-                                            if (typeof window.loadRandomVideo === 'function') {
-                                                setTimeout(function() {
-                                                    window.loadRandomVideo();
-                                                }, 1000);
-                                            }
-                                        }
-                                    } catch (e) {
-                                        // Not JSON, ignore
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }, 1000); // Check every second
-
-                // Stop checking after 30 seconds
-                setTimeout(function() {
-                    clearInterval(checkInterval);
-                }, 30000);
-            }
-
-            // Initialize auto-play next on page load
-            setupAutoPlayNext();
         });
     </script>
 @endsection

@@ -142,7 +142,7 @@
                 youtubeQualityButtonSelectedColor: "#FFFFFF",
                 scrubbersToolTipLabelBackgroundColor: "#FFFFFF",
                 scrubbersToolTipLabelFontColor: "#5a5a5a",
-                redirectURL: redirectURL,
+                // redirectURL: redirectURL, // Disabled to use AJAX auto-play instead
                 // Cuepoints
                 executeCuepointsOnlyOnce: "no",
                 cuepoints: [],
@@ -256,6 +256,18 @@
                     player.play();
                 }
             }, 2000);
+
+            // Add event listener for video complete to trigger AJAX next video
+            if (player && player.addListener) {
+                player.addListener(FWDEVPlayer.VIDEO_STOP, function() {
+                    console.log('Video ended - triggering AJAX next video');
+                    if (typeof window.loadRandomVideo === 'function') {
+                        setTimeout(function() {
+                            window.loadRandomVideo();
+                        }, 1000);
+                    }
+                });
+            }
 
         });
     </script>
