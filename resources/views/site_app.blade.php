@@ -251,7 +251,8 @@ $(document).ready(function() {
 $(document).ready(function() {
     console.log('Stumble button script loaded');
 
-    function loadRandomVideo() {
+    // Make loadRandomVideo globally accessible for auto-play next functionality
+    window.loadRandomVideo = function() {
         console.log('loadRandomVideo triggered');
 
         var originalText = $('#stumble-text').text();
@@ -495,21 +496,21 @@ $(document).ready(function() {
                 }
             }
         });
-    }
+    }; // End of window.loadRandomVideo
 
     // Bind click event to Stumble button
     $('#stumble-btn').on('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        loadRandomVideo();
+        window.loadRandomVideo();
         return false;
     });
 
     // Bind click event to Next button (delegated since it might be dynamic)
     $(document).on('click', '#footer-next-btn', function(e) {
         e.preventDefault();
-        loadRandomVideo();
+        window.loadRandomVideo();
         return false;
     });
 
