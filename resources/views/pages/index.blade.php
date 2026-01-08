@@ -157,12 +157,47 @@
         }
 
         @media (max-width: 767px) {
+            /* News Ticker Mobile Styling */
             .news-ticker-container {
-                height: 300px;
+                max-height: 400px;
+                height: auto;
+                min-height: 300px;
+                margin-top: 0;
+                margin-bottom: 15px;
+            }
+
+            /* Game Container Mobile Styling */
+            .pacman-game-wrapper {
+                height: 400px;
+                min-height: 350px;
+            }
+
+            /* Mobile Column Full Width */
+            .col-md-3.d-flex {
+                width: 100%;
+                max-width: 100%;
+                padding: 0 15px;
                 margin-top: 15px;
             }
-            .pacman-game-wrapper {
-                height: 300px;
+
+            /* Toggle Buttons Mobile */
+            .toggle-section-btn {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+
+            /* News Item Mobile Adjustments */
+            .news-item {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .news-headline {
+                font-size: 16px;
+            }
+
+            .news-details {
+                font-size: 14px;
             }
         }
     </style>
@@ -227,7 +262,7 @@
                 </div>
 
                 <!-- Right Side News Ticker and Banners -->
-                <div class="col-md-3 d-none d-md-flex flex-column justify-content-start" style="max-height: 100%;">
+                <div class="col-md-3 d-flex flex-column justify-content-start" style="max-height: 100%;">
                     <!-- News Ticker Section -->
                 <div id="watchAccordion">
                     <!-- News Content -->
@@ -1346,12 +1381,12 @@
             window.matchHeightToPlayer = function() {
                 // Only apply on desktop (md and above)
                 if (window.innerWidth < 768) {
-                     // Reset heights on mobile
+                     // Reset heights on mobile - let CSS handle it
                     var ticker = document.querySelector('.news-ticker-container');
                     if (ticker) ticker.style.height = '';
 
                     var gameWrapper = document.querySelector('.pacman-game-wrapper');
-                    if (gameWrapper) gameWrapper.style.height = '300px'; // Default mobile height
+                    if (gameWrapper) gameWrapper.style.height = ''; // Let CSS media query handle mobile height
                     return;
                 }
 
