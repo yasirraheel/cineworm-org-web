@@ -142,7 +142,7 @@
                 youtubeQualityButtonSelectedColor: "#FFFFFF",
                 scrubbersToolTipLabelBackgroundColor: "#FFFFFF",
                 scrubbersToolTipLabelFontColor: "#5a5a5a",
-                // redirectURL: redirectURL, // Disabled to use AJAX auto-play instead
+                redirectURL: "", // Disabled to use AJAX auto-play instead
                 // Cuepoints
                 executeCuepointsOnlyOnce: "no",
                 cuepoints: [],
@@ -257,17 +257,83 @@
                 }
             }, 2000);
 
-            // Add event listener for video complete to trigger AJAX next video
+            // Multiple approaches to detect video end and trigger AJAX next video
+            var videoEndHandled = false;
+
+            // Method 1: Try FWDEVPlayer event listener with different event names
             if (player && player.addListener) {
-                player.addListener(FWDEVPlayer.VIDEO_STOP, function() {
-                    console.log('Video ended - triggering AJAX next video');
-                    if (typeof window.loadRandomVideo === 'function') {
-                        setTimeout(function() {
-                            window.loadRandomVideo();
-                        }, 1000);
-                    }
-                });
+                console.log('Adding FWDEVPlayer event listeners');
+
+                // Try VIDEO_STOP event
+                try {
+                    player.addListener(FWDEVPlayer.VIDEO_STOP, function() {
+                        console.log('VIDEO_STOP event fired');
+                        if (!videoEndHandled && typeof window.loadRandomVideo === 'function') {
+                            videoEndHandled = true;
+                            setTimeout(function() {
+                                window.loadRandomVideo();
+                            }, 1000);
+                        }
+                    });
+                } catch(e) {
+                    console.log('VIDEO_STOP listener failed:', e);
+                }
+
+                // Try COMPLETE event
+                try {
+                    player.addListener(FWDEVPlayer.COMPLETE, function() {
+                        console.log('COMPLETE event fired');
+                        if (!videoEndHandled && typeof window.loadRandomVideo === 'function') {
+                            videoEndHandled = true;
+                            setTimeout(function() {
+                                window.loadRandomVideo();
+                            }, 1000);
+                        }
+                    });
+                } catch(e) {
+                    console.log('COMPLETE listener failed:', e);
+                }
             }
+
+            // Method 2: Direct HTML5 video element listener
+            setTimeout(function() {
+                var videoElement = document.querySelector('#viavi_player video');
+                if (videoElement) {
+                    console.log('Found HTML5 video element, adding ended listener');
+                    videoElement.addEventListener('ended', function() {
+                        console.log('HTML5 video ended event fired');
+                        if (!videoEndHandled && typeof window.loadRandomVideo === 'function') {
+                            videoEndHandled = true;
+                            setTimeout(function() {
+                                window.loadRandomVideo();
+                            }, 1000);
+                        }
+                    });
+                }
+            }, 2000);
+
+            // Method 3: Poll for video completion
+            var checkVideoEndInterval = setInterval(function() {
+                var videoElement = document.querySelector('#viavi_player video');
+                if (videoElement && !videoEndHandled) {
+                    // Check if video has ended
+                    if (videoElement.ended || (videoElement.currentTime > 0 && videoElement.currentTime >= videoElement.duration - 0.5)) {
+                        console.log('Video end detected via polling');
+                        videoEndHandled = true;
+                        clearInterval(checkVideoEndInterval);
+                        if (typeof window.loadRandomVideo === 'function') {
+                            setTimeout(function() {
+                                window.loadRandomVideo();
+                            }, 1000);
+                        }
+                    }
+                }
+            }, 1000);
+
+            // Stop polling after 2 hours
+            setTimeout(function() {
+                clearInterval(checkVideoEndInterval);
+            }, 7200000);
 
         });
     </script>
