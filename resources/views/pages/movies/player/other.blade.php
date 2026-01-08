@@ -260,6 +260,37 @@
             // Multiple approaches to detect video end and trigger AJAX next video
             var videoEndHandled = false;
 
+            function triggerNextVideo() {
+                console.log('=== TRIGGERING NEXT VIDEO ===');
+                console.log('videoEndHandled flag:', videoEndHandled);
+                console.log('window.loadRandomVideo exists:', typeof window.loadRandomVideo);
+
+                if (!videoEndHandled) {
+                    videoEndHandled = true;
+
+                    if (typeof window.loadRandomVideo === 'function') {
+                        console.log('Calling window.loadRandomVideo() in 1 second...');
+                        setTimeout(function() {
+                            console.log('NOW calling window.loadRandomVideo()');
+                            window.loadRandomVideo();
+                        }, 1000);
+                    } else {
+                        console.error('window.loadRandomVideo is not a function!');
+                        // Try to wait and retry
+                        setTimeout(function() {
+                            if (typeof window.loadRandomVideo === 'function') {
+                                console.log('Retrying - NOW calling window.loadRandomVideo()');
+                                window.loadRandomVideo();
+                            } else {
+                                console.error('Still not available after retry');
+                            }
+                        }, 2000);
+                    }
+                } else {
+                    console.log('Video end already handled, skipping');
+                }
+            }
+
             // Method 1: Try FWDEVPlayer event listener with different event names
             if (player && player.addListener) {
                 console.log('Adding FWDEVPlayer event listeners');
@@ -267,13 +298,8 @@
                 // Try VIDEO_STOP event
                 try {
                     player.addListener(FWDEVPlayer.VIDEO_STOP, function() {
-                        console.log('VIDEO_STOP event fired');
-                        if (!videoEndHandled && typeof window.loadRandomVideo === 'function') {
-                            videoEndHandled = true;
-                            setTimeout(function() {
-                                window.loadRandomVideo();
-                            }, 1000);
-                        }
+                        console.log('***** VIDEO_STOP event fired *****');
+                        triggerNextVideo();
                     });
                 } catch(e) {
                     console.log('VIDEO_STOP listener failed:', e);
@@ -282,13 +308,8 @@
                 // Try COMPLETE event
                 try {
                     player.addListener(FWDEVPlayer.COMPLETE, function() {
-                        console.log('COMPLETE event fired');
-                        if (!videoEndHandled && typeof window.loadRandomVideo === 'function') {
-                            videoEndHandled = true;
-                            setTimeout(function() {
-                                window.loadRandomVideo();
-                            }, 1000);
-                        }
+                        console.log('***** COMPLETE event fired *****');
+                        triggerNextVideo();
                     });
                 } catch(e) {
                     console.log('COMPLETE listener failed:', e);
@@ -301,14 +322,11 @@
                 if (videoElement) {
                     console.log('Found HTML5 video element, adding ended listener');
                     videoElement.addEventListener('ended', function() {
-                        console.log('HTML5 video ended event fired');
-                        if (!videoEndHandled && typeof window.loadRandomVideo === 'function') {
-                            videoEndHandled = true;
-                            setTimeout(function() {
-                                window.loadRandomVideo();
-                            }, 1000);
-                        }
+                        console.log('***** HTML5 video ended event fired *****');
+                        triggerNextVideo();
                     });
+                } else {
+                    console.log('No HTML5 video element found');
                 }
             }, 2000);
 
@@ -318,14 +336,10 @@
                 if (videoElement && !videoEndHandled) {
                     // Check if video has ended
                     if (videoElement.ended || (videoElement.currentTime > 0 && videoElement.currentTime >= videoElement.duration - 0.5)) {
-                        console.log('Video end detected via polling');
-                        videoEndHandled = true;
+                        console.log('***** Video end detected via polling *****');
+                        console.log('Video ended:', videoElement.ended, 'Current time:', videoElement.currentTime, 'Duration:', videoElement.duration);
                         clearInterval(checkVideoEndInterval);
-                        if (typeof window.loadRandomVideo === 'function') {
-                            setTimeout(function() {
-                                window.loadRandomVideo();
-                            }, 1000);
-                        }
+                        triggerNextVideo();
                     }
                 }
             }, 1000);
