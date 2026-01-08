@@ -200,6 +200,275 @@
                 font-size: 14px;
             }
         }
+
+        /* Player Footer Section */
+        .player-footer-section {
+            background: linear-gradient(135deg, #0d0620 0%, #1a0d33 100%);
+            border-radius: 0;
+            margin-top: 0;
+            padding: 20px 25px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+            width: 100%;
+        }
+
+        /* Unified Player Footer - Single Row Layout */
+        .player-footer-unified {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Video Title Section */
+        .video-title-section {
+            flex: 0 1 auto;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        .video-title-link {
+            text-decoration: none;
+        }
+
+        .video-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color 0.3s ease;
+        }
+
+        .video-title-link:hover .video-title {
+            color: #fe8805;
+        }
+
+        /* Action Buttons Section */
+        .action-buttons-section {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .like-form {
+            display: inline-block;
+            margin: 0;
+        }
+
+        /* Base Action Button Style */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .action-btn i {
+            font-size: 14px;
+        }
+
+        /* Donate Button */
+        .donate-btn {
+            background: linear-gradient(90deg, #fe8805, #ff6b00);
+            box-shadow: 0 2px 8px rgba(254, 136, 5, 0.25);
+        }
+
+        .donate-btn:hover {
+            background: linear-gradient(90deg, #ff6b00, #fe8805);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(254, 136, 5, 0.4);
+            color: #ffffff;
+        }
+
+        /* Webpage Button */
+        .webpage-btn {
+            background: linear-gradient(90deg, #167ac6, #0a789c);
+            box-shadow: 0 2px 8px rgba(22, 122, 198, 0.25);
+        }
+
+        .webpage-btn:hover {
+            background: linear-gradient(90deg, #0a789c, #167ac6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(22, 122, 198, 0.4);
+            color: #ffffff;
+        }
+
+        /* Like Button */
+        .like-btn {
+            background: linear-gradient(90deg, #fe0278, #d10257);
+            box-shadow: 0 2px 8px rgba(254, 2, 120, 0.25);
+        }
+
+        .like-btn:hover {
+            background: linear-gradient(90deg, #d10257, #fe0278);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(254, 2, 120, 0.4);
+        }
+
+        .like-btn.liked {
+            background: linear-gradient(90deg, #118d04, #0d6b03);
+            box-shadow: 0 2px 8px rgba(17, 141, 4, 0.25);
+        }
+
+        .like-btn.liked:hover {
+            background: linear-gradient(90deg, #0d6b03, #118d04);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(17, 141, 4, 0.4);
+        }
+
+        /* Share Button */
+        .share-btn {
+            background: linear-gradient(90deg, #8e44ad, #6c2d91);
+            box-shadow: 0 2px 8px rgba(142, 68, 173, 0.25);
+        }
+
+        .share-btn:hover {
+            background: linear-gradient(90deg, #6c2d91, #8e44ad);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(142, 68, 173, 0.4);
+            color: #ffffff;
+        }
+
+        /* Next Button */
+        .next-btn {
+            background: linear-gradient(90deg, #2c3e50, #4ca1af);
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.25);
+        }
+
+        .next-btn:hover {
+            background: linear-gradient(90deg, #4ca1af, #2c3e50);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.4);
+            color: #ffffff;
+        }
+
+        /* Player Footer Meta */
+        .player-footer-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            flex: 1 1 auto;
+            justify-content: center;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b5b5b5;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .meta-item i {
+            font-size: 14px;
+            color: #fe8805;
+        }
+
+        .meta-item.imdb-rating {
+            background: rgba(245, 197, 24, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .imdb-logo {
+            width: 30px;
+            height: auto;
+            vertical-align: middle;
+        }
+
+        .meta-item.imdb-rating span {
+            color: #f5c518;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Responsive adjustments for player footer */
+        @media (max-width: 992px) {
+            .player-footer-unified {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .video-title-section {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .player-footer-meta {
+                width: 100%;
+                justify-content: flex-start;
+                order: 2;
+            }
+
+            .action-buttons-section {
+                width: 100%;
+                justify-content: flex-start;
+                order: 3;
+            }
+
+            .video-title {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .player-footer-section {
+                padding: 15px 18px;
+            }
+
+            .player-footer-unified {
+                gap: 12px;
+            }
+
+            .action-btn {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+
+            .action-btn span {
+                display: none;
+            }
+
+            .action-btn i {
+                margin: 0;
+            }
+
+            .video-title {
+                font-size: 16px;
+                white-space: normal;
+            }
+
+            .player-footer-meta {
+                gap: 12px;
+            }
+
+            .meta-item {
+                font-size: 12px;
+            }
+
+            .meta-item i {
+                font-size: 13px;
+            }
+        }
     </style>
 
     <!-- Start Page Content Area -->
@@ -259,6 +528,85 @@
                             NO Source URL Set
                         </div>
                     @endif
+
+                    <!-- Player Footer Section -->
+                    <div class="player-footer-section">
+                        <!-- Combined Title, Meta Info, and Action Buttons Row -->
+                        <div class="player-footer-unified">
+                            <div class="video-title-section">
+                                <a href="{{ url('movies/details', ['slug' => $movies_info->video_slug, 'id' => $movies_info->id]) }}" class="video-title-link">
+                                    <h3 class="video-title">{{ $movies_info->video_title }}</h3>
+                                </a>
+                            </div>
+
+                            <!-- Video Info Meta -->
+                            <div class="player-footer-meta">
+                                <div class="meta-item">
+                                    <i class="fa fa-eye"></i>
+                                    <span>{{ number_format_short($movies_info->views) }} {{ trans('words.video_views') }}</span>
+                                </div>
+
+                                @if ($movies_info->release_date)
+                                    <div class="meta-item">
+                                        <i class="fa fa-calendar-alt"></i>
+                                        <span>{{ date('M d, Y', $movies_info->release_date) }}</span>
+                                    </div>
+                                @endif
+
+                                @if ($movies_info->duration)
+                                    <div class="meta-item">
+                                        <i class="fa fa-clock"></i>
+                                        <span>{{ $movies_info->duration }}</span>
+                                    </div>
+                                @endif
+
+                                @if ($movies_info->imdb_rating)
+                                    <div class="meta-item imdb-rating">
+                                        <img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb" class="imdb-logo" />
+                                        <span>{{ $movies_info->imdb_rating }}</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="action-buttons-section">
+                                @if ($movies_info->funding_url)
+                                    <a href="{{ $movies_info->funding_url }}" target="_blank" class="action-btn donate-btn">
+                                        <i class="fas fa-donate"></i>
+                                        <span>Fund/Donate</span>
+                                    </a>
+                                @endif
+
+                                @if ($movies_info->webpage_url)
+                                    <a href="{{ $movies_info->webpage_url }}" target="_blank" class="action-btn webpage-btn">
+                                        <i class="fas fa-globe"></i>
+                                        <span>Webpage</span>
+                                    </a>
+                                @endif
+
+                                @auth
+                                    <form
+                                        action="{{ $user_has_liked ? route('movie-videos.unlike', $movies_info->id) : route('movie-videos.like', $movies_info->id) }}"
+                                        method="POST" class="like-form">
+                                        @csrf
+                                        <button type="submit" class="action-btn like-btn {{ $user_has_liked ? 'liked' : '' }}">
+                                            <i class="fas fa-heart"></i>
+                                            <span class="like-text">{{ $user_has_liked ? 'Unlike' : 'Like' }} ({{ $movies_info->likes }})</span>
+                                        </button>
+                                    </form>
+                                @endauth
+
+                                <button class="action-btn share-btn" data-toggle="modal" data-target="#social-media">
+                                    <i class="fas fa-share-alt"></i>
+                                    <span>{{ trans('words.share_text') }}</span>
+                                </button>
+
+                                <a href="{{ $random_movie ? url('movies/'.$random_movie->video_slug.'/'.$random_movie->id) : URL::to('/') }}" class="action-btn next-btn" id="footer-next-btn">
+                                    <i class="fas fa-step-forward"></i>
+                                    <span>Next</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Right Side News Ticker and Banners -->
@@ -383,355 +731,6 @@
             </div>
         </div>
 
-            <!-- Player Footer Section -->
-            <div class="player-footer-section">
-                <!-- Combined Title, Meta Info, and Action Buttons Row -->
-                <div class="player-footer-unified">
-                    <div class="video-title-section">
-                        <a href="{{ url('movies/details', ['slug' => $movies_info->video_slug, 'id' => $movies_info->id]) }}" class="video-title-link">
-                            <h3 class="video-title">{{ $movies_info->video_title }}</h3>
-                        </a>
-                    </div>
-
-                    <!-- Video Info Meta -->
-                    <div class="player-footer-meta">
-                        <div class="meta-item">
-                            <i class="fa fa-eye"></i>
-                            <span>{{ number_format_short($movies_info->views) }} {{ trans('words.video_views') }}</span>
-                        </div>
-
-                        @if ($movies_info->release_date)
-                            <div class="meta-item">
-                                <i class="fa fa-calendar-alt"></i>
-                                <span>{{ date('M d, Y', $movies_info->release_date) }}</span>
-                            </div>
-                        @endif
-
-                        @if ($movies_info->duration)
-                            <div class="meta-item">
-                                <i class="fa fa-clock"></i>
-                                <span>{{ $movies_info->duration }}</span>
-                            </div>
-                        @endif
-
-                        @if ($movies_info->imdb_rating)
-                            <div class="meta-item imdb-rating">
-                                <img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb" class="imdb-logo" />
-                                <span>{{ $movies_info->imdb_rating }}</span>
-                            </div>
-                        @endif
-                    </div>
-
-                    <div class="action-buttons-section">
-                        @if ($movies_info->funding_url)
-                            <a href="{{ $movies_info->funding_url }}" target="_blank" class="action-btn donate-btn">
-                                <i class="fas fa-donate"></i>
-                                <span>Fund/Donate</span>
-                            </a>
-                        @endif
-
-                        @if ($movies_info->webpage_url)
-                            <a href="{{ $movies_info->webpage_url }}" target="_blank" class="action-btn webpage-btn">
-                                <i class="fas fa-globe"></i>
-                                <span>Webpage</span>
-                            </a>
-                        @endif
-
-                        @auth
-                            <form
-                                action="{{ $user_has_liked ? route('movie-videos.unlike', $movies_info->id) : route('movie-videos.like', $movies_info->id) }}"
-                                method="POST" class="like-form">
-                                @csrf
-                                <button type="submit" class="action-btn like-btn {{ $user_has_liked ? 'liked' : '' }}">
-                                    <i class="fas fa-heart"></i>
-                                    <span class="like-text">{{ $user_has_liked ? 'Unlike' : 'Like' }} ({{ $movies_info->likes }})</span>
-                                </button>
-                            </form>
-                        @endauth
-
-                        <button class="action-btn share-btn" data-toggle="modal" data-target="#social-media">
-                            <i class="fas fa-share-alt"></i>
-                            <span>{{ trans('words.share_text') }}</span>
-                        </button>
-
-                        <a href="{{ $random_movie ? url('movies/'.$random_movie->video_slug.'/'.$random_movie->id) : URL::to('/') }}" class="action-btn next-btn" id="footer-next-btn">
-                            <i class="fas fa-step-forward"></i>
-                            <span>Next</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <style>
-            /* Player Footer Section */
-            .player-footer-section {
-                background: linear-gradient(135deg, #0d0620 0%, #1a0d33 100%);
-                border-radius: 0;
-                margin-top: 0;
-                padding: 20px 25px;
-                box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
-                width: 100%;
-            }
-
-            /* Unified Player Footer - Single Row Layout */
-            .player-footer-unified {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 20px;
-                flex-wrap: wrap;
-            }
-
-            /* Video Title Section */
-            .video-title-section {
-                flex: 0 1 auto;
-                min-width: 200px;
-                max-width: 300px;
-            }
-
-            .video-title-link {
-                text-decoration: none;
-            }
-
-            .video-title {
-                font-size: 20px;
-                font-weight: 700;
-                color: #ffffff;
-                margin: 0;
-                line-height: 1.3;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                transition: color 0.3s ease;
-            }
-
-            .video-title-link:hover .video-title {
-                color: #fe8805;
-            }
-
-            /* Action Buttons Section */
-            .action-buttons-section {
-                display: flex;
-                gap: 10px;
-                flex-wrap: wrap;
-                align-items: center;
-            }
-
-            .like-form {
-                display: inline-block;
-                margin: 0;
-            }
-
-            /* Base Action Button Style */
-            .action-btn {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                padding: 10px 18px;
-                font-size: 13px;
-                font-weight: 600;
-                text-transform: uppercase;
-                color: #ffffff;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                text-decoration: none;
-                gap: 8px;
-                white-space: nowrap;
-            }
-
-            .action-btn i {
-                font-size: 14px;
-            }
-
-            /* Donate Button */
-            .donate-btn {
-                background: linear-gradient(90deg, #fe8805, #ff6b00);
-                box-shadow: 0 2px 8px rgba(254, 136, 5, 0.25);
-            }
-
-            .donate-btn:hover {
-                background: linear-gradient(90deg, #ff6b00, #fe8805);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(254, 136, 5, 0.4);
-                color: #ffffff;
-            }
-
-            /* Webpage Button */
-            .webpage-btn {
-                background: linear-gradient(90deg, #167ac6, #0a789c);
-                box-shadow: 0 2px 8px rgba(22, 122, 198, 0.25);
-            }
-
-            .webpage-btn:hover {
-                background: linear-gradient(90deg, #0a789c, #167ac6);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(22, 122, 198, 0.4);
-                color: #ffffff;
-            }
-
-            /* Like Button */
-            .like-btn {
-                background: linear-gradient(90deg, #fe0278, #d10257);
-                box-shadow: 0 2px 8px rgba(254, 2, 120, 0.25);
-            }
-
-            .like-btn:hover {
-                background: linear-gradient(90deg, #d10257, #fe0278);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(254, 2, 120, 0.4);
-            }
-
-            .like-btn.liked {
-                background: linear-gradient(90deg, #118d04, #0d6b03);
-                box-shadow: 0 2px 8px rgba(17, 141, 4, 0.25);
-            }
-
-            .like-btn.liked:hover {
-                background: linear-gradient(90deg, #0d6b03, #118d04);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(17, 141, 4, 0.4);
-            }
-
-            /* Share Button */
-            .share-btn {
-                background: linear-gradient(90deg, #8e44ad, #6c2d91);
-                box-shadow: 0 2px 8px rgba(142, 68, 173, 0.25);
-            }
-
-            .share-btn:hover {
-                background: linear-gradient(90deg, #6c2d91, #8e44ad);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(142, 68, 173, 0.4);
-                color: #ffffff;
-            }
-
-            /* Next Button */
-            .next-btn {
-                background: linear-gradient(90deg, #2c3e50, #4ca1af);
-                box-shadow: 0 2px 8px rgba(44, 62, 80, 0.25);
-            }
-
-            .next-btn:hover {
-                background: linear-gradient(90deg, #4ca1af, #2c3e50);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(44, 62, 80, 0.4);
-                color: #ffffff;
-            }
-
-            /* Player Footer Meta */
-            .player-footer-meta {
-                display: flex;
-                gap: 15px;
-                flex-wrap: wrap;
-                align-items: center;
-                flex: 1 1 auto;
-                justify-content: center;
-            }
-
-            .meta-item {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                color: #b5b5b5;
-                font-size: 13px;
-                font-weight: 500;
-            }
-
-            .meta-item i {
-                font-size: 14px;
-                color: #fe8805;
-            }
-
-            .meta-item.imdb-rating {
-                background: rgba(245, 197, 24, 0.1);
-                padding: 4px 10px;
-                border-radius: 4px;
-            }
-
-            .imdb-logo {
-                width: 30px;
-                height: auto;
-                vertical-align: middle;
-            }
-
-            .meta-item.imdb-rating span {
-                color: #f5c518;
-                font-weight: 700;
-                font-size: 14px;
-            }
-
-            /* Responsive adjustments */
-            @media (max-width: 992px) {
-                .player-footer-unified {
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 15px;
-                }
-
-                .video-title-section {
-                    width: 100%;
-                    max-width: 100%;
-                }
-
-                .player-footer-meta {
-                    width: 100%;
-                    justify-content: flex-start;
-                    order: 2;
-                }
-
-                .action-buttons-section {
-                    width: 100%;
-                    justify-content: flex-start;
-                    order: 3;
-                }
-
-                .video-title {
-                    font-size: 18px;
-                }
-            }
-
-            @media (max-width: 768px) {
-                .player-footer-section {
-                    padding: 15px 18px;
-                }
-
-                .player-footer-unified {
-                    gap: 12px;
-                }
-
-                .action-btn {
-                    padding: 8px 14px;
-                    font-size: 12px;
-                }
-
-                .action-btn span {
-                    display: none;
-                }
-
-                .action-btn i {
-                    margin: 0;
-                }
-
-                .video-title {
-                    font-size: 16px;
-                    white-space: normal;
-                }
-
-                .player-footer-meta {
-                    gap: 12px;
-                }
-
-                .meta-item {
-                    font-size: 12px;
-                }
-
-                .meta-item i {
-                    font-size: 13px;
-                }
-            }
-            </style>
 @if(request()->getHost() != 'home.cineworm.org')
 
 @if (get_web_banner('home_top') != '')
