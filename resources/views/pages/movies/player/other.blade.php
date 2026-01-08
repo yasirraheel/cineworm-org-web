@@ -295,24 +295,34 @@
             if (player && player.addListener) {
                 console.log('Adding FWDEVPlayer event listeners');
 
-                // Try VIDEO_STOP event
+                // Try video stop event with string type
                 try {
-                    player.addListener(FWDEVPlayer.VIDEO_STOP, function() {
-                        console.log('***** VIDEO_STOP event fired *****');
+                    player.addListener('onVideoStop', function() {
+                        console.log('***** onVideoStop event fired *****');
                         triggerNextVideo();
                     });
                 } catch(e) {
-                    console.log('VIDEO_STOP listener failed:', e);
+                    console.log('onVideoStop listener failed:', e);
                 }
 
-                // Try COMPLETE event
+                // Try video complete/end event
                 try {
-                    player.addListener(FWDEVPlayer.COMPLETE, function() {
-                        console.log('***** COMPLETE event fired *****');
+                    player.addListener('onComplete', function() {
+                        console.log('***** onComplete event fired *****');
                         triggerNextVideo();
                     });
                 } catch(e) {
-                    console.log('COMPLETE listener failed:', e);
+                    console.log('onComplete listener failed:', e);
+                }
+
+                // Try video ended event
+                try {
+                    player.addListener('onVideoEnd', function() {
+                        console.log('***** onVideoEnd event fired *****');
+                        triggerNextVideo();
+                    });
+                } catch(e) {
+                    console.log('onVideoEnd listener failed:', e);
                 }
             }
 
