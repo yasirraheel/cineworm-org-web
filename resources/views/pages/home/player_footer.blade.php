@@ -1,9 +1,38 @@
-<!-- Title and Action Buttons Row -->
-<div class="player-footer-top">
+<!-- Combined Title, Meta Info, and Action Buttons Row -->
+<div class="player-footer-unified">
     <div class="video-title-section">
         <a href="{{ url('movies/details', ['slug' => $movies_info->video_slug, 'id' => $movies_info->id]) }}" class="video-title-link">
             <h3 class="video-title">{{ $movies_info->video_title }}</h3>
         </a>
+    </div>
+
+    <!-- Video Info Meta -->
+    <div class="player-footer-meta">
+        <div class="meta-item">
+            <i class="fa fa-eye"></i>
+            <span>{{ number_format_short($movies_info->views) }} {{ trans('words.video_views') }}</span>
+        </div>
+
+        @if ($movies_info->release_date)
+            <div class="meta-item">
+                <i class="fa fa-calendar-alt"></i>
+                <span>{{ date('M d, Y', $movies_info->release_date) }}</span>
+            </div>
+        @endif
+
+        @if ($movies_info->duration)
+            <div class="meta-item">
+                <i class="fa fa-clock"></i>
+                <span>{{ $movies_info->duration }}</span>
+            </div>
+        @endif
+
+        @if ($movies_info->imdb_rating)
+            <div class="meta-item imdb-rating">
+                <img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb" class="imdb-logo" />
+                <span>{{ $movies_info->imdb_rating }}</span>
+            </div>
+        @endif
     </div>
 
     <div class="action-buttons-section">
@@ -43,33 +72,4 @@
             <span>Next</span>
         </a>
     </div>
-</div>
-
-<!-- Video Info Meta Row -->
-<div class="player-footer-meta">
-    <div class="meta-item">
-        <i class="fa fa-eye"></i>
-        <span>{{ number_format_short($movies_info->views) }} {{ trans('words.video_views') }}</span>
-    </div>
-
-    @if ($movies_info->release_date)
-        <div class="meta-item">
-            <i class="fa fa-calendar-alt"></i>
-            <span>{{ date('M d, Y', $movies_info->release_date) }}</span>
-        </div>
-    @endif
-
-    @if ($movies_info->duration)
-        <div class="meta-item">
-            <i class="fa fa-clock"></i>
-            <span>{{ $movies_info->duration }}</span>
-        </div>
-    @endif
-
-    @if ($movies_info->imdb_rating)
-        <div class="meta-item imdb-rating">
-            <img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb" class="imdb-logo" />
-            <span>{{ $movies_info->imdb_rating }}</span>
-        </div>
-    @endif
 </div>

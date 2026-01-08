@@ -356,12 +356,41 @@
 
             <!-- Player Footer Section -->
             <div class="player-footer-section">
-                <!-- Title and Action Buttons Row -->
-                <div class="player-footer-top">
+                <!-- Combined Title, Meta Info, and Action Buttons Row -->
+                <div class="player-footer-unified">
                     <div class="video-title-section">
                         <a href="{{ url('movies/details', ['slug' => $movies_info->video_slug, 'id' => $movies_info->id]) }}" class="video-title-link">
                             <h3 class="video-title">{{ $movies_info->video_title }}</h3>
                         </a>
+                    </div>
+
+                    <!-- Video Info Meta -->
+                    <div class="player-footer-meta">
+                        <div class="meta-item">
+                            <i class="fa fa-eye"></i>
+                            <span>{{ number_format_short($movies_info->views) }} {{ trans('words.video_views') }}</span>
+                        </div>
+
+                        @if ($movies_info->release_date)
+                            <div class="meta-item">
+                                <i class="fa fa-calendar-alt"></i>
+                                <span>{{ date('M d, Y', $movies_info->release_date) }}</span>
+                            </div>
+                        @endif
+
+                        @if ($movies_info->duration)
+                            <div class="meta-item">
+                                <i class="fa fa-clock"></i>
+                                <span>{{ $movies_info->duration }}</span>
+                            </div>
+                        @endif
+
+                        @if ($movies_info->imdb_rating)
+                            <div class="meta-item imdb-rating">
+                                <img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb" class="imdb-logo" />
+                                <span>{{ $movies_info->imdb_rating }}</span>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="action-buttons-section">
@@ -402,35 +431,6 @@
                         </a>
                     </div>
                 </div>
-
-                <!-- Video Info Meta Row -->
-                <div class="player-footer-meta">
-                    <div class="meta-item">
-                        <i class="fa fa-eye"></i>
-                        <span>{{ number_format_short($movies_info->views) }} {{ trans('words.video_views') }}</span>
-                    </div>
-
-                    @if ($movies_info->release_date)
-                        <div class="meta-item">
-                            <i class="fa fa-calendar-alt"></i>
-                            <span>{{ date('M d, Y', $movies_info->release_date) }}</span>
-                        </div>
-                    @endif
-
-                    @if ($movies_info->duration)
-                        <div class="meta-item">
-                            <i class="fa fa-clock"></i>
-                            <span>{{ $movies_info->duration }}</span>
-                        </div>
-                    @endif
-
-                    @if ($movies_info->imdb_rating)
-                        <div class="meta-item imdb-rating">
-                            <img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb" class="imdb-logo" />
-                            <span>{{ $movies_info->imdb_rating }}</span>
-                        </div>
-                    @endif
-                </div>
             </div>
 
             <style>
@@ -444,21 +444,20 @@
                 width: 100%;
             }
 
-            /* Player Footer Top Section */
-            .player-footer-top {
+            /* Unified Player Footer - Single Row Layout */
+            .player-footer-unified {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 gap: 20px;
-                margin-bottom: 20px;
-                padding-bottom: 15px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                flex-wrap: wrap;
             }
 
             /* Video Title Section */
             .video-title-section {
-                flex: 1;
-                min-width: 0;
+                flex: 0 1 auto;
+                min-width: 200px;
+                max-width: 300px;
             }
 
             .video-title-link {
@@ -466,7 +465,7 @@
             }
 
             .video-title {
-                font-size: 22px;
+                font-size: 20px;
                 font-weight: 700;
                 color: #ffffff;
                 margin: 0;
@@ -595,33 +594,35 @@
             /* Player Footer Meta */
             .player-footer-meta {
                 display: flex;
-                gap: 25px;
+                gap: 15px;
                 flex-wrap: wrap;
                 align-items: center;
+                flex: 1 1 auto;
+                justify-content: center;
             }
 
             .meta-item {
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 6px;
                 color: #b5b5b5;
-                font-size: 14px;
+                font-size: 13px;
                 font-weight: 500;
             }
 
             .meta-item i {
-                font-size: 16px;
+                font-size: 14px;
                 color: #fe8805;
             }
 
             .meta-item.imdb-rating {
                 background: rgba(245, 197, 24, 0.1);
-                padding: 5px 12px;
+                padding: 4px 10px;
                 border-radius: 4px;
             }
 
             .imdb-logo {
-                width: 35px;
+                width: 30px;
                 height: auto;
                 vertical-align: middle;
             }
@@ -629,29 +630,46 @@
             .meta-item.imdb-rating span {
                 color: #f5c518;
                 font-weight: 700;
-                font-size: 15px;
+                font-size: 14px;
             }
 
             /* Responsive adjustments */
             @media (max-width: 992px) {
-                .player-footer-top {
+                .player-footer-unified {
                     flex-direction: column;
                     align-items: flex-start;
+                    gap: 15px;
+                }
+
+                .video-title-section {
+                    width: 100%;
+                    max-width: 100%;
+                }
+
+                .player-footer-meta {
+                    width: 100%;
+                    justify-content: flex-start;
+                    order: 2;
                 }
 
                 .action-buttons-section {
                     width: 100%;
                     justify-content: flex-start;
+                    order: 3;
                 }
 
                 .video-title {
-                    font-size: 20px;
+                    font-size: 18px;
                 }
             }
 
             @media (max-width: 768px) {
                 .player-footer-section {
                     padding: 15px 18px;
+                }
+
+                .player-footer-unified {
+                    gap: 12px;
                 }
 
                 .action-btn {
@@ -668,15 +686,19 @@
                 }
 
                 .video-title {
-                    font-size: 18px;
+                    font-size: 16px;
                     white-space: normal;
                 }
 
                 .player-footer-meta {
-                    gap: 15px;
+                    gap: 12px;
                 }
 
                 .meta-item {
+                    font-size: 12px;
+                }
+
+                .meta-item i {
                     font-size: 13px;
                 }
             }
