@@ -221,7 +221,7 @@ class MoviesController extends Controller
             return view('pages.movies.watch', compact('movies_info', 'related_movies_list', 'random_movie', 'user_has_liked', 'rss_news'));
         }
     }
-    public function like($video_id)
+    public function like(Request $request, $video_id)
     {
         $user = Auth::user();
 
@@ -232,7 +232,10 @@ class MoviesController extends Controller
 
         if ($existingLike) {
             // User has already liked the video, so we'll return a message
-            return response()->json(['message' => 'You have already liked this video.'], 400);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You have already liked this video.'], 400);
+            }
+            return redirect()->back()->with('error', 'You have already liked this video.');
         }
 
         // Create a new like
@@ -247,12 +250,21 @@ class MoviesController extends Controller
             $movie->increment('likes');
         }
 
-        // return response()->json(['message' => 'Video liked successfully', 'likes' => $movie->likes]);
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'liked' => true,
+                'likes' => $movie->likes,
+                'message' => 'Video liked successfully'
+            ]);
+        }
+
         return redirect()->back()->with('success','Video liked successfully');
     }
 
 
-    public function unlike($video_id)
+    public function unlike(Request $request, $video_id)
     {
         // dd($video_id);
         $user = Auth::user();
@@ -263,7 +275,10 @@ class MoviesController extends Controller
                     ->where('movie_video_id', $video_id)
                     ->first();
         if (!$like) {
-            return response()->json(['message' => 'You have not liked this video'], 403);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You have not liked this video'], 400);
+            }
+            return redirect()->back()->with('error', 'You have not liked this video');
         }
 
         // Delete the like
@@ -272,7 +287,16 @@ class MoviesController extends Controller
         // Decrement the likes count on the video
         $video->decrement('likes');
 
-        // return response()->json(['message' => 'Video unliked successfully']);
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'liked' => false,
+                'likes' => $video->likes,
+                'message' => 'Video unliked successfully'
+            ]);
+        }
+
         return redirect()->back()->with('success','Video unliked successfully');
     }
 

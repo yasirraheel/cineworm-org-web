@@ -255,8 +255,12 @@ $(document).ready(function() {
         console.log('loadRandomVideo triggered');
 
         var originalText = $('#stumble-text').text();
-        $('#stumble-text').text('Loading...');
-        $('#stumble-btn').css('pointer-events', 'none');
+        if ($('#stumble-text').length) {
+            $('#stumble-text').text('Loading...');
+        }
+        if ($('#stumble-btn').length) {
+            $('#stumble-btn').css('pointer-events', 'none');
+        }
 
         // Also disable next button if it exists and show loading
         var $nextBtn = $('#footer-next-btn');
@@ -279,28 +283,57 @@ $(document).ready(function() {
                     console.log('Updating player container');
 
                     // Get the container as a DOM element - try multiple selectors
-                    var $container = $('.col-md-7.col-lg-7.col-xl-7');
+                    var $container = null;
+
+                    // Homepage selector (index.blade.php)
+                    $container = $('#main-player-column');
+                    console.log('Trying #main-player-column:', $container.length);
+
+                    // Try specific class combinations
                     if ($container.length === 0) {
-                        $container = $('.col-lg-9.col-md-12');
+                        $container = $('.col-md-9.p-0').first();
+                        console.log('Trying .col-md-9.p-0:', $container.length);
                     }
 
-                    // Specific selector for Watch page
+                    // Try watch page selectors
                     if ($container.length === 0) {
-                        $container = $('.col-md-9.p-0');
+                        $container = $('.col-md-7.col-lg-7.col-xl-7').first();
+                        console.log('Trying .col-md-7.col-lg-7.col-xl-7:', $container.length);
                     }
 
-                    // Fallback for different layouts
+                    if ($container.length === 0) {
+                        $container = $('.col-lg-9.col-md-12').first();
+                        console.log('Trying .col-lg-9.col-md-12:', $container.length);
+                    }
+
+                    // Try finding any col-md-9 or col-lg-9
+                    if ($container.length === 0) {
+                        $container = $('[class*="col-md-9"]').first();
+                        console.log('Trying col-md-9 wildcard:', $container.length);
+                    }
+
+                    if ($container.length === 0) {
+                        $container = $('[class*="col-lg-9"]').first();
+                        console.log('Trying col-lg-9 wildcard:', $container.length);
+                    }
+
+                    // Fallback for slider-area layouts
                     if ($container.length === 0) {
                         $container = $('.slider-area .row > div').first();
+                        console.log('Trying .slider-area fallback:', $container.length);
                     }
 
-                    console.log('Found container:', $container.length);
+                    console.log('Final container found:', $container.length, $container.attr('class'));
 
                     if ($container.length === 0) {
                         console.error('Player container not found!');
-                        alert('Error: Player container not found on page');
-                        $('#stumble-text').text(originalText);
-                        $('#stumble-btn').css('pointer-events', 'auto');
+                        alert('Error: Player container not found on page. Please refresh and try again.');
+                        if ($('#stumble-text').length) {
+                            $('#stumble-text').text(originalText);
+                        }
+                        if ($('#stumble-btn').length) {
+                            $('#stumble-btn').css('pointer-events', 'auto');
+                        }
                         if ($nextBtn.length) {
                             $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
                             $nextBtn.html(originalNextContent);
@@ -368,8 +401,12 @@ $(document).ready(function() {
                     function executeNextScript() {
                         if (scriptIndex >= scripts.length) {
                             console.log('All scripts executed');
-                            $('#stumble-text').text(originalText);
-                            $('#stumble-btn').css('pointer-events', 'auto');
+                            if ($('#stumble-text').length) {
+                                $('#stumble-text').text(originalText);
+                            }
+                            if ($('#stumble-btn').length) {
+                                $('#stumble-btn').css('pointer-events', 'auto');
+                            }
                             // If footer was NOT updated, restore next button
                             if (!response.footerHtml && $nextBtn.length) {
                                 $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
@@ -414,8 +451,12 @@ $(document).ready(function() {
                     console.error('Server returned success=false:', response.error);
                     alert('Error: ' + (response.error || 'Failed to load video'));
 
-                    $('#stumble-text').text(originalText);
-                    $('#stumble-btn').css('pointer-events', 'auto');
+                    if ($('#stumble-text').length) {
+                        $('#stumble-text').text(originalText);
+                    }
+                    if ($('#stumble-btn').length) {
+                        $('#stumble-btn').css('pointer-events', 'auto');
+                    }
                     if ($nextBtn.length) {
                         $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
                         $nextBtn.html(originalNextContent);
@@ -433,8 +474,12 @@ $(document).ready(function() {
 
                 alert(errorMsg);
 
-                $('#stumble-text').text(originalText);
-                $('#stumble-btn').css('pointer-events', 'auto');
+                if ($('#stumble-text').length) {
+                    $('#stumble-text').text(originalText);
+                }
+                if ($('#stumble-btn').length) {
+                    $('#stumble-btn').css('pointer-events', 'auto');
+                }
                 if ($nextBtn.length) {
                     $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
                     $nextBtn.html(originalNextContent);
