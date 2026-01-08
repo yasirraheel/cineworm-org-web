@@ -184,10 +184,10 @@ class MoviesController extends Controller
             $user_has_liked = null;
         }
 
-        // Fetch DW RSS News
+        // Fetch Good News Network RSS News
         $rss_news = [];
         try {
-            $rss_content = @file_get_contents('https://rss.dw.com/xml/rss-en-all');
+            $rss_content = @file_get_contents('https://www.goodnewsnetwork.org/category/news/feed/');
             if ($rss_content) {
                 $rss = simplexml_load_string($rss_content);
                 if ($rss) {
@@ -308,9 +308,9 @@ class MoviesController extends Controller
             return response()->json(['error' => 'Invalid URL'], 400);
         }
 
-        // Basic security check: ensure it is a DW domain
+        // Basic security check: ensure it is a Good News Network domain
         $parsedUrl = parse_url($url);
-        if (!isset($parsedUrl['host']) || strpos($parsedUrl['host'], 'dw.com') === false) {
+        if (!isset($parsedUrl['host']) || strpos($parsedUrl['host'], 'goodnewsnetwork.org') === false) {
             return response()->json(['error' => 'Invalid domain'], 400);
         }
 

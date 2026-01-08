@@ -158,7 +158,7 @@ class IndexController extends Controller
 
         $rss_news = [];
         try {
-            $rss_content = @file_get_contents('https://rss.dw.com/xml/rss-en-all');
+            $rss_content = @file_get_contents('https://www.goodnewsnetwork.org/category/news/feed/');
             if ($rss_content) {
                  $rss = simplexml_load_string($rss_content);
                  if ($rss) {

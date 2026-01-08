@@ -246,10 +246,10 @@ class LiveTvController extends Controller
         $video_obj->increment('views');
         $video_obj->save();
 
-        // Fetch DW RSS News
+        // Fetch Good News Network RSS News
         $rss_news = [];
         try {
-            $rss_content = @file_get_contents('https://rss.dw.com/xml/rss-en-all');
+            $rss_content = @file_get_contents('https://www.goodnewsnetwork.org/category/news/feed/');
             if ($rss_content) {
                 $rss = simplexml_load_string($rss_content);
                 if ($rss) {
