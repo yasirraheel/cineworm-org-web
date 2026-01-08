@@ -85,7 +85,7 @@
             const form = this;
             const button = form.querySelector('.like-btn');
             const likeText = form.querySelector('.like-text');
-            const csrfToken = form.querySelector('input[name="_token"]').value;
+            const formData = new FormData(form);
 
             // Disable button during request
             button.disabled = true;
@@ -93,13 +93,9 @@
             fetch(form.action, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrfToken
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({
-                    _token: csrfToken
-                })
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
