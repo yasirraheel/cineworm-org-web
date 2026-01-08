@@ -85,6 +85,51 @@
             .news-ticker-container::-webkit-scrollbar-track {
                 background: #111;
             }
+
+        /* Responsive News Content Body */
+        #news-content-body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            color: #ccc;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        #news-content-body img,
+        #news-content-body video,
+        #news-content-body iframe,
+        #news-content-body object,
+        #news-content-body embed {
+            max-width: 100% !important;
+            height: auto !important;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        #news-content-body table {
+            display: block;
+            width: 100% !important;
+            overflow-x: auto;
+            border-collapse: collapse;
+        }
+
+        #news-content-body pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #222;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #news-content-body a {
+            color: #fe8805;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
         .news-item {
             margin-bottom: 20px;
             border-bottom: 1px solid #333;
