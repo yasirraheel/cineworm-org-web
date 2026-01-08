@@ -347,6 +347,10 @@ $(document).ready(function() {
                     var $playerButtons = $container.find('.player-buttons-container');
                     var savedButtonsHtml = $playerButtons.length > 0 ? $playerButtons[0].outerHTML : '';
 
+                    // Save the player footer HTML before replacing content
+                    var $playerFooter = $container.find('.player-footer-section');
+                    var savedFooterHtml = $playerFooter.length > 0 ? $playerFooter[0].outerHTML : '';
+
                     // Create a temporary div to parse the HTML
                     var $temp = $('<div>').html(response.playerHtml);
 
@@ -366,6 +370,11 @@ $(document).ready(function() {
                     // Restore the player buttons at the top if they existed
                     if (savedButtonsHtml) {
                         $container.prepend(savedButtonsHtml);
+                    }
+
+                    // Restore the player footer at the bottom if it existed
+                    if (savedFooterHtml) {
+                        $container.append(savedFooterHtml);
                     }
 
                     // Update Footer if provided
