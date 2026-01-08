@@ -65,9 +65,12 @@
         .news-ticker-container {
                 max-height: 550px;
                 overflow-y: auto;
+                overflow-x: hidden;
                 padding: 10px;
                 background: #111;
                 color: #fff;
+                width: 100%;
+                max-width: 100%;
             }
 
             .news-ticker-container::-webkit-scrollbar {
@@ -86,6 +89,10 @@
             margin-bottom: 20px;
             border-bottom: 1px solid #333;
             padding-bottom: 15px;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
         }
         .news-item:last-child {
             border-bottom: none;
@@ -95,11 +102,21 @@
             font-weight: bold;
             margin-bottom: 5px;
             color: #e50914;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
         .news-details {
             font-size: 15px;
             color: #ccc;
             line-height: 1.4;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
         .news-time {
             font-size: 13px;
@@ -156,6 +173,33 @@
             display: block;
         }
 
+        /* Prevent horizontal overflow in news ticker column */
+        .col-md-3.d-flex {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        .card.bg-dark {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        .card-body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* Ensure all news content stays within bounds */
+        .news-item * {
+            max-width: 100%;
+        }
+
+        .news-item a,
+        .news-item img {
+            max-width: 100%;
+            height: auto;
+        }
+
         @media (max-width: 767px) {
             /* News Ticker Mobile Styling */
             .news-ticker-container {
@@ -190,14 +234,27 @@
             .news-item {
                 padding: 12px;
                 margin-bottom: 15px;
+                max-width: 100%;
+                overflow-wrap: break-word;
             }
 
             .news-headline {
                 font-size: 16px;
+                max-width: 100%;
+                overflow-wrap: break-word;
+                word-break: break-word;
             }
 
             .news-details {
                 font-size: 14px;
+                max-width: 100%;
+                overflow-wrap: break-word;
+                word-break: break-word;
+            }
+
+            .news-time {
+                font-size: 12px;
+                overflow-wrap: break-word;
             }
         }
 
