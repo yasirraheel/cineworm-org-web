@@ -217,7 +217,7 @@
                                                     {!! \Illuminate\Support\Str::limit(strip_tags($news['details']), 150) !!}
                                                 </div>
                                                 <span class="news-time">
-                                                    <i class="fa fa-clock-o"></i> {{ $news['created_at'] }}
+                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news['created_at'])->diffForHumans() }}
                                                 </span>
                                                 <a href="#" class="read-dw-news" data-link="{{ $news['link'] }}" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read Full Story</a>
                                             </div>

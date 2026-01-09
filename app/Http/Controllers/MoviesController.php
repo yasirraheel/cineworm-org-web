@@ -320,20 +320,31 @@ class MoviesController extends Controller
 
     public function getNewsContent(Request $request)
     {
+        \Log::info("getNewsContent called with URL: " . $request->query('url'));
+
         $url = $request->query('url');
 
         if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
-            return response()->json(['error' => 'Invalid URL'], 400);
+            \Log::error("getNewsContent: Invalid URL provided: " . $url);
+            return response()->json(['error' => 'Invalid URL provided'], 400);
         }
 
         // Basic security check: ensure URL belongs to one of our RSS feed domains
         $parsedUrl = parse_url($url);
         if (!isset($parsedUrl['host'])) {
-            return response()->json(['error' => 'Invalid URL'], 400);
+            \Log::error("getNewsContent: Could not parse host from URL: " . $url);
+            return response()->json(['error' => 'Invalid URL format'], 400);
         }
 
         // Check if the domain is from one of our active RSS feeds
         $rss_feeds = RssFeed::where('status', 1)->get();
+        \Log::info("getNewsContent: Found " . $rss_feeds->count() . " active RSS feeds");
+
+        if ($rss_feeds->count() == 0) {
+            \Log::error("getNewsContent: No active RSS feeds found in database");
+            return response()->json(['error' => 'No active RSS feeds configured'], 500);
+        }
+
         $validDomain = false;
         foreach ($rss_feeds as $feed) {
             $feedParsedUrl = parse_url($feed->url);
@@ -342,16 +353,19 @@ class MoviesController extends Controller
                 $feedHost = str_replace('www.', '', $feedParsedUrl['host']);
                 $urlHost = str_replace('www.', '', $parsedUrl['host']);
 
+                \Log::info("getNewsContent: Comparing - Feed: $feedHost, Article: $urlHost");
+
                 if (strpos($urlHost, $feedHost) !== false || strpos($feedHost, $urlHost) !== false) {
                     $validDomain = true;
+                    \Log::info("getNewsContent: Domain validation passed for feed: " . $feed->name);
                     break;
                 }
             }
         }
 
         if (!$validDomain) {
-            \Log::error("Invalid domain for news content: " . $parsedUrl['host']);
-            return response()->json(['error' => 'Invalid domain'], 400);
+            \Log::error("getNewsContent: Domain validation failed for: " . $parsedUrl['host']);
+            return response()->json(['error' => 'Article domain does not match any active RSS feed'], 403);
         }
 
         try {
