@@ -750,7 +750,7 @@
                                         @foreach($rss_news as $news)
                                             <div class="news-item">
                                                 <div class="news-headline">
-                                                    <span class="breaking-badge" style="background: #007bff;">WORLD NEWS</span>
+                                                    <span class="breaking-badge" style="background: #007bff;">{{ $news['feed_name'] }}</span>
                                                     {{ $news['headline'] }}
                                                 </div>
                                                 <div class="news-details">
