@@ -175,9 +175,9 @@ class IndexController extends Controller
                 if ($rss_content) {
                      $rss = simplexml_load_string($rss_content);
                      if ($rss) {
-                        $count = 0;
+                        $feed_count = 0;
                         foreach ($rss->channel->item as $item) {
-                            if(count($rss_news) >= 20) break; // Limit total items to 20
+                            if($feed_count >= 10) break; // Limit items per feed to allow mixing
 
                             $image = '';
                             // Try to find image
@@ -189,18 +189,24 @@ class IndexController extends Controller
                                 'headline' => (string)$item->title,
                                 'details' => (string)$item->description,
                                 'created_at' => (string)$item->pubDate,
+                                'timestamp' => strtotime((string)$item->pubDate),
                                 'link' => (string)$item->link,
                                 'image' => $image,
                                 'feed_name' => $feed->name
                             ];
-                            $count++;
+                            $feed_count++;
                         }
                      }
                 }
-
-                // Break if we've reached the limit
-                if(count($rss_news) >= 20) break;
             }
+
+            // Sort by timestamp descending
+            usort($rss_news, function($a, $b) {
+                return $b['timestamp'] - $a['timestamp'];
+            });
+
+            // Limit to top 20
+            $rss_news = array_slice($rss_news, 0, 20);
         } catch (\Exception $e) {
              \Log::error("RSS Fetch Error: " . $e->getMessage());
         }
