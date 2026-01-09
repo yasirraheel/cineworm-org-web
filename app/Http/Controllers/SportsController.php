@@ -13,8 +13,9 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Models\RssFeed;
 use Illuminate\Support\Facades\DB;
-use Intervention\Image\Facades\Image; 
+use Intervention\Image\Facades\Image;
 
 use Session;
 
@@ -243,32 +244,41 @@ class SportsController extends Controller
         $video_obj->increment('views');
         $video_obj->save();
 
-        // Fetch Good News Network RSS News
+        // Fetch RSS News from database
         $rss_news = [];
         try {
-            $rss_content = @file_get_contents('https://www.goodnewsnetwork.org/category/news/feed/');
-            if ($rss_content) {
-                $rss = simplexml_load_string($rss_content);
-                if ($rss) {
-                    $count = 0;
-                    foreach ($rss->channel->item as $item) {
-                        if($count >= 20) break;
+            // Fetch active RSS feeds from database
+            $rss_feeds = RssFeed::where('status', 1)->get();
 
-                        $image = '';
-                        if (isset($item->enclosure) && isset($item->enclosure['url'])) {
-                            $image = (string)$item->enclosure['url'];
+            foreach ($rss_feeds as $feed) {
+                $rss_content = @file_get_contents($feed->url);
+                if ($rss_content) {
+                    $rss = simplexml_load_string($rss_content);
+                    if ($rss) {
+                        $count = 0;
+                        foreach ($rss->channel->item as $item) {
+                            if(count($rss_news) >= 20) break; // Limit total items to 20
+
+                            $image = '';
+                            if (isset($item->enclosure) && isset($item->enclosure['url'])) {
+                                $image = (string)$item->enclosure['url'];
+                            }
+
+                            $rss_news[] = [
+                                'headline' => (string)$item->title,
+                                'details' => (string)$item->description,
+                                'created_at' => (string)$item->pubDate,
+                                'link' => (string)$item->link,
+                                'image' => $image,
+                                'feed_name' => $feed->name
+                            ];
+                            $count++;
                         }
-
-                        $rss_news[] = [
-                            'headline' => (string)$item->title,
-                            'details' => (string)$item->description,
-                            'created_at' => (string)$item->pubDate,
-                            'link' => (string)$item->link,
-                            'image' => $image
-                        ];
-                        $count++;
                     }
                 }
+
+                // Break if we've reached the limit
+                if(count($rss_news) >= 20) break;
             }
         } catch (\Exception $e) {
             \Log::error("RSS Fetch Error: " . $e->getMessage());
