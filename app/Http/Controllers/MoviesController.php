@@ -376,12 +376,13 @@ class MoviesController extends Controller
 
             $content = '';
 
-            // Strategy 1: Try Tribune-specific selectors
+            // Strategy 1: Try multiple content selectors for different news sites
             $queries = [
+                '//div[contains(@class, "story-content")]', // Tribune
                 '//div[contains(@class, "story-detail")]//div[contains(@class, "detail")]',
                 '//div[contains(@class, "story-detail")]',
                 '//div[contains(@class, "content-area")]',
-                '//div[contains(@class, "rich-text")]',
+                '//div[contains(@class, "rich-text")]', // Good News Network
                 '//article[contains(@class, "story")]',
                 '//article',
                 '//div[contains(@class, "entry-content")]',
