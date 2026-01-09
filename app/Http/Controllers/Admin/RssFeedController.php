@@ -75,7 +75,7 @@ class RssFeedController extends MainAdminController
         $obj->name = $inputs['name'];
         $obj->url = $inputs['url'];
         $obj->description = isset($inputs['description']) ? $inputs['description'] : null;
-        $obj->status = isset($inputs['status']) ? 1 : 0;
+        $obj->status = isset($inputs['status']) ? $inputs['status'] : 0;
 
         $obj->save();
 
