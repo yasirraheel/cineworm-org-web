@@ -22,7 +22,8 @@
       "Bash(php test_multiple_feeds.php:*)",
       "Bash(php test_news_fetch.php:*)",
       "Bash(php verify_tribune_fix.php:*)",
-      "Bash(php test_ajax_simple.php:*)"
+      "Bash(php test_ajax_simple.php:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
