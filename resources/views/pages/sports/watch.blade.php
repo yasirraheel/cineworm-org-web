@@ -219,7 +219,7 @@
                                                 <span class="news-time">
                                                     <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news['created_at'])->diffForHumans() }}
                                                 </span>
-                                                <a href="{{ $news['link'] }}" target="_blank" rel="noopener" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;"><i class="fa fa-external-link"></i> Read Full Story</a>
+                                                <a href="#" class="read-dw-news" data-link="{{ $news['link'] }}" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read Full Story</a>
                                             </div>
                                         @endforeach
                                     @endif

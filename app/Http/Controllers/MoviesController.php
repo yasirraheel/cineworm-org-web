@@ -369,19 +369,42 @@ class MoviesController extends Controller
         }
 
         try {
-            // Set a user agent to avoid being blocked
-            $options = [
-                'http' => [
-                    'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n",
-                    'timeout' => 10
-                ]
-            ];
-            $context = stream_context_create($options);
-            $html = @file_get_contents($url, false, $context);
+            // Use cURL with comprehensive headers for better compatibility
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_MAXREDIRS => 5,
+                CURLOPT_TIMEOUT => 15,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_HTTPHEADER => [
+                    'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language: en-US,en;q=0.5',
+                    'Accept-Encoding: gzip, deflate, br',
+                    'Connection: keep-alive',
+                    'Upgrade-Insecure-Requests: 1',
+                    'Sec-Fetch-Dest: document',
+                    'Sec-Fetch-Mode: navigate',
+                    'Sec-Fetch-Site: none',
+                    'Cache-Control: max-age=0'
+                ],
+                CURLOPT_ENCODING => '', // Handle all encodings
+            ]);
 
-            if (!$html) {
-                \Log::error("Failed to fetch content from URL: " . $url);
-                return response()->json(['error' => 'Failed to fetch content'], 500);
+            $html = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($html === false || $httpCode >= 400) {
+                \Log::error("Failed to fetch content from URL: $url (HTTP: $httpCode, cURL Error: $curlError)");
+                return response()->json(['error' => 'Content not available or blocked by source'], 403);
+            }
+
+            if (empty($html)) {
+                \Log::error("Empty content from URL: " . $url);
+                return response()->json(['error' => 'No content received'], 500);
             }
 
             $dom = new \DOMDocument();

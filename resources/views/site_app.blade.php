@@ -541,11 +541,12 @@ $(document).ready(function() {
                     contentBody.find('img').css({'max-width': '100%', 'height': 'auto', 'border-radius': '5px'});
                     contentBody.find('a').css('color', '#fe8805');
                 } else {
-                    contentBody.html('<p class="text-danger" style="padding: 15px;">Could not load full content. <br><a href="'+link+'" target="_blank" style="color: #fe8805;">Click here to read the full article</a></p>');
+                    contentBody.html('<p class="text-danger" style="padding: 15px;"><i class="fa fa-exclamation-triangle"></i> Could not load full content. <br><br><a href="'+link+'" target="_blank" class="btn btn-sm" style="background: #fe8805; color: #fff; text-decoration: none; padding: 8px 15px; border-radius: 4px;"><i class="fa fa-external-link"></i> Open in New Tab</a></p>');
                 }
             },
-            error: function() {
-                 contentBody.html('<p class="text-danger" style="padding: 15px;">Failed to load news. <br><a href="'+link+'" target="_blank" style="color: #fe8805;">Click here to read the full article</a></p>');
+            error: function(xhr) {
+                var errorMsg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Content not available';
+                contentBody.html('<p class="text-danger" style="padding: 15px;"><i class="fa fa-exclamation-triangle"></i> ' + errorMsg + '<br><br><a href="'+link+'" target="_blank" class="btn btn-sm" style="background: #fe8805; color: #fff; text-decoration: none; padding: 8px 15px; border-radius: 4px;"><i class="fa fa-external-link"></i> Open in New Tab</a></p>');
             }
         });
     });
