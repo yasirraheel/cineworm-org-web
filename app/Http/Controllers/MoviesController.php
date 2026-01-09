@@ -321,7 +321,7 @@ class MoviesController extends Controller
     public function getNewsContent(Request $request)
     {
         $url = $request->query('url');
-        
+
         if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
             return response()->json(['error' => 'Invalid URL'], 400);
         }
@@ -337,13 +337,20 @@ class MoviesController extends Controller
         $validDomain = false;
         foreach ($rss_feeds as $feed) {
             $feedParsedUrl = parse_url($feed->url);
-            if (isset($feedParsedUrl['host']) && strpos($parsedUrl['host'], $feedParsedUrl['host']) !== false) {
-                $validDomain = true;
-                break;
+            if (isset($feedParsedUrl['host'])) {
+                // Extract base domain (e.g., tribune.com.pk from www.tribune.com.pk)
+                $feedHost = str_replace('www.', '', $feedParsedUrl['host']);
+                $urlHost = str_replace('www.', '', $parsedUrl['host']);
+
+                if (strpos($urlHost, $feedHost) !== false || strpos($feedHost, $urlHost) !== false) {
+                    $validDomain = true;
+                    break;
+                }
             }
         }
 
         if (!$validDomain) {
+            \Log::error("Invalid domain for news content: " . $parsedUrl['host']);
             return response()->json(['error' => 'Invalid domain'], 400);
         }
 
@@ -351,13 +358,15 @@ class MoviesController extends Controller
             // Set a user agent to avoid being blocked
             $options = [
                 'http' => [
-                    'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n"
+                    'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n",
+                    'timeout' => 10
                 ]
             ];
             $context = stream_context_create($options);
             $html = @file_get_contents($url, false, $context);
 
             if (!$html) {
+                \Log::error("Failed to fetch content from URL: " . $url);
                 return response()->json(['error' => 'Failed to fetch content'], 500);
             }
 
@@ -365,34 +374,57 @@ class MoviesController extends Controller
             @$dom->loadHTML($html); // Suppress warnings for malformed HTML
             $xpath = new \DOMXPath($dom);
 
-            // DW articles usually have content in div.rich-text
-            $nodes = $xpath->query('//div[contains(@class, "rich-text")]');
-            
             $content = '';
-            
-            if ($nodes->length > 0) {
-                // If found, get the inner HTML
-                // We need to iterate over child nodes and export them
-                foreach ($nodes->item(0)->childNodes as $child) {
-                    $content .= $dom->saveHTML($child);
-                }
-            } else {
-                // Fallback: try finding <article> tag
-                $nodes = $xpath->query('//article');
+
+            // Strategy 1: Try Tribune-specific selectors
+            $queries = [
+                '//div[contains(@class, "story-detail")]//div[contains(@class, "detail")]',
+                '//div[contains(@class, "story-detail")]',
+                '//div[contains(@class, "content-area")]',
+                '//div[contains(@class, "rich-text")]',
+                '//article[contains(@class, "story")]',
+                '//article',
+                '//div[contains(@class, "entry-content")]',
+                '//div[contains(@class, "post-content")]',
+                '//div[contains(@class, "article-content")]',
+                '//main//p'
+            ];
+
+            foreach ($queries as $query) {
+                $nodes = $xpath->query($query);
                 if ($nodes->length > 0) {
                     foreach ($nodes->item(0)->childNodes as $child) {
                         $content .= $dom->saveHTML($child);
                     }
-                } else {
-                    // Another fallback: try finding header and rich-text separately if structure is different
-                    // Sometimes title is separate. For now return not found if rich-text is missing.
-                     return response()->json(['error' => 'Content not found'], 404);
+                    if (trim(strip_tags($content)) !== '') {
+                        break;
+                    }
                 }
             }
-            
+
+            // If still no content, try to get all paragraphs
+            if (trim(strip_tags($content)) === '') {
+                $nodes = $xpath->query('//p');
+                $paragraphCount = 0;
+                foreach ($nodes as $node) {
+                    $text = trim($node->textContent);
+                    if (strlen($text) > 50) { // Only include meaningful paragraphs
+                        $content .= $dom->saveHTML($node);
+                        $paragraphCount++;
+                        if ($paragraphCount >= 10) break; // Limit to first 10 paragraphs
+                    }
+                }
+            }
+
+            if (trim(strip_tags($content)) === '') {
+                \Log::error("No content found for URL: " . $url);
+                return response()->json(['error' => 'Content not found'], 404);
+            }
+
             return response()->json(['content' => $content]);
 
         } catch (\Exception $e) {
+            \Log::error("Exception in getNewsContent: " . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
