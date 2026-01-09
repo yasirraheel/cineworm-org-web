@@ -162,8 +162,16 @@ class IndexController extends Controller
             // Fetch active RSS feeds from database
             $rss_feeds = RssFeed::where('status', 1)->get();
 
+            // Set context options with User-Agent header (required by some RSS feeds)
+            $options = [
+                'http' => [
+                    'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n"
+                ]
+            ];
+            $context = stream_context_create($options);
+
             foreach ($rss_feeds as $feed) {
-                $rss_content = @file_get_contents($feed->url);
+                $rss_content = @file_get_contents($feed->url, false, $context);
                 if ($rss_content) {
                      $rss = simplexml_load_string($rss_content);
                      if ($rss) {
