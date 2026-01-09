@@ -18,7 +18,10 @@
       "Bash(curl:*)",
       "Bash(php check_rss_table.php:*)",
       "Bash(php test_tribune_feed.php:*)",
-      "Bash(del check_rss_table.php test_tribune_feed.php)"
+      "Bash(del check_rss_table.php test_tribune_feed.php)",
+      "Bash(php test_multiple_feeds.php:*)",
+      "Bash(php test_news_fetch.php:*)",
+      "Bash(php verify_tribune_fix.php:*)"
     ]
   }
 }

@@ -376,19 +376,39 @@ class MoviesController extends Controller
 
             $content = '';
 
-            // Strategy 1: Try multiple content selectors for different news sites
+            // Strategy 1: Try comprehensive list of content selectors for different news sites
             $queries = [
-                '//div[contains(@class, "story-content")]', // Tribune
-                '//div[contains(@class, "story-detail")]//div[contains(@class, "detail")]',
+                // Tribune Pakistan
+                '//div[contains(@class, "story-content")]',
                 '//div[contains(@class, "story-detail")]',
-                '//div[contains(@class, "content-area")]',
-                '//div[contains(@class, "rich-text")]', // Good News Network
+
+                // Good News Network
+                '//div[contains(@class, "rich-text")]',
+
+                // BBC, CNN, Reuters
                 '//article[contains(@class, "story")]',
-                '//article',
+                '//article[contains(@class, "article")]',
+                '//div[contains(@class, "story-body")]',
+                '//div[contains(@class, "article-body")]',
+                '//div[contains(@class, "article__body")]',
+
+                // WordPress sites
                 '//div[contains(@class, "entry-content")]',
                 '//div[contains(@class, "post-content")]',
+                '//div[contains(@class, "content-area")]',
+
+                // Generic article tags
+                '//article',
+                '//main[contains(@class, "content")]',
                 '//div[contains(@class, "article-content")]',
-                '//main//p'
+                '//div[contains(@class, "main-content")]',
+
+                // Dawn, Geo News, other Pakistani sites
+                '//div[contains(@class, "detail")]',
+                '//div[contains(@class, "story")]',
+
+                // Last resort: main tag with paragraphs
+                '//main',
             ];
 
             foreach ($queries as $query) {
@@ -397,22 +417,30 @@ class MoviesController extends Controller
                     foreach ($nodes->item(0)->childNodes as $child) {
                         $content .= $dom->saveHTML($child);
                     }
-                    if (trim(strip_tags($content)) !== '') {
+                    $textContent = trim(strip_tags($content));
+                    // Only accept if we got meaningful content (at least 100 chars)
+                    if (strlen($textContent) > 100) {
                         break;
+                    } else {
+                        $content = ''; // Reset and try next selector
                     }
                 }
             }
 
-            // If still no content, try to get all paragraphs
+            // Strategy 2: If still no content, extract all meaningful paragraphs from body
             if (trim(strip_tags($content)) === '') {
-                $nodes = $xpath->query('//p');
+                $paragraphs = $xpath->query('//body//p');
                 $paragraphCount = 0;
-                foreach ($nodes as $node) {
+                $foundContent = false;
+
+                foreach ($paragraphs as $node) {
                     $text = trim($node->textContent);
-                    if (strlen($text) > 50) { // Only include meaningful paragraphs
+                    // Only include paragraphs with substantial content
+                    if (strlen($text) > 80) {
                         $content .= $dom->saveHTML($node);
                         $paragraphCount++;
-                        if ($paragraphCount >= 10) break; // Limit to first 10 paragraphs
+                        $foundContent = true;
+                        if ($paragraphCount >= 15) break; // Get more paragraphs for better content
                     }
                 }
             }
