@@ -17,6 +17,8 @@
                                 class="fa fa-list"></i><span>{{ trans('words.genres_text') }}</span></a></li>
                     <li><a href="{{ URL::to('admin/news_ticker') }}" class="waves-effect {{ classActivePath('news_ticker') }}"><i
                                 class="fa fa-newspaper-o"></i><span>News Ticker</span></a></li>
+                    <li><a href="{{ URL::to('admin/rss_feeds') }}" class="waves-effect {{ classActivePath('rss_feeds') }}"><i
+                                class="fa fa-rss"></i><span>RSS Feeds</span></a></li>
                     <li><a href="{{ URL::to('admin/home_sections') }}" class="waves-effect {{ classActivePath('home_sections') }}"><i
                                 class="fa fa-home"></i><span>{{ trans('words.home_section') }}</span></a></li>
 

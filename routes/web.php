@@ -193,6 +193,11 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('news_ticker/edit/{id}', 'NewsTickerController@edit');
         Route::get('news_ticker/delete/{id}', 'NewsTickerController@delete');
 
+        Route::get('rss_feeds', 'RssFeedController@index');
+        Route::post('rss_feeds/save', 'RssFeedController@save');
+        Route::get('rss_feeds/edit/{id}', 'RssFeedController@edit');
+        Route::get('rss_feeds/delete/{id}', 'RssFeedController@delete');
+
 
         Route::get('general_settings', 'SettingsController@general_settings');
         Route::post('general_settings', 'SettingsController@update_general_settings');
