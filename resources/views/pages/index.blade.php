@@ -1736,15 +1736,14 @@
             var btn = document.getElementById('open-game-modal');
             var closeBtn = document.getElementById('close-game-modal');
             var iframe = document.getElementById('game-iframe');
-            var gameUrl = "{{ URL::asset('games/Watermelon/index.html') }}";
+            var gameUrl = "{{ URL::asset('games/Watermelon/index.html') }}?v={{ time() }}";
 
             // Open Modal
             if(btn){
                 btn.onclick = function() {
                     modal.style.display = "flex";
-                    if(iframe.src === "" || iframe.src === "about:blank") {
-                        iframe.src = gameUrl;
-                    }
+                    // Always reload to ensure fresh logs
+                    iframe.src = gameUrl;
                 }
             }
 
