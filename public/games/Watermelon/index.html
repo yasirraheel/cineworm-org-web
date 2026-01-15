@@ -21,54 +21,6 @@
 <body>
 
 <script>
-(function() {
-    // Debug overlay
-    var debugDiv = document.createElement('div');
-    debugDiv.id = 'debug-log';
-    debugDiv.style.cssText = "position:fixed; top:0; left:0; width:100%; height:50%; overflow:auto; background:rgba(0,0,0,0.8); color:lime; z-index:9999; pointer-events:none; font-family:monospace; font-size:12px; display:block;";
-    debugDiv.innerHTML = "<div>Debug Log Started...</div>";
-    document.body.appendChild(debugDiv);
-
-    function logToScreen(msg, color) {
-        if (!debugDiv) return;
-        var div = document.createElement('div');
-        div.style.color = color || 'lime';
-        div.textContent = '[' + new Date().toISOString().split('T')[1] + '] ' + msg;
-        debugDiv.appendChild(div);
-        debugDiv.scrollTop = debugDiv.scrollHeight;
-    }
-
-    var originalLog = console.log;
-    var originalWarn = console.warn;
-    var originalError = console.error;
-
-    console.log = function() {
-        var args = Array.prototype.slice.call(arguments);
-        originalLog.apply(console, args);
-        logToScreen(args.join(' '), 'lime');
-    };
-    console.warn = function() {
-        var args = Array.prototype.slice.call(arguments);
-        originalWarn.apply(console, args);
-        logToScreen(args.join(' '), 'yellow');
-    };
-    console.error = function() {
-        var args = Array.prototype.slice.call(arguments);
-        originalError.apply(console, args);
-        logToScreen(args.join(' '), 'red');
-    };
-
-    window.onerror = function(msg, url, line, col, error) {
-        logToScreen("Global Error: " + msg + " (" + url + ":" + line + ":" + col + ")", 'red');
-        if (error && error.stack) logToScreen(error.stack, 'red');
-    };
-
-    window.addEventListener('unhandledrejection', function(event) {
-        logToScreen("Unhandled Rejection: " + event.reason, 'red');
-    });
-})();
-</script>
-<script>
 if (location.protocol.substr(0, 4) === "file")
 {
 	alert("Web exports won't work until you upload them. (When running on the file: protocol, browsers block many features from working for security reasons.)");
@@ -81,10 +33,10 @@ if (location.protocol.substr(0, 4) === "file")
 			<p class="notSupportedMessage">JavaScript appears to be disabled. Please enable it to view this content.</p>
 		</div>
 	</noscript>
-	<script src="scripts/supportcheck.js?v=2"></script>
-	<script src="scripts/offlineclient.js?v=2" type="module"></script>
-	<script src="scripts/main.js?v=2" type="module"></script>
-	<script src="scripts/register-sw.js?v=2" type="module"></script>
+	<script src="scripts/supportcheck.js"></script>
+	<script src="scripts/offlineclient.js" type="module"></script>
+	<script src="scripts/main.js" type="module"></script>
+	<script src="scripts/register-sw.js" type="module"></script>
 
 </body>
 </html>
