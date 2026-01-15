@@ -1,19 +1,4 @@
-'use strict';
-(function(){
-    var originalLog = console.log;
-    var originalWarn = console.warn;
-    var originalError = console.error;
-
-    function sendLog(type, args) {
-        var msg = Array.prototype.slice.call(args).join(' ');
-        self.postMessage({type: "console-log", level: type, message: msg});
-    }
-
-    console.log = function() { sendLog('log', arguments); originalLog.apply(console, arguments); };
-    console.warn = function() { sendLog('warn', arguments); originalWarn.apply(console, arguments); };
-    console.error = function() { sendLog('error', arguments); originalError.apply(console, arguments); };
-})();
-let hasInitialised=false;let runtime=null;function HandleInitRuntimeMessage(e){const data=e.data;if(data&&data["type"]==="init-runtime"){InitRuntime(data);self.removeEventListener("message",HandleInitRuntimeMessage)}}self.addEventListener("message",HandleInitRuntimeMessage);self.c3_import=url=>import(url);function IsAbsoluteURL(url){return/^(?:[a-z\-]+:)?\/\//.test(url)||url.substr(0,5)==="data:"||url.substr(0,5)==="blob:"}function IsRelativeURL(url){return!IsAbsoluteURL(url)}
+'use strict';let hasInitialised=false;let runtime=null;function HandleInitRuntimeMessage(e){const data=e.data;if(data&&data["type"]==="init-runtime"){InitRuntime(data);self.removeEventListener("message",HandleInitRuntimeMessage)}}self.addEventListener("message",HandleInitRuntimeMessage);self.c3_import=url=>import(url);function IsAbsoluteURL(url){return/^(?:[a-z\-]+:)?\/\//.test(url)||url.substr(0,5)==="data:"||url.substr(0,5)==="blob:"}function IsRelativeURL(url){return!IsAbsoluteURL(url)}
 async function LoadScripts(scriptsArr){if(scriptsArr.length===1){const url=scriptsArr[0];await import(((IsRelativeURL(url)?"./":"")+url))}else{const scriptStr=scriptsArr.map(url=>`import "${IsRelativeURL(url)?"./":""}${url}";`).join("\n");const blobUrl=URL.createObjectURL(new Blob([scriptStr],{type:"application/javascript"}));try{await import(blobUrl)}catch(err){console.warn("[Construct] Unable to import script from blob: URL. Falling back to loading scripts sequentially, which could significantly increase loading time. Make sure blob: URLs are allowed for best performance.",
 err);for(const url of scriptsArr)await import(((IsRelativeURL(url)?"./":"")+url))}}}
 async function InitRuntime(data){if(hasInitialised)throw new Error("already initialised");hasInitialised=true;const messagePort=data["messagePort"];const runtimeBaseUrl=data["runtimeBaseUrl"];const exportType=data["exportType"];self.devicePixelRatio=data["devicePixelRatio"];const workerDependencyScripts=data["workerDependencyScripts"].map(urlOrBlob=>{let url=urlOrBlob;if(urlOrBlob instanceof Blob)url=URL.createObjectURL(urlOrBlob);else url=(new URL(url,runtimeBaseUrl)).toString();return url});const runOnStartupFunctions=
