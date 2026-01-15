@@ -146,12 +146,12 @@ this._baseUrl,{name:"JobWorker"+number});const dispatchChannel=new MessageChanne
         try {
             window["c3_runtimeInterface"] = new self.RuntimeInterface({
                 useWorker: enableWorker,
-                workerMainUrl: "workermain.js",
+                workerMainUrl: "scripts/workermain.js",
                 engineScripts: ["scripts/c3runtime.js"],
                 projectScripts: [],
                 mainProjectScript: "",
                 scriptFolder: "scripts/",
-                workerDependencyScripts: ["box2d.wasm.js"],
+                workerDependencyScripts: ["scripts/box2d.wasm.js"],
                 exportType: "html5"
             });
             console.log("main.js: RuntimeInterface created successfully.");
