@@ -1724,18 +1724,19 @@
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             .game-modal {
-                width: 95% !important;
-                height: 80vh !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) !important;
+                width: 85% !important;
+                height: 60vh !important;
+                /* Use initial centered position but allow overriding via JS (no !important on position) */
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
                 border-radius: 4px;
                 resize: none;
             }
 
             .game-modal-header {
                 padding: 15px; /* Larger touch target */
-                cursor: default; /* Disable move cursor on mobile */
+                cursor: move; /* Enable move cursor on mobile */
             }
 
             .game-modal-close {
@@ -1789,28 +1790,56 @@
                 var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
                 var header = document.getElementById("game-modal-header");
                 if (header) {
+                    // Mouse events
                     header.onmousedown = dragMouseDown;
+                    // Touch events
+                    header.addEventListener('touchstart', dragMouseDown, {passive: false});
                 }
 
                 function dragMouseDown(e) {
                     e = e || window.event;
-                    e.preventDefault();
+
+                    var clientX, clientY;
+                    if (e.type === 'touchstart') {
+                         clientX = e.touches[0].clientX;
+                         clientY = e.touches[0].clientY;
+                    } else {
+                        e.preventDefault();
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    }
+
                     // get the mouse cursor position at startup:
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
-                    document.onmouseup = closeDragElement;
-                    // call a function whenever the cursor moves:
-                    document.onmousemove = elementDrag;
+                    pos3 = clientX;
+                    pos4 = clientY;
+
+                    if (e.type === 'touchstart') {
+                        document.addEventListener('touchend', closeDragElement);
+                        document.addEventListener('touchmove', elementDrag, {passive: false});
+                    } else {
+                        document.onmouseup = closeDragElement;
+                        document.onmousemove = elementDrag;
+                    }
                 }
 
                 function elementDrag(e) {
                     e = e || window.event;
-                    e.preventDefault();
+                    if (e.preventDefault) e.preventDefault(); // Prevent scrolling on mobile
+
+                    var clientX, clientY;
+                    if (e.type === 'touchmove') {
+                         clientX = e.touches[0].clientX;
+                         clientY = e.touches[0].clientY;
+                    } else {
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    }
+
                     // calculate the new cursor position:
-                    pos1 = pos3 - e.clientX;
-                    pos2 = pos4 - e.clientY;
-                    pos3 = e.clientX;
-                    pos4 = e.clientY;
+                    pos1 = pos3 - clientX;
+                    pos2 = pos4 - clientY;
+                    pos3 = clientX;
+                    pos4 = clientY;
                     // set the element's new position:
                     elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
                     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
@@ -1822,6 +1851,8 @@
                     // stop moving when mouse button is released:
                     document.onmouseup = null;
                     document.onmousemove = null;
+                    document.removeEventListener('touchend', closeDragElement);
+                    document.removeEventListener('touchmove', elementDrag);
                 }
             }
         });
