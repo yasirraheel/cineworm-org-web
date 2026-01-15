@@ -571,6 +571,73 @@
                 font-size: 13px;
             }
         }
+
+        /* Game Button */
+        .game-btn {
+            background: linear-gradient(90deg, #e67e22, #d35400);
+            box-shadow: 0 2px 8px rgba(230, 126, 34, 0.25);
+        }
+        .game-btn:hover {
+            background: linear-gradient(90deg, #d35400, #e67e22);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
+            color: #ffffff;
+        }
+
+        /* Draggable Game Modal */
+        .game-modal {
+            position: fixed;
+            z-index: 99999; /* High z-index to be on top of everything */
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 700px;
+            background-color: #fff;
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            overflow: hidden;
+            resize: both;
+            overflow: auto;
+        }
+
+        .game-modal-header {
+            padding: 10px 15px;
+            cursor: move;
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+        }
+
+        .game-modal-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .game-modal-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+        }
+        .game-modal-close:hover {
+            color: #fe8805;
+        }
+
+        .game-modal-body {
+            flex-grow: 1;
+            background-color: #000;
+            position: relative;
+        }
     </style>
 
     <!-- Start Page Content Area -->
@@ -696,6 +763,11 @@
                                         </button>
                                     </form>
                                 @endauth
+
+                                <button class="action-btn game-btn" id="open-game-modal">
+                                    <i class="fas fa-gamepad"></i>
+                                    <span>Play Watermelon</span>
+                                </button>
 
                                 <button class="action-btn share-btn" data-toggle="modal" data-target="#social-media">
                                     <i class="fas fa-share-alt"></i>
@@ -1643,6 +1715,87 @@
                         button.disabled = false;
                     });
                 });
+            }
+        });
+    </script>
+
+    <!-- Watermelon Game Modal -->
+    <div id="watermelon-game-modal" class="game-modal" style="display: none;">
+        <div class="game-modal-header" id="game-modal-header">
+            <span class="game-modal-title">Watermelon Game</span>
+            <button class="game-modal-close" id="close-game-modal">&times;</button>
+        </div>
+        <div class="game-modal-body">
+            <iframe id="game-iframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var modal = document.getElementById('watermelon-game-modal');
+            var btn = document.getElementById('open-game-modal');
+            var closeBtn = document.getElementById('close-game-modal');
+            var iframe = document.getElementById('game-iframe');
+            var gameUrl = "{{ URL::asset('games/Watermelon/index.html') }}";
+
+            // Open Modal
+            if(btn){
+                btn.onclick = function() {
+                    modal.style.display = "flex";
+                    if(iframe.src === "" || iframe.src === "about:blank") {
+                        iframe.src = gameUrl;
+                    }
+                }
+            }
+
+            // Close Modal
+            if(closeBtn){
+                closeBtn.onclick = function() {
+                    modal.style.display = "none";
+                }
+            }
+
+            // Draggable Logic
+            dragElement(modal);
+
+            function dragElement(elmnt) {
+                var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                var header = document.getElementById("game-modal-header");
+                if (header) {
+                    header.onmousedown = dragMouseDown;
+                }
+
+                function dragMouseDown(e) {
+                    e = e || window.event;
+                    e.preventDefault();
+                    // get the mouse cursor position at startup:
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    document.onmouseup = closeDragElement;
+                    // call a function whenever the cursor moves:
+                    document.onmousemove = elementDrag;
+                }
+
+                function elementDrag(e) {
+                    e = e || window.event;
+                    e.preventDefault();
+                    // calculate the new cursor position:
+                    pos1 = pos3 - e.clientX;
+                    pos2 = pos4 - e.clientY;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    // set the element's new position:
+                    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                    // Remove transform centering once dragged
+                    elmnt.style.transform = "none";
+                }
+
+                function closeDragElement() {
+                    // stop moving when mouse button is released:
+                    document.onmouseup = null;
+                    document.onmousemove = null;
+                }
             }
         });
     </script>
