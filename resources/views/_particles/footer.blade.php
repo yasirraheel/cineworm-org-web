@@ -366,7 +366,7 @@
 <script>
     // Detect iOS devices
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+    const isAppInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
 
     // Check if banner was dismissed recently (within 7 days)
     const dismissedTime = localStorage.getItem('pwa-banner-dismissed');
@@ -381,7 +381,7 @@
     // iOS specific handling
     if (isIOS) {
         // Don't show banner if already installed (standalone mode)
-        if (!isInStandaloneMode && shouldShowBanner) {
+        if (!isAppInStandaloneMode && shouldShowBanner) {
             // Show iOS-specific banner
             document.getElementById('pwa-install-banner').style.display = 'block';
             document.getElementById('pwa-banner-desc').textContent = 'Install on your home screen for a better experience!';
