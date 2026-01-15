@@ -33,6 +33,53 @@ if (location.protocol.substr(0, 4) === "file")
 			<p class="notSupportedMessage">JavaScript appears to be disabled. Please enable it to view this content.</p>
 		</div>
 	</noscript>
+    
+    <!-- Debug Log Overlay -->
+    <div id="debug-log" style="position:fixed; top:0; left:0; width:100%; height:50%; overflow:auto; background:rgba(0,0,0,0.8); color:lime; z-index:9999; pointer-events:none; font-family:monospace; font-size:12px; display:block;">
+        <div>Debug Log Started...</div>
+    </div>
+    <script>
+        (function() {
+            var debugDiv = document.getElementById('debug-log');
+            function logToScreen(msg, color) {
+                if (!debugDiv) return;
+                var div = document.createElement('div');
+                div.style.color = color || 'lime';
+                div.textContent = '[' + new Date().toISOString().split('T')[1] + '] ' + msg;
+                debugDiv.appendChild(div);
+                debugDiv.scrollTop = debugDiv.scrollHeight;
+            }
+
+            var originalLog = console.log;
+            console.log = function() {
+                var args = Array.prototype.slice.call(arguments);
+                originalLog.apply(console, args);
+                logToScreen(args.join(' '), 'lime');
+            };
+
+            var originalWarn = console.warn;
+            console.warn = function() {
+                var args = Array.prototype.slice.call(arguments);
+                originalWarn.apply(console, args);
+                logToScreen(args.join(' '), 'yellow');
+            };
+
+            var originalError = console.error;
+            console.error = function() {
+                var args = Array.prototype.slice.call(arguments);
+                originalError.apply(console, args);
+                logToScreen(args.join(' '), 'red');
+            };
+
+            window.onerror = function(message, source, lineno, colno, error) {
+                logToScreen("Global Error: " + message + " at " + source + ":" + lineno + ":" + colno, 'red');
+                return false;
+            };
+            
+            console.log("Console overrides initialized.");
+        })();
+    </script>
+
 	<script src="scripts/supportcheck.js"></script>
 	<script src="scripts/offlineclient.js" type="module"></script>
 	<script src="scripts/main.js" type="module"></script>
