@@ -584,60 +584,6 @@
             color: #ffffff;
         }
 
-        /* Draggable Game Modal */
-        .game-modal {
-            position: fixed;
-            z-index: 99999; /* High z-index to be on top of everything */
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 450px;
-            height: 700px;
-            background-color: #fff;
-            border: 1px solid #333;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            border-radius: 8px;
-            overflow: hidden;
-            resize: both;
-            overflow: auto;
-        }
-
-        .game-modal-header {
-            padding: 10px 15px;
-            cursor: move;
-            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
-            color: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #444;
-        }
-
-        .game-modal-title {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .game-modal-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            line-height: 1;
-            padding: 0;
-        }
-        .game-modal-close:hover {
-            color: #fe8805;
-        }
-
-        .game-modal-body {
-            flex-grow: 1;
-            background-color: #000;
-            position: relative;
-        }
     </style>
 
     <!-- Start Page Content Area -->
@@ -1719,6 +1665,86 @@
         });
     </script>
 
+    <style>
+        /* Game Modal Styling */
+        .game-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 600px;
+            background: #000;
+            border: 2px solid #fe8805;
+            border-radius: 8px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            resize: both;
+            overflow: hidden;
+        }
+
+        .game-modal-header {
+            padding: 10px 15px;
+            background: #1a1a1a;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-bottom: 1px solid #333;
+        }
+
+        .game-modal-title {
+            font-weight: bold;
+            color: #fe8805;
+        }
+
+        .game-modal-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .game-modal-close:hover {
+            color: #fe8805;
+        }
+
+        .game-modal-body {
+            flex: 1;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .game-modal {
+                width: 95% !important;
+                height: 80vh !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                border-radius: 4px;
+                resize: none;
+            }
+
+            .game-modal-header {
+                padding: 15px; /* Larger touch target */
+                cursor: default; /* Disable move cursor on mobile */
+            }
+
+            .game-modal-close {
+                font-size: 28px;
+                padding: 5px;
+            }
+        }
+    </style>
+
     <!-- Watermelon Game Modal -->
     <div id="watermelon-game-modal" class="game-modal" style="display: none;">
         <div class="game-modal-header" id="game-modal-header">
@@ -1742,6 +1768,7 @@
             if(btn){
                 btn.onclick = function() {
                     modal.style.display = "flex";
+                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
                     // Always reload to ensure fresh logs
                     iframe.src = gameUrl;
                 }
@@ -1751,6 +1778,7 @@
             if(closeBtn){
                 closeBtn.onclick = function() {
                     modal.style.display = "none";
+                    document.body.style.overflow = ''; // Restore background scrolling
                 }
             }
 
