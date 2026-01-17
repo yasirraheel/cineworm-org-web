@@ -715,6 +715,11 @@
                                     <span>Play Watermelon</span>
                                 </button>
 
+                                <button class="action-btn game-btn" id="open-pacman-modal" style="background: linear-gradient(90deg, #f1c40f, #f39c12); box-shadow: 0 2px 8px rgba(241, 196, 15, 0.25);">
+                                    <i class="fas fa-ghost"></i>
+                                    <span>Play Pacman</span>
+                                </button>
+
                                 <button class="action-btn share-btn" data-toggle="modal" data-target="#social-media">
                                     <i class="fas fa-share-alt"></i>
                                     <span>{{ trans('words.share_text') }}</span>
@@ -1746,10 +1751,10 @@
         }
     </style>
 
-    <!-- Watermelon Game Modal -->
+    <!-- Game Modal -->
     <div id="watermelon-game-modal" class="game-modal" style="display: none;">
         <div class="game-modal-header" id="game-modal-header">
-            <span class="game-modal-title">Watermelon Game</span>
+            <span class="game-modal-title" id="game-modal-title">Game</span>
             <button class="game-modal-close" id="close-game-modal">&times;</button>
         </div>
         <div class="game-modal-body">
@@ -1761,17 +1766,33 @@
         document.addEventListener('DOMContentLoaded', function() {
             var modal = document.getElementById('watermelon-game-modal');
             var btn = document.getElementById('open-game-modal');
+            var pacmanBtn = document.getElementById('open-pacman-modal');
             var closeBtn = document.getElementById('close-game-modal');
             var iframe = document.getElementById('game-iframe');
-            var gameUrl = "{{ URL::asset('games/Watermelon/index.html') }}?v={{ time() }}";
+            var modalTitle = document.getElementById('game-modal-title');
 
-            // Open Modal
+            var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}?v={{ time() }}";
+            var pacmanUrl = "{{ URL::asset('games/pacman/index.html') }}?v={{ time() }}";
+
+            // Open Watermelon Modal
             if(btn){
                 btn.onclick = function() {
+                    if(modalTitle) modalTitle.innerText = "Watermelon Game";
                     modal.style.display = "flex";
                     document.body.style.overflow = 'hidden'; // Prevent background scrolling
                     // Always reload to ensure fresh logs
-                    iframe.src = gameUrl;
+                    iframe.src = watermelonUrl;
+                }
+            }
+
+            // Open Pacman Modal
+            if(pacmanBtn){
+                pacmanBtn.onclick = function() {
+                    if(modalTitle) modalTitle.innerText = "Pacman Game";
+                    modal.style.display = "flex";
+                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                    // Always reload to ensure fresh logs
+                    iframe.src = pacmanUrl;
                 }
             }
 
@@ -1780,6 +1801,7 @@
                 closeBtn.onclick = function() {
                     modal.style.display = "none";
                     document.body.style.overflow = ''; // Restore background scrolling
+                    iframe.src = ""; // Stop game execution
                 }
             }
 
