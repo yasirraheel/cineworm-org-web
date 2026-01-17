@@ -500,6 +500,13 @@ $(document).ready(function() {
 
     // Bind click event to Stumble button
     $('#stumble-btn').on('click', function(e) {
+        // Check if we are on the movies page
+        var currentPath = window.location.pathname;
+        if (currentPath === '/movies' || currentPath === '/movies/') {
+             window.location.href = "{{ URL::to('/') }}";
+             return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
