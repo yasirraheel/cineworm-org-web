@@ -882,7 +882,16 @@ Pacman.Audio = function(game) {
             endEvents[name] = function() { ended(name); };
             playing.push(name);
             files[name].addEventListener("ended", endEvents[name], true);
-            files[name].play();
+            try {
+                var result = files[name].play();
+                if (result !== undefined) {
+                    result.catch(function(error) {
+                        console.log("Audio play failed:", error);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio play error:", e);
+            }
         }
     };
 
@@ -1212,7 +1221,18 @@ var PACMAN = (function () {
             callback();
         } else {
             var x = arr.pop();
-            audio.load(x[0], x[1], function() { load(arr, callback); });
+            var done = false;
+            var next = function() {
+                if (!done) {
+                    done = true;
+                    load(arr, callback);
+                }
+            };
+
+            // Timeout to prevent hanging if audio fails to load
+            setTimeout(next, 1000);
+
+            audio.load(x[0], x[1], next);
         }
     };
 
