@@ -1772,7 +1772,8 @@
             var modalTitle = document.getElementById('game-modal-title');
 
             var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}?v={{ time() }}";
-            var pacmanUrl = "{{ URL::asset('games/pacman/index.html') }}?v={{ time() }}";
+            // Use external Pacman game URL from existing embed
+            var pacmanUrl = "https://pacman.platzh1rsch.ch/";
 
             // Open Watermelon Modal
             if(btn){
