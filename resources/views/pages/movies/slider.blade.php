@@ -176,7 +176,7 @@
                             <div class="pacman-game-container">
                                 <div class="pacman-game-wrapper">
                                     <iframe
-                                        src="https://pacman.platzh1rsch.ch/"
+                                        src="{{ URL::asset('games/pacman/index.html') }}?v={{ time() }}"
                                         style="width: 100%; height: 100%; border: none;"
                                         allowfullscreen
                                         title="Pacman Game">

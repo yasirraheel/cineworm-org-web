@@ -1487,7 +1487,7 @@
             if (gameWrapper) {
                 // Create iframe element
                 var iframe = document.createElement('iframe');
-                iframe.src = 'https://pacman.platzh1rsch.ch/';
+                iframe.src = "{{ URL::asset('games/pacman/index.html') }}?v={{ time() }}";
                 iframe.style.width = '100%';
                 iframe.style.height = '100%';
                 iframe.style.border = 'none';
@@ -1772,8 +1772,8 @@
             var modalTitle = document.getElementById('game-modal-title');
 
             var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}?v={{ time() }}";
-            // Use external Pacman game URL from existing embed
-            var pacmanUrl = "https://pacman.platzh1rsch.ch/";
+            // Use local Pacman game
+            var pacmanUrl = "{{ URL::asset('games/pacman/index.html') }}?v={{ time() }}";
 
             // Open Watermelon Modal
             if(btn){
