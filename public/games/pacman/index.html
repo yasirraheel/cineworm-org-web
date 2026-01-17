@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Maintenance - Moota.co</title>
+	<title>Pacman Game</title>
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Permanent+Marker">
 	<style type="text/css">
 		body {
@@ -20,15 +20,55 @@
 		#pacman {
 			width: 100%;
 			max-width: 450px;
-			margin: 10px auto;
+			margin: 5px auto;
 			position: relative;
+            display: flex;
+            justify-content: center;
 		}
 
 		#pacman canvas {
-			width: 100%;
+			max-width: 100%;
+            max-height: 60vh;
+			width: auto;
 			height: auto;
 			display: block;
 		}
+
+        .dpad {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+            gap: 5px;
+            touch-action: none;
+        }
+        .dpad-row {
+            display: flex;
+            gap: 15px;
+        }
+        .dpad-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(254, 136, 5, 0.2);
+            border: 2px solid #fe8805;
+            border-radius: 50%;
+            color: #fe8805;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .dpad-btn:active {
+            background: #fe8805;
+            color: black;
+        }
+
+        @media (max-width: 768px) {
+            .dpad { display: flex; }
+        }
 
 		#shim {
 			font-family: 'Permanent Marker', cursive;
@@ -77,6 +117,15 @@
 	</div>
 
 	<div id="pacman"></div>
+
+    <div class="dpad">
+        <div class="dpad-btn" id="btn-up">▲</div>
+        <div class="dpad-row">
+            <div class="dpad-btn" id="btn-left">◀</div>
+            <div class="dpad-btn" id="btn-down">▼</div>
+            <div class="dpad-btn" id="btn-right">▶</div>
+        </div>
+    </div>
 
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -425,6 +474,10 @@ Pacman.User = function (game, map) {
         return true;
 	};
 
+    function setDirection(dir) {
+        due = dir;
+    };
+
     function getNewCoord(dir, current) {
         return {
             "x": current.x + (dir === LEFT && -2 || dir === RIGHT && 2 || 0),
@@ -605,6 +658,7 @@ Pacman.User = function (game, map) {
         "addScore"      : addScore,
         "theScore"      : theScore,
         "keyDown"       : keyDown,
+        "setDirection"  : setDirection,
         "move"          : move,
         "newLevel"      : newLevel,
         "reset"         : reset,
@@ -1175,6 +1229,9 @@ var PACMAN = (function () {
     return {
         "init" : init,
         "restart" : startNewGame,
+        "userInput" : function(dir) {
+            if (user) { user.setDirection(dir); }
+        },
         "togglePause" : function() {
             if (state === PAUSE) {
                 audio.resume();
@@ -1377,14 +1434,35 @@ $(function(){
   document.getElementById('btn-new').addEventListener('click', function() {
       PACMAN.restart();
   });
-  
+
   document.getElementById('btn-pause').addEventListener('click', function() {
       PACMAN.togglePause();
   });
-  
+
   document.getElementById('btn-sound').addEventListener('click', function() {
       var soundOn = PACMAN.toggleSound();
       this.textContent = "Sound: " + (soundOn ? "On" : "Off");
+  });
+
+  var dpadButtons = [
+      {id: 'btn-up', dir: UP},
+      {id: 'btn-down', dir: DOWN},
+      {id: 'btn-left', dir: LEFT},
+      {id: 'btn-right', dir: RIGHT}
+  ];
+
+  dpadButtons.forEach(function(btn) {
+      var el = document.getElementById(btn.id);
+      if(el) {
+          el.addEventListener('touchstart', function(e) {
+              e.preventDefault();
+              PACMAN.userInput(btn.dir);
+          }, {passive: false});
+          el.addEventListener('mousedown', function(e) {
+              e.preventDefault();
+              PACMAN.userInput(btn.dir);
+          });
+      }
   });
 
   if (Modernizr.canvas && Modernizr.localstorage &&
