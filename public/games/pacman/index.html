@@ -1447,12 +1447,21 @@ $(function(){
   });
 
   joystick.on('move', function (evt, data) {
-      if (data && data.direction) {
-          var dir = data.direction.angle; // 'up', 'down', 'left', 'right'
-          if (dir === 'up') PACMAN.userInput(3);
-          if (dir === 'down') PACMAN.userInput(1);
-          if (dir === 'left') PACMAN.userInput(2);
-          if (dir === 'right') PACMAN.userInput(11);
+      if (data && data.angle) {
+          var angle = data.angle.degree;
+          var dir;
+
+          // Calculate direction from angle (0 is Right, 90 is Up)
+          if (angle >= 45 && angle < 135) {
+              dir = 3; // UP
+          } else if (angle >= 135 && angle < 225) {
+              dir = 2; // LEFT
+          } else if (angle >= 225 && angle < 315) {
+              dir = 1; // DOWN
+          } else {
+              dir = 11; // RIGHT
+          }
+          PACMAN.userInput(dir);
       }
   });
 
