@@ -88,6 +88,8 @@ class SettingsController extends MainAdminController
         $settings->site_footer_code = addslashes($inputs['site_footer_code']);
 
         $settings->site_copyright = addslashes($inputs['site_copyright']);
+        
+        $settings->comments_approval = $inputs['comments_approval'];
 
 
         $settings->footer_fb_link = addslashes($inputs['footer_fb_link']);

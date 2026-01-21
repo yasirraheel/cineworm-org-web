@@ -195,6 +195,16 @@
                                         </div>
                                     </div>
 
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Comments Approval</label>
+                                        <div class="col-sm-8">
+                                            <select name="comments_approval" class="form-control">
+                                                <option value="1" @if(isset($settings->comments_approval) && $settings->comments_approval=="1") selected @endif>Auto Approve</option>
+                                                <option value="0" @if(isset($settings->comments_approval) && $settings->comments_approval=="0") selected @endif>Manual Approval</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                 </div>
                                 <div class="col-md-6">
 

@@ -15,6 +15,10 @@
                                 class="fa fa-language"></i><span>{{ trans('words.language_text') }}</span></a></li>
                     <li><a href="{{ URL::to('admin/genres') }}" class="waves-effect {{ classActivePath('genres') }}"><i
                                 class="fa fa-list"></i><span>{{ trans('words.genres_text') }}</span></a></li>
+                    
+                    <li><a href="{{ URL::to('admin/comments') }}" class="waves-effect {{ classActivePath('comments') }}"><i
+                                class="fa fa-comments"></i><span>Comments</span></a></li>
+
                     <li><a href="{{ URL::to('admin/news_ticker') }}" class="waves-effect {{ classActivePath('news_ticker') }}"><i
                                 class="fa fa-newspaper-o"></i><span>News Ticker</span></a></li>
                     <li><a href="{{ URL::to('admin/rss_feeds') }}" class="waves-effect {{ classActivePath('rss_feeds') }}"><i

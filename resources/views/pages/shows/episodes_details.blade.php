@@ -351,6 +351,9 @@
 
     </div>
     <!-- End Season Video Carousel -->
+    
+    @include('_particles.comments', ['post_id' => $episode_info->id, 'post_type' => 'App\Episodes'])
+
   </div>
 </div>
 <!-- End Page Content Area -->

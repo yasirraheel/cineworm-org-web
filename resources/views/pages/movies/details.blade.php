@@ -274,6 +274,9 @@
                 </div>
             </div>
             <!-- End You May Also Like Video Carousel -->
+            
+            @include('_particles.comments', ['post_id' => $movies_info->id, 'post_type' => 'App\Movies'])
+
         </div>
     </div>
     <!-- End Page Content Area -->

@@ -49,6 +49,9 @@ Route::get('/clear-all-cache', function() {
 });
 
  Route::get('livetv/stumble/play', 'LiveTvController@stumble_random')->name('stumble_random');
+Route::post('comments/add', 'CommentsController@add');
+Route::get('comments/get', 'CommentsController@getComments');
+
 Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
     Route::get('movies', 'MoviesController@movies_list');
     Route::get('movies/add_movie', 'MoviesController@addMovie');
@@ -94,7 +97,10 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::post('genres/add_edit_genre', 'GenresController@addnew');
         Route::get('genres/delete/{id}', 'GenresController@delete');
 
-
+        Route::get('comments', 'CommentsController@comments_list');
+        Route::get('comments/approve/{id}', 'CommentsController@approve');
+        Route::get('comments/unapprove/{id}', 'CommentsController@unapprove');
+        Route::get('comments/delete/{id}', 'CommentsController@delete');
 
 
         Route::get('series', 'SeriesController@series_list');
