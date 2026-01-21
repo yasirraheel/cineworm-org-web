@@ -23,3 +23,7 @@ test_*.php
 diagnose.php
 verify_*.php
 check_*.php
+
+# Logs
+/storage/logs/*.log
+*.log
