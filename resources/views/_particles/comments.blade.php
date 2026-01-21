@@ -1,4 +1,67 @@
-<div class="comments-section vfx-item-ptb">
+<style>
+    #dark-comments-wrapper {
+        background-color: #111 !important;
+        color: #fff !important;
+        padding: 30px 0;
+        margin-top: 20px;
+        border-top: 1px solid #222;
+    }
+    #dark-comments-wrapper h3 {
+        color: #fff !important;
+        border-bottom: 1px solid #333;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+    #dark-comments-wrapper .form-control {
+        background-color: #222 !important;
+        border: 1px solid #333 !important;
+        color: #fff !important;
+        border-radius: 4px;
+    }
+    #dark-comments-wrapper .form-control:focus {
+        background-color: #2a2a2a !important;
+        border-color: #fe8805 !important;
+        box-shadow: none !important;
+    }
+    #dark-comments-wrapper .single-comment {
+        background-color: #1a1a1a !important;
+        border: 1px solid #333 !important;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    #dark-comments-wrapper .comment-user {
+        color: #fe8805 !important;
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    #dark-comments-wrapper .comment-date {
+        font-size: 12px;
+        color: #888 !important;
+        float: right;
+        font-weight: normal;
+    }
+    #dark-comments-wrapper .comment-text {
+        color: #ddd !important;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    #dark-comments-wrapper .btn-primary {
+        background: linear-gradient(90deg, #fe8805, #ff6b00) !important;
+        border: none !important;
+        color: #fff !important;
+    }
+    #dark-comments-wrapper .text-muted {
+        color: #999 !important;
+    }
+    #dark-comments-wrapper a {
+        color: #fe8805 !important;
+    }
+</style>
+
+<div id="dark-comments-wrapper" class="vfx-item-ptb">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -20,7 +83,7 @@
                     <div id="comment_msg" class="mt-2"></div>
                 </div>
                 @else
-                <div class="alert alert-warning">
+                <div class="alert alert-warning" style="background-color: #332b00; border-color: #665200; color: #ffda6a;">
                     Please <a href="{{ URL::to('login') }}">login</a> to post a comment.
                 </div>
                 @endif

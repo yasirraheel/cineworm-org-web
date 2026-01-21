@@ -594,9 +594,8 @@
             }
             </style>
         </div>
-        
-        @include('_particles.comments', ['post_id' => $movies_info->id, 'post_type' => 'App\Movies'])
 
+        </div>
             <!-- Banner -->
 @if (get_web_banner('home_top') != '')
 <div class="vid-item-ptb banner_ads_item pb-1" style="padding: 15px 0;">
@@ -703,6 +702,8 @@
                 </div>
             </div>
             <!-- Start Popular Videos -->
+
+            @include('_particles.comments', ['post_id' => $movies_info->id, 'post_type' => 'App\Movies'])
 
             <!-- Start You May Also Like Video Carousel -->
             <div class="video-carousel-area vfx-item-ptb related-video-item">
