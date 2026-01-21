@@ -594,6 +594,9 @@
             }
             </style>
         </div>
+        
+        @include('_particles.comments', ['post_id' => $movies_info->id, 'post_type' => 'App\Movies'])
+
             <!-- Banner -->
 @if (get_web_banner('home_top') != '')
 <div class="vid-item-ptb banner_ads_item pb-1" style="padding: 15px 0;">

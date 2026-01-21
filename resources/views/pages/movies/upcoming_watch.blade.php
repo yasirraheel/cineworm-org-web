@@ -183,6 +183,9 @@
 
         </section>
       </div>
+      
+      @include('_particles.comments', ['post_id' => $movies_info->id, 'post_type' => 'App\Movies'])
+
         </div>
       </div>
       <!-- Start Popular Videos -->

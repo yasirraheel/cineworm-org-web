@@ -5,7 +5,7 @@
                 <div class="vfx-item-section">
                     <h3>Comments</h3>
                 </div>
-                
+
                 @if(Auth::check())
                 <div class="comment-form">
                     <form id="comment_form">
@@ -24,7 +24,7 @@
                     Please <a href="{{ URL::to('login') }}">login</a> to post a comment.
                 </div>
                 @endif
-                
+
                 <div id="comments_list" class="mt-4">
                     <!-- Comments will be loaded here -->
                 </div>
@@ -42,7 +42,7 @@
             commentForm.addEventListener('submit', function(e){
                 e.preventDefault();
                 var formData = new FormData(this);
-                
+
                 fetch('{{ URL::to("comments/add") }}', {
                     method: 'POST',
                     body: formData,
@@ -68,9 +68,9 @@
 
     function loadComments(){
         var postId = '{{ $post_id }}';
-        var postType = '{{ $post_type }}';
-        
-        fetch('{{ URL::to("comments/get") }}?post_id='+postId+'&post_type='+postType)
+        var postType = {!! json_encode($post_type) !!};
+
+        fetch('{{ URL::to("comments/get") }}?post_id='+postId+'&post_type='+encodeURIComponent(postType))
         .then(response => response.text())
         .then(html => {
             document.getElementById('comments_list').innerHTML = html;
