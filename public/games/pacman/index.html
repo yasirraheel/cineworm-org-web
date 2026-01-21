@@ -37,13 +37,37 @@
 			display: block;
 		}
 
-        #zone_joystick {
-            display: block;
-            width: 100%;
-            height: 150px;
-            position: relative;
+        #dpad {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
             margin-top: 20px;
             touch-action: none;
+            user-select: none;
+        }
+        .dpad-row {
+            display: flex;
+            gap: 15px;
+        }
+        .dpad-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(254, 136, 5, 0.3);
+            border: 2px solid #fe8805;
+            border-radius: 50%;
+            color: #fe8805;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dpad-btn:active {
+            background: #fe8805;
+            color: black;
         }
 
 		#shim {
@@ -95,9 +119,16 @@
 
 	<div id="pacman"></div>
 
-    <div id="zone_joystick"></div>
-
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
+    <div id="dpad">
+        <div class="dpad-row">
+            <div class="dpad-btn" data-dir="3">▲</div>
+        </div>
+        <div class="dpad-row">
+            <div class="dpad-btn" data-dir="2">◀</div>
+            <div class="dpad-btn" data-dir="1">▼</div>
+            <div class="dpad-btn" data-dir="11">▶</div>
+        </div>
+    </div>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script type="text/javascript">
@@ -1438,32 +1469,19 @@ $(function(){
       this.textContent = "Sound: " + (soundOn ? "On" : "Off");
   });
 
-  var joystick = nipplejs.create({
-      zone: document.getElementById('zone_joystick'),
-      mode: 'static',
-      position: {left: '50%', top: '50%'},
-      color: '#fe8805',
-      size: 100
-  });
-
-  joystick.on('move', function (evt, data) {
-      if (data && data.angle) {
-          var angle = data.angle.degree;
-          var dir;
-
-          // Calculate direction from angle (0 is Right, 90 is Up)
-          if (angle >= 45 && angle < 135) {
-              dir = 3; // UP
-          } else if (angle >= 135 && angle < 225) {
-              dir = 2; // LEFT
-          } else if (angle >= 225 && angle < 315) {
-              dir = 1; // DOWN
-          } else {
-              dir = 11; // RIGHT
-          }
-          PACMAN.userInput(dir);
-      }
-  });
+  // Mobile Controls (D-Pad)
+  var dpadButtons = document.querySelectorAll('.dpad-btn');
+  for (var i = 0; i < dpadButtons.length; i++) {
+      (function(btn) {
+          var dir = parseInt(btn.getAttribute('data-dir'), 10);
+          var handleInput = function(e) {
+              e.preventDefault();
+              PACMAN.userInput(dir);
+          };
+          btn.addEventListener('touchstart', handleInput, false);
+          btn.addEventListener('mousedown', handleInput, false);
+      })(dpadButtons[i]);
+  }
 
   if (Modernizr.canvas && Modernizr.localstorage &&
       Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
