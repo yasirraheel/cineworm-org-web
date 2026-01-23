@@ -201,7 +201,7 @@
 
 <!-- Custom CSS for Responsive Behavior -->
 <style>
-    /* Auto-hide header styles */
+    /* Auto-hide header styles - DISABLED */
     #auto-hide-header {
         position: fixed;
         top: 0;
@@ -209,13 +209,14 @@
         right: 0;
         z-index: 1000;
         height: 100px;
-        transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+        /* transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; */
     }
 
+    /* Force visibility */
     #auto-hide-header.header-hidden {
-        transform: translateY(-100%);
-        opacity: 0;
-        pointer-events: none;
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
 
     #auto-hide-header.header-visible {
@@ -225,7 +226,7 @@
     }
 
     #header-hover-trigger {
-        pointer-events: all;
+        display: none; /* Disable hover trigger */
     }
 
     /* Ensure header-section is positioned correctly */
@@ -240,93 +241,23 @@
     /* Body padding to accommodate header */
     body {
         padding-top: 100px;
-        transition: padding-top 0.4s ease-in-out;
+        /* transition: padding-top 0.4s ease-in-out; */
     }
 
     body.header-is-hidden {
-        padding-top: 0;
+        padding-top: 100px !important; /* Force padding */
     }
 </style>
 
 <script>
+    // Header hiding logic disabled by request
     document.addEventListener('DOMContentLoaded', function() {
         const header = document.getElementById('auto-hide-header');
-        const hoverTrigger = document.getElementById('header-hover-trigger');
-        let autoHideTimeout;
-        let delayedHideTimeout;
-        let isHidden = false;
-
-        // Function to hide header
-        function hideHeader() {
-            header.classList.add('header-hidden');
-            header.classList.remove('header-visible');
-            document.body.classList.add('header-is-hidden');
-            isHidden = true;
-        }
-
-        // Function to show header
-        function showHeader() {
-            clearTimeout(autoHideTimeout);
-            clearTimeout(delayedHideTimeout);
+        
+        // Ensure header is always visible
+        if(header) {
             header.classList.remove('header-hidden');
             header.classList.add('header-visible');
-            document.body.classList.remove('header-is-hidden');
-            isHidden = false;
         }
-
-        // Auto-hide after 5 seconds on page load
-        autoHideTimeout = setTimeout(() => {
-            hideHeader();
-        }, 5000);
-
-        // Show header when hovering over trigger area
-        hoverTrigger.addEventListener('mouseenter', function() {
-            showHeader();
-        });
-
-        // Delay hide when leaving trigger area
-        hoverTrigger.addEventListener('mouseleave', function(e) {
-            // Check if mouse is moving to the header
-            const rect = header.getBoundingClientRect();
-            if (e.clientY > rect.bottom) {
-                // Mouse moved down, away from header
-                delayedHideTimeout = setTimeout(() => {
-                    hideHeader();
-                }, 800);
-            }
-        });
-
-        // Keep header visible when mouse enters header
-        header.addEventListener('mouseenter', function() {
-            showHeader();
-        });
-
-        // Delay hide when mouse leaves header
-        header.addEventListener('mouseleave', function(e) {
-            // Only hide if mouse is moving down (away from top)
-            if (e.clientY > 100) {
-                delayedHideTimeout = setTimeout(() => {
-                    hideHeader();
-                }, 800);
-            }
-        });
-
-        // Cancel hide on any interaction within header
-        header.addEventListener('click', function() {
-            showHeader();
-        });
-
-        // Also respond to scroll - show header when scrolling up near top
-        let lastScrollTop = 0;
-        window.addEventListener('scroll', function() {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-            if (scrollTop < 100 && scrollTop < lastScrollTop) {
-                // Near top and scrolling up
-                showHeader();
-            }
-
-            lastScrollTop = scrollTop;
-        }, false);
     });
 </script>
