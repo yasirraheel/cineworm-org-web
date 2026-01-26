@@ -296,7 +296,7 @@ class MoviesController extends MainAdminController
                      \Log::error("Screenshot generation failed: " . $errorMsg);
                      Session::flash('flash_message', trans('words.added') . ' but screenshot failed. Error: ' . $errorMsg . ' Used default images.');
                 }
-                
+
                 $movie_obj->save();
 
                 if (!Session::has('flash_message')) {
@@ -439,7 +439,8 @@ class MoviesController extends MainAdminController
 
                 return ['success' => 'Screenshot generated successfully', 'path' => $relativePath];
             } else {
-                return ['error' => 'Error generating screenshot. Exit Code: ' . $returnVar . '. Error Output: ' . $errorOutput . '. Stdout: ' . $output];
+                $pathMsg = $usingBundled ? "Bundled path: $bundledPath" : "System path: ffmpeg (Bundled not found at $bundledPath)";
+                return ['error' => 'Error generating screenshot. ' . $pathMsg . '. Exit Code: ' . $returnVar . '. Error Output: ' . $errorOutput . '. Stdout: ' . $output];
             }
         } else {
             return ['error' => 'Failed to start FFmpeg process.'];
