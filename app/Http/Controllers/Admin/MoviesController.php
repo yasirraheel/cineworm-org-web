@@ -413,7 +413,7 @@ class MoviesController extends MainAdminController
 
         // FFmpeg command to generate the screenshot
         // Added -y to overwrite output files without asking
-        $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y 2>&1";
+        $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y";
 
         // Execute the command using proc_open
         $descriptors = [
@@ -435,7 +435,7 @@ class MoviesController extends MainAdminController
                 $usingBundled = false;  // We are no longer using bundled
                 
                 // Re-build command with system ffmpeg
-                $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y 2>&1";
+                $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y";
                 
                 // Re-run process
                 $process = proc_open($command, $descriptors, $pipes);

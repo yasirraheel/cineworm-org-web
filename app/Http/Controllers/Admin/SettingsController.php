@@ -594,14 +594,25 @@ class SettingsController extends MainAdminController
         }
 
         // FFmpeg executable path
-        $opratingSystem = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        $ffmpegPath = $opratingSystem ? storage_path('ffmpeg_win/bin/ffmpeg.exe') : storage_path('ffmpeg_linux/ffmpeg');
+        $operatingSystem = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        $bundledPath = $operatingSystem ? storage_path('ffmpeg_win/bin/ffmpeg.exe') : storage_path('ffmpeg_linux/ffmpeg');
+        
+        $ffmpegPath = 'ffmpeg'; // Default to system path
+        $usingBundled = false;
+
+        if (file_exists($bundledPath)) {
+            $ffmpegPath = $bundledPath;
+            $usingBundled = true;
+            if (!$operatingSystem) {
+                chmod($ffmpegPath, 0755); // Ensure executable
+            }
+        }
 
         // Generate a random timestamp within the first 15 seconds
         $randomTimestamp = rand(1, 15);
 
         // FFmpeg command to generate the screenshot
-        $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" 2>&1";
+        $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y";
 
         // Execute the command using proc_open
         $descriptors = [
@@ -616,6 +627,25 @@ class SettingsController extends MainAdminController
             fclose($pipes[1]);
             fclose($pipes[2]);
             $returnVar = proc_close($process);
+
+            // Fallback: If bundled FFmpeg failed, try system FFmpeg
+            if ($returnVar !== 0 && $usingBundled) {
+                $ffmpegPath = 'ffmpeg'; // Fallback to system path
+                $usingBundled = false;  // We are no longer using bundled
+                
+                // Re-build command with system ffmpeg
+                $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y";
+                
+                // Re-run process
+                $process = proc_open($command, $descriptors, $pipes);
+                if (is_resource($process)) {
+                    $output = stream_get_contents($pipes[1]);
+                    $errorOutput = stream_get_contents($pipes[2]);
+                    fclose($pipes[1]);
+                    fclose($pipes[2]);
+                    $returnVar = proc_close($process);
+                }
+            }
 
             // Check if the FFmpeg command was successful
             if ($returnVar === 0) {
@@ -632,7 +662,8 @@ class SettingsController extends MainAdminController
 
                 return redirect()->back()->with('flash_message', 'Screenshot generated successfully!');
             } else {
-                return redirect()->back()->with('error', 'Error generating screenshot: ' . $errorOutput);
+                $pathMsg = $usingBundled ? "Bundled path: $bundledPath" : "System path: ffmpeg";
+                return redirect()->back()->with('error', 'Error generating screenshot. ' . $pathMsg . '. Exit Code: ' . $returnVar . '. Error Output: ' . $errorOutput . '. Stdout: ' . $output);
             }
         } else {
             return redirect()->back()->with('error', 'Failed to start FFmpeg process.');
