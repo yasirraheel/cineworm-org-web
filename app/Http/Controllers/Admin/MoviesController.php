@@ -376,6 +376,12 @@ class MoviesController extends MainAdminController
         $publicImagePath = public_path('screenshots/' . $fileId . '.jpg');
         $relativePath = 'screenshots/' . $fileId . '.jpg';
 
+        // Ensure the temp screenshots directory exists
+        $tempScreenshotsDir = dirname($tempImagePath);
+        if (!file_exists($tempScreenshotsDir)) {
+            mkdir($tempScreenshotsDir, 0777, true);
+        }
+
         // Ensure the public screenshots directory exists
         $publicScreenshotsDir = public_path('screenshots');
         if (!file_exists($publicScreenshotsDir)) {
