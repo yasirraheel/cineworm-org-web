@@ -396,7 +396,7 @@ class MoviesController extends MainAdminController
         // FFmpeg executable path
         $operatingSystem = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
         $bundledPath = $operatingSystem ? storage_path('ffmpeg_win/bin/ffmpeg.exe') : storage_path('ffmpeg_linux/ffmpeg');
-        
+
         // Try base_path if storage_path fails (sometimes storage_path is symlinked or different)
         if (!file_exists($bundledPath)) {
              $bundledPath = $operatingSystem ? base_path('storage/ffmpeg_win/bin/ffmpeg.exe') : base_path('storage/ffmpeg_linux/ffmpeg');
@@ -420,14 +420,20 @@ class MoviesController extends MainAdminController
 
         // FFmpeg command to generate the screenshot
         // Added -y to overwrite output files without asking
-        $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y";
+        // Use escapeshellarg for safety and proper handling of special characters
+        $cmd_ffmpeg = $ffmpegPath; // Don't escape yet, we handle quotes manually or rely on proc_open/shell behavior?
+        // Actually, it's safer to use escapeshellarg for paths and URLs.
+        // But we need to be careful with Windows vs Linux if we rely on PHP's escapeshellarg.
+        // Since we are running on Linux (mostly), escapeshellarg uses single quotes.
+
+        $command = escapeshellarg($ffmpegPath) . " -ss " . $randomTimestamp . " -i " . escapeshellarg($videoUrl) . " -t 00:00:15 -vframes 1 " . escapeshellarg($tempImagePath) . " -y";
 
         // Execute the command using proc_open
         $descriptors = [
             1 => ['pipe', 'w'],  // stdout
             2 => ['pipe', 'w']   // stderr
         ];
-        
+
         $bundledError = '';
 
         $process = proc_open($command, $descriptors, $pipes);
@@ -440,13 +446,18 @@ class MoviesController extends MainAdminController
 
             // Fallback: If bundled FFmpeg failed, try system FFmpeg
             if ($returnVar !== 0 && $usingBundled) {
-                $bundledError = "Bundled FFmpeg failed at $bundledPath with code $returnVar. Error: $errorOutput. ";
+                $bundledError = "Bundled FFmpeg failed at $bundledPath with code $returnVar.";
+                if ($returnVar == 139) {
+                     $bundledError .= " (Segmentation Fault: Binary incompatible with kernel. Try older FFmpeg v5.x or v4.x)";
+                }
+                $bundledError .= " Error: $errorOutput. ";
+
                 $ffmpegPath = 'ffmpeg'; // Fallback to system path
                 $usingBundled = false;  // We are no longer using bundled
-                
+
                 // Re-build command with system ffmpeg
-                $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y";
-                
+                $command = "ffmpeg -ss " . $randomTimestamp . " -i " . escapeshellarg($videoUrl) . " -t 00:00:15 -vframes 1 " . escapeshellarg($tempImagePath) . " -y";
+
                 // Re-run process
                 $process = proc_open($command, $descriptors, $pipes);
                 if (is_resource($process)) {
