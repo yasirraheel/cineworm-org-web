@@ -647,8 +647,7 @@
                                         </div>
 
                                         <div class="form-group row" id="url_id"
-                                            @if (isset($movie->video_type) and $movie->video_type != 'URL') style="display:none;" @endif
-                                            @if (!isset($movie->id)) style="display:none;" @endif>
+                                            @if (isset($movie->video_type) and $movie->video_type != 'URL') style="display:none;" @endif>
 
                                             <div class="col-sm-11">
                                                 <small id="emailHelp" class="form-text text-muted">(Supported : MP4 URL.

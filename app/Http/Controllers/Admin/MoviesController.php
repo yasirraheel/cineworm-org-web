@@ -342,6 +342,7 @@ class MoviesController extends MainAdminController
         // Define paths for the screenshot
         $tempImagePath = storage_path('app/public/screenshots/' . $fileId . '.jpg');
         $publicImagePath = public_path('screenshots/' . $fileId . '.jpg');
+        $relativePath = 'screenshots/' . $fileId . '.jpg';
 
         // Ensure the public screenshots directory exists
         $publicScreenshotsDir = public_path('screenshots');
@@ -358,11 +359,17 @@ class MoviesController extends MainAdminController
         $operatingSystem = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
         $ffmpegPath = $operatingSystem ? storage_path('ffmpeg_win/bin/ffmpeg.exe') : storage_path('ffmpeg_linux/ffmpeg');
 
+        // Robustness: Check if configured ffmpeg exists, if not try system 'ffmpeg'
+        if (!file_exists($ffmpegPath)) {
+            $ffmpegPath = 'ffmpeg'; // Try system path
+        }
+
         // Generate a random timestamp within the first 15 seconds
         $randomTimestamp = rand(1, 15);
 
         // FFmpeg command to generate the screenshot
-        $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" 2>&1";
+        // Added -y to overwrite output files without asking
+        $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y 2>&1";
 
         // Execute the command using proc_open
         $descriptors = [
@@ -383,23 +390,24 @@ class MoviesController extends MainAdminController
                 // Move the screenshot to the public directory
                 if (file_exists($tempImagePath)) {
                     rename($tempImagePath, $publicImagePath);
+                } elseif (!file_exists($publicImagePath)) {
+                    // It's possible ffmpeg wrote directly to tempImagePath but it wasn't found?
+                    // Or maybe it failed silently but exit code 0?
+                     return ['error' => 'FFmpeg exited with 0 but output file not found. Output: ' . $output . ' Error: ' . $errorOutput];
                 }
 
                 // Save or update the screenshot in the Thumbnail model
                 Thumbnail::updateOrCreate(
                     ['file_id' => $fileId],
-                    ['video_image_thumb' => 'screenshots/' . $fileId . '.jpg']
+                    ['video_image_thumb' => $relativePath]
                 );
-                $movies = session()->get('movie_obj');
-                // dd($movies);
-                $movies->video_image_thumb = 'screenshots/' . $fileId . '.jpg';
-                $movies->video_image = 'screenshots/' . $fileId . '.jpg';
-                $movies->save();
-                session()->forget('movie_obj');
 
-                return ['success' => 'Screenshot generated successfully'];
+                // Note: We are NO LONGER modifying session object or saving movie here.
+                // The caller (addnew) handles saving the movie.
+
+                return ['success' => 'Screenshot generated successfully', 'path' => $relativePath];
             } else {
-                return ['error' => 'Error generating screenshot: ' . $errorOutput];
+                return ['error' => 'Error generating screenshot. Exit Code: ' . $returnVar . '. Error Output: ' . $errorOutput . '. Stdout: ' . $output];
             }
         } else {
             return ['error' => 'Failed to start FFmpeg process.'];

@@ -81,6 +81,65 @@
                                             </div>
                                         </div>
                                     @endif
+
+                                    {{-- site default movie thumb is starting from here --}}
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Default Movie Thumbnail</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" name="site_default_movie_thumb" id="site_default_movie_thumb"
+                                                    value="{{ isset($settings->site_default_movie_thumb) ? $settings->site_default_movie_thumb : null }}"
+                                                    class="form-control" readonly>
+                                                <div class="input-group-append">
+                                                    <button type="button"
+                                                        class="btn btn-dark waves-effect waves-light popup_selector"
+                                                        data-input="site_default_movie_thumb" data-preview="holder_thumb"
+                                                        data-inputid="site_default_movie_thumb">Select</button>
+                                                </div>
+                                            </div>
+                                            <div id="site_default_movie_thumb_holder" style="margin-top:5px;max-height:100px;"></div>
+                                        </div>
+                                    </div>
+
+                                    @if (isset($settings->site_default_movie_thumb))
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">&nbsp;</label>
+                                            <div class="col-sm-8">
+                                                <img src="{{ URL::to('/' . $settings->site_default_movie_thumb) }}" alt="video image"
+                                                    class="img-thumbnail" width="160">
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    {{-- site default movie poster is starting from here --}}
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Default Movie Poster</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" name="site_default_movie_poster" id="site_default_movie_poster"
+                                                    value="{{ isset($settings->site_default_movie_poster) ? $settings->site_default_movie_poster : null }}"
+                                                    class="form-control" readonly>
+                                                <div class="input-group-append">
+                                                    <button type="button"
+                                                        class="btn btn-dark waves-effect waves-light popup_selector"
+                                                        data-input="site_default_movie_poster" data-preview="holder_poster"
+                                                        data-inputid="site_default_movie_poster">Select</button>
+                                                </div>
+                                            </div>
+                                            <div id="site_default_movie_poster_holder" style="margin-top:5px;max-height:100px;"></div>
+                                        </div>
+                                    </div>
+
+                                    @if (isset($settings->site_default_movie_poster))
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">&nbsp;</label>
+                                            <div class="col-sm-8">
+                                                <img src="{{ URL::to('/' . $settings->site_default_movie_poster) }}" alt="video image"
+                                                    class="img-thumbnail" width="160">
+                                            </div>
+                                        </div>
+                                    @endif
+
                                     {{-- site meta image is starting from here --}}
                                     <div class="form-group row">
                                         <label class="col-sm-3 col-form-label">Site Meta Image*</label>

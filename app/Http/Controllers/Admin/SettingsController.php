@@ -77,8 +77,10 @@ class SettingsController extends MainAdminController
         $settings->currency_code = $inputs['currency_code'];
 
 		$settings->site_name = addslashes($inputs['site_name']);
-		$settings->site_logo = $inputs['site_logo'];
-		$settings->site_meta_image = $inputs['site_meta_image'];
+        $settings->site_logo = $inputs['site_logo'];
+        $settings->site_default_movie_thumb = $inputs['site_default_movie_thumb'];
+        $settings->site_default_movie_poster = $inputs['site_default_movie_poster'];
+        $settings->site_meta_image = $inputs['site_meta_image'];
         $settings->site_favicon = $inputs['site_favicon'];
         $settings->site_email = $inputs['site_email'];
         $settings->site_description = addslashes($inputs['site_description']);
