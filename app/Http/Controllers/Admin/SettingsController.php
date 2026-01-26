@@ -606,7 +606,13 @@ class SettingsController extends MainAdminController
         $usingBundled = false;
         $bundledFound = false;
 
-        if (file_exists($bundledPath)) {
+        // Priority 1: User specified path (Shared Hosting)
+        $userCustomPath = '/home/u273790872/bin/ffmpeg';
+        if (!$operatingSystem && file_exists($userCustomPath)) {
+            $ffmpegPath = $userCustomPath;
+        } 
+        // Priority 2: Bundled path
+        elseif (file_exists($bundledPath)) {
             $ffmpegPath = $bundledPath;
             $usingBundled = true;
             $bundledFound = true;
