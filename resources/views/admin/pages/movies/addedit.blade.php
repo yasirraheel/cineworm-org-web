@@ -815,7 +815,12 @@
                                                 <input type="text" name="subtitle_url1" id="subtitle_url1"
                                                     value="{{ isset($movie->subtitle_url1) ? $movie->subtitle_url1 : old('subtitle_url1') }}"
                                                     class="form-control" placeholder="http://example.com/demo.srt">
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-info btn-xs" onclick="document.getElementById('upload_srt1').click()">Upload SRT</button>
+                                                    <input type="file" id="upload_srt1" style="display:none" onchange="uploadSrt(this, 'subtitle_url1')">
 
+                                                    <button type="button" class="btn btn-warning btn-xs" onclick="showPasteModal('subtitle_url1')">Paste SRT Content</button>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -837,7 +842,12 @@
                                                 <input type="text" name="subtitle_url2" id="subtitle_url2"
                                                     value="{{ isset($movie->subtitle_url2) ? $movie->subtitle_url2 : old('subtitle_url2') }}"
                                                     class="form-control" placeholder="http://example.com/demo.srt">
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-info btn-xs" onclick="document.getElementById('upload_srt2').click()">Upload SRT</button>
+                                                    <input type="file" id="upload_srt2" style="display:none" onchange="uploadSrt(this, 'subtitle_url2')">
 
+                                                    <button type="button" class="btn btn-warning btn-xs" onclick="showPasteModal('subtitle_url2')">Paste SRT Content</button>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -859,7 +869,12 @@
                                                 <input type="text" name="subtitle_url3" id="subtitle_url3"
                                                     value="{{ isset($movie->subtitle_url3) ? $movie->subtitle_url3 : old('subtitle_url3') }}"
                                                     class="form-control" placeholder="http://example.com/demo.srt">
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-info btn-xs" onclick="document.getElementById('upload_srt3').click()">Upload SRT</button>
+                                                    <input type="file" id="upload_srt3" style="display:none" onchange="uploadSrt(this, 'subtitle_url3')">
 
+                                                    <button type="button" class="btn btn-warning btn-xs" onclick="showPasteModal('subtitle_url3')">Paste SRT Content</button>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -920,6 +935,68 @@
             $('#' + requestingField).val(filePath.replace(/\\/g, "/")).trigger('change');
 
         }
+
+        function uploadSrt(input, targetId) {
+            if (input.files && input.files[0]) {
+                var formData = new FormData();
+                formData.append('file', input.files[0]);
+
+                $.ajax({
+                    url: '{{ url("admin/movies/upload_srt") }}',
+                    type: 'POST',
+                    data: formData,
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.url) {
+                            $('#' + targetId).val(response.url);
+                            $(input).val('');
+                            Swal.fire('Success', 'SRT uploaded successfully', 'success');
+                        } else {
+                            Swal.fire('Error', response.error, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Upload failed', 'error');
+                    }
+                });
+            }
+        }
+
+        var currentPasteTarget = '';
+        function showPasteModal(targetId) {
+            currentPasteTarget = targetId;
+            $('#srt_content').val('');
+            $('#pasteSrtModal').modal('show');
+        }
+
+        function generateSrt() {
+            var content = $('#srt_content').val();
+            if (!content) {
+                Swal.fire('Error', 'Please paste content', 'error');
+                return;
+            }
+
+            $.ajax({
+                url: '{{ url("admin/movies/generate_srt") }}',
+                type: 'POST',
+                data: {content: content},
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                success: function(response) {
+                    if (response.url) {
+                        $('#' + currentPasteTarget).val(response.url);
+                        $('#pasteSrtModal').modal('hide');
+                        Swal.fire('Success', 'SRT generated successfully', 'success');
+                    } else {
+                        Swal.fire('Error', response.error, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Generation failed', 'error');
+                }
+            });
+        }
     </script>
 
     <script type="text/javascript">
@@ -956,4 +1033,28 @@
             })
         @endif
     </script>
+<!-- Paste SRT Modal -->
+<div id="pasteSrtModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="pasteSrtModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="pasteSrtModalLabel">Paste SRT Content</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Paste your SRT content here:</label>
+                    <textarea id="srt_content" class="form-control" rows="15" placeholder="1
+00:00:01,000 --> 00:00:04,000
+Subtitle text here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="generateSrt()">Generate & Use</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection

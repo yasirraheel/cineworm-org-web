@@ -30,6 +30,7 @@ class MoviesController extends MainAdminController
         parent::__construct();
         check_verify_purchase();
     }
+
     public function movies_list()
     {
         if (Auth::User()->usertype != "Admin" && Auth::User()->usertype != "Sub_Admin" && Auth::User()->usertype != "Moderator") {
@@ -627,5 +628,46 @@ private function convertVttToSrt($vttContent) {
     return $srtContent;
 }
 
+    public function upload_srt(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $extension = $file->getClientOriginalExtension();
+            if (strtolower($extension) !== 'srt') {
+                 return response()->json(['error' => 'Only .srt files are allowed.']);
+            }
+
+            $filename = 'sub_'.time() . '.' . $extension;
+            $destinationPath = public_path('upload/subtitles');
+
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
+
+            $file->move($destinationPath, $filename);
+
+            return response()->json(['url' => asset('upload/subtitles/' . $filename)]);
+        }
+        return response()->json(['error' => 'No file uploaded.']);
+    }
+
+    public function generate_srt(Request $request)
+    {
+        $content = $request->input('content');
+        if (empty($content)) {
+             return response()->json(['error' => 'Content is empty.']);
+        }
+
+        $filename = 'sub_gen_'.time() . '.srt';
+        $destinationPath = public_path('upload/subtitles');
+
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0777, true);
+        }
+
+        file_put_contents($destinationPath . '/' . $filename, $content);
+
+        return response()->json(['url' => asset('upload/subtitles/' . $filename)]);
+    }
 
 }

@@ -61,6 +61,11 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
      Route::get('movies/extract_audio/{id}', 'MoviesController@extractAudio');
     Route::post('movies/add_edit_movie', 'MoviesController@addnew');
     Route::get('movies/delete/{id}', 'MoviesController@delete');
+
+    // Subtitle AJAX routes
+    Route::post('movies/upload_srt', 'MoviesController@upload_srt');
+    Route::post('movies/generate_srt', 'MoviesController@generate_srt');
+
     Route::get('dashboard', 'DashboardController@index');
     Route::get('login', ['as' => 'login', 'uses' => 'IndexController@index']);
 
