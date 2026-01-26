@@ -47,7 +47,7 @@
 
 <div class="video-container">
     <!-- Video player with dynamic URL from movie_details->video_url -->
-    <video id="videoPlayer" controls autoplay preload="metadata" poster={{ url($movies_info->video_image_thumb) }}>
+    <video id="videoPlayer" controls autoplay preload="metadata" poster="{{ !empty($movies_info->video_image_thumb) ? url($movies_info->video_image_thumb) : '' }}">
         <source src="{{ $movies_info->video_url }}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
