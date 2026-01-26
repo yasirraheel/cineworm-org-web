@@ -406,19 +406,21 @@ class MoviesController extends MainAdminController
         $usingBundled = false;
         $bundledFound = false;
         
-        // Priority 1: User specified path (Shared Hosting)
-        $userCustomPath = '/home/u273790872/bin/ffmpeg';
-        if (!$operatingSystem && file_exists($userCustomPath)) {
-            $ffmpegPath = $userCustomPath;
-        } 
-        // Priority 2: Bundled path
-        elseif (file_exists($bundledPath)) {
+        // Priority 1: Bundled path (Controlled environment, preferred)
+        if (file_exists($bundledPath)) {
             $ffmpegPath = $bundledPath;
             $usingBundled = true;
             $bundledFound = true;
             if (!$operatingSystem) {
                 chmod($ffmpegPath, 0755); // Ensure executable
             }
+        }
+        // Priority 2: User specified path (Shared Hosting) - Only if bundled is missing
+        else {
+             $userCustomPath = '/home/u273790872/bin/ffmpeg';
+             if (!$operatingSystem && file_exists($userCustomPath)) {
+                 $ffmpegPath = $userCustomPath;
+             }
         }
 
         // Generate a random timestamp within the first 15 seconds
