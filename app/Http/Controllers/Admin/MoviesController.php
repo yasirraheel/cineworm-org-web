@@ -397,12 +397,19 @@ class MoviesController extends MainAdminController
         $operatingSystem = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
         $bundledPath = $operatingSystem ? storage_path('ffmpeg_win/bin/ffmpeg.exe') : storage_path('ffmpeg_linux/ffmpeg');
         
+        // Try base_path if storage_path fails (sometimes storage_path is symlinked or different)
+        if (!file_exists($bundledPath)) {
+             $bundledPath = $operatingSystem ? base_path('storage/ffmpeg_win/bin/ffmpeg.exe') : base_path('storage/ffmpeg_linux/ffmpeg');
+        }
+
         $ffmpegPath = 'ffmpeg'; // Default to system path
         $usingBundled = false;
+        $bundledFound = false;
 
         if (file_exists($bundledPath)) {
             $ffmpegPath = $bundledPath;
             $usingBundled = true;
+            $bundledFound = true;
             if (!$operatingSystem) {
                 chmod($ffmpegPath, 0755); // Ensure executable
             }
@@ -420,6 +427,8 @@ class MoviesController extends MainAdminController
             1 => ['pipe', 'w'],  // stdout
             2 => ['pipe', 'w']   // stderr
         ];
+        
+        $bundledError = '';
 
         $process = proc_open($command, $descriptors, $pipes);
         if (is_resource($process)) {
@@ -431,6 +440,7 @@ class MoviesController extends MainAdminController
 
             // Fallback: If bundled FFmpeg failed, try system FFmpeg
             if ($returnVar !== 0 && $usingBundled) {
+                $bundledError = "Bundled FFmpeg failed at $bundledPath with code $returnVar. Error: $errorOutput. ";
                 $ffmpegPath = 'ffmpeg'; // Fallback to system path
                 $usingBundled = false;  // We are no longer using bundled
                 
@@ -470,8 +480,11 @@ class MoviesController extends MainAdminController
 
                 return ['success' => 'Screenshot generated successfully', 'path' => $relativePath];
             } else {
-                $pathMsg = $usingBundled ? "Bundled path: $bundledPath" : "System path: ffmpeg (Bundled not found at $bundledPath)";
-                return ['error' => 'Error generating screenshot. ' . $pathMsg . '. Exit Code: ' . $returnVar . '. Error Output: ' . $errorOutput . '. Stdout: ' . $output];
+                $pathMsg = $usingBundled ? "Bundled path: $bundledPath" : "System path: ffmpeg";
+                if (!$usingBundled && !$bundledFound) {
+                     $pathMsg .= " (Bundled not found at $bundledPath)";
+                }
+                return ['error' => $bundledError . 'Error generating screenshot. ' . $pathMsg . '. Exit Code: ' . $returnVar . '. Error Output: ' . $errorOutput . '. Stdout: ' . $output];
             }
         } else {
             return ['error' => 'Failed to start FFmpeg process.'];
