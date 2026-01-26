@@ -262,15 +262,47 @@ class MoviesController extends MainAdminController
             if($video_type =='GoogleDrive'){
 
                 $screenshotResult = $this->store_generateScreenshot($fileId);
-                if (isset($screenshotResult['error'])) {
-                    // return redirect()->back()->with('error', $screenshotResult['error']);
-                    Session::flash('flash_message',$screenshotResult['error']);
 
+                if (isset($screenshotResult['success'])) {
+                     $movie_obj->video_image = $screenshotResult['path'];
+                     $movie_obj->video_image_thumb = $screenshotResult['path'];
+                } else {
+                     // Screenshot failed, use default images
+                     $settings = \App\Settings::findOrFail('1');
+
+                     if (!empty($settings->site_default_movie_poster)) {
+                         $poster = $settings->site_default_movie_poster;
+                         if (filter_var($poster, FILTER_VALIDATE_URL)) {
+                             $poster = parse_url($poster, PHP_URL_PATH);
+                         }
+                         $poster = ltrim($poster, '/');
+                         $movie_obj->video_image = $poster;
+                     } else {
+                         $movie_obj->video_image = 'NA';
+                     }
+
+                     if (!empty($settings->site_default_movie_thumb)) {
+                         $thumb = $settings->site_default_movie_thumb;
+                         if (filter_var($thumb, FILTER_VALIDATE_URL)) {
+                             $thumb = parse_url($thumb, PHP_URL_PATH);
+                         }
+                         $thumb = ltrim($thumb, '/');
+                         $movie_obj->video_image_thumb = $thumb;
+                     } else {
+                         $movie_obj->video_image_thumb = 'NA';
+                     }
+
+                     $errorMsg = $screenshotResult['error'] ?? 'Unknown error';
+                     \Log::error("Screenshot generation failed: " . $errorMsg);
+                     Session::flash('flash_message', trans('words.added') . ' but screenshot failed. Used default images.');
                 }
-                // Flash success message and redirect back
-                // Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
 
                 $movie_obj->save();
+
+                if (!Session::has('flash_message')) {
+                     Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
+                }
+
                 return redirect()->back();
             }
             // Handle error if screenshot generation fails

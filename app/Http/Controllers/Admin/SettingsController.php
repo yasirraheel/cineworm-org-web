@@ -78,8 +78,19 @@ class SettingsController extends MainAdminController
 
 		$settings->site_name = addslashes($inputs['site_name']);
         $settings->site_logo = $inputs['site_logo'];
-        $settings->site_default_movie_thumb = $inputs['site_default_movie_thumb'];
-        $settings->site_default_movie_poster = $inputs['site_default_movie_poster'];
+
+        $thumb = $inputs['site_default_movie_thumb'];
+        if (filter_var($thumb, FILTER_VALIDATE_URL)) {
+             $thumb = parse_url($thumb, PHP_URL_PATH);
+        }
+        $settings->site_default_movie_thumb = ltrim($thumb, '/');
+
+        $poster = $inputs['site_default_movie_poster'];
+        if (filter_var($poster, FILTER_VALIDATE_URL)) {
+             $poster = parse_url($poster, PHP_URL_PATH);
+        }
+        $settings->site_default_movie_poster = ltrim($poster, '/');
+
         $settings->site_meta_image = $inputs['site_meta_image'];
         $settings->site_favicon = $inputs['site_favicon'];
         $settings->site_email = $inputs['site_email'];
@@ -90,7 +101,7 @@ class SettingsController extends MainAdminController
         $settings->site_footer_code = addslashes($inputs['site_footer_code']);
 
         $settings->site_copyright = addslashes($inputs['site_copyright']);
-        
+
         $settings->comments_approval = $inputs['comments_approval'];
 
 
