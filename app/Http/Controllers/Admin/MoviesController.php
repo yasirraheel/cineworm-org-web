@@ -429,6 +429,25 @@ class MoviesController extends MainAdminController
             fclose($pipes[2]);
             $returnVar = proc_close($process);
 
+            // Fallback: If bundled FFmpeg failed, try system FFmpeg
+            if ($returnVar !== 0 && $usingBundled) {
+                $ffmpegPath = 'ffmpeg'; // Fallback to system path
+                $usingBundled = false;  // We are no longer using bundled
+                
+                // Re-build command with system ffmpeg
+                $command = "\"$ffmpegPath\" -ss $randomTimestamp -i \"$videoUrl\" -t 00:00:15 -vframes 1 \"$tempImagePath\" -y 2>&1";
+                
+                // Re-run process
+                $process = proc_open($command, $descriptors, $pipes);
+                if (is_resource($process)) {
+                    $output = stream_get_contents($pipes[1]);
+                    $errorOutput = stream_get_contents($pipes[2]);
+                    fclose($pipes[1]);
+                    fclose($pipes[2]);
+                    $returnVar = proc_close($process);
+                }
+            }
+
             // Check if the FFmpeg command was successful
             if ($returnVar === 0) {
                 // Move the screenshot to the public directory
