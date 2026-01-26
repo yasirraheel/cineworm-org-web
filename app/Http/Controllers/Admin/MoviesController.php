@@ -395,11 +395,17 @@ class MoviesController extends MainAdminController
 
         // FFmpeg executable path
         $operatingSystem = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        $ffmpegPath = $operatingSystem ? storage_path('ffmpeg_win/bin/ffmpeg.exe') : storage_path('ffmpeg_linux/ffmpeg');
+        $bundledPath = $operatingSystem ? storage_path('ffmpeg_win/bin/ffmpeg.exe') : storage_path('ffmpeg_linux/ffmpeg');
+        
+        $ffmpegPath = 'ffmpeg'; // Default to system path
+        $usingBundled = false;
 
-        // Robustness: Check if configured ffmpeg exists, if not try system 'ffmpeg'
-        if (!file_exists($ffmpegPath)) {
-            $ffmpegPath = 'ffmpeg'; // Try system path
+        if (file_exists($bundledPath)) {
+            $ffmpegPath = $bundledPath;
+            $usingBundled = true;
+            if (!$operatingSystem) {
+                chmod($ffmpegPath, 0755); // Ensure executable
+            }
         }
 
         // Generate a random timestamp within the first 15 seconds
