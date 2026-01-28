@@ -1737,10 +1737,8 @@
             var iframe = document.getElementById('game-iframe');
             var modalTitle = document.getElementById('game-modal-title');
 
-            var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}?v={{ time() }}";
-            // Use local Pacman game
-            var pacmanUrl = "{{ URL::asset('games/pacman/index.html') }}?v={{ time() }}";
-
+            var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}";
+            
             // Open Watermelon Modal
             if(btn){
                 btn.onclick = function() {
