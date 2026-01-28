@@ -687,12 +687,6 @@
                                     </form>
                                 @endauth
 
-                                <button class="action-btn game-btn" id="open-game-modal">
-                                    <i class="fas fa-gamepad"></i>
-                                    <span>Play Watermelon</span>
-                                </button>
-
-
                                 <button class="action-btn share-btn" data-toggle="modal" data-target="#social-media">
                                     <i class="fas fa-share-alt"></i>
                                     <span>{{ trans('words.share_text') }}</span>
@@ -799,6 +793,14 @@
                                 </button>
                             </h5>
                         </div>
+                    </div>
+
+                    <!-- Watermelon Game Button Moved from Footer -->
+                    <div class="card bg-dark text-white border-0 mt-2">
+                        <button class="action-btn game-btn w-100" id="open-game-modal" style="justify-content: center;">
+                            <i class="fas fa-gamepad"></i>
+                            <span>Play Watermelon</span>
+                        </button>
                     </div>
                 </div>
             </div>
