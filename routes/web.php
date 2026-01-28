@@ -199,6 +199,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::post('pages/add_edit', 'PagesController@addnew');
         Route::get('pages/delete/{id}', 'PagesController@delete');
 
+        Route::get('awards', 'AwardsController@index');
+
         Route::get('news_ticker', 'NewsTickerController@index');
         Route::post('news_ticker/save', 'NewsTickerController@save');
         Route::get('news_ticker/edit/{id}', 'NewsTickerController@edit');

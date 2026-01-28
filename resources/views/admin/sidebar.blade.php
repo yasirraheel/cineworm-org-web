@@ -18,6 +18,9 @@
                     
                     <li><a href="{{ URL::to('admin/comments') }}" class="waves-effect {{ classActivePath('comments') }}"><i
                                 class="fa fa-comments"></i><span>Comments</span></a></li>
+                    
+                    <li><a href="{{ URL::to('admin/awards') }}" class="waves-effect {{ classActivePath('awards') }}"><i
+                                class="fa fa-trophy"></i><span>Awards</span></a></li>
 
                     <li><a href="{{ URL::to('admin/news_ticker') }}" class="waves-effect {{ classActivePath('news_ticker') }}"><i
                                 class="fa fa-newspaper-o"></i><span>News Ticker</span></a></li>
