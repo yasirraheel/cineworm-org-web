@@ -8,7 +8,7 @@ class Movies extends Model
 {
     protected $table = 'movie_videos';
 
-    protected $fillable = ['video_title','video_image','added_by','file_id'];
+    protected $fillable = ['video_title','video_image','added_by','file_id','is_owner'];
 
 
 	public $timestamps = false;
@@ -22,7 +22,7 @@ class Movies extends Model
         if (!isset($movies_cache[$id])) {
     	    $movies_cache[$id] = Movies::where('status','1')->where('id',$id)->first();
         }
-        
+
         $movie_info = $movies_cache[$id];
 
 		if($movie_info)

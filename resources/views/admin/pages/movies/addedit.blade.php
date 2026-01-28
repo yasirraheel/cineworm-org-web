@@ -180,6 +180,21 @@
                                         </div>
 
                                     </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Are you the owner?*</label>
+                                        <div class="col-sm-8">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="is_owner" id="is_owner_yes" value="1" @if(isset($movie->is_owner) && $movie->is_owner == 1) checked @endif>
+                                                <label class="form-check-label" for="is_owner_yes">Yes, I am the owner</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="is_owner" id="is_owner_no" value="0" @if((isset($movie->is_owner) && $movie->is_owner == 0) || !isset($movie->id)) checked @endif>
+                                                <label class="form-check-label" for="is_owner_no">No, I am sharing someone else's work</label>
+                                            </div>
+                                            <small class="form-text text-muted">(Owners get digital awards based on likes)</small>
+                                        </div>
+                                    </div>
                                     <!--<div class="form-group row">-->
                                     <!--    <label class="col-sm-3 col-form-label">{{ trans('words.movie_access') }}</label>-->
                                     <!--    <div class="col-sm-8">-->

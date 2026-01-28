@@ -266,6 +266,22 @@ class MoviesController extends Controller
         $movie = Movies::find($video_id);
         if ($movie) {
             $movie->increment('likes');
+
+            // Check for awards if the movie has an owner
+            if ($movie->is_owner && $movie->added_by) {
+                $updatedMovie = $movie->fresh(); // Get updated likes count
+                $likes = $updatedMovie->likes;
+
+                if ($likes >= 100) {
+                    $this->checkAndGiveAward($updatedMovie->added_by, $updatedMovie->id, '100_likes');
+                }
+                if ($likes >= 1000) {
+                    $this->checkAndGiveAward($updatedMovie->added_by, $updatedMovie->id, '1000_likes');
+                }
+                if ($likes >= 10000) {
+                    $this->checkAndGiveAward($updatedMovie->added_by, $updatedMovie->id, '10000_likes');
+                }
+            }
         }
 
         // Return JSON for AJAX requests
@@ -492,6 +508,25 @@ class MoviesController extends Controller
         } catch (\Exception $e) {
             \Log::error("Exception in getNewsContent: " . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    private function checkAndGiveAward($user_id, $movie_id, $award_type)
+    {
+        // Check if award already exists
+        $exists = Award::where('user_id', $user_id)
+            ->where('movie_id', $movie_id)
+            ->where('award_type', $award_type)
+            ->exists();
+
+        if (!$exists) {
+            Award::create([
+                'user_id' => $user_id,
+                'movie_id' => $movie_id,
+                'award_type' => $award_type
+            ]);
+            // Log or notify if needed
+            \Log::info("Award given: User $user_id, Movie $movie_id, Type $award_type");
         }
     }
 }

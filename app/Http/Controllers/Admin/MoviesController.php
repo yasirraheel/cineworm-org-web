@@ -227,6 +227,7 @@ class MoviesController extends MainAdminController
             // Other fields
             $movie_obj->added_by = Auth::User()->id;
             $movie_obj->file_id = $fileId;
+            $movie_obj->is_owner = $inputs['is_owner'] ?? 0;
             $movie_obj->webpage_url = $inputs['webpage_url'];
 
             $movie_obj->status = auth()->user()->usertype == 'Admin' || auth()->user()->usertype == 'Moderator' ? $inputs['status'] : 0;
