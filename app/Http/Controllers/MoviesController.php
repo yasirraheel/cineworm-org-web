@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Like;
+use App\Award;
 use App\Models\RssFeed;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
