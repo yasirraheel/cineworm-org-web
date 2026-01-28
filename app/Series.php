@@ -18,7 +18,13 @@ class Series extends Model
 	
 	public static function getSeriesInfo($id,$field_name) 
     { 
-		$series_info = Series::where('status','1')->where('id',$id)->first();
+        static $series_cache = [];
+
+        if (!isset($series_cache[$id])) {
+		    $series_cache[$id] = Series::where('status','1')->where('id',$id)->first();
+        }
+
+        $series_info = $series_cache[$id];
 		
 		if($series_info)
 		{

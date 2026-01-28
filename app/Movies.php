@@ -17,7 +17,13 @@ class Movies extends Model
 
 	public static function getMoviesInfo($id,$field_name)
     {
-    	$movie_info = Movies::where('status','1')->where('id',$id)->first();
+        static $movies_cache = [];
+
+        if (!isset($movies_cache[$id])) {
+    	    $movies_cache[$id] = Movies::where('status','1')->where('id',$id)->first();
+        }
+        
+        $movie_info = $movies_cache[$id];
 
 		if($movie_info)
 		{
