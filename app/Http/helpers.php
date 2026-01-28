@@ -317,14 +317,27 @@ if (! function_exists('getcong')) {
 
     function getcong($key)
     {
-    	//echo "string";exit;
+        // Use static variable for per-request caching
+        static $settings = null;
 
-       if(file_exists(base_path('/public/.lic')))
-       {
-            $settings = Settings::findOrFail('1');
+        if ($settings === null) {
+            // Use Laravel Cache for cross-request caching (cache for 60 minutes)
+            $settings = Cache::remember('site_settings', 60, function () {
+                if (file_exists(base_path('/public/.lic'))) {
+                    try {
+                        return Settings::findOrFail('1');
+                    } catch (\Exception $e) {
+                        return null;
+                    }
+                }
+                return null;
+            });
+        }
 
+        if ($settings) {
             return $settings->$key;
-       }
+        }
+        return null;
     }
 }
 
@@ -332,10 +345,22 @@ if (! function_exists('get_player_cong')) {
 
     function get_player_cong($key)
     {
+        static $playerSettings = null;
 
-        $settings = Player::findOrFail('1');
+        if ($playerSettings === null) {
+            $playerSettings = Cache::remember('player_settings', 60, function () {
+                try {
+                    return Player::findOrFail('1');
+                } catch (\Exception $e) {
+                    return null;
+                }
+            });
+        }
 
-        return $settings->$key;
+        if ($playerSettings) {
+            return $playerSettings->$key;
+        }
+        return null;
     }
 }
 
@@ -559,7 +584,7 @@ if (! function_exists('checkSignSalt')) {
 
         // Decode Base64
         $decoded_json = base64_decode($data_json);
-        
+
         if(!$decoded_json) {
              $set['VIDEO_STREAMING_APP'][] = array("status" => -1, "message" => "Invalid base64 data.");
              header( 'Content-Type: application/json; charset=utf-8' );

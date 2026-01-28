@@ -1738,7 +1738,7 @@
             var modalTitle = document.getElementById('game-modal-title');
 
             var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}";
-            
+
             // Open Watermelon Modal
             if(btn){
                 btn.onclick = function() {
@@ -1749,8 +1749,6 @@
                     iframe.src = watermelonUrl;
                 }
             }
-
-            // Open Pacman Modal - REMOVED
 
             // Close Modal
             if(closeBtn){
