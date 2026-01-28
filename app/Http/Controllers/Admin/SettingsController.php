@@ -615,12 +615,11 @@ class SettingsController extends MainAdminController
                 chmod($ffmpegPath, 0755); // Ensure executable
             }
         }
-        // Priority 2: User specified path (Shared Hosting) - Only if bundled is missing
-        else {
-             $userCustomPath = '/home/u273790872/bin/ffmpeg';
-             if (!$operatingSystem && file_exists($userCustomPath)) {
-                 $ffmpegPath = $userCustomPath;
-             }
+        
+        // Priority 2: User specified path (Shared Hosting) - Fallback if bundled is missing
+        $userCustomPath = '/home/u273790872/bin/ffmpeg';
+        if (!$usingBundled && !$operatingSystem && file_exists($userCustomPath)) {
+            $ffmpegPath = $userCustomPath;
         }
 
         // Generate a random timestamp within the first 15 seconds

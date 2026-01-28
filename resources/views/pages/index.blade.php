@@ -194,29 +194,6 @@
             background: #666;
         }
 
-        /* Pacman Game Container Styling */
-        .pacman-game-container {
-            background: #1a1a1a;
-            flex: 1;
-            overflow: hidden;
-            padding: 0;
-            color: #fff;
-        }
-
-        .pacman-game-wrapper {
-            background: #000;
-            height: 100%;
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .pacman-game-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
 
         /* Prevent horizontal overflow in news ticker column */
         .col-md-3.d-flex {
@@ -715,10 +692,6 @@
                                     <span>Play Watermelon</span>
                                 </button>
 
-                                <button class="action-btn game-btn" id="open-pacman-modal" style="background: linear-gradient(90deg, #f1c40f, #f39c12); box-shadow: 0 2px 8px rgba(241, 196, 15, 0.25);">
-                                    <i class="fas fa-ghost"></i>
-                                    <span>Play Pacman</span>
-                                </button>
 
                                 <button class="action-btn share-btn" data-toggle="modal" data-target="#social-media">
                                     <i class="fas fa-share-alt"></i>
@@ -823,13 +796,6 @@
                             <h5 class="mb-0">
                                 <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold active-toggle-btn" type="button" onclick="toggleSection('news')" id="newsToggleBtn">
                                     <i class="fa fa-newspaper-o mr-2"></i> Latest News
-                                </button>
-                            </h5>
-                        </div>
-                        <div class="card-header p-2" id="headingGame" style="background: #111; border-bottom: 1px solid #333;">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left font-weight-bold" type="button" onclick="toggleSection('game')" id="gameToggleBtn">
-                                    <i class="fa fa-gamepad mr-2"></i> Games
                                 </button>
                             </h5>
                         </div>
@@ -1547,14 +1513,14 @@
                     }
                 }
 
-                // Adjust Game if visible
-                var gameCollapse = document.getElementById('collapseGame');
-                if (gameCollapse && gameCollapse.style.display !== 'none') {
-                    var gameWrapper = document.querySelector('.pacman-game-wrapper');
-                    if (gameWrapper) {
-                        gameWrapper.style.height = availableHeight + 'px';
-                    }
-                }
+                // Adjust Game if visible - REMOVED
+                // var gameCollapse = document.getElementById('collapseGame');
+                // if (gameCollapse && gameCollapse.style.display !== 'none') {
+                //    var gameWrapper = document.querySelector('.pacman-game-wrapper');
+                //    if (gameWrapper) {
+                //        gameWrapper.style.height = availableHeight + 'px';
+                //    }
+                // }
             }
 
             // Call on load, resize, and periodically
@@ -1786,16 +1752,7 @@
                 }
             }
 
-            // Open Pacman Modal
-            if(pacmanBtn){
-                pacmanBtn.onclick = function() {
-                    if(modalTitle) modalTitle.innerText = "Pacman Game";
-                    modal.style.display = "flex";
-                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
-                    // Always reload to ensure fresh logs
-                    iframe.src = pacmanUrl;
-                }
-            }
+            // Open Pacman Modal - REMOVED
 
             // Close Modal
             if(closeBtn){
