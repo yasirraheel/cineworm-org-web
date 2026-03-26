@@ -165,6 +165,13 @@ class UsersController extends MainAdminController
             $user->exp_date = strtotime($inputs['exp_date']);
         }
 
+        $allowedUserTypes = ['Admin', 'Moderator', 'Sub_Admin', 'User'];
+        if (!empty($inputs['usertype']) && in_array($inputs['usertype'], $allowedUserTypes, true)) {
+            $user->usertype = $inputs['usertype'];
+        } elseif (empty($inputs['id']) && empty($user->usertype)) {
+            $user->usertype = 'User';
+        }
+
 
         // $user->plan_id = $plan_id;
         $user->status = $inputs['status'];
@@ -349,7 +356,8 @@ class UsersController extends MainAdminController
         }
 
 
-        $user->usertype = $inputs['usertype'];
+        $allowedAdminTypes = ['Admin', 'Moderator', 'Sub_Admin'];
+        $user->usertype = in_array($inputs['usertype'], $allowedAdminTypes, true) ? $inputs['usertype'] : 'Moderator';
         $user->name = $inputs['name'];
         $user->email = $inputs['email'];
 

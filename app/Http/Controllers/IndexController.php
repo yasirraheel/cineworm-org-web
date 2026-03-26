@@ -545,7 +545,7 @@ class IndexController extends Controller
         Auth::user()->save();
         */
 
-        if (Auth::user()->usertype == 'Admin' or Auth::user()->usertype == 'Sub_Admin') {
+        if (Auth::user()->usertype == 'Admin' or Auth::user()->usertype == 'Sub_Admin' or Auth::user()->usertype == 'Moderator') {
             return redirect('/');
         } else {
 

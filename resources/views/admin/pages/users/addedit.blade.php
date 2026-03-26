@@ -116,6 +116,17 @@
                       </div>
                   </div>
                   <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Role</label>
+                      <div class="col-sm-8">
+                            <select class="form-control" name="usertype">
+                                <option value="User" @if(isset($user->usertype) AND $user->usertype=="User") selected @endif>User</option>
+                                <option value="Moderator" @if(isset($user->usertype) AND ($user->usertype=="Moderator" OR $user->usertype=="Sub_Admin")) selected @endif>Moderator</option>
+                                <option value="Admin" @if(isset($user->usertype) AND $user->usertype=="Admin") selected @endif>Admin</option>
+                            </select>
+                      </div>
+                  </div>
+
+                  <div class="form-group row">
                     <label class="col-sm-3 col-form-label">{{trans('words.status')}}</label>
                       <div class="col-sm-8">
                             <select class="form-control" name="status">                               

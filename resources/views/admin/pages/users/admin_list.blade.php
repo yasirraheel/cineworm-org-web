@@ -47,7 +47,15 @@
                       <td>{{ $user_data->name }}</td>
                       <td>{{ $user_data->email }}</td>
                       <td>{{ $user_data->phone }}</td>
-                      <td>@if ($user_data->usertype == 'Admin') <span class="badge badge-success">Admin</span> @else <span class="badge badge-info">Moderator</span>@endif</td>
+                      <td>
+                        @if ($user_data->usertype == 'Admin')
+                          <span class="badge badge-success">Admin</span>
+                        @elseif ($user_data->usertype == 'Moderator' || $user_data->usertype == 'Sub_Admin')
+                          <span class="badge badge-info">Moderator</span>
+                        @else
+                          <span class="badge badge-secondary">{{ $user_data->usertype }}</span>
+                        @endif
+                      </td>
 
                       <td>@if($user_data->status==1)<span class="badge badge-success">{{trans('words.active')}}</span> @else<span class="badge badge-danger">{{trans('words.inactive')}}</span>@endif</td>
 

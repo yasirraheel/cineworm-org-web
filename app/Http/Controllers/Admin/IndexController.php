@@ -81,7 +81,7 @@ class IndexController extends MainAdminController
             return $this->authenticated($request, Auth::user());
         }
 
-        if(Auth::user()->usertype=='Admin' OR Auth::user()->usertype=='Sub_Admin')
+        if(Auth::user()->usertype=='Admin' OR Auth::user()->usertype=='Sub_Admin' OR Auth::user()->usertype=='Moderator')
         {
             return redirect('/');
         }

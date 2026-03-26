@@ -86,7 +86,7 @@
                                 <label class="col-sm-3 col-form-label">{{ trans('words.admin_type') }}</label>
                                 <div class="col-sm-8">
                                     <select class="form-control" name="usertype" id="admin_usertype">
-                                        <option value="Sub_Admin" @if (isset($user->usertype) and $user->usertype == 'Sub_Admin') selected @endif>
+                                        <option value="Moderator" @if (isset($user->usertype) and ($user->usertype == 'Moderator' || $user->usertype == 'Sub_Admin')) selected @endif>
                                             Moderator</option>
                                         <option value="Admin" @if (isset($user->usertype) and $user->usertype == 'Admin') selected @endif>
                                             Master Admin</option>
@@ -96,7 +96,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">&nbsp;</label>
                                 <div class="col-sm-8">
-                                    <p id="sub_admin_id" @if (isset($user->usertype) and $user->usertype != 'Sub_Admin'); @endif>
+                                    <p id="sub_admin_id" @if (isset($user->usertype) and $user->usertype == 'Admin') style="display:none;" @endif>
                                         Permission for Moderators<small id="emailHelp"
                                             class="form-text text-muted">({{ trans('words.language_text') }},
                                             {{ trans('words.genres_text') }}, {{ trans('words.movies_text') }},
