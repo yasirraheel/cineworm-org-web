@@ -38,6 +38,20 @@
                                 </a>
                             </div>
                         </div>
+                        <div class="col-6">
+                            <div class="right-sub-item-area">
+                                @if (getcong('donation_link'))
+                                    <div class="signup-btn-item" style="float:right;">
+                                        <a href="{{ stripslashes(getcong('donation_link')) }}" title="Donate"
+                                            target="_blank" rel="noopener noreferrer">
+                                            <img src="{{ URL::asset('site_assets/images/ic-subscribe2.png') }}"
+                                                alt="donate" title="donate">
+                                            <span>Donate</span>
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

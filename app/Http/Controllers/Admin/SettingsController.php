@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Session;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends MainAdminController
 {
@@ -111,6 +112,7 @@ class SettingsController extends MainAdminController
 
         $settings->footer_google_play_link = addslashes($inputs['footer_google_play_link']);
         $settings->footer_apple_store_link = addslashes($inputs['footer_apple_store_link']);
+        $settings->donation_link = addslashes($inputs['donation_link'] ?? '');
 
         $settings->gdpr_cookie_on_off = $inputs['gdpr_cookie_on_off'];
         $settings->gdpr_cookie_title = addslashes($inputs['gdpr_cookie_title']);
@@ -120,6 +122,7 @@ class SettingsController extends MainAdminController
         $settings->tmdb_api_key = trim($inputs['tmdb_api_key']);
 
 	    $settings->save();
+        Cache::forget('site_settings');
 
 
 	    Session::flash('flash_message', trans('words.successfully_updated'));

@@ -402,6 +402,15 @@
                                         </div>
                                     </div>
 
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Donation URL</label>
+                                        <div class="col-sm-8">
+                                            <input type="url" name="donation_link"
+                                                value="{{ isset($settings->donation_link) ? stripslashes($settings->donation_link) : null }}"
+                                                class="form-control" placeholder="https://example.com/donate">
+                                        </div>
+                                    </div>
+
 
                                 </div>
 

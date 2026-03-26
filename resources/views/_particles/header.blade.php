@@ -121,6 +121,16 @@
                                         </a>
                                     </form>
                                 </div>
+                                @if (getcong('donation_link'))
+                                    <div class="signup-btn-item">
+                                        <a href="{{ stripslashes(getcong('donation_link')) }}" title="Donate"
+                                            target="_blank" rel="noopener noreferrer">
+                                            <img src="{{ URL::asset('site_assets/images/ic-subscribe2.png') }}"
+                                                alt="donate" title="donate">
+                                            <span>Donate</span>
+                                        </a>
+                                    </div>
+                                @endif
                                 <!-- Stumble Button -->
 
 

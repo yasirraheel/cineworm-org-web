@@ -8,7 +8,7 @@ class Settings extends Model
 {
     protected $table = 'settings';
 
-    protected $fillable = ['site_name','currency_symbol', 'site_email', 'site_logo', 'site_default_movie_thumb', 'site_default_movie_poster', 'site_meta_image', 'site_favicon','site_description','site_header_code','site_footer_code','site_copyright','comments_approval'];
+    protected $fillable = ['site_name','currency_symbol', 'site_email', 'site_logo', 'site_default_movie_thumb', 'site_default_movie_poster', 'site_meta_image', 'site_favicon','site_description','site_header_code','site_footer_code','site_copyright','comments_approval','donation_link'];
 
 
 
