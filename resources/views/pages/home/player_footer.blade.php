@@ -67,9 +67,9 @@
             <span>{{ trans('words.share_text') }}</span>
         </button>
 
-        <a href="{{ $random_movie ? url('movies/'.$random_movie->video_slug.'/'.$random_movie->id) : URL::to('/') }}" class="action-btn next-btn" id="footer-next-btn">
-            <i class="fas fa-step-forward"></i>
-            <span>Next</span>
+        <a href="{{ $random_movie ? url('movies/'.$random_movie->video_slug.'/'.$random_movie->id) : URL::to('/') }}" class="action-btn next-btn" id="footer-stumble-btn">
+            <i class="fas fa-random"></i>
+            <span>Stumble</span>
         </a>
     </div>
 </div>

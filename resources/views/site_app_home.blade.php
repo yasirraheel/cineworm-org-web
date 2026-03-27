@@ -255,17 +255,12 @@ $(document).ready(function() {
     function loadRandomVideo() {
         console.log('loadRandomVideo triggered');
 
-        var originalText = $('#stumble-text').text();
-        $('#stumble-text').text('Loading...');
-        $('#stumble-btn').css('pointer-events', 'none');
-
-        // Also disable next button if it exists and show loading
-        var $nextBtn = $('#footer-next-btn');
-        var originalNextContent = '';
-        if ($nextBtn.length) {
-            originalNextContent = $nextBtn.html();
-            $nextBtn.addClass('disabled').css('pointer-events', 'none');
-            $nextBtn.html('<i class="fas fa-spinner fa-spin"></i> <span>Loading...</span>');
+        var $randomBtn = $('#footer-stumble-btn');
+        var originalRandomContent = '';
+        if ($randomBtn.length) {
+            originalRandomContent = $randomBtn.html();
+            $randomBtn.addClass('disabled').css('pointer-events', 'none');
+            $randomBtn.html('<i class="fas fa-spinner fa-spin"></i> <span>Loading...</span>');
         }
 
         console.log('Making AJAX request...');
@@ -316,11 +311,9 @@ $(document).ready(function() {
                         console.error('Player container not found!');
                         console.log('Available containers:', $('.slider-area .row > div').length);
                         alert('Error: Player container not found on page. Please refresh and try again.');
-                        $('#stumble-text').text(originalText);
-                        $('#stumble-btn').css('pointer-events', 'auto');
-                        if ($nextBtn.length) {
-                            $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
-                            $nextBtn.html(originalNextContent);
+                        if ($randomBtn.length) {
+                            $randomBtn.removeClass('disabled').css('pointer-events', 'auto');
+                            $randomBtn.html(originalRandomContent);
                         }
                         return;
                     }
@@ -371,12 +364,10 @@ $(document).ready(function() {
                     function executeNextScript() {
                         if (scriptIndex >= scripts.length) {
                             console.log('All scripts executed');
-                            $('#stumble-text').text(originalText);
-                            $('#stumble-btn').css('pointer-events', 'auto');
-                            // If footer was NOT updated, restore next button
-                            if (!response.footerHtml && $nextBtn.length) {
-                                $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
-                                $nextBtn.html(originalNextContent);
+                            // If footer was NOT updated, restore the stumble button state
+                            if (!response.footerHtml && $randomBtn.length) {
+                                $randomBtn.removeClass('disabled').css('pointer-events', 'auto');
+                                $randomBtn.html(originalRandomContent);
                             }
                             return;
                         }
@@ -417,11 +408,9 @@ $(document).ready(function() {
                     console.error('Server returned success=false:', response.error);
                     alert('Error: ' + (response.error || 'Failed to load video'));
 
-                    $('#stumble-text').text(originalText);
-                    $('#stumble-btn').css('pointer-events', 'auto');
-                    if ($nextBtn.length) {
-                        $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
-                        $nextBtn.html(originalNextContent);
+                    if ($randomBtn.length) {
+                        $randomBtn.removeClass('disabled').css('pointer-events', 'auto');
+                        $randomBtn.html(originalRandomContent);
                     }
                 }
             },
@@ -436,28 +425,19 @@ $(document).ready(function() {
 
                 alert(errorMsg);
 
-                $('#stumble-text').text(originalText);
-                $('#stumble-btn').css('pointer-events', 'auto');
-                if ($nextBtn.length) {
-                    $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
-                    $nextBtn.html(originalNextContent);
+                if ($randomBtn.length) {
+                    $randomBtn.removeClass('disabled').css('pointer-events', 'auto');
+                    $randomBtn.html(originalRandomContent);
                 }
             }
         });
     }
 
-    // Bind click event to Stumble button
-    $('#stumble-btn').on('click', function(e) {
+    // Bind click event to footer stumble button
+    $(document).on('click', '#footer-stumble-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        loadRandomVideo();
-        return false;
-    });
-
-    // Bind click event to Next button (delegated since it might be dynamic)
-    $(document).on('click', '#footer-next-btn', function(e) {
-        e.preventDefault();
         loadRandomVideo();
         return false;
     });

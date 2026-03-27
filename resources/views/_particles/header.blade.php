@@ -85,34 +85,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 nav-order-last nopadding text-center"
-                            style="display: flex; justify-content: center; align-items: center; height: 100px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
-
-                            <div class="subscribe-btn-item stumble-button">
-                                <a href="#" id="stumble-btn" title="Stumble" onclick="return false;"
-                                    style="display: flex; align-items: center; text-decoration: none; font-weight: bold; border: 2px solid #444; padding: 10px 20px; border-radius: 5px; transition: background 0.3s, border 0.3s; cursor: pointer;">
-
-                                    <img src="{{ URL::asset('site_assets/images/ic-subscribe2.png') }}"
-                                        alt="ic-subscribe" title="Stumble"
-                                        style="width: 24px; height: 24px; margin-right: 8px;">
-
-                                    <span style="color: #fff;" id="stumble-text">Stumble</span>
-                                </a>
-                            </div>
-                        </div>
-
-
-                        <!-- Centered Stumble Button (Mobile only) -->
-                        {{-- <div class="col-2">
-                            <div class="centered-stumble-button">
-                                <a href="{{ route('stumble_random') }}" class="btn btn-primary px-4 py-2 fw-bold text-white">
-                                    Stumble
-                                </a>
-                            </div>
-                        </div> --}}
-
-
-                        <div class="col-3">
+                        <div class="col-6">
                             <div class="right-sub-item-area">
                                 <div class="search-item-block">
                                     <form class="navbar-form navbar-left">

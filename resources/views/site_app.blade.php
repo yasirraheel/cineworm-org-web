@@ -255,21 +255,12 @@ $(document).ready(function() {
     window.loadRandomVideo = function() {
         console.log('loadRandomVideo triggered');
 
-        var originalText = $('#stumble-text').text();
-        if ($('#stumble-text').length) {
-            $('#stumble-text').text('Loading...');
-        }
-        if ($('#stumble-btn').length) {
-            $('#stumble-btn').css('pointer-events', 'none');
-        }
-
-        // Also disable next button if it exists and show loading
-        var $nextBtn = $('#footer-next-btn');
-        var originalNextContent = '';
-        if ($nextBtn.length) {
-            originalNextContent = $nextBtn.html();
-            $nextBtn.addClass('disabled').css('pointer-events', 'none');
-            $nextBtn.html('<i class="fas fa-spinner fa-spin"></i> <span>Loading...</span>');
+        var $randomBtn = $('#footer-stumble-btn');
+        var originalRandomContent = '';
+        if ($randomBtn.length) {
+            originalRandomContent = $randomBtn.html();
+            $randomBtn.addClass('disabled').css('pointer-events', 'none');
+            $randomBtn.html('<i class="fas fa-spinner fa-spin"></i> <span>Loading...</span>');
         }
 
         console.log('Making AJAX request...');
@@ -329,15 +320,9 @@ $(document).ready(function() {
                     if ($container.length === 0) {
                         console.error('Player container not found!');
                         alert('Error: Player container not found on page. Please refresh and try again.');
-                        if ($('#stumble-text').length) {
-                            $('#stumble-text').text(originalText);
-                        }
-                        if ($('#stumble-btn').length) {
-                            $('#stumble-btn').css('pointer-events', 'auto');
-                        }
-                        if ($nextBtn.length) {
-                            $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
-                            $nextBtn.html(originalNextContent);
+                        if ($randomBtn.length) {
+                            $randomBtn.removeClass('disabled').css('pointer-events', 'auto');
+                            $randomBtn.html(originalRandomContent);
                         }
                         return;
                     }
@@ -387,7 +372,7 @@ $(document).ready(function() {
 
                             // If on Watch page, ensure Next button is visible (it defaults to hidden in the partial)
                             if ($('.video-posts-video .col-md-7').length > 0) {
-                                $('#footer-next-btn').show();
+                                $('#footer-stumble-btn').show();
                             }
 
                             // Re-initialize any listeners for the new footer content if needed
@@ -411,16 +396,10 @@ $(document).ready(function() {
                     function executeNextScript() {
                         if (scriptIndex >= scripts.length) {
                             console.log('All scripts executed');
-                            if ($('#stumble-text').length) {
-                                $('#stumble-text').text(originalText);
-                            }
-                            if ($('#stumble-btn').length) {
-                                $('#stumble-btn').css('pointer-events', 'auto');
-                            }
-                            // If footer was NOT updated, restore next button
-                            if (!response.footerHtml && $nextBtn.length) {
-                                $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
-                                $nextBtn.html(originalNextContent);
+                            // If footer was NOT updated, restore the stumble button state
+                            if (!response.footerHtml && $randomBtn.length) {
+                                $randomBtn.removeClass('disabled').css('pointer-events', 'auto');
+                                $randomBtn.html(originalRandomContent);
                             }
                             return;
                         }
@@ -461,15 +440,9 @@ $(document).ready(function() {
                     console.error('Server returned success=false:', response.error);
                     alert('Error: ' + (response.error || 'Failed to load video'));
 
-                    if ($('#stumble-text').length) {
-                        $('#stumble-text').text(originalText);
-                    }
-                    if ($('#stumble-btn').length) {
-                        $('#stumble-btn').css('pointer-events', 'auto');
-                    }
-                    if ($nextBtn.length) {
-                        $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
-                        $nextBtn.html(originalNextContent);
+                    if ($randomBtn.length) {
+                        $randomBtn.removeClass('disabled').css('pointer-events', 'auto');
+                        $randomBtn.html(originalRandomContent);
                     }
                 }
             },
@@ -484,39 +457,19 @@ $(document).ready(function() {
 
                 alert(errorMsg);
 
-                if ($('#stumble-text').length) {
-                    $('#stumble-text').text(originalText);
-                }
-                if ($('#stumble-btn').length) {
-                    $('#stumble-btn').css('pointer-events', 'auto');
-                }
-                if ($nextBtn.length) {
-                    $nextBtn.removeClass('disabled').css('pointer-events', 'auto');
-                    $nextBtn.html(originalNextContent);
+                if ($randomBtn.length) {
+                    $randomBtn.removeClass('disabled').css('pointer-events', 'auto');
+                    $randomBtn.html(originalRandomContent);
                 }
             }
         });
     }; // End of window.loadRandomVideo
 
-    // Bind click event to Stumble button
-    $('#stumble-btn').on('click', function(e) {
-        // Check if we are on the movies page
-        var currentPath = window.location.pathname;
-        if (currentPath === '/movies' || currentPath === '/movies/') {
-             window.location.href = "{{ URL::to('/') }}";
-             return;
-        }
-
+    // Bind click event to footer stumble button
+    $(document).on('click', '#footer-stumble-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.loadRandomVideo();
-        return false;
-    });
-
-    // Bind click event to Next button (delegated since it might be dynamic)
-    $(document).on('click', '#footer-next-btn', function(e) {
-        e.preventDefault();
         window.loadRandomVideo();
         return false;
     });
