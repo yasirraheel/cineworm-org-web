@@ -286,7 +286,7 @@
                                     <span>{{ trans('words.share_text') }}</span>
                                 </button>
 
-                                <a href="{{ URL::to('/') }}" class="action-btn next-btn" id="footer-stumble-btn">
+                                <a href="{{ URL::to('/') }}" class="action-btn next-btn footer-stumble-btn" id="footer-next-btn">
                                     <i class="fas fa-random"></i>
                                     <span>Stumble</span>
                                 </a>

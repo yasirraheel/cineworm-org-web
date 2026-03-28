@@ -255,7 +255,7 @@ $(document).ready(function() {
     function loadRandomVideo() {
         console.log('loadRandomVideo triggered');
 
-        var $randomBtn = $('#footer-stumble-btn');
+        var $randomBtn = $('#footer-next-btn, #footer-stumble-btn, .footer-stumble-btn').first();
         var originalRandomContent = '';
         if ($randomBtn.length) {
             originalRandomContent = $randomBtn.html();
@@ -434,7 +434,7 @@ $(document).ready(function() {
     }
 
     // Bind click event to footer stumble button
-    $(document).on('click', '#footer-stumble-btn', function(e) {
+    $(document).on('click', '#footer-next-btn, #footer-stumble-btn, .footer-stumble-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();

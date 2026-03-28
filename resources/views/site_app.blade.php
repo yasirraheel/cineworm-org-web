@@ -255,7 +255,7 @@ $(document).ready(function() {
     window.loadRandomVideo = function() {
         console.log('loadRandomVideo triggered');
 
-        var $randomBtn = $('#footer-stumble-btn');
+        var $randomBtn = $('#footer-next-btn, #footer-stumble-btn, .footer-stumble-btn').first();
         var originalRandomContent = '';
         if ($randomBtn.length) {
             originalRandomContent = $randomBtn.html();
@@ -372,7 +372,7 @@ $(document).ready(function() {
 
                             // If on Watch page, ensure Next button is visible (it defaults to hidden in the partial)
                             if ($('.video-posts-video .col-md-7').length > 0) {
-                                $('#footer-stumble-btn').show();
+                                $('#footer-next-btn, #footer-stumble-btn, .footer-stumble-btn').show();
                             }
 
                             // Re-initialize any listeners for the new footer content if needed
@@ -466,7 +466,7 @@ $(document).ready(function() {
     }; // End of window.loadRandomVideo
 
     // Bind click event to footer stumble button
-    $(document).on('click', '#footer-stumble-btn', function(e) {
+    $(document).on('click', '#footer-next-btn, #footer-stumble-btn, .footer-stumble-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
