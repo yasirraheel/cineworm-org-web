@@ -345,6 +345,29 @@
                 </div>
             </div>
 
+            <!-- Start Social Media Icon Popup -->
+            <div id="social-media" class="modal fade centered-modal" tabindex="-1" role="dialog" aria-labelledby="myModal" aria-hidden="true">
+                <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+                    <div class="modal-content bg-dark-2 text-light">
+                        <div class="modal-header">
+                            <h4 class="modal-title text-white">{{ trans('words.share_text') }}</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="social-media-modal">
+                                <ul>
+                                    <li><a title="Sharing" href="https://www.facebook.com/sharer/sharer.php?u={{ share_url_get('movies', $movies_info->video_slug, $movies_info->id) }}" class="facebook-icon" target="_blank"><i class="ion-social-facebook"></i></a></li>
+                                    <li><a title="Sharing" href="https://twitter.com/intent/tweet?text={{ $movies_info->video_title }}&amp;url={{ share_url_get('movies', $movies_info->video_slug, $movies_info->id) }}" class="twitter-icon" target="_blank"><i class="ion-social-twitter"></i></a></li>
+                                    <li><a title="Sharing" href="https://www.instagram.com/?url={{ share_url_get('movies', $movies_info->video_slug, $movies_info->id) }}" class="instagram-icon" target="_blank"><i class="ion-social-instagram"></i></a></li>
+                                    <li><a title="Sharing" href="https://wa.me?text={{ share_url_get('movies', $movies_info->video_slug, $movies_info->id) }}" class="whatsapp-icon" target="_blank"><i class="ion-social-whatsapp"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Social Media Icon Popup -->
+
             <style>
             /* Player Footer Section */
             .player-footer-section {
