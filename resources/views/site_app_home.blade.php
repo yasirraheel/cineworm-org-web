@@ -139,6 +139,49 @@
 <script src="{{ URL::asset('site_assets/js/jquery-eu-cookie-law-popup.js') }}"></script>
 
 <script type="text/javascript">
+  (function () {
+    function fallbackShare(trigger) {
+      var shareUrl = trigger.getAttribute('data-share-url') || window.location.href;
+      var shareTitle = trigger.getAttribute('data-share-title') || document.title || '';
+
+      if (navigator.share) {
+        navigator.share({ title: shareTitle, url: shareUrl }).catch(function () {});
+        return;
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(function () {
+          alert('Share link copied to clipboard');
+        }).catch(function () {
+          window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank');
+        });
+        return;
+      }
+
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank');
+    }
+
+    // Guard Bootstrap modal triggers that point to missing targets.
+    document.addEventListener('click', function (event) {
+      var trigger = event.target.closest('[data-bs-toggle="modal"], [data-toggle="modal"]');
+      if (!trigger) return;
+
+      var targetSelector = trigger.getAttribute('data-bs-target') || trigger.getAttribute('data-target');
+      if (!targetSelector) return;
+
+      if (!document.querySelector(targetSelector)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        if (trigger.classList.contains('share-btn')) {
+          fallbackShare(trigger);
+        }
+      }
+    }, true);
+  })();
+</script>
+
+<script type="text/javascript">
 
 @if(getcong('gdpr_cookie_on_off'))
   $(document).ready( function() {
