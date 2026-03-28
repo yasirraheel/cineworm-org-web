@@ -477,20 +477,40 @@ $(document).ready(function() {
     // Handle Good News Network Link Click (In-place loading)
     $(document).on('click', '.read-dw-news', function(e) {
         e.preventDefault();
-        var link = $(this).data('link');
+        var $clickedLink = $(this);
+        var link = $clickedLink.data('link');
 
         // Find the parent container
-        var container = $(this).closest('.news-ticker-container');
+        var container = $clickedLink.closest('.news-ticker-container');
         var listView = container.find('#news-list-view');
         var detailView = container.find('#news-detail-view');
         var contentBody = container.find('#news-content-body');
+        var $newsItem = $clickedLink.closest('.news-item');
+
+        // Build a reliable in-panel fallback first, so users always see content.
+        var headlineText = $.trim(
+            $newsItem.find('.news-headline').clone().children().remove().end().text()
+        );
+        var detailsHtml = $newsItem.find('.news-details').html() || '';
+        var timeText = $.trim($newsItem.find('.news-time').text());
+        var fallbackHtml = ''
+            + '<div style="padding: 10px 5px;">'
+            +   '<h4 style="color:#fff; margin-bottom:10px;">' + $('<div>').text(headlineText).html() + '</h4>'
+            +   '<div style="color:#ccc; line-height:1.6;">' + detailsHtml + '</div>'
+            +   (timeText ? '<p style="margin-top:10px; color:#888; font-size:12px;">' + $('<div>').text(timeText).html() + '</p>' : '')
+            +   '<div style="margin-top:15px;">'
+            +     '<a href="' + link + '" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="background:#fe8805; color:#fff; text-decoration:none; padding:8px 15px; border-radius:4px;">'
+            +       '<i class="fa fa-external-link"></i> Open Full Story'
+            +     '</a>'
+            +   '</div>'
+            + '</div>';
 
         // Hide list, show detail
         listView.hide();
         detailView.css('display', 'flex');
-        contentBody.html('<div class="text-center p-4"><i class="fa fa-spinner fa-spin fa-2x"></i><p>Loading news...</p></div>');
+        contentBody.html(fallbackHtml);
 
-        // Fetch content via AJAX
+        // Fetch full article via AJAX as an enhancement (may be blocked by source sites).
         $.ajax({
             url: '{{ url("ajax/get_news_content") }}',
             data: { url: link },
@@ -501,12 +521,11 @@ $(document).ready(function() {
                     contentBody.find('img').css({'max-width': '100%', 'height': 'auto', 'border-radius': '5px'});
                     contentBody.find('a').css('color', '#fe8805');
                 } else {
-                    contentBody.html('<p class="text-danger" style="padding: 15px;"><i class="fa fa-exclamation-triangle"></i> Could not load full content. <br><br><a href="'+link+'" target="_blank" class="btn btn-sm" style="background: #fe8805; color: #fff; text-decoration: none; padding: 8px 15px; border-radius: 4px;"><i class="fa fa-external-link"></i> Open in New Tab</a></p>');
+                    contentBody.prepend('<p style="padding: 10px 5px; color:#ffb366;"><i class="fa fa-info-circle"></i> Showing feed summary. Full article preview is blocked by source site.</p>');
                 }
             },
             error: function(xhr) {
-                var errorMsg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Content not available';
-                contentBody.html('<p class="text-danger" style="padding: 15px;"><i class="fa fa-exclamation-triangle"></i> ' + errorMsg + '<br><br><a href="'+link+'" target="_blank" class="btn btn-sm" style="background: #fe8805; color: #fff; text-decoration: none; padding: 8px 15px; border-radius: 4px;"><i class="fa fa-external-link"></i> Open in New Tab</a></p>');
+                contentBody.prepend('<p style="padding: 10px 5px; color:#ffb366;"><i class="fa fa-info-circle"></i> Full article preview unavailable. Showing feed summary instead.</p>');
             }
         });
     });
