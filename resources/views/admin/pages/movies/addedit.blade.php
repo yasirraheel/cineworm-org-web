@@ -965,6 +965,7 @@
                     success: function(response) {
                         if (response.url) {
                             $('#' + targetId).val(response.url);
+                            autoEnableSubtitles(targetId);
                             $(input).val('');
                             Swal.fire('Success', 'SRT uploaded successfully', 'success');
                         } else {
@@ -1000,6 +1001,7 @@
                 success: function(response) {
                     if (response.url) {
                         $('#' + currentPasteTarget).val(response.url);
+                        autoEnableSubtitles(currentPasteTarget);
                         $('#pasteSrtModal').modal('hide');
                         Swal.fire('Success', 'SRT generated successfully', 'success');
                     } else {
@@ -1010,6 +1012,21 @@
                     Swal.fire('Error', 'Generation failed', 'error');
                 }
             });
+        }
+
+        function autoEnableSubtitles(targetId) {
+            // Ensure subtitles are active when an SRT URL is added by upload/paste flow.
+            $('#inlineRadio5').prop('checked', true);
+
+            var langFieldMap = {
+                subtitle_url1: 'subtitle_language1',
+                subtitle_url2: 'subtitle_language2',
+                subtitle_url3: 'subtitle_language3'
+            };
+            var languageFieldId = langFieldMap[targetId];
+            if (languageFieldId && !$('#' + languageFieldId).val().trim()) {
+                $('#' + languageFieldId).val('English');
+            }
         }
     </script>
 

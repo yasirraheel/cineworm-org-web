@@ -256,6 +256,15 @@ class MoviesController extends MainAdminController
             $movie_obj->subtitle_url2 = $inputs['subtitle_url2'] ?? '';
             $movie_obj->subtitle_language3 = $inputs['subtitle_language3'] ?? '';
             $movie_obj->subtitle_url3 = $inputs['subtitle_url3'] ?? '';
+
+            // Safety: if any subtitle URL is present, keep subtitles enabled for playback.
+            if (
+                !empty($movie_obj->subtitle_url1) ||
+                !empty($movie_obj->subtitle_url2) ||
+                !empty($movie_obj->subtitle_url3)
+            ) {
+                $movie_obj->subtitle_on_off = 1;
+            }
             // dd($movie_obj->id);
 
             // Remove from recently watched if status is 0 (inactive)
