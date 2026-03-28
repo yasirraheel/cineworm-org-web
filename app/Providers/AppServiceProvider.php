@@ -14,7 +14,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $FWDEVPlayer = "FWDEVPlayer2.js";
+        $fwdevPlayerFile = "FWDEVPlayer2.js";
+        $fwdevPlayerPath = public_path('site_assets/player/java/' . $fwdevPlayerFile);
+        $fwdevPlayerVersion = file_exists($fwdevPlayerPath) ? filemtime($fwdevPlayerPath) : null;
+
+        $FWDEVPlayer = $fwdevPlayerVersion
+            ? $fwdevPlayerFile . '?v=' . $fwdevPlayerVersion
+            : $fwdevPlayerFile;
 
         // Share the variable with all views
         View::share('FWDEVPlayer', $FWDEVPlayer);
