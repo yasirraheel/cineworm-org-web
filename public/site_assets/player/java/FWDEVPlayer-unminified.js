@@ -17648,7 +17648,7 @@
             for (var i = 0; i < _s.subtitiles_ar.length; i++) {
                 start = _s.subtitiles_ar[i].startDuration;
                 end = _s.subtitiles_ar[i].endDuration;
-                if (start < duration && end > duration) {
+                if (duration >= start && duration < end) {
                     text = _s.subtitiles_ar[i].text
                     break;
                 };

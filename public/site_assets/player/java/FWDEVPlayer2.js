@@ -4282,7 +4282,7 @@ function(t) {
         }, r.updateSubtitle = function(t) {
             if (r.isLoaded_bl) {
                 for (var o = "", s = 0, n, d; s < r.subtitiles_ar.length; s++)
-                    if (n = r.subtitiles_ar[s].startDuration, d = r.subtitiles_ar[s].endDuration, n < t && d > t) {
+                    if (n = r.subtitiles_ar[s].startDuration, d = r.subtitiles_ar[s].endDuration, t >= n && t < d) {
                         o = r.subtitiles_ar[s].text;
                         break
                     }
