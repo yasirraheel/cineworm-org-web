@@ -17687,13 +17687,12 @@
 
             var finalY;
             _s.text_do.setWidth(prt.tempVidStageWidth);
-
-            var textHeight = _s.text_do.getHeight();
+            var subtitleBottomOffset = prt.sW <= 600 ? 64 : 86;
 
             if (prt.controller_do) {
-                finalY = parseInt(prt.sH - prt.controller_do.h - textHeight - 6);
+                finalY = parseInt(prt.sH - prt.controller_do.h - subtitleBottomOffset);
             } else {
-                finalY = parseInt(prt.sH - textHeight);
+                finalY = parseInt(prt.sH - subtitleBottomOffset);
             }
 
             FWDAnimation.killTweensOf(_s.text_do)

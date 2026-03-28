@@ -4295,9 +4295,7 @@ function(t) {
         }, r.position = function(t) {
             if (r.isLoaded_bl) {
                 var o;
-                r.text_do.setWidth(e.tempVidStageWidth);
-                var s = r.text_do.getHeight();
-                o = e.controller_do ? parseInt(e.sH - e.controller_do.h - s - 6) : parseInt(e.sH - s - 10), FWDAnimation.killTweensOf(r.text_do), r.text_do.setY(o)
+                r.text_do.setWidth(e.tempVidStageWidth); var s = 600 >= e.sW ? 64 : 86; o = e.controller_do ? parseInt(e.sH - e.controller_do.h - s) : parseInt(e.sH - s), FWDAnimation.killTweensOf(r.text_do), r.text_do.setY(o)
             }
         }, r.show = function() {
             r.setVisible(!0)
