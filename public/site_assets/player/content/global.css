@@ -565,22 +565,29 @@
 	font: 600 22px Roboto, Arial !important;
 	text-align: center !important;
 	color: #FFFFFF !important;
-	text-shadow: 0px 0px 1px #000000 !important;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
 	line-height: 28px !important;
-	margin: 0 20px 20px !important;
-	padding: 0px !important;
+	margin: 0 auto 12px !important;
+	padding: 6px 12px !important;
+	display: inline-block !important;
+	max-width: 92% !important;
+	background: rgba(0, 0, 0, 0.45) !important;
+	border-radius: 6px !important;
+	word-break: break-word !important;
 }
 
 .EVPSubtitle.phone{
 	font-size: 16px !important;
 	line-height: 20px !important;
-	margin: 0 10px 10px !important;
+	margin: 0 auto 8px !important;
+	padding: 5px 10px !important;
 }
 
 .EVPSubtitle.large{
 	font-size: 28px !important;
 	line-height: 38px !important;
-	margin: 0 20px 20px !important;
+	margin: 0 auto 14px !important;
+	padding: 8px 14px !important;
 }
 
 

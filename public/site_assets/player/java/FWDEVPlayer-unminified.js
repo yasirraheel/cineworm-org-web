@@ -17676,11 +17676,7 @@
                     var sW = prt.tempVidStageWidth;
 
                 _s.text_do.setInnerHTML(text);
-                _s.setAlpha(0);
-                setTimeout(function() {
-                    _s.setAlpha(1);
-                    _s.position();
-                }, 300);
+                _s.position(false);
                 _s.hasText_bl = true;
             }
             _s.prevText = text;
@@ -17695,21 +17691,13 @@
             var textHeight = _s.text_do.getHeight();
 
             if (prt.controller_do) {
-                if (prt.controller_do.isShowed_bl) {
-                    finalY = parseInt(prt.sH - prt.controller_do.h - textHeight);
-                } else {
-                    finalY = parseInt(prt.sH - textHeight - 10);
-                }
+                finalY = parseInt(prt.sH - prt.controller_do.h - textHeight - 6);
             } else {
                 finalY = parseInt(prt.sH - textHeight);
             }
 
             FWDAnimation.killTweensOf(_s.text_do)
-            if (animate) {
-                FWDAnimation.to(_s.text_do, .8, { y: finalY, ease: Expo.easeInOut });
-            } else {
-                _s.text_do.setY(finalY)
-            }
+            _s.text_do.setY(finalY)
         };
 
         _s.show = function() {

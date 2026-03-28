@@ -4288,9 +4288,7 @@ function(t) {
                     }
                 if (260 > e.sW ? r.setVisible(!1) : r.setVisible(!0), o = 600 >= e.sW ? o.replace("EVPSubtitle", "EVPSubtitle phone") : 1e3 >= e.sW ? o.replace("EVPSubtitle", "EVPSubtitle tablet") : 1800 >= e.sW ? o.replace("EVPSubtitle", "EVPSubtitle normal") : o.replace("EVPSubtitle", "EVPSubtitle large"), r.prevText != o) {
                     if (e.sW) e.tempVidStageWidth;
-                    r.text_do.setInnerHTML(o), r.setAlpha(0), setTimeout(function() {
-                        r.setAlpha(1), r.position()
-                    }, 300), r.hasText_bl = !0
+                    r.text_do.setInnerHTML(o), r.position(!1), r.hasText_bl = !0
                 }
                 r.prevText = o
             }
@@ -4299,10 +4297,7 @@ function(t) {
                 var o;
                 r.text_do.setWidth(e.tempVidStageWidth);
                 var s = r.text_do.getHeight();
-                o = e.controller_do ? e.controller_do.isShowed_bl ? parseInt(e.sH - e.controller_do.h - s) : parseInt(e.sH - s - 10) : parseInt(e.sH - s), FWDAnimation.killTweensOf(r.text_do), t ? FWDAnimation.to(r.text_do, .8, {
-                    y: o,
-                    ease: Expo.easeInOut
-                }) : r.text_do.setY(o)
+                o = e.controller_do ? parseInt(e.sH - e.controller_do.h - s - 6) : parseInt(e.sH - s - 10), FWDAnimation.killTweensOf(r.text_do), r.text_do.setY(o)
             }
         }, r.show = function() {
             r.setVisible(!0)
