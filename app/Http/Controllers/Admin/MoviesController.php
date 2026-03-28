@@ -248,6 +248,14 @@ class MoviesController extends MainAdminController
             if (isset($inputs['subtitle_on_off'])) {
                 $movie_obj->subtitle_on_off = $inputs['subtitle_on_off'];
             }
+
+            // Persist subtitle language/url fields for both uploaded and generated SRT links.
+            $movie_obj->subtitle_language1 = $inputs['subtitle_language1'] ?? '';
+            $movie_obj->subtitle_url1 = $inputs['subtitle_url1'] ?? '';
+            $movie_obj->subtitle_language2 = $inputs['subtitle_language2'] ?? '';
+            $movie_obj->subtitle_url2 = $inputs['subtitle_url2'] ?? '';
+            $movie_obj->subtitle_language3 = $inputs['subtitle_language3'] ?? '';
+            $movie_obj->subtitle_url3 = $inputs['subtitle_url3'] ?? '';
             // dd($movie_obj->id);
 
             // Remove from recently watched if status is 0 (inactive)
