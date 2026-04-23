@@ -125,6 +125,50 @@
                     </li>
 
                     <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect">
+                            <i class="fa fa-credit-card"></i>
+                            <span>Subscriptions</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul class="list-unstyled">
+                            <li class="{{ classActivePath('subscription_plan') }}">
+                                <a href="{{ URL::to('admin/subscription_plan') }}"
+                                    class="{{ classActivePath('subscription_plan') }}">
+                                    <i class="fa fa-list-alt"></i>
+                                    <span>{{ trans('words.subscription_plan') }}</span>
+                                </a>
+                            </li>
+                            <li class="{{ classActivePath('transactions') }}">
+                                <a href="{{ URL::to('admin/transactions') }}"
+                                    class="{{ classActivePath('transactions') }}">
+                                    <i class="fa fa-exchange"></i>
+                                    <span>{{ trans('words.transactions') }}</span>
+                                </a>
+                            </li>
+                            <li class="{{ classActivePath('coupons') }}">
+                                <a href="{{ URL::to('admin/coupons') }}" class="{{ classActivePath('coupons') }}">
+                                    <i class="fa fa-ticket"></i>
+                                    <span>{{ trans('words.coupons') }}</span>
+                                </a>
+                            </li>
+                            <li class="{{ classActivePath('payment_gateway') }}">
+                                <a href="{{ URL::to('admin/payment_gateway') }}"
+                                    class="{{ classActivePath('payment_gateway') }}">
+                                    <i class="fa fa-money"></i>
+                                    <span>{{ trans('words.payment_gateway') }}</span>
+                                </a>
+                            </li>
+                            <li class="{{ classActivePath('payment_settings') }}">
+                                <a href="{{ URL::to('admin/payment_settings') }}"
+                                    class="{{ classActivePath('payment_settings') }}">
+                                    <i class="fa fa-cogs"></i>
+                                    <span>Payment Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="has_sub">
                         <a href="javascript:void(0);" class="waves-effect"><i
                                 class="fa fa-edit"></i><span>{{ trans('words.pages') }}</span><span
                                 class="menu-arrow"></span></a>
