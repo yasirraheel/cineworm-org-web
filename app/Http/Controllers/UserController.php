@@ -107,7 +107,7 @@ class UserController extends Controller
 
         $rule=array(
                 'name' => 'required',
-                'email' => 'required|email|max:255|unique:users,email,'.$id,
+                'email' => ['required', 'email', 'max:255', User::uniqueEmailRule($id)],
                 'user_image' => 'mimes:jpg,jpeg,gif,png'
                  );
 

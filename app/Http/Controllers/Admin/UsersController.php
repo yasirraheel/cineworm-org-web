@@ -43,21 +43,27 @@ class UsersController extends MainAdminController
         if(isset($_GET['s']))
         {
             $keyword = $_GET['s'];
-            $user_list = User::where("usertype", "=","Sub_Admin")->where("name", "LIKE","%$keyword%")->orwhere("email", "LIKE","%$keyword%")->orderBy('id','DESC')->paginate(10);
+            $user_list = User::where("usertype", "=", "User")
+                ->where(function ($query) use ($keyword) {
+                    $query->where("name", "LIKE", "%$keyword%")
+                        ->orWhere("email", "LIKE", "%$keyword%");
+                })
+                ->orderBy('id','DESC')
+                ->paginate(10);
 
             $user_list->appends(\Request::only('s'))->links();
         }
         else if(isset($_GET['plan_id']))
         {
             $plan_id = $_GET['plan_id'];
-            $user_list = User::where("usertype", "=","Sub_Admin")->where("plan_id", "=",$plan_id)->orderBy('id','DESC')->paginate(10);
+            $user_list = User::where("usertype", "=", "User")->where("plan_id", "=",$plan_id)->orderBy('id','DESC')->paginate(10);
 
             $user_list->appends(\Request::only('plan_id'))->links();
         }
         else
         {
 
-            $user_list = User::where('usertype', '=', 'Sub_Admin')->orderBy('id','DESC')->paginate(10);
+            $user_list = User::where('usertype', '=', 'User')->orderBy('id','DESC')->paginate(10);
         }
 
         return view('admin.pages.users.list',compact('page_title','user_list'));
@@ -91,7 +97,7 @@ class UsersController extends MainAdminController
 	    {
 			$rule=array(
 		        'name' => 'required',
-		        'email' => 'required|email|max:255|unique:users,email,'.$inputs['id'],
+		        'email' => ['required', 'email', 'max:255', User::uniqueEmailRule($inputs['id'])],
                 'user_image' => 'mimes:jpg,jpeg,gif,png'
 		   		 );
 
@@ -100,7 +106,7 @@ class UsersController extends MainAdminController
 		{
 			$rule=array(
 		        'name' => 'required',
-		        'email' => 'required|email|max:255|unique:users,email',
+		        'email' => ['required', 'email', 'max:255', User::uniqueEmailRule()],
 		        'password' => 'required|min:8|max:15',
                 'user_image' => 'mimes:jpg,jpeg,gif,png'
 		   		 );
@@ -306,7 +312,7 @@ class UsersController extends MainAdminController
         {
             $rule=array(
                 'name' => 'required',
-                'email' => 'required|email|max:255|unique:users,email,'.$inputs['id'],
+                'email' => ['required', 'email', 'max:255', User::uniqueEmailRule($inputs['id'])],
                 'user_image' => 'mimes:jpg,jpeg,gif,png'
                  );
 
@@ -315,7 +321,7 @@ class UsersController extends MainAdminController
         {
             $rule=array(
                 'name' => 'required',
-                'email' => 'required|email|max:255|unique:users,email',
+                'email' => ['required', 'email', 'max:255', User::uniqueEmailRule()],
                 'password' => 'required|min:8|max:15',
                 'user_image' => 'mimes:jpg,jpeg,gif,png'
                  );
@@ -418,14 +424,21 @@ class UsersController extends MainAdminController
         if(isset($_GET['s']))
         {
             $keyword = $_GET['s'];
-            $user_list = User::where("usertype", "=","Sub_admin")->where("name", "LIKE","%$keyword%")->orwhere("email", "LIKE","%$keyword%")->onlyTrashed()->orderBy('id','DESC')->paginate(10);
+            $user_list = User::onlyTrashed()
+                ->where("usertype", "=", "User")
+                ->where(function ($query) use ($keyword) {
+                    $query->where("name", "LIKE", "%$keyword%")
+                        ->orWhere("email", "LIKE", "%$keyword%");
+                })
+                ->orderBy('id','DESC')
+                ->paginate(10);
 
             $user_list->appends(\Request::only('s'))->links();
         }
         else
         {
 
-            $user_list = User::where('usertype', '=', 'Sub_admin')->onlyTrashed()->orderBy('id','DESC')->paginate(10);
+            $user_list = User::onlyTrashed()->where('usertype', '=', 'User')->orderBy('id','DESC')->paginate(10);
         }
 
         return view('admin.pages.users.deleted_list',compact('page_title','user_list'));

@@ -45,7 +45,7 @@ class DashboardController extends MainAdminController
             $series = Series::count();
             $sports = Sports::count();
             $livetv = LiveTV::count();
-            $users = User::where('usertype','sub_admin')->count();
+            $users = User::where('usertype', 'User')->count();
             $plan = SubscriptionPlan::count();
             $transactions = Transactions::count();
 

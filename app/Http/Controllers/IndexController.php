@@ -605,7 +605,7 @@ class IndexController extends Controller
         if (getcong('recaptcha_on_signup')) {
             $rule = array(
                 'name' => 'required',
-                'email' => 'required|email|max:200|unique:users',
+                'email' => ['required', 'email', 'max:200', User::uniqueEmailRule()],
                 'password' => 'required|confirmed|min:8',
                 'password_confirmation' => 'required',
                 'g-recaptcha-response' => 'required'
@@ -613,7 +613,7 @@ class IndexController extends Controller
         } else {
             $rule = array(
                 'name' => 'required',
-                'email' => 'required|email|max:200|unique:users',
+                'email' => ['required', 'email', 'max:200', User::uniqueEmailRule()],
                 'password' => 'required|confirmed|min:8',
                 'password_confirmation' => 'required'
             );

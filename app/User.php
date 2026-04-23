@@ -9,6 +9,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\Rule;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -51,6 +52,66 @@ class User extends Authenticatable
     protected $attributes = [
         'usertype' => 'User',
     ];
+
+    protected static function booted()
+    {
+        static::saving(function (self $user) {
+            if (empty($user->email) || ($user->exists && !$user->isDirty('email'))) {
+                return;
+            }
+
+            static::releaseDeletedEmailIfNeeded($user->email, $user->getKey());
+        });
+
+        static::deleting(function (self $user) {
+            if ($user->isForceDeleting() || empty($user->email)) {
+                return;
+            }
+
+            $user->releaseEmailForReuse();
+        });
+    }
+
+    public static function uniqueEmailRule($ignoreId = null)
+    {
+        $rule = Rule::unique('users', 'email')->where(function ($query) {
+            $query->whereNull('deleted_at');
+        });
+
+        if (!is_null($ignoreId)) {
+            $rule->ignore($ignoreId);
+        }
+
+        return $rule;
+    }
+
+    public static function releaseDeletedEmailIfNeeded(string $email, $ignoreId = null): void
+    {
+        static::onlyTrashed()
+            ->where('email', $email)
+            ->when(!is_null($ignoreId), function ($query) use ($ignoreId) {
+                $query->where('id', '!=', $ignoreId);
+            })
+            ->get()
+            ->each(function (self $deletedUser) {
+                $deletedUser->releaseEmailForReuse();
+            });
+    }
+
+    public function releaseEmailForReuse(): void
+    {
+        if (str_contains((string) $this->email, '__deleted__')) {
+            return;
+        }
+
+        $suffix = '__deleted__' . $this->getKey() . '_' . time();
+        $maxBaseLength = 255 - strlen($suffix);
+        $baseEmail = substr((string) $this->email, 0, max(0, $maxBaseLength));
+
+        $this->forceFill([
+            'email' => $baseEmail . $suffix,
+        ])->saveQuietly();
+    }
 
     public static function getUserInfo($id)
     {
