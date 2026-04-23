@@ -49,7 +49,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $attributes = [
-        'usertype' => 'Sub_Admin',
+        'usertype' => 'User',
     ];
 
     public static function getUserInfo($id)

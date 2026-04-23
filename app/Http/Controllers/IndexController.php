@@ -423,12 +423,11 @@ class IndexController extends Controller
         if (Auth::check()) {
             $user = Auth::user();
             if ($user) {
-                if ($user->usertype != 'Admin') {
-                    $changeUserType = User::where('id', $user->id)->update(['usertype' => 'Sub_Admin']);
-                    if ($changeUserType) {
-                        return redirect('/');
-                    }
+                if ($user->usertype == 'Admin' || $user->usertype == 'Sub_Admin' || $user->usertype == 'Moderator') {
+                    return redirect('/');
                 }
+
+                return redirect('dashboard');
             }
         }
         return view('pages.user.login');
@@ -661,7 +660,7 @@ class IndexController extends Controller
         //$confirmation_code = str_random(30);
 
 
-        $user->usertype = 'Sub_Admin';
+        $user->usertype = 'User';
         $user->name = $inputs['name'];
         $user->email = $inputs['email'];
         $user->password = bcrypt($inputs['password']);
