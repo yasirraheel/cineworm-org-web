@@ -114,7 +114,7 @@
                             </li>
                             <li class="{{ classActivePath('sub_admin') }}"><a href="{{ URL::to('admin/sub_admin') }}"
                                     class="{{ classActivePath('sub_admin') }}"><i
-                                        class="fa fa-users"></i><span>Moderators</span></a></li>
+                                        class="fa fa-shield"></i><span>Roles & Permissions</span></a></li>
                             <li class="{{ classActivePath('deleted_users') }}"><a
                                     href="{{ URL::to('admin/deleted_users') }}"
                                     class="{{ classActivePath('deleted_users') }}"><i
@@ -364,7 +364,7 @@
                             <li class="{{ classActivePath('sub_admin') }}"><a
                                     href="{{ URL::to('admin/sub_admin') }}"
                                     class="{{ classActivePath('sub_admin') }}"><i
-                                        class="fa fa-users"></i><span>Moderators</span></a></li>
+                                        class="fa fa-shield"></i><span>Roles & Permissions</span></a></li>
                             <li class="{{ classActivePath('deleted_users') }}"><a
                                     href="{{ URL::to('admin/deleted_users') }}"
                                     class="{{ classActivePath('deleted_users') }}"><i

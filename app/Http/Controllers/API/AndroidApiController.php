@@ -988,7 +988,7 @@ class AndroidApiController extends MainAPIController
     {
         $get_data=checkSignSalt($_POST['data']);
 
-        $plan_list = SubscriptionPlan::where('status','1')->orderby('id')->get();
+        $plan_list = SubscriptionPlan::active()->orderBy('id')->get();
 
 
         $settings = Settings::findOrFail('1');
@@ -1024,7 +1024,7 @@ class AndroidApiController extends MainAPIController
         $payment_gateway=$get_data['payment_gateway'];
 
 
-        $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
+        $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
         $plan_name=$plan_info->plan_name;
         $plan_days=$plan_info->plan_days;
         $amount=$plan_info->plan_price;
@@ -4192,7 +4192,7 @@ class AndroidApiController extends MainAPIController
 
 
          //$plan_id = 6;
-         $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
+         $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
          $plan_name=$plan_info->plan_name;
          $plan_amount=$plan_info->plan_price;
 
@@ -4738,7 +4738,7 @@ class AndroidApiController extends MainAPIController
 
         $currency_code=getcong('currency_code')?getcong('currency_code'):'USD';
 
-        $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
+        $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
         $plan_name=$plan_info->plan_name;
         $amount=$plan_info->plan_price;
 
@@ -4859,7 +4859,7 @@ class AndroidApiController extends MainAPIController
         //$currency_code='EUR';
         $currency_code=getcong('currency_code')?getcong('currency_code'):'EUR';
 
-         $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
+         $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
          $plan_name=$plan_info->plan_name;
          $amount=$plan_info->plan_price;
 

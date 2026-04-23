@@ -204,7 +204,7 @@ class UserController extends Controller
         }
 
 
-        $plan_list = SubscriptionPlan::where('status','1')->orderby('id')->get();
+        $plan_list = SubscriptionPlan::active()->orderBy('id')->get();
 
         return view('pages.payment.plan',compact('plan_list'));
     }
@@ -222,7 +222,7 @@ class UserController extends Controller
             return redirect('admin');
         }
 
-        $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
+        $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
 
         if(!$plan_info)
         {

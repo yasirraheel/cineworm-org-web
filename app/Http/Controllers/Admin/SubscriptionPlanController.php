@@ -61,22 +61,30 @@ class SubscriptionPlanController extends MainAdminController
     
     public function addnew(Request $request)
     { 
-        
         $data =  \Request::except(array('_token')) ;
-        
+        $inputs = $request->all();
+
         if(!empty($inputs['id'])){
-                
+
                 $rule=array(
                 'plan_name' => 'required',
+                'plan_duration' => 'required|integer|min:1',
+                'plan_duration_type' => 'required|in:1,30,365',
                 'plan_price' => 'required',
-                'plan_device_limit' => 'required'                 
+                'plan_device_limit' => 'required|integer|min:1',
+                'ads_on_off' => 'required|in:0,1',
+                'status' => 'required|in:0,1'
                  );
         }else
         {
             $rule=array(
                 'plan_name' => 'required',
+                'plan_duration' => 'required|integer|min:1',
+                'plan_duration_type' => 'required|in:1,30,365',
                 'plan_price' => 'required',
-                'plan_device_limit' => 'required'                  
+                'plan_device_limit' => 'required|integer|min:1',
+                'ads_on_off' => 'required|in:0,1',
+                'status' => 'required|in:0,1'
                  );
         }
 
@@ -88,7 +96,6 @@ class SubscriptionPlanController extends MainAdminController
         {
                 return redirect()->back()->withErrors($validator->messages());
         } 
-        $inputs = $request->all();
         
         if(!empty($inputs['id'])){
            
@@ -109,9 +116,9 @@ class SubscriptionPlanController extends MainAdminController
          $plan_obj->plan_price = $inputs['plan_price'];
          
          $plan_obj->plan_device_limit = $inputs['plan_device_limit'];
-         $plan_obj->ads_on_off = $inputs['ads_on_off'];
+         $plan_obj->ads_on_off = (int) $inputs['ads_on_off'];
 
-         $plan_obj->status = $inputs['status']; 
+         $plan_obj->status = (int) $inputs['status']; 
          
          $plan_obj->save();
          

@@ -26,7 +26,7 @@ class StripeController extends Controller
     {   
         $plan_id = Session::get('plan_id');  
 
-        $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
+        $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
         $plan_name=$plan_info->plan_name;
         $plan_days=$plan_info->plan_days;
         $amount=$plan_info->plan_price*100;
@@ -84,7 +84,7 @@ class StripeController extends Controller
           
         $plan_id = Session::get('plan_id');
 
-        $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
+        $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
         $plan_name=$plan_info->plan_name;
         $plan_days=$plan_info->plan_days;
         $amount=$plan_info->plan_price;

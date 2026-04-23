@@ -10,6 +10,14 @@ class SubscriptionPlan extends Model
 
     protected $fillable = ['plan_name','plan_days','plan_duration','plan_price'];
 
+    public function scopeActive($query)
+    {
+        return $query->where(function ($subQuery) {
+            $subQuery->where('status', 1)
+                ->orWhere('status', '1')
+                ->orWhereRaw('LOWER(CAST(status AS CHAR)) IN (?, ?, ?)', ['true', 'on', 'active']);
+        });
+    }
 
 	public $timestamps = false; 
 	 

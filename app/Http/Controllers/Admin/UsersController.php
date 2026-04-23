@@ -81,7 +81,7 @@ class UsersController extends MainAdminController
 
         $page_title=trans('words.add_user');
 
-        $plan_list = SubscriptionPlan::where('status','1')->orderby('id')->get();
+        $plan_list = SubscriptionPlan::active()->orderBy('id')->get();
 
         return view('admin.pages.users.addedit',compact('page_title','plan_list'));
     }
@@ -212,7 +212,7 @@ class UsersController extends MainAdminController
 
           $user = User::findOrFail($id);
 
-          $plan_list = SubscriptionPlan::where('status','1')->orderby('id')->get();
+          $plan_list = SubscriptionPlan::active()->orderBy('id')->get();
 
           return view('admin.pages.users.addedit',compact('page_title','user','plan_list'));
 
