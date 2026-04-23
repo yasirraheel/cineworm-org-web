@@ -15,6 +15,7 @@ use URL;
 use Session;
 use Redirect;
 use Input;
+use DB;
  
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
@@ -50,6 +51,36 @@ class PaypalController extends Controller
                     'validate_ssl'   => true,
                 ];
     }
+
+    protected function hasPaypalCredentials()
+    {
+        $mode = $this->config['mode'] === 'live' ? 'live' : 'sandbox';
+
+        return !empty($this->config[$mode]['client_id']) && !empty($this->config[$mode]['client_secret']);
+    }
+
+    protected function paypalGatewayMessage()
+    {
+        return 'PayPal is not configured right now. Please choose another payment method or contact support.';
+    }
+
+    protected function redirectToPaymentScreen($planId = null)
+    {
+        $planId = $planId ?: Session::get('plan_id');
+
+        if ($planId) {
+            return redirect('payment_method/' . $planId);
+        }
+
+        return redirect('membership_plan');
+    }
+
+    protected function redirectWithGatewayError($message, $planId = null)
+    {
+        Session::flash('error_flash_message', $message);
+
+        return $this->redirectToPaymentScreen($planId);
+    }
  
 
      /**
@@ -69,26 +100,36 @@ class PaypalController extends Controller
         $success_url=\URL::to('paypal/success/');
         $fail_url=\URL::to('paypal/fail/');   
 
-        $provider = new PayPalClient;
-        $provider->setApiCredentials($this->config);
-        $paypalToken = $provider->getAccessToken();
+        if (!$this->hasPaypalCredentials()) {
+            return $this->redirectWithGatewayError($this->paypalGatewayMessage(), $plan_id);
+        }
 
-        $response = $provider->createOrder([
-            "intent" => "CAPTURE",
-            "application_context" => [
-                "return_url" => $success_url,
-                "cancel_url" => $fail_url,
-            ],
-            "purchase_units" => [
-                0 => [
-                    "amount" => [
-                        "currency_code" => $currency_code,
-                        "value" => $plan_amount
-                    ],
-                    "description" => $plan_name,
+        try {
+            $provider = new PayPalClient;
+            $provider->setApiCredentials($this->config);
+            $provider->getAccessToken();
+
+            $response = $provider->createOrder([
+                "intent" => "CAPTURE",
+                "application_context" => [
+                    "return_url" => $success_url,
+                    "cancel_url" => $fail_url,
+                ],
+                "purchase_units" => [
+                    0 => [
+                        "amount" => [
+                            "currency_code" => $currency_code,
+                            "value" => $plan_amount
+                        ],
+                        "description" => $plan_name,
+                    ]
                 ]
-            ]
-        ]);
+            ]);
+        } catch (\Throwable $e) {
+            \Log::warning('PayPal payment initiation failed: ' . $e->getMessage());
+
+            return $this->redirectWithGatewayError($this->paypalGatewayMessage(), $plan_id);
+        }
 
          
         if (isset($response['id']) && $response['id'] != null) {
@@ -100,14 +141,16 @@ class PaypalController extends Controller
                 }
             }
 
-            \Session::flash('error_flash_message','Something went wrong.');
-                return redirect('dashboard');
+            \Log::warning('PayPal approval link missing for order: ' . $response['id']);
+
+            return $this->redirectWithGatewayError('Unable to start the PayPal payment right now. Please try again.', $plan_id);
  
 
         } else {
-            
-            \Session::flash('error_flash_message',$response['message'] ?? 'Something went wrong.');
-            return redirect('dashboard');
+
+            \Log::warning('PayPal order creation failed.', ['response' => $response]);
+
+            return $this->redirectWithGatewayError($response['message'] ?? 'Unable to start the PayPal payment right now. Please try again.', $plan_id);
  
         }
     }
@@ -119,10 +162,26 @@ class PaypalController extends Controller
      */
     public function paypal_success(Request $request)
     {
-        $provider = new PayPalClient;
-        $provider->setApiCredentials($this->config);
-        $provider->getAccessToken();
-        $response = $provider->capturePaymentOrder($request['token']);
+        $plan_id = Session::get('plan_id');
+
+        if (!$this->hasPaypalCredentials()) {
+            return $this->redirectWithGatewayError($this->paypalGatewayMessage(), $plan_id);
+        }
+
+        if (!$request->filled('token')) {
+            return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
+        }
+
+        try {
+            $provider = new PayPalClient;
+            $provider->setApiCredentials($this->config);
+            $provider->getAccessToken();
+            $response = $provider->capturePaymentOrder($request['token']);
+        } catch (\Throwable $e) {
+            \Log::warning('PayPal payment capture failed: ' . $e->getMessage());
+
+            return $this->redirectWithGatewayError('We could not verify the PayPal payment right now. Please try again.', $plan_id);
+        }
  
 
         if (isset($response['status']) && $response['status'] == 'COMPLETED') {
@@ -133,8 +192,12 @@ class PaypalController extends Controller
             $user_email=Auth::user()->email;           
             $user = User::findOrFail($user_id);
 
-            $plan_id = Session::get('plan_id');
             $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
+
+            if (!$plan_info) {
+                return $this->redirectWithGatewayError('Selected plan is no longer available.', $plan_id);
+            }
+
             $plan_days=$plan_info->plan_days;
  
             if(Session::get('coupon_percentage'))
@@ -219,8 +282,7 @@ class PaypalController extends Controller
              
         } else {
             
-            \Session::flash('error_flash_message',trans('words.payment_failed'));
-            return redirect('dashboard');
+            return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
         
         }
     }
@@ -232,8 +294,7 @@ class PaypalController extends Controller
      */
     public function paypal_fail()
     {
-            \Session::flash('error_flash_message',trans('words.payment_failed'));
-            return redirect('dashboard');
+            return $this->redirectWithGatewayError(trans('words.payment_failed'));
  
     }
 
