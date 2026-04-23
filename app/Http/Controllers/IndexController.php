@@ -672,7 +672,9 @@ class IndexController extends Controller
 
         Session::flash('signup_flash_message', 'Account created successfully! Please check your email to verify your account.');
 
-        return redirect('signup');
+        Auth::login($user);
+
+        return $this->handleUserWasAuthenticated($request);
     }
 
 
