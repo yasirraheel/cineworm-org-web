@@ -158,13 +158,6 @@
                                     <span>{{ trans('words.payment_gateway') }}</span>
                                 </a>
                             </li>
-                            <li class="{{ classActivePath('payment_settings') }}">
-                                <a href="{{ URL::to('admin/payment_settings') }}"
-                                    class="{{ classActivePath('payment_settings') }}">
-                                    <i class="fa fa-cogs"></i>
-                                    <span>Payment Settings</span>
-                                </a>
-                            </li>
                         </ul>
                     </li>
 

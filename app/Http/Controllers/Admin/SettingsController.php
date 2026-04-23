@@ -289,6 +289,24 @@ class SettingsController extends MainAdminController
         return redirect()->back();
     }
 
+    public function payment_settings()
+    {
+        if(Auth::User()->usertype!="Admin" AND Auth::User()->usertype!="Sub_Admin"){
+
+            \Session::flash('flash_message', trans('words.access_denied'));
+
+            return redirect('admin/dashboard');
+
+        }
+
+        return redirect('admin/payment_gateway');
+    }
+
+    public function update_payment_settings(Request $request)
+    {
+        return $this->payment_settings();
+    }
+
 
     public function menu_settings()
     {
