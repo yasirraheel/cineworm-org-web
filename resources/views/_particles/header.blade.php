@@ -81,6 +81,14 @@
                                                 </ul> --}}
                                             </li>
                                         @endif
+
+                                        <li>
+                                            <a href="{{ URL::to('membership_plan') }}"
+                                                class="{{ request()->is('membership_plan') || request()->is('payment_method/*') ? 'active' : '' }}"
+                                                title="{{ trans('words.subscription_plan') }}">
+                                                {{ trans('words.subscription_plan') }}
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -147,6 +155,10 @@
                                                 <li><a href="{{ URL::to('dashboard') }}"
                                                         title="{{ trans('words.dashboard_text') }}"><i
                                                             class="fa fa-database"></i>{{ trans('words.dashboard_text') }}</a>
+                                                </li>
+                                                <li><a href="{{ URL::to('membership_plan') }}"
+                                                        title="{{ trans('words.subscription_plan') }}"><i
+                                                            class="fa fa-credit-card"></i>{{ trans('words.subscription_plan') }}</a>
                                                 </li>
                                                 <li><a href="{{ URL::to('profile') }}"
                                                         title="{{ trans('words.profile') }}"><i

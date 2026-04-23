@@ -25,6 +25,13 @@
                         </div>
                         <div class="col-6">
                             <div class="right-sub-item-area">
+                                <div class="signup-btn-item" style="float:right; margin-left:10px;">
+                                    <a href="{{ URL::to('membership_plan') }}"
+                                        title="{{ trans('words.subscription_plan') }}">
+                                        <i class="fa fa-credit-card" aria-hidden="true"></i>
+                                        <span>{{ trans('words.subscription_plan') }}</span>
+                                    </a>
+                                </div>
                                 @if (getcong('donation_link'))
                                     <div class="signup-btn-item" style="float:right;">
                                         <a href="{{ stripslashes(getcong('donation_link')) }}" title="Donate"
