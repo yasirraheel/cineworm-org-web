@@ -59,11 +59,6 @@ class PaypalController extends Controller
         return !empty($this->config[$mode]['client_id']) && !empty($this->config[$mode]['client_secret']);
     }
 
-    protected function paypalGatewayMessage()
-    {
-        return 'PayPal is not configured right now. Please choose another payment method or contact support.';
-    }
-
     protected function redirectToPaymentScreen($planId = null)
     {
         $planId = $planId ?: Session::get('plan_id');
@@ -101,7 +96,7 @@ class PaypalController extends Controller
         $fail_url=\URL::to('paypal/fail/');   
 
         if (!$this->hasPaypalCredentials()) {
-            return $this->redirectWithGatewayError($this->paypalGatewayMessage(), $plan_id);
+            return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
         }
 
         try {
@@ -128,7 +123,7 @@ class PaypalController extends Controller
         } catch (\Throwable $e) {
             \Log::warning('PayPal payment initiation failed: ' . $e->getMessage());
 
-            return $this->redirectWithGatewayError($this->paypalGatewayMessage(), $plan_id);
+            return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
         }
 
          
@@ -143,14 +138,14 @@ class PaypalController extends Controller
 
             \Log::warning('PayPal approval link missing for order: ' . $response['id']);
 
-            return $this->redirectWithGatewayError('Unable to start the PayPal payment right now. Please try again.', $plan_id);
+            return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
  
 
         } else {
 
             \Log::warning('PayPal order creation failed.', ['response' => $response]);
 
-            return $this->redirectWithGatewayError($response['message'] ?? 'Unable to start the PayPal payment right now. Please try again.', $plan_id);
+            return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
  
         }
     }
@@ -165,7 +160,7 @@ class PaypalController extends Controller
         $plan_id = Session::get('plan_id');
 
         if (!$this->hasPaypalCredentials()) {
-            return $this->redirectWithGatewayError($this->paypalGatewayMessage(), $plan_id);
+            return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
         }
 
         if (!$request->filled('token')) {
@@ -180,7 +175,7 @@ class PaypalController extends Controller
         } catch (\Throwable $e) {
             \Log::warning('PayPal payment capture failed: ' . $e->getMessage());
 
-            return $this->redirectWithGatewayError('We could not verify the PayPal payment right now. Please try again.', $plan_id);
+            return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
         }
  
 
@@ -195,7 +190,7 @@ class PaypalController extends Controller
             $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
 
             if (!$plan_info) {
-                return $this->redirectWithGatewayError('Selected plan is no longer available.', $plan_id);
+                return $this->redirectWithGatewayError(trans('words.payment_failed'), $plan_id);
             }
 
             $plan_days=$plan_info->plan_days;
