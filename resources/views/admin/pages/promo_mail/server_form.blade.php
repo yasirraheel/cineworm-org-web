@@ -231,66 +231,61 @@
 
 <script type="text/javascript">
     @if(isset($server->id))
-    jQuery(document).ready(function(){
-        $(document).on('click', '#test_email_sent_btn', function() {
-            var testEmail = $("#test_email").val();
+    document.addEventListener('DOMContentLoaded', function () {
+        var testEmailButton = document.getElementById('test_email_sent_btn');
 
-            if (testEmail != '') {
-                $.ajax({
-                    type: 'GET',
-                    url: "{{ URL::to('admin/promo_mail/servers/test/'.(isset($server->id) ? $server->id : 0)) }}",
-                    data: "test_email=" + encodeURIComponent(testEmail),
-                    dataType: 'json',
-                    beforeSend: function() {
-                        $("#test_email_sent_btn").html('sending...');
-                    },
-                    success: function(response) {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: false,
-                        });
+        if (!testEmailButton) {
+            return;
+        }
 
-                        Toast.fire({
-                            icon: response.resp_status == 'success' ? 'success' : 'error',
-                            title: response.resp_msg
-                        });
+        testEmailButton.addEventListener('click', function () {
+            var testEmailInput = document.getElementById('test_email');
+            var testEmail = testEmailInput ? testEmailInput.value.trim() : '';
 
-                        $('#test_email_sent_btn').html('Send');
-                    },
-                    error: function() {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: false,
-                        });
+            var toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+            });
 
-                        Toast.fire({
-                            icon: 'error',
-                            title: 'Something went wrong while sending the test email.'
-                        });
-
-                        $('#test_email_sent_btn').html('Send');
-                    }
-                });
-            } else {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: false,
-                });
-
-                Toast.fire({
+            if (testEmail === '') {
+                toast.fire({
                     icon: 'error',
                     title: 'Please enter email'
                 });
+                return;
             }
+
+            testEmailButton.innerHTML = 'sending...';
+
+            fetch("{{ URL::to('admin/promo_mail/servers/test/'.(isset($server->id) ? $server->id : 0)) }}?test_email=" + encodeURIComponent(testEmail), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (response) {
+                toast.fire({
+                    icon: response.resp_status === 'success' ? 'success' : 'error',
+                    title: response.resp_msg
+                });
+
+                testEmailButton.innerHTML = 'Send';
+            })
+            .catch(function () {
+                toast.fire({
+                    icon: 'error',
+                    title: 'Something went wrong while sending the test email.'
+                });
+
+                testEmailButton.innerHTML = 'Send';
+            });
         });
     });
     @endif
