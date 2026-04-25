@@ -12,21 +12,21 @@
 
                         <div class="row m-b-20">
                             <div class="col-md-4">
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="m-b-5">{{ $servers->total() }}</h4>
-                                    <p class="text-muted mb-0">Configured SMTP servers</p>
+                                    <p class="mb-0">Configured SMTP servers</p>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="m-b-5">{{ $sendingDomainsCount }}</h4>
-                                    <p class="text-muted mb-0">Sending domains linked</p>
+                                    <p class="mb-0">Sending domains linked</p>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="m-b-5">{{ $trackingDomainsCount }}</h4>
-                                    <p class="text-muted mb-0">Tracking domains linked</p>
+                                    <p class="mb-0">Tracking domains linked</p>
                                 </div>
                             </div>
                         </div>
@@ -34,7 +34,7 @@
                         <div class="row m-b-20">
                             <div class="col-md-8">
                                 <h4 class="header-title m-t-0">Promotional SMTP Infrastructure</h4>
-                                <p class="text-muted">
+                                <p>
                                     Keep campaign SMTP separate from the app login/order email server. Add one or more promotional
                                     servers here, mark one as default, then attach verified sending and tracking domains before
                                     building campaigns.
@@ -57,7 +57,7 @@
                         @endif
 
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
+                            <table class="table table-bordered">
                                 <thead>
                                 <tr>
                                     <th>Server</th>
@@ -76,19 +76,19 @@
                                             @if($server->is_default)
                                                 <span class="badge badge-primary ml-1">Default</span>
                                             @endif
-                                            <div class="text-muted">{{ strtoupper($server->gateway_type) }}</div>
+                                            <div>{{ strtoupper($server->gateway_type) }}</div>
                                         </td>
                                         <td>
                                             <div>{{ $server->from_name ?: 'Not set' }}</div>
-                                            <div class="text-muted">{{ $server->sender_email }}</div>
+                                            <div>{{ $server->sender_email }}</div>
                                         </td>
                                         <td>
                                             <div>{{ $server->host }}:{{ $server->port }}</div>
-                                            <div class="text-muted">{{ $server->username }}</div>
+                                            <div>{{ $server->username }}</div>
                                         </td>
                                         <td>
                                             <div>Delay: {{ $server->min_delay_per_message }} - {{ $server->max_delay_per_message }} sec</div>
-                                            <div class="text-muted">Pause {{ $server->pause_duration }} sec after {{ $server->pause_after_messages }} emails</div>
+                                            <div>Pause {{ $server->pause_duration }} sec after {{ $server->pause_after_messages }} emails</div>
                                         </td>
                                         <td>
                                             @if($server->status)

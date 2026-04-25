@@ -168,7 +168,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="header-title">Configuration Guide</h4>
                                     <ul class="m-b-0 pl-3">
                                         <li>Use a dedicated mailbox only for campaigns and promotional traffic.</li>
@@ -179,9 +179,9 @@
                                     </ul>
                                 </div>
 
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="header-title">What To Configure Next</h4>
-                                    <p class="text-muted">After saving the server, continue with:</p>
+                                    <p>After saving the server, continue with:</p>
                                     <ol class="m-b-0 pl-3">
                                         <li>Add a sending domain and publish SPF, DKIM, and DMARC records.</li>
                                         <li>Add a tracking domain for branded open/click links.</li>

@@ -13,7 +13,7 @@
                         <div class="row m-b-20">
                             <div class="col-md-8">
                                 <h4 class="header-title m-t-0">Sending Domains</h4>
-                                <p class="text-muted">
+                                <p>
                                     Add the brand/domain used in the sender address, then publish SPF, DKIM, and DMARC records.
                                     Verification is kept dynamic in admin for now so your team can update status after DNS propagation.
                                 </p>
@@ -35,7 +35,7 @@
                         @endif
 
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
+                            <table class="table table-bordered">
                                 <thead>
                                 <tr>
                                     <th>Domain</th>
@@ -50,13 +50,13 @@
                                     <tr>
                                         <td>
                                             <strong>{{ $domain->domain }}</strong>
-                                            <div class="text-muted">Selector: {{ $domain->selector }}</div>
+                                            <div>Selector: {{ $domain->selector }}</div>
                                         </td>
                                         <td>
                                             <span class="badge {{ $domain->dkim_status ? 'badge-success' : 'badge-warning' }}">DKIM: {{ $domain->dkim_status ? 'Pass' : 'Pending' }}</span>
                                             <span class="badge {{ $domain->spf_status ? 'badge-success' : 'badge-warning' }}">SPF: {{ $domain->spf_status ? 'Pass' : 'Pending' }}</span>
                                             <span class="badge {{ $domain->dmarc_status ? 'badge-success' : 'badge-warning' }}">DMARC: {{ $domain->dmarc_status ? 'Pass' : 'Pending' }}</span>
-                                            <div class="text-muted m-t-5">
+                                            <div class="m-t-5">
                                                 @if($domain->verified_at)
                                                     Verified {{ \Carbon\Carbon::parse($domain->verified_at)->format('M d, Y H:i') }}
                                                 @else

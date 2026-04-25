@@ -13,7 +13,7 @@
                         <div class="row m-b-20">
                             <div class="col-md-8">
                                 <h4 class="header-title m-t-0">Tracking Domains</h4>
-                                <p class="text-muted">
+                                <p>
                                     Use branded subdomains for email opens, click tracking, and unsubscribe redirects instead of
                                     generic vendor URLs. This helps deliverability and brand trust.
                                 </p>
@@ -35,7 +35,7 @@
                         @endif
 
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
+                            <table class="table table-bordered">
                                 <thead>
                                 <tr>
                                     <th>Domain</th>

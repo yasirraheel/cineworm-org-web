@@ -154,7 +154,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="header-title">DNS Records To Publish</h4>
                                     <div class="table-responsive">
                                         <table class="table table-bordered m-b-0">
@@ -191,7 +191,7 @@
                                     </div>
                                 </div>
 
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="header-title">Setup Guide</h4>
                                     <ol class="m-b-0 pl-3">
                                         <li>Use the same domain as your sender email whenever possible.</li>

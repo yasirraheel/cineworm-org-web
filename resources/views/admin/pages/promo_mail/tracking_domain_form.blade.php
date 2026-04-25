@@ -85,7 +85,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="header-title">Tracking Setup Instructions</h4>
                                     <ol class="pl-3">
                                         <li>Create a subdomain like <strong>track</strong> or <strong>links</strong>.</li>
@@ -94,7 +94,7 @@
                                         <li>Future campaign links and open tracking should use this branded domain.</li>
                                     </ol>
                                 </div>
-                                <div class="card-box bg-light">
+                                <div class="card-box">
                                     <h4 class="header-title">DNS Record Preview</h4>
                                     <table class="table table-bordered m-b-0">
                                         <thead>
