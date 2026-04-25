@@ -2,6 +2,16 @@
 
 @section("content")
 
+@php
+  $availableFeatures = \App\SubscriptionPlan::AVAILABLE_FEATURES;
+  $selectedFeatures = isset($plan_info) ? $plan_info->getDirectFeatureKeys() : [];
+  $inheritedFeatures = isset($plan_info) ? $plan_info->getInheritedFeatureKeys() : [];
+  $includedPlanId = isset($plan_info->included_plan_id) ? $plan_info->included_plan_id : null;
+  $planFeatureMap = isset($plan_list) ? $plan_list->mapWithKeys(function ($plan) {
+      return [$plan->id => $plan->getEffectiveFeatureKeys()];
+  }) : collect();
+@endphp
+
 <style type="text/css">
   .iframe-container {
   overflow: hidden;
@@ -16,6 +26,32 @@
    position: absolute;
    top: 0;
    width: 100%;
+}
+.plan-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px 16px;
+}
+.plan-feature-option {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  min-height: 38px;
+  padding: 8px 10px;
+}
+.plan-feature-option input {
+  margin: 0;
+}
+.plan-feature-option.is-inherited {
+  opacity: .58;
+}
+.plan-feature-option small {
+  color: #98a6ad;
+  margin-left: auto;
 }
 </style>
  
@@ -72,6 +108,36 @@
                     <div class="col-sm-8">
                       <input type="text" name="plan_device_limit" value="{{ isset($plan_info->plan_device_limit) ? $plan_info->plan_device_limit : null }}" class="form-control" placeholder="1" min="1">
                        
+                    </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Includes Plan</label>
+                    <div class="col-sm-8">
+                      <select name="included_plan_id" id="included_plan_id" class="form-control">
+                        <option value="">No included plan</option>
+                        @if(isset($plan_list))
+                          @foreach($plan_list as $plan_data)
+                            <option value="{{ $plan_data->id }}" @if($includedPlanId == $plan_data->id) selected @endif>Everything in {{ $plan_data->plan_name }}</option>
+                          @endforeach
+                        @endif
+                      </select>
+                      <small class="form-text text-muted mb-2">Features from the selected plan will be included automatically. Those options are locked below so you can add only extra features.</small>
+                    </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Plan Features</label>
+                    <div class="col-sm-8">
+                      <div class="plan-features-grid" id="plan_features_grid">
+                        @foreach($availableFeatures as $featureKey => $featureLabel)
+                          <label class="plan-feature-option @if(in_array($featureKey, $inheritedFeatures, true)) is-inherited @endif" data-feature-key="{{ $featureKey }}">
+                            <input type="checkbox" name="features[]" value="{{ $featureKey }}" @if(in_array($featureKey, array_merge($selectedFeatures, $inheritedFeatures), true)) checked @endif @if(in_array($featureKey, $inheritedFeatures, true)) disabled @endif>
+                            <span>{{ $featureLabel }}</span>
+                            <small @if(!in_array($featureKey, $inheritedFeatures, true)) style="display:none;" @endif>Included</small>
+                          </label>
+                        @endforeach
+                      </div>
                     </div>
                   </div>
 
@@ -150,6 +216,48 @@
   @endif
 
   </script>    
+  <script type="text/javascript">
+    (function() {
+      var planFeatureMap = @json($planFeatureMap);
+      var originalDirectFeatures = @json($selectedFeatures);
+      var featureGrid = document.getElementById('plan_features_grid');
+      var includedPlanSelect = document.getElementById('included_plan_id');
+
+      function updateInheritedFeatures() {
+        if (!featureGrid || !includedPlanSelect) {
+          return;
+        }
+
+        var inheritedFeatures = planFeatureMap[includedPlanSelect.value] || [];
+
+        featureGrid.querySelectorAll('.plan-feature-option').forEach(function(option) {
+          var input = option.querySelector('input[type="checkbox"]');
+          var note = option.querySelector('small');
+          var featureKey = option.getAttribute('data-feature-key');
+          var isInherited = inheritedFeatures.indexOf(featureKey) !== -1;
+          var wasInherited = option.classList.contains('is-inherited');
+
+          input.disabled = isInherited;
+          option.classList.toggle('is-inherited', isInherited);
+
+          if (isInherited) {
+            input.checked = true;
+            note.style.display = '';
+          } else {
+            if (wasInherited && originalDirectFeatures.indexOf(featureKey) === -1) {
+              input.checked = false;
+            }
+            note.style.display = 'none';
+          }
+        });
+      }
+
+      if (includedPlanSelect) {
+        includedPlanSelect.addEventListener('change', updateInheritedFeatures);
+        updateInheritedFeatures();
+      }
+    })();
+  </script>
  
 
 @endsection

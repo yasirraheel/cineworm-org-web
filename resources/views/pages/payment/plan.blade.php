@@ -5,6 +5,32 @@
 @section('head_url', Request::url())
 
 @section('content')
+
+<style type="text/css">
+  .membership-plan-features {
+    list-style: none;
+    margin: 18px 0 24px;
+    padding: 0;
+    text-align: left;
+  }
+  .membership-plan-features li {
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 22px;
+    margin-bottom: 8px;
+    padding-left: 22px;
+    position: relative;
+    text-transform: none;
+  }
+  .membership-plan-features li::before {
+    color: #fe0278;
+    content: "\f00c";
+    font-family: FontAwesome;
+    left: 0;
+    position: absolute;
+    top: 0;
+  }
+</style>
   
  
 <!-- Start Breadcrumb -->
@@ -71,6 +97,13 @@
             <p></p>
             <h4>{{ App\SubscriptionPlan::getPlanDuration($plan_data->id) }}</h4>
             <h4>{{trans('words.plan_device_limit')}} - {{ $plan_data->plan_device_limit }}</h4>
+            @if(count($plan_data->getEffectiveFeatureLabels()))
+            <ul class="membership-plan-features">
+              @foreach($plan_data->getEffectiveFeatureLabels() as $featureLabel)
+                <li>{{ $featureLabel }}</li>
+              @endforeach
+            </ul>
+            @endif
             <a href="{{ URL::to('payment_method/'.$plan_data->id) }}" class="vfx-item-btn-danger text-uppercase mb-30" title="plan">{{trans('words.select_plan')}}</a>
           </div>
         </div>

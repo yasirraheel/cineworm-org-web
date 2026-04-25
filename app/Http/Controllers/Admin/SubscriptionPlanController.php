@@ -54,9 +54,10 @@ class SubscriptionPlanController extends MainAdminController
         }
 
         $page_title=trans('words.add_plan');
+        $plan_list = SubscriptionPlan::orderBy('id')->get();
  
 
-        return view('admin.pages.plan.addedit',compact('page_title'));
+        return view('admin.pages.plan.addedit',compact('page_title','plan_list'));
     }
     
     public function addnew(Request $request)
@@ -72,6 +73,8 @@ class SubscriptionPlanController extends MainAdminController
                 'plan_duration_type' => 'required|in:1,30,365',
                 'plan_price' => 'required',
                 'plan_device_limit' => 'required|integer|min:1',
+                'included_plan_id' => 'nullable|exists:subscription_plan,id',
+                'features' => 'nullable|array',
                 'ads_on_off' => 'required|in:0,1',
                 'status' => 'required|in:0,1'
                  );
@@ -83,6 +86,8 @@ class SubscriptionPlanController extends MainAdminController
                 'plan_duration_type' => 'required|in:1,30,365',
                 'plan_price' => 'required',
                 'plan_device_limit' => 'required|integer|min:1',
+                'included_plan_id' => 'nullable|exists:subscription_plan,id',
+                'features' => 'nullable|array',
                 'ads_on_off' => 'required|in:0,1',
                 'status' => 'required|in:0,1'
                  );
@@ -96,6 +101,10 @@ class SubscriptionPlanController extends MainAdminController
         {
                 return redirect()->back()->withErrors($validator->messages());
         } 
+
+        $featureKeys = array_keys(SubscriptionPlan::AVAILABLE_FEATURES);
+        $selectedFeatures = array_values(array_intersect($inputs['features'] ?? [], $featureKeys));
+        $includedPlanId = !empty($inputs['included_plan_id']) ? (int) $inputs['included_plan_id'] : null;
         
         if(!empty($inputs['id'])){
            
@@ -107,6 +116,16 @@ class SubscriptionPlanController extends MainAdminController
 
         }
 
+        if ($plan_obj->wouldCreateInheritanceLoop($includedPlanId)) {
+            return redirect()->back()->withErrors(['included_plan_id' => 'Selected included plan would create a loop.'])->withInput();
+        }
+
+        $inheritedFeatures = [];
+        if ($includedPlanId) {
+            $includedPlan = SubscriptionPlan::find($includedPlanId);
+            $inheritedFeatures = $includedPlan ? $includedPlan->getEffectiveFeatureKeys() : [];
+        }
+
          $plan_days_final=$inputs['plan_duration']*$inputs['plan_duration_type'];
          
          $plan_obj->plan_name = $inputs['plan_name'];
@@ -116,6 +135,8 @@ class SubscriptionPlanController extends MainAdminController
          $plan_obj->plan_price = $inputs['plan_price'];
          
          $plan_obj->plan_device_limit = $inputs['plan_device_limit'];
+         $plan_obj->included_plan_id = $includedPlanId;
+         $plan_obj->features = array_values(array_diff($selectedFeatures, $inheritedFeatures));
          $plan_obj->ads_on_off = (int) $inputs['ads_on_off'];
 
          $plan_obj->status = (int) $inputs['status']; 
@@ -154,8 +175,9 @@ class SubscriptionPlanController extends MainAdminController
           $page_title=trans('words.edit_plan');
 
           $plan_info = SubscriptionPlan::findOrFail($plan_id);
+          $plan_list = SubscriptionPlan::where('id', '!=', $plan_id)->orderBy('id')->get();
  
-          return view('admin.pages.plan.addedit',compact('page_title','plan_info'));
+          return view('admin.pages.plan.addedit',compact('page_title','plan_info','plan_list'));
         
     }	 
     
