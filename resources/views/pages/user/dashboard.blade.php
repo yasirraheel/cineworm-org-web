@@ -111,118 +111,115 @@
       </div>
 
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
         <div class="table-wrapper">
-
           <div class="vfx-item-section">
             <h3>Watch History</h3>
           </div>
 
+          @if ($recently_watched->count() > 0)
+            <div class="recently-watched-video-carousel owl-carousel">
+              @foreach ($recently_watched as $i => $watched_videos)
+                  <div class="single-video">
+                      @if ($watched_videos->video_type == 'Movies')
+                          @php
+                              $info = recently_watched_info(
+                                  $watched_videos->video_type,
+                                  $watched_videos->video_id,
+                              );
+                          @endphp
+                          @if ($info)
+                              <a href="{{ URL::to('movies/details/' . $info->video_slug . '/' . $info->id) }}"
+                                  title="{{ $info->video_title }}">
+                                  <div class="video-img">
+                                      <span class="video-item-content">{{ $info->video_title }}</span>
+                                      <img src="{{ URL::to('/' . $info->video_image) }}"
+                                          alt="{{ $info->video_title }}"
+                                          title="Movies-{{ $info->video_title }}">
+                                  </div>
+                              </a>
+                          @endif
+                      @endif
 
-          <div class="recently-watched-video-carousel owl-carousel">
-            @foreach ($recently_watched as $i => $watched_videos)
-                <div class="single-video">
-                    @if ($watched_videos->video_type == 'Movies')
-                        @php
-                            $info = recently_watched_info(
-                                $watched_videos->video_type,
-                                $watched_videos->video_id,
-                            );
-                        @endphp
-                        @if ($info)
-                            <a href="{{ URL::to('movies/details/' . $info->video_slug . '/' . $info->id) }}"
-                                title="{{ $info->video_title }}">
-                                <div class="video-img">
-                                    <span class="video-item-content">{{ $info->video_title }}</span>
-                                    <img src="{{ URL::to('/' . $info->video_image) }}"
-                                        alt="{{ $info->video_title }}"
-                                        title="Movies-{{ $info->video_title }}">
-                                </div>
-                            </a>
-                        @endif
-                    @endif
+                      @if ($watched_videos->video_type == 'Episodes')
+                          @php
+                              $episode_series_id = \App\Episodes::getEpisodesInfo(
+                                  $watched_videos->video_id,
+                                  'episode_series_id',
+                              );
+                              $info = recently_watched_info(
+                                  $watched_videos->video_type,
+                                  $watched_videos->video_id,
+                              );
+                          @endphp
+                          @if ($info)
+                              <div class="single-video">
+                                  <a href="{{ URL::to('shows/' . \App\Series::getSeriesInfo($episode_series_id, 'series_slug') . '/' . $info->video_slug . '/' . $info->id) }}"
+                                      title="{{ $info->video_title }}">
+                                      <div class="video-img">
+                                          <span class="video-item-content">{{ $info->video_title }}</span>
+                                          <img src="{{ URL::to('/' . $info->video_image) }}"
+                                              alt="{{ $info->video_title }}"
+                                              title="Episodes-{{ $info->video_title }}">
+                                      </div>
+                                  </a>
+                              </div>
+                          @endif
+                      @endif
 
-                    @if ($watched_videos->video_type == 'Episodes')
-                        @php
-                            $episode_series_id = \App\Episodes::getEpisodesInfo(
-                                $watched_videos->video_id,
-                                'episode_series_id',
-                            );
-                            $info = recently_watched_info(
-                                $watched_videos->video_type,
-                                $watched_videos->video_id,
-                            );
-                        @endphp
-                        @if ($info)
-                            <div class="single-video">
-                                <a href="{{ URL::to('shows/' . \App\Series::getSeriesInfo($episode_series_id, 'series_slug') . '/' . $info->video_slug . '/' . $info->id) }}"
-                                    title="{{ $info->video_title }}">
-                                    <div class="video-img">
-                                        <span class="video-item-content">{{ $info->video_title }}</span>
-                                        <img src="{{ URL::to('/' . $info->video_image) }}"
-                                            alt="{{ $info->video_title }}"
-                                            title="Episodes-{{ $info->video_title }}">
-                                    </div>
-                                </a>
-                            </div>
-                        @endif
-                    @endif
+                      @if ($watched_videos->video_type == 'Sports')
+                          @php
+                              $info = recently_watched_info(
+                                  $watched_videos->video_type,
+                                  $watched_videos->video_id,
+                              );
+                          @endphp
+                          @if ($info)
+                              <div class="single-video">
+                                  <a href="{{ URL::to('sports/details/' . $info->video_slug . '/' . $info->id) }}"
+                                      title="{{ $info->video_title }}">
+                                      <div class="video-img">
+                                          <span class="video-item-content">{{ $info->video_title }}</span>
+                                          <img src="{{ URL::to('/' . $info->video_image) }}"
+                                              alt="{{ $info->video_title }}"
+                                              title="Sports-{{ $info->video_title }}">
+                                      </div>
+                                  </a>
+                              </div>
+                          @endif
+                      @endif
 
-                    @if ($watched_videos->video_type == 'Sports')
-                        @php
-                            $info = recently_watched_info(
-                                $watched_videos->video_type,
-                                $watched_videos->video_id,
-                            );
-                        @endphp
-                        @if ($info)
-                            <div class="single-video">
-                                <a href="{{ URL::to('sports/details/' . $info->video_slug . '/' . $info->id) }}"
-                                    title="{{ $info->video_title }}">
-                                    <div class="video-img">
-                                        <span class="video-item-content">{{ $info->video_title }}</span>
-                                        <img src="{{ URL::to('/' . $info->video_image) }}"
-                                            alt="{{ $info->video_title }}"
-                                            title="Sports-{{ $info->video_title }}">
-                                    </div>
-                                </a>
-                            </div>
-                        @endif
-                    @endif
+                      @if ($watched_videos->video_type == 'LiveTV')
+                          @php
+                              $info = recently_watched_info(
+                                  $watched_videos->video_type,
+                                  $watched_videos->video_id,
+                              );
+                          @endphp
+                          @if ($info)
+                              <div class="single-video">
+                                  <a href="{{ URL::to('livetv/details/' . $info->channel_slug . '/' . $info->id) }}"
+                                      title="{{ $info->channel_name }}">
+                                      <div class="video-img">
+                                          <span class="video-item-content">{{ $info->channel_name }}</span>
+                                          <img src="{{ URL::to('/' . $info->channel_thumb) }}"
+                                              alt="{{ $info->channel_name }}"
+                                              title="LiveTV-{{ $info->channel_name }}">
+                                      </div>
+                                  </a>
+                              </div>
+                          @endif
+                      @endif
+                  </div>
+              @endforeach
+            </div>
 
-                    @if ($watched_videos->video_type == 'LiveTV')
-                        @php
-                            $info = recently_watched_info(
-                                $watched_videos->video_type,
-                                $watched_videos->video_id,
-                            );
-                        @endphp
-                        @if ($info)
-                            <div class="single-video">
-                                <a href="{{ URL::to('livetv/details/' . $info->channel_slug . '/' . $info->id) }}"
-                                    title="{{ $info->channel_name }}">
-                                    <div class="video-img">
-                                        <span class="video-item-content">{{ $info->channel_name }}</span>
-                                        <img src="{{ URL::to('/' . $info->channel_thumb) }}"
-                                            alt="{{ $info->channel_name }}"
-                                            title="LiveTV-{{ $info->channel_name }}">
-                                    </div>
-                                </a>
-                            </div>
-                        @endif
-                    @endif
-                </div>
-            @endforeach
-
-
+            <div class="col-xs-12">
+              @include('_particles.pagination', ['paginator' => $transactions_list])
+            </div>
+          @else
+            <p class="mb-0">No watch history found yet.</p>
+          @endif
         </div>
-
-        <div class="col-xs-12">
-
-          @include('_particles.pagination', ['paginator' => $transactions_list])
-
-        </div>
-
       </div>
     </div>
   </div>
