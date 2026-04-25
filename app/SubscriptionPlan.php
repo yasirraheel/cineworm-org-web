@@ -8,9 +8,10 @@ class SubscriptionPlan extends Model
 {
     protected $table = 'subscription_plan';
 
-    protected $fillable = ['plan_name','plan_days','plan_duration','plan_price','included_plan_id','features'];
+    protected $fillable = ['plan_name','plan_days','plan_duration','plan_price','included_plan_id','included_plan_ids','features'];
 
     protected $casts = [
+        'included_plan_ids' => 'array',
         'features' => 'array',
     ];
 
@@ -52,6 +53,38 @@ class SubscriptionPlan extends Model
         return $this->belongsTo(self::class, 'included_plan_id');
     }
 
+    public function getIncludedPlanIds(): array
+    {
+        $includedPlanIds = array_filter(array_map('intval', (array) $this->included_plan_ids));
+
+        if (!empty($this->included_plan_id)) {
+            $includedPlanIds[] = (int) $this->included_plan_id;
+        }
+
+        return array_values(array_unique($includedPlanIds));
+    }
+
+    public function getIncludedPlans()
+    {
+        $includedPlanIds = $this->getIncludedPlanIds();
+
+        if (empty($includedPlanIds)) {
+            return collect();
+        }
+
+        return self::whereIn('id', $includedPlanIds)
+            ->get()
+            ->sortBy(function ($plan) use ($includedPlanIds) {
+                return array_search((int) $plan->id, $includedPlanIds, true);
+            })
+            ->values();
+    }
+
+    public function getIncludedPlanNames(): array
+    {
+        return $this->getIncludedPlans()->pluck('plan_name')->all();
+    }
+
     public function getDirectFeatureKeys(): array
     {
         return array_values(array_intersect((array) $this->features, array_keys(self::AVAILABLE_FEATURES)));
@@ -59,22 +92,25 @@ class SubscriptionPlan extends Model
 
     public function getInheritedFeatureKeys(array $visitedPlanIds = []): array
     {
-        if (empty($this->included_plan_id) || in_array($this->included_plan_id, $visitedPlanIds, true)) {
+        $includedPlanIds = array_diff($this->getIncludedPlanIds(), $visitedPlanIds);
+
+        if (empty($includedPlanIds)) {
             return [];
         }
 
-        $includedPlan = self::find($this->included_plan_id);
+        $inheritedFeatures = [];
 
-        if (!$includedPlan) {
-            return [];
+        foreach (self::whereIn('id', $includedPlanIds)->get() as $includedPlan) {
+            $nextVisitedPlanIds = array_merge($visitedPlanIds, [$includedPlan->id]);
+
+            $inheritedFeatures = array_merge(
+                $inheritedFeatures,
+                $includedPlan->getInheritedFeatureKeys($nextVisitedPlanIds),
+                $includedPlan->getDirectFeatureKeys()
+            );
         }
 
-        $visitedPlanIds[] = $this->included_plan_id;
-
-        return array_values(array_unique(array_merge(
-            $includedPlan->getInheritedFeatureKeys($visitedPlanIds),
-            $includedPlan->getDirectFeatureKeys()
-        )));
+        return array_values(array_unique($inheritedFeatures));
     }
 
     public function getEffectiveFeatureKeys(): array
@@ -90,22 +126,38 @@ class SubscriptionPlan extends Model
         return array_values(array_intersect_key(self::AVAILABLE_FEATURES, array_flip($this->getEffectiveFeatureKeys())));
     }
 
-    public function wouldCreateInheritanceLoop($includedPlanId): bool
+    public function getDirectFeatureLabels(): array
     {
-        if (empty($includedPlanId) || empty($this->id)) {
+        return array_values(array_intersect_key(self::AVAILABLE_FEATURES, array_flip($this->getDirectFeatureKeys())));
+    }
+
+    public function wouldCreateInheritanceLoop($includedPlanIds): bool
+    {
+        if (empty($includedPlanIds) || empty($this->id)) {
             return false;
         }
 
+        $includedPlanIds = array_filter(array_map('intval', (array) $includedPlanIds));
+        $planIdsToCheck = $includedPlanIds;
         $visitedPlanIds = [];
-        $nextPlanId = (int) $includedPlanId;
 
-        while ($nextPlanId) {
+        while (!empty($planIdsToCheck)) {
+            $nextPlanId = array_shift($planIdsToCheck);
+
+            if (!$nextPlanId) {
+                continue;
+            }
+
             if ($nextPlanId === (int) $this->id || in_array($nextPlanId, $visitedPlanIds, true)) {
                 return true;
             }
 
             $visitedPlanIds[] = $nextPlanId;
-            $nextPlanId = (int) self::where('id', $nextPlanId)->value('included_plan_id');
+            $nextPlan = self::find($nextPlanId);
+
+            if ($nextPlan) {
+                $planIdsToCheck = array_merge($planIdsToCheck, $nextPlan->getIncludedPlanIds());
+            }
         }
 
         return false;

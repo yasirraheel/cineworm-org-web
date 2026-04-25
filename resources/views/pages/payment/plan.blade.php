@@ -26,6 +26,13 @@
     position: relative;
     text-transform: none;
   }
+  .membership-plan-features li.plan-includes-line {
+    color: #ffffff;
+    font-weight: 700;
+  }
+  .membership-plan-features li.plan-includes-line::before {
+    border-color: #fe8805;
+  }
   .membership-plan-features li::before {
     border-bottom: 2px solid #fe0278;
     border-right: 2px solid #fe0278;
@@ -91,6 +98,10 @@
         </div>
 
         @foreach($plan_list as $plan_data)
+        @php
+          $includedPlanNames = $plan_data->getIncludedPlanNames();
+          $directFeatureLabels = $plan_data->getDirectFeatureLabels();
+        @endphp
         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
             <div class="membership-plan-list">
             <h3>{{$plan_data->plan_name}}</h3>
@@ -111,9 +122,12 @@
             <p></p>
             <h4>{{ App\SubscriptionPlan::getPlanDuration($plan_data->id) }}</h4>
             <h4>{{trans('words.plan_device_limit')}} - {{ $plan_data->plan_device_limit }}</h4>
-            @if(count($plan_data->getEffectiveFeatureLabels()))
+            @if(count($includedPlanNames) || count($directFeatureLabels))
             <ul class="membership-plan-features">
-              @foreach($plan_data->getEffectiveFeatureLabels() as $featureLabel)
+              @foreach($includedPlanNames as $includedPlanName)
+                <li class="plan-includes-line">Everything in {{ $includedPlanName }}</li>
+              @endforeach
+              @foreach($directFeatureLabels as $featureLabel)
                 <li>{{ $featureLabel }}</li>
               @endforeach
             </ul>

@@ -1003,9 +1003,11 @@ class AndroidApiController extends MainAPIController
                 $plan_price= $plan_data->plan_price;
                 $plan_device_limit= $plan_data->plan_device_limit;
                 $ads_on_off= $plan_data->ads_on_off;
+                $included_plans= $plan_data->getIncludedPlanNames();
+                $direct_features= $plan_data->getDirectFeatureLabels();
                 $features= $plan_data->getEffectiveFeatureLabels();
 
-                $response[]=array("plan_id"=>$plan_id,"plan_name"=>$plan_name,"plan_duration"=>$plan_duration,"plan_price"=>$plan_price,"plan_device_limit"=>$plan_device_limit,"ads_on_off"=>$ads_on_off,"features"=>$features,"currency_code"=>$currency_code);
+                $response[]=array("plan_id"=>$plan_id,"plan_name"=>$plan_name,"plan_duration"=>$plan_duration,"plan_price"=>$plan_price,"plan_device_limit"=>$plan_device_limit,"ads_on_off"=>$ads_on_off,"included_plans"=>$included_plans,"direct_features"=>$direct_features,"features"=>$features,"currency_code"=>$currency_code);
         }
 
         return \Response::json(array(

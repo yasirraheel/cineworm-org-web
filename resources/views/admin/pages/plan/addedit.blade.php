@@ -6,7 +6,7 @@
   $availableFeatures = \App\SubscriptionPlan::AVAILABLE_FEATURES;
   $selectedFeatures = isset($plan_info) ? $plan_info->getDirectFeatureKeys() : [];
   $inheritedFeatures = isset($plan_info) ? $plan_info->getInheritedFeatureKeys() : [];
-  $includedPlanId = isset($plan_info->included_plan_id) ? $plan_info->included_plan_id : null;
+  $includedPlanIds = isset($plan_info) ? $plan_info->getIncludedPlanIds() : [];
   $planFeatureMap = isset($plan_list) ? $plan_list->mapWithKeys(function ($plan) {
       return [$plan->id => $plan->getEffectiveFeatureKeys()];
   }) : collect();
@@ -112,17 +112,16 @@
                   </div>
 
                   <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Includes Plan</label>
+                    <label class="col-sm-2 col-form-label">Includes Plans</label>
                     <div class="col-sm-8">
-                      <select name="included_plan_id" id="included_plan_id" class="form-control">
-                        <option value="">No included plan</option>
+                      <select name="included_plan_ids[]" id="included_plan_ids" class="form-control" multiple size="5">
                         @if(isset($plan_list))
                           @foreach($plan_list as $plan_data)
-                            <option value="{{ $plan_data->id }}" @if($includedPlanId == $plan_data->id) selected @endif>Everything in {{ $plan_data->plan_name }}</option>
+                            <option value="{{ $plan_data->id }}" @if(in_array($plan_data->id, $includedPlanIds, true)) selected @endif>Everything in {{ $plan_data->plan_name }}</option>
                           @endforeach
                         @endif
                       </select>
-                      <small class="form-text text-muted mb-2">Features from the selected plan will be included automatically. Those options are locked below so you can add only extra features.</small>
+                      <small class="form-text text-muted mb-2">Hold Ctrl/Cmd to select multiple plans. Features from selected plans will be included automatically and locked below so you can add only extra features.</small>
                     </div>
                   </div>
 
@@ -221,14 +220,25 @@
       var planFeatureMap = @json($planFeatureMap);
       var originalDirectFeatures = @json($selectedFeatures);
       var featureGrid = document.getElementById('plan_features_grid');
-      var includedPlanSelect = document.getElementById('included_plan_id');
+      var includedPlanSelect = document.getElementById('included_plan_ids');
 
       function updateInheritedFeatures() {
         if (!featureGrid || !includedPlanSelect) {
           return;
         }
 
-        var inheritedFeatures = planFeatureMap[includedPlanSelect.value] || [];
+        var selectedPlanIds = Array.prototype.map.call(includedPlanSelect.selectedOptions, function(option) {
+          return option.value;
+        });
+        var inheritedFeatures = [];
+
+        selectedPlanIds.forEach(function(planId) {
+          inheritedFeatures = inheritedFeatures.concat(planFeatureMap[planId] || []);
+        });
+
+        inheritedFeatures = inheritedFeatures.filter(function(featureKey, index) {
+          return inheritedFeatures.indexOf(featureKey) === index;
+        });
 
         featureGrid.querySelectorAll('.plan-feature-option').forEach(function(option) {
           var input = option.querySelector('input[type="checkbox"]');
