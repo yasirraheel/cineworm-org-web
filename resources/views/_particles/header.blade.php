@@ -23,7 +23,7 @@
                             @endif
                         </div>
 
-                        <div class="col-4 nav-order-last nopadding">
+                        <div class="col-5 nav-order-last nopadding">
                             <div class="main-nav leftnav">
                                 <ul class="top-nav">
                                     <li class="visible-this d-md-none menu-icon">
@@ -93,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-5">
                             <div class="right-sub-item-area">
                                 <div class="search-item-block">
                                     <form class="navbar-form navbar-left">
@@ -240,6 +240,22 @@
 
     body.header-is-hidden {
         padding-top: 100px !important; /* Force padding */
+    }
+
+    @media only screen and (min-width: 1001px) {
+        .header-section #menu > ul.vfx-item-nav {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+
+        .header-section #menu > ul.vfx-item-nav > li {
+            flex: 0 0 auto;
+        }
+
+        .main-menu .vfx-item-nav > li > a {
+            white-space: nowrap;
+        }
     }
 </style>
 
