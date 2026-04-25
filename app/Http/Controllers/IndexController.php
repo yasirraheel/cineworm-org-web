@@ -666,6 +666,7 @@ class IndexController extends Controller
         $user->password = bcrypt($inputs['password']);
 
         $user->save();
+        assignDefaultSignupPlanToUser($user);
 
         // Send Email Verification
         \App\Http\Controllers\Auth\EmailVerificationController::sendVerificationEmail($user);

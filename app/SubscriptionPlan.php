@@ -8,6 +8,8 @@ class SubscriptionPlan extends Model
 {
     protected $table = 'subscription_plan';
 
+    public const DEFAULT_SIGNUP_FEATURE_FLAG = '__default_signup_plan';
+
     protected $fillable = ['plan_name','plan_days','plan_duration','plan_price','included_plan_id','included_plan_ids','features'];
 
     protected $casts = [
@@ -88,6 +90,26 @@ class SubscriptionPlan extends Model
     public function getDirectFeatureKeys(): array
     {
         return array_values(array_intersect((array) $this->features, array_keys(self::AVAILABLE_FEATURES)));
+    }
+
+    public function getRawFeatureKeys(): array
+    {
+        return array_values(array_filter((array) $this->features));
+    }
+
+    public function isDefaultSignupPlan(): bool
+    {
+        return in_array(self::DEFAULT_SIGNUP_FEATURE_FLAG, $this->getRawFeatureKeys(), true);
+    }
+
+    public static function getDefaultSignupPlan()
+    {
+        return self::active()
+            ->orderBy('id')
+            ->get()
+            ->first(function (self $plan) {
+                return $plan->isDefaultSignupPlan();
+            });
     }
 
     public function getInheritedFeatureKeys(array $visitedPlanIds = []): array

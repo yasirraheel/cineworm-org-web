@@ -7,6 +7,7 @@
   $selectedFeatures = isset($plan_info) ? $plan_info->getDirectFeatureKeys() : [];
   $inheritedFeatures = isset($plan_info) ? $plan_info->getInheritedFeatureKeys() : [];
   $includedPlanIds = isset($plan_info) ? $plan_info->getIncludedPlanIds() : [];
+  $isDefaultSignupPlan = (int) old('is_default_signup_plan', isset($plan_info) && $plan_info->isDefaultSignupPlan() ? 1 : 0) === 1;
   $planFeatureMap = isset($plan_list) ? $plan_list->mapWithKeys(function ($plan) {
       return [$plan->id => $plan->getEffectiveFeatureKeys()];
   }) : collect();
@@ -177,6 +178,18 @@
                                 <option value="0" @if(isset($plan_info->status) AND $plan_info->status==0) selected @endif>{{trans('words.inactive')}}</option>                            
                             </select>
                       </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Default Signup Plan</label>
+                    <div class="col-sm-8">
+                      <label class="included-plan-option mb-0">
+                        <input type="hidden" name="is_default_signup_plan" value="0">
+                        <input type="checkbox" name="is_default_signup_plan" value="1" @if($isDefaultSignupPlan) checked @endif>
+                        <span>Automatically assign this plan to new users</span>
+                      </label>
+                      <small class="form-text text-muted mb-2">Only one plan can be the default signup plan at a time.</small>
+                    </div>
                   </div>
 
                   <div class="form-group row mb-0">

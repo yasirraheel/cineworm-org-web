@@ -707,6 +707,39 @@ function getPaymentGatewayInfo($id,$field_name=null)
 }
 }
 
+if (! function_exists('getDefaultSignupPlan')) {
+function getDefaultSignupPlan()
+{
+    return SubscriptionPlan::getDefaultSignupPlan();
+}
+}
+
+if (! function_exists('assignDefaultSignupPlanToUser')) {
+function assignDefaultSignupPlanToUser($user)
+{
+    if (!$user) {
+        return false;
+    }
+
+    $defaultPlan = getDefaultSignupPlan();
+
+    if (!$defaultPlan) {
+        return false;
+    }
+
+    $planDays = (int) $defaultPlan->plan_days;
+    $startDate = strtotime(date('m/d/Y'));
+
+    $user->plan_id = $defaultPlan->id;
+    $user->start_date = $startDate;
+    $user->exp_date = $planDays > 0 ? strtotime(date('m/d/Y', strtotime("+$planDays days"))) : null;
+    $user->plan_amount = $defaultPlan->plan_price;
+    $user->save();
+
+    return true;
+}
+}
+
 if (! function_exists('getStatisticsColors')) {
 function getStatisticsColors($colorId)
 {

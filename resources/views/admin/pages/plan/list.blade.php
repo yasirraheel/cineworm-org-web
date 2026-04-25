@@ -32,6 +32,7 @@
                       <th>{{trans('words.duration')}}</th>
                       <th>{{trans('words.price')}}</th>
                       <th>{{trans('words.plan_device_limit')}}</th>
+                      <th>Default</th>
                       <th>{{trans('words.ads_on_off')}}</th>
                       <th>{{trans('words.status')}}</th>                       
                       <th>{{trans('words.action')}}</th>
@@ -44,6 +45,7 @@
                       <td>{{ App\SubscriptionPlan::getPlanDuration($plan_data->id) }}</td>
                       <td>{{html_entity_decode(getCurrencySymbols(getcong('currency_code')))}} {{ $plan_data->plan_price }}</td>
                       <td>{{ $plan_data->plan_device_limit }}</td>
+                      <td>@if($plan_data->isDefaultSignupPlan())<span class="badge badge-primary">Default</span>@else<span class="badge badge-secondary">No</span>@endif</td>
 
                       <td>@if($plan_data->ads_on_off==1)<span class="badge badge-success">{{trans('words.on')}}</span> @else<span class="badge badge-danger">{{trans('words.off')}}</span>@endif</td>
 
