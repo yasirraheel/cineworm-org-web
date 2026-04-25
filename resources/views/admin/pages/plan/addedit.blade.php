@@ -32,6 +32,12 @@
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 10px 16px;
 }
+.included-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px 16px;
+}
+.included-plan-option,
 .plan-feature-option {
   align-items: center;
   background: rgba(255, 255, 255, 0.04);
@@ -43,8 +49,18 @@
   min-height: 38px;
   padding: 8px 10px;
 }
+.included-plan-option {
+  cursor: pointer;
+}
+.included-plan-option:hover {
+  border-color: rgba(254, 2, 120, .55);
+}
+.included-plan-option input,
 .plan-feature-option input {
   margin: 0;
+}
+.included-plan-option span {
+  font-weight: 700;
 }
 .plan-feature-option.is-inherited {
   opacity: .58;
@@ -114,14 +130,17 @@
                   <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Includes Plans</label>
                     <div class="col-sm-8">
-                      <select name="included_plan_ids[]" id="included_plan_ids" class="form-control" multiple size="5">
+                      <div class="included-plans-grid" id="included_plan_ids">
                         @if(isset($plan_list))
                           @foreach($plan_list as $plan_data)
-                            <option value="{{ $plan_data->id }}" @if(in_array($plan_data->id, $includedPlanIds, true)) selected @endif>Everything in {{ $plan_data->plan_name }}</option>
+                            <label class="included-plan-option">
+                              <input type="checkbox" name="included_plan_ids[]" value="{{ $plan_data->id }}" @if(in_array($plan_data->id, $includedPlanIds, true)) checked @endif>
+                              <span>Everything in {{ $plan_data->plan_name }}</span>
+                            </label>
                           @endforeach
                         @endif
-                      </select>
-                      <small class="form-text text-muted mb-2">Hold Ctrl/Cmd to select multiple plans. Features from selected plans will be included automatically and locked below so you can add only extra features.</small>
+                      </div>
+                      <small class="form-text text-muted mb-2">Select one or more plans to include. Their features are locked below so you can add only extra features.</small>
                     </div>
                   </div>
 
@@ -220,15 +239,15 @@
       var planFeatureMap = @json($planFeatureMap);
       var originalDirectFeatures = @json($selectedFeatures);
       var featureGrid = document.getElementById('plan_features_grid');
-      var includedPlanSelect = document.getElementById('included_plan_ids');
+      var includedPlanList = document.getElementById('included_plan_ids');
 
       function updateInheritedFeatures() {
-        if (!featureGrid || !includedPlanSelect) {
+        if (!featureGrid || !includedPlanList) {
           return;
         }
 
-        var selectedPlanIds = Array.prototype.map.call(includedPlanSelect.selectedOptions, function(option) {
-          return option.value;
+        var selectedPlanIds = Array.prototype.map.call(includedPlanList.querySelectorAll('input[type="checkbox"]:checked'), function(input) {
+          return input.value;
         });
         var inheritedFeatures = [];
 
@@ -262,8 +281,8 @@
         });
       }
 
-      if (includedPlanSelect) {
-        includedPlanSelect.addEventListener('change', updateInheritedFeatures);
+      if (includedPlanList) {
+        includedPlanList.addEventListener('change', updateInheritedFeatures);
         updateInheritedFeatures();
       }
     })();
