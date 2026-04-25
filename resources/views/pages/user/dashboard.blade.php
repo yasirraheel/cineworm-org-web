@@ -6,6 +6,36 @@
 
 @section('content')
 
+<style>
+  .dashboard-card-grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-card-col {
+    margin-bottom: 30px;
+  }
+
+  .dashboard-card-col .member-ship-option {
+    height: 100%;
+  }
+
+  .dashboard-card-action {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    box-sizing: border-box;
+    text-decoration: none;
+  }
+
+  @media only screen and (max-width: 991px) {
+    .dashboard-card-col {
+      margin-bottom: 25px;
+    }
+  }
+</style>
+
 
 <!-- Start Breadcrumb -->
 <div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
@@ -52,8 +82,8 @@
               </div>
             </div>
             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
-              <div class="row">
-                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+              <div class="row dashboard-card-grid">
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">
                   <div class="member-ship-option">
                     <h5 class="color-up">Stats</h5>
                     <span class="premuim-memplan-bold-text"><strong>Joined Since:</strong>
@@ -67,7 +97,7 @@
                     </span>
                   </div>
                 </div>
-                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">
                   <div class="member-ship-option">
                     <h5 class="color-up">{{trans('words.my_subscription')}}</h5>
                     @if($currentPlan)
@@ -89,11 +119,11 @@
                   </div>
                 </div>
                 @foreach($dashboardCards as $dashboardCard)
-                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">
                   <div class="member-ship-option">
                     <h5 class="color-up">{{ $dashboardCard['title'] }}</h5>
                     <div class="mt-3">
-                      <a href="{{ $dashboardCard['url'] }}" class="vfx-item-btn-danger text-uppercase" style="display: block; width: 100%; text-align: center; padding: 12px; box-sizing: border-box; text-decoration: none;">{{ $dashboardCard['button_text'] }}</a>
+                      <a href="{{ $dashboardCard['url'] }}" class="vfx-item-btn-danger text-uppercase dashboard-card-action">{{ $dashboardCard['button_text'] }}</a>
                     </div>
                   </div>
                 </div>
