@@ -8,6 +8,7 @@ use App\PromotionalTrackingDomain;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
 
 class PromotionalMailController extends MainAdminController
@@ -152,6 +153,77 @@ class PromotionalMailController extends MainAdminController
         \Session::flash('flash_message', trans('words.deleted'));
 
         return redirect('admin/promo_mail/servers');
+    }
+
+    public function testServer($id, Request $request)
+    {
+        if ($redirect = $this->ensureAdminAccess()) {
+            return $redirect;
+        }
+
+        $server = PromotionalSmtpServer::findOrFail($id);
+        $testEmail = trim($request->get('test_email'));
+
+        if (empty($testEmail) || !filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
+            return response()->json([
+                'resp_status' => 'failed',
+                'resp_msg' => 'Please enter a valid test email address.',
+            ]);
+        }
+
+        if (!$server->status) {
+            return response()->json([
+                'resp_status' => 'failed',
+                'resp_msg' => 'Please activate this SMTP server before sending a test email.',
+            ]);
+        }
+
+        if (empty($server->decrypted_password)) {
+            return response()->json([
+                'resp_status' => 'failed',
+                'resp_msg' => 'SMTP password is missing for this server.',
+            ]);
+        }
+
+        try {
+            Config::set('mail.default', 'smtp');
+            Config::set('mail.mailers.smtp.transport', 'smtp');
+            Config::set('mail.mailers.smtp.host', $server->host);
+            Config::set('mail.mailers.smtp.port', $server->port);
+            Config::set('mail.mailers.smtp.encryption', $server->encryption ?: null);
+            Config::set('mail.mailers.smtp.username', $server->username);
+            Config::set('mail.mailers.smtp.password', $server->decrypted_password);
+            Config::set('mail.mailers.smtp.local_domain', $server->ehlo_domain ?: null);
+            Config::set('mail.from.address', $server->sender_email);
+            Config::set('mail.from.name', $server->from_name ?: $server->server_name);
+
+            if (app()->bound('mail.manager') && method_exists(app('mail.manager'), 'forgetMailers')) {
+                app('mail.manager')->forgetMailers();
+            }
+
+            $userName = 'Promotional SMTP Test';
+            $dataEmail = ['name' => $userName];
+
+            \Mail::mailer('smtp')->send('emails.test_smtp', $dataEmail, function ($message) use ($testEmail, $userName, $server) {
+                $message->to($testEmail, $userName)
+                    ->from($server->sender_email, $server->from_name ?: $server->server_name)
+                    ->subject('Test Promotional SMTP');
+
+                if (!empty($server->reply_to_email)) {
+                    $message->replyTo($server->reply_to_email);
+                }
+            });
+
+            return response()->json([
+                'resp_status' => 'success',
+                'resp_msg' => 'Test email sent successfully.',
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'resp_status' => 'failed',
+                'resp_msg' => $exception->getMessage(),
+            ]);
+        }
     }
 
     public function sendingDomains()

@@ -320,6 +320,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('promo_mail/servers', 'PromotionalMailController@servers');
         Route::get('promo_mail/servers/add', 'PromotionalMailController@addServer');
         Route::get('promo_mail/servers/edit/{id}', 'PromotionalMailController@editServer');
+        Route::get('promo_mail/servers/test/{id}', 'PromotionalMailController@testServer');
         Route::post('promo_mail/servers/save', 'PromotionalMailController@saveServer');
         Route::get('promo_mail/servers/delete/{id}', 'PromotionalMailController@deleteServer');
 

@@ -40,7 +40,7 @@
                         <input type="hidden" name="id" value="{{ isset($domain->id) ? $domain->id : null }}">
 
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-12">
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">SMTP Server</label>
                                     <div class="col-sm-9">
@@ -148,8 +148,10 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div class="card-box">
                                     <h4 class="header-title">DNS Records To Publish</h4>
                                     <div class="table-responsive">
@@ -186,7 +188,11 @@
                                         </table>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div class="card-box">
                                     <h4 class="header-title">Setup Guide</h4>
                                     <ol class="m-b-0 pl-3">

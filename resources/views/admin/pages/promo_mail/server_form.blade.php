@@ -23,7 +23,38 @@
                                     </h4>
                                 </a>
                             </div>
+                            @if(isset($server->id))
+                            <div class="col-sm-6 text-right">
+                                <a href="#" class="btn btn-info btn-md waves-effect waves-light m-b-20 mt-2" data-toggle="modal" data-target="#smtp_test_model">
+                                    <i class="fa fa-send"></i> Test Email
+                                </a>
+                            </div>
+                            @endif
                         </div>
+
+                        @if(isset($server->id))
+                        <div id="smtp_test_model" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="promoMailTestLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="promoMailTestLabel">Test SMTP Server</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Test Email</label>
+                                            <div class="col-sm-9">
+                                                <input type="email" name="test_email" placeholder="name@{{ $currentDomain }}" class="form-control" id="test_email" autocomplete="off" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" id="test_email_sent_btn" class="btn btn-primary waves-effect waves-light">Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
 
                         {!! Form::open(array('url' => array('admin/promo_mail/servers/save'),'name'=>'server_form','id'=>'server_form','role'=>'form')) !!}
                         <input type="hidden" name="id" value="{{ isset($server->id) ? $server->id : null }}">
@@ -199,6 +230,71 @@
 </div>
 
 <script type="text/javascript">
+    @if(isset($server->id))
+    jQuery(document).ready(function(){
+        $(document).on('click', '#test_email_sent_btn', function() {
+            var testEmail = $("#test_email").val();
+
+            if (testEmail != '') {
+                $.ajax({
+                    type: 'GET',
+                    url: "{{ URL::to('admin/promo_mail/servers/test/'.(isset($server->id) ? $server->id : 0)) }}",
+                    data: "test_email=" + encodeURIComponent(testEmail),
+                    dataType: 'json',
+                    beforeSend: function() {
+                        $("#test_email_sent_btn").html('sending...');
+                    },
+                    success: function(response) {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: false,
+                        });
+
+                        Toast.fire({
+                            icon: response.resp_status == 'success' ? 'success' : 'error',
+                            title: response.resp_msg
+                        });
+
+                        $('#test_email_sent_btn').html('Send');
+                    },
+                    error: function() {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: false,
+                        });
+
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Something went wrong while sending the test email.'
+                        });
+
+                        $('#test_email_sent_btn').html('Send');
+                    }
+                });
+            } else {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: false,
+                });
+
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Please enter email'
+                });
+            }
+        });
+    });
+    @endif
+
     @if(Session::has('flash_message'))
     const Toast = Swal.mixin({
         toast: true,

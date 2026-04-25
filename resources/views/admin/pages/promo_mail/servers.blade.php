@@ -48,15 +48,6 @@
                             </div>
                         </div>
 
-                        @if(Session::has('flash_message'))
-                            <div class="alert alert-success">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                {{ Session::get('flash_message') }}
-                            </div>
-                        @endif
-
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
@@ -140,5 +131,22 @@
     </div>
     @include("admin.copyright")
 </div>
+
+<script type="text/javascript">
+    @if(Session::has('flash_message'))
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: false,
+    });
+
+    Toast.fire({
+        icon: 'success',
+        title: '{{ Session::get('flash_message') }}'
+    });
+    @endif
+</script>
 
 @endsection
