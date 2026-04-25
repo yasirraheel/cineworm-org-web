@@ -123,7 +123,7 @@
                             <div class="col-md-12">
                                 <div class="card-box" style="border: 1px dashed #d6d6d6;">
                                     <h4 class="header-title">Recommended Setup Flow</h4>
-                                    <ol class="m-b-0">
+                                    <ol class="m-b-0" style="color: #cfd8e3;">
                                         <li>Add the SMTP server with mailbox, host, encryption, and rate limits.</li>
                                         <li>Add the sending domain and publish SPF, DKIM, and DMARC DNS records.</li>
                                         <li>Add a tracking domain for open/click tracking CNAME routing.</li>
