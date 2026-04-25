@@ -55,40 +55,6 @@
               <div class="row">
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                   <div class="member-ship-option">
-                    <h5 class="color-up">Add/ Upload Video</h5>
-                    <div class="mt-3">
-                      <a href="{{ URL::to('admin/movies/add_movie') }}" class="vfx-item-btn-danger text-uppercase" style="display: block; width: 100%; text-align: center; padding: 12px; box-sizing: border-box; text-decoration: none;">Add Video</a>
-                    </div>
-                  </div>
-
-
-                </div>
-                {{-- <!-- <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                  <div class="member-ship-option">
-
-                    <h5 class="color-up">{{trans('words.my_subscription')}}</h5>
-
-                    @if($user->plan_id!=0)
-
-                    <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>{{\App\SubscriptionPlan::getSubscriptionPlanInfo($user->plan_id,'plan_name')}}</span></span>
-
-                    @if($user->exp_date)
-                    <span class="premuim-memplan-bold-text"><strong>{{trans('words.subscription_expires_on')}}:</strong><span>{{date('F, d, Y',$user->exp_date)}}</span></span>
-                    @endif
-
-                    <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.upgrade_plan')}}</a></div>
-
-                    @else
-
-                    <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.select_plan')}}</a></div>
-
-                    @endif
-
-                  </div>
-
-                </div> --> --}}
-                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                  <div class="member-ship-option">
                     <h5 class="color-up">Stats</h5>
                     <span class="premuim-memplan-bold-text"><strong>Joined Since:</strong>
                         <span>{{ date('F, d, Y',strtotime(Auth::User()->created_at)) }}</span>
@@ -96,14 +62,42 @@
                     <span class="premuim-memplan-bold-text"><strong>Total Films:</strong>
                         <span>{{ \App\Movies::where('added_by', Auth::user()->id)->count() }}</span>
                     </span>
-
                     <span class="premuim-memplan-bold-text"><strong>Active Device:</strong>
                         <span>{{ \App\UsersDeviceHistory::where('user_id', Auth::user()->id)->first()->user_device_name ?? 'No Active Device' }}</span>
                     </span>
-
-
                   </div>
                 </div>
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                  <div class="member-ship-option">
+                    <h5 class="color-up">{{trans('words.my_subscription')}}</h5>
+                    @if($currentPlan)
+                    <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>{{ $currentPlan->plan_name }}</span></span>
+                    @if($user->start_date)
+                    <span class="premuim-memplan-bold-text"><strong>Plan Started:</strong><span>{{ date('F, d, Y',$user->start_date) }}</span></span>
+                    @endif
+                    @if($user->exp_date)
+                    <span class="premuim-memplan-bold-text"><strong>{{trans('words.subscription_expires_on')}}:</strong><span>{{ date('F, d, Y',$user->exp_date) }}</span></span>
+                    @endif
+                    @if(!empty($currentPlan->plan_price) || $currentPlan->plan_price === '0' || $currentPlan->plan_price === 0)
+                    <span class="premuim-memplan-bold-text"><strong>Plan Price:</strong><span>{{ html_entity_decode(getcong('currency_sign')) }} {{ number_format((float) $currentPlan->plan_price, 2) }}</span></span>
+                    @endif
+                    <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.upgrade_plan')}}</a></div>
+                    @else
+                    <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>No Plan Selected</span></span>
+                    <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.select_plan')}}</a></div>
+                    @endif
+                  </div>
+                </div>
+                @foreach($dashboardCards as $dashboardCard)
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                  <div class="member-ship-option">
+                    <h5 class="color-up">{{ $dashboardCard['title'] }}</h5>
+                    <div class="mt-3">
+                      <a href="{{ $dashboardCard['url'] }}" class="vfx-item-btn-danger text-uppercase" style="display: block; width: 100%; text-align: center; padding: 12px; box-sizing: border-box; text-decoration: none;">{{ $dashboardCard['button_text'] }}</a>
+                    </div>
+                  </div>
+                </div>
+                @endforeach
               </div>
             </div>
           </div>

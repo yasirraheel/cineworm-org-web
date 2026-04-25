@@ -69,8 +69,67 @@ class UserController extends Controller
             $recently_watched = array();
         }
         $transactions_list = Transactions::where('user_id',$user_id)->orderBy('id','DESC')->paginate(10);
+        $currentPlan = null;
+        $planFeatureKeys = [];
 
-        return view('pages.user.dashboard',compact('user','transactions_list','recently_watched'));
+        if (!empty($user->plan_id)) {
+            $currentPlan = SubscriptionPlan::find($user->plan_id);
+            if ($currentPlan) {
+                $planFeatureKeys = $currentPlan->getEffectiveFeatureKeys();
+            }
+        }
+
+        $dashboardCards = [];
+        $featureCardConfig = [
+            'film_uploads' => [
+                'title' => 'Add/ Upload Video',
+                'button_text' => 'Add Video',
+                'url' => URL('admin/movies/add_movie'),
+            ],
+            'promotion_services' => [
+                'title' => 'Promotion Services',
+                'button_text' => 'Promotion Services',
+                'url' => 'javascript:void(0);',
+            ],
+            'crowdfunding_link_sharing' => [
+                'title' => 'Crowdfunding Link Sharing',
+                'button_text' => 'Crowdfunding Link Sharing',
+                'url' => 'javascript:void(0);',
+            ],
+            'project_showcase_page' => [
+                'title' => 'Project Showcase Page',
+                'button_text' => 'Project Showcase Page',
+                'url' => 'javascript:void(0);',
+            ],
+            'website_link_sharing' => [
+                'title' => 'Website Link Sharing',
+                'button_text' => 'Website Link Sharing',
+                'url' => 'javascript:void(0);',
+            ],
+            'deal_plus_access' => [
+                'title' => 'Deal Plus Access',
+                'button_text' => 'Deal Plus Access',
+                'url' => 'javascript:void(0);',
+            ],
+            'photo_gallery' => [
+                'title' => 'Photo Gallery',
+                'button_text' => 'Photo Gallery',
+                'url' => 'javascript:void(0);',
+            ],
+            'personal_profile_page' => [
+                'title' => 'Personal Profile Page',
+                'button_text' => 'Personal Profile Page',
+                'url' => 'javascript:void(0);',
+            ],
+        ];
+
+        foreach ($featureCardConfig as $featureKey => $cardConfig) {
+            if (in_array($featureKey, $planFeatureKeys, true)) {
+                $dashboardCards[] = $cardConfig;
+            }
+        }
+
+        return view('pages.user.dashboard',compact('user','transactions_list','recently_watched','currentPlan','dashboardCards'));
     }
 
     public function profile()
