@@ -12,23 +12,6 @@
     box-shadow: 0 18px 50px rgba(254, 2, 120, 0.22);
     position: relative;
   }
-  .membership-plan-current-badge {
-    background: linear-gradient(90deg, #fe0278, #fe8805);
-    border-radius: 999px;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, .25);
-    color: #fff;
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .04em;
-    left: 12px;
-    line-height: 1;
-    padding: 7px 12px;
-    position: absolute;
-    top: -14px;
-    text-transform: uppercase;
-    z-index: 2;
-  }
   .membership-plan-disabled-btn {
     background: #4c465f !important;
     border: 1px solid #6a647b;
@@ -135,9 +118,6 @@
         @endphp
         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
             <div class="membership-plan-list @if($isCurrentPlan) is-current-plan @endif">
-            @if($isCurrentPlan)
-            <div class="membership-plan-current-badge">{{trans('words.current_plan')}}</div>
-            @endif
             <h3>{{$plan_data->plan_name}}</h3>
             <h1>
               <span>{{html_entity_decode(getCurrencySymbols(getcong('currency_code')))}}</span>
