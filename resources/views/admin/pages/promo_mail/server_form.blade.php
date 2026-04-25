@@ -3,6 +3,10 @@
 @section("content")
 @include('admin.pages.promo_mail.partials.content_styles')
 
+@php
+    $currentDomain = parse_url(URL::to('/'), PHP_URL_HOST) ?: request()->getHost();
+@endphp
+
 <div class="content-page promo-mail-page">
     <div class="content">
         <div class="container-fluid">
@@ -96,7 +100,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">EHLO Domain</label>
                                     <div class="col-sm-9">
-                                        <input type="text" name="ehlo_domain" value="{{ old('ehlo_domain', isset($server->ehlo_domain) ? $server->ehlo_domain : '') }}" class="form-control" placeholder="mail.yourdomain.com">
+                                        <input type="text" name="ehlo_domain" value="{{ old('ehlo_domain', isset($server->ehlo_domain) ? $server->ehlo_domain : '') }}" class="form-control" placeholder="mail.{{ $currentDomain }}">
                                     </div>
                                 </div>
 
@@ -137,12 +141,6 @@
                                     <label class="col-sm-3 col-form-label">Max Messages Per Day</label>
                                     <div class="col-sm-9">
                                         <input type="number" name="max_messages_per_day" value="{{ old('max_messages_per_day', isset($server->max_messages_per_day) ? $server->max_messages_per_day : 0) }}" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Notes / Warmup Plan</label>
-                                    <div class="col-sm-9">
-                                        <textarea name="notes" class="form-control elm1_editor" rows="6">{{ old('notes', isset($server->notes) ? $server->notes : '') }}</textarea>
                                     </div>
                                 </div>
                                 <div class="form-group row">

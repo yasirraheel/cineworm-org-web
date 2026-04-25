@@ -4,8 +4,9 @@
 @include('admin.pages.promo_mail.partials.content_styles')
 
 @php
+    $currentDomain = parse_url(URL::to('/'), PHP_URL_HOST) ?: request()->getHost();
     $trackingDomainName = old('domain', isset($domain->domain) ? $domain->domain : '');
-    $cnameTarget = old('cname_target', isset($domain->cname_target) ? $domain->cname_target : 'track.your-provider.com');
+    $cnameTarget = old('cname_target', isset($domain->cname_target) ? $domain->cname_target : 'track.'.$currentDomain);
 @endphp
 
 <div class="content-page promo-mail-page">
@@ -45,19 +46,13 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Tracking Domain*</label>
                                     <div class="col-sm-9">
-                                        <input type="text" name="domain" value="{{ $trackingDomainName }}" class="form-control" placeholder="tracking.example.com">
+                                        <input type="text" name="domain" value="{{ $trackingDomainName }}" class="form-control" placeholder="tracking.{{ $currentDomain }}">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">CNAME Target*</label>
                                     <div class="col-sm-9">
                                         <input type="text" name="cname_target" value="{{ $cnameTarget }}" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Notes</label>
-                                    <div class="col-sm-9">
-                                        <textarea name="notes" class="form-control elm1_editor" rows="6">{{ old('notes', isset($domain->notes) ? $domain->notes : '') }}</textarea>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -108,7 +103,7 @@
                                         <tbody>
                                         <tr>
                                             <td>CNAME</td>
-                                            <td>{{ $trackingDomainName ?: 'tracking.yourdomain.com' }}</td>
+                                            <td>{{ $trackingDomainName ?: 'tracking.'.$currentDomain }}</td>
                                             <td style="word-break: break-all;">{{ $cnameTarget }}</td>
                                         </tr>
                                         </tbody>

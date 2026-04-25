@@ -4,13 +4,14 @@
 @include('admin.pages.promo_mail.partials.content_styles')
 
 @php
+    $currentDomain = parse_url(URL::to('/'), PHP_URL_HOST) ?: request()->getHost();
     $domainName = old('domain', isset($domain->domain) ? $domain->domain : '');
     $selector = old('selector', isset($domain->selector) ? $domain->selector : 'default');
     $returnPathSubdomain = old('return_path_subdomain', isset($domain->return_path_subdomain) ? $domain->return_path_subdomain : 'mail');
     $dmarcPolicy = old('dmarc_policy', isset($domain->dmarc_policy) ? $domain->dmarc_policy : 'quarantine');
     $dmarcReportEmail = old('dmarc_report_email', isset($domain->dmarc_report_email) ? $domain->dmarc_report_email : '');
     $dmarcAlignment = old('dmarc_alignment', isset($domain->dmarc_alignment) ? $domain->dmarc_alignment : 'relaxed');
-    $spfValue = old('spf_value', isset($domain->spf_value) ? $domain->spf_value : 'v=spf1 include:your-smtp-provider ~all');
+    $spfValue = old('spf_value', isset($domain->spf_value) ? $domain->spf_value : 'v=spf1 include:'.$currentDomain.' ~all');
     $dmarcValue = 'v=DMARC1; p='.$dmarcPolicy.'; adkim=' . ($dmarcAlignment == 'strict' ? 's' : 'r') . '; aspf=' . ($dmarcAlignment == 'strict' ? 's' : 'r');
     if($dmarcReportEmail){
         $dmarcValue .= '; rua=mailto:'.$dmarcReportEmail;
@@ -54,7 +55,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">Domain*</label>
                                     <div class="col-sm-9">
-                                        <input type="text" name="domain" value="{{ $domainName }}" class="form-control" placeholder="example.com">
+                                        <input type="text" name="domain" value="{{ $domainName }}" class="form-control" placeholder="{{ $currentDomain }}">
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -103,7 +104,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">DMARC Report Email</label>
                                     <div class="col-sm-9">
-                                        <input type="email" name="dmarc_report_email" value="{{ $dmarcReportEmail }}" class="form-control" placeholder="dmarc@example.com">
+                                        <input type="email" name="dmarc_report_email" value="{{ $dmarcReportEmail }}" class="form-control" placeholder="dmarc@{{ $currentDomain }}">
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -130,12 +131,6 @@
                                             <input id="dmarc_status" type="checkbox" name="dmarc_status" value="1" @if(old('dmarc_status', isset($domain->dmarc_status) ? $domain->dmarc_status : 0)) checked @endif>
                                             <label for="dmarc_status">DMARC verified</label>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Notes</label>
-                                    <div class="col-sm-9">
-                                        <textarea name="notes" class="form-control elm1_editor" rows="6">{{ old('notes', isset($domain->notes) ? $domain->notes : '') }}</textarea>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -169,22 +164,22 @@
                                             <tbody>
                                             <tr>
                                                 <td>{{ old('dkim_type', isset($domain->dkim_type) ? $domain->dkim_type : 'TXT') }}</td>
-                                                <td>{{ $selector }}._domainkey.{{ $domainName ?: 'yourdomain.com' }}</td>
+                                                <td>{{ $selector }}._domainkey.{{ $domainName ?: $currentDomain }}</td>
                                                 <td style="word-break: break-all;">{{ old('dkim_value', isset($domain->dkim_value) ? $domain->dkim_value : 'Paste your DKIM value here') }}</td>
                                             </tr>
                                             <tr>
                                                 <td>TXT</td>
-                                                <td>{{ $domainName ?: 'yourdomain.com' }}</td>
+                                                <td>{{ $domainName ?: $currentDomain }}</td>
                                                 <td style="word-break: break-all;">{{ $spfValue }}</td>
                                             </tr>
                                             <tr>
                                                 <td>TXT</td>
-                                                <td>_dmarc.{{ $domainName ?: 'yourdomain.com' }}</td>
+                                                <td>_dmarc.{{ $domainName ?: $currentDomain }}</td>
                                                 <td style="word-break: break-all;">{{ $dmarcValue }}</td>
                                             </tr>
                                             <tr>
                                                 <td>CNAME/TXT</td>
-                                                <td>{{ $returnPathSubdomain }}.{{ $domainName ?: 'yourdomain.com' }}</td>
+                                                <td>{{ $returnPathSubdomain }}.{{ $domainName ?: $currentDomain }}</td>
                                                 <td style="word-break: break-all;">Return-path / bounce domain provided by your SMTP vendor</td>
                                             </tr>
                                             </tbody>

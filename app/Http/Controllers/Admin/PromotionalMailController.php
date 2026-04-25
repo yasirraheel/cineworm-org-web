@@ -126,7 +126,6 @@ class PromotionalMailController extends MainAdminController
         $server->max_messages_per_day = (int) ($inputs['max_messages_per_day'] ?? 0);
         $server->status = (int) ($inputs['status'] ?? 0);
         $server->is_default = $isDefault;
-        $server->notes = $inputs['notes'] ?? null;
 
         if (!empty($inputs['smtp_password'])) {
             $server->smtp_password = Crypt::encrypt($inputs['smtp_password']);
@@ -230,7 +229,6 @@ class PromotionalMailController extends MainAdminController
         $domain->spf_status = !empty($inputs['spf_status']) ? 1 : 0;
         $domain->dmarc_status = !empty($inputs['dmarc_status']) ? 1 : 0;
         $domain->status = (int) ($inputs['status'] ?? 0);
-        $domain->notes = $inputs['notes'] ?? null;
         $domain->verified_at = ($domain->dkim_status && $domain->spf_status && $domain->dmarc_status)
             ? ($domain->verified_at ?: Carbon::now())
             : null;
@@ -319,7 +317,6 @@ class PromotionalMailController extends MainAdminController
         $domain->domain = trim($inputs['domain']);
         $domain->cname_target = trim($inputs['cname_target']);
         $domain->status = (int) ($inputs['status'] ?? 0);
-        $domain->notes = $inputs['notes'] ?? null;
         $domain->verified_at = $isVerified ? ($domain->verified_at ?: Carbon::now()) : null;
         $domain->save();
 
