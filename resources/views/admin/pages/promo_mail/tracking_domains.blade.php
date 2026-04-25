@@ -1,8 +1,9 @@
 @extends("admin.admin_app")
 
 @section("content")
+@include('admin.pages.promo_mail.partials.content_styles')
 
-<div class="content-page">
+<div class="content-page promo-mail-page">
     <div class="content">
         <div class="container-fluid">
             <div class="row">

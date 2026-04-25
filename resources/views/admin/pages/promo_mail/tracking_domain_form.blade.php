@@ -1,13 +1,14 @@
 @extends("admin.admin_app")
 
 @section("content")
+@include('admin.pages.promo_mail.partials.content_styles')
 
 @php
     $trackingDomainName = old('domain', isset($domain->domain) ? $domain->domain : '');
     $cnameTarget = old('cname_target', isset($domain->cname_target) ? $domain->cname_target : 'track.your-provider.com');
 @endphp
 
-<div class="content-page">
+<div class="content-page promo-mail-page">
     <div class="content">
         <div class="container-fluid">
             <div class="row">

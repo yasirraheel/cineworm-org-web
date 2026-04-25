@@ -1,6 +1,7 @@
 @extends("admin.admin_app")
 
 @section("content")
+@include('admin.pages.promo_mail.partials.content_styles')
 
 @php
     $domainName = old('domain', isset($domain->domain) ? $domain->domain : '');
@@ -16,7 +17,7 @@
     }
 @endphp
 
-<div class="content-page">
+<div class="content-page promo-mail-page">
     <div class="content">
         <div class="container-fluid">
             <div class="row">
