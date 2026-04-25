@@ -152,6 +152,8 @@ class UsersController extends MainAdminController
         // $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
         // $plan_days=$plan_info->plan_days;
 
+        $emailChanged = $user->exists && $user->email !== $inputs['email'];
+
 		$user->name = $inputs['name'];
 		$user->email = $inputs['email'];
 
@@ -180,6 +182,16 @@ class UsersController extends MainAdminController
 
 
         // $user->plan_id = $plan_id;
+        if (array_key_exists('email_verified', $inputs)) {
+            if ($inputs['email_verified'] == '1') {
+                if (empty($user->email_verified_at) || $emailChanged) {
+                    $user->email_verified_at = Carbon::now();
+                }
+            } else {
+                $user->email_verified_at = null;
+            }
+        }
+
         $user->status = $inputs['status'];
 	    $user->save();
 

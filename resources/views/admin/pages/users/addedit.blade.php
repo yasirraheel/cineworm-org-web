@@ -126,6 +126,18 @@
                       </div>
                   </div>
 
+                  @if(isset($user->id))
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Email Verified</label>
+                      <div class="col-sm-8">
+                            <select class="form-control" name="email_verified">
+                                <option value="1" @if(!empty($user->email_verified_at)) selected @endif>Yes</option>
+                                <option value="0" @if(empty($user->email_verified_at)) selected @endif>No</option>
+                            </select>
+                      </div>
+                  </div>
+                  @endif
+
                   <div class="form-group row">
                     <label class="col-sm-3 col-form-label">{{trans('words.status')}}</label>
                       <div class="col-sm-8">
