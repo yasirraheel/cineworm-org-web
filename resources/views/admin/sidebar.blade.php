@@ -162,6 +162,34 @@
                     </li>
 
                     <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect">
+                            <i class="fa fa-envelope"></i>
+                            <span>Promotions</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul class="list-unstyled">
+                            <li class="{{ classActivePath('promo_mail.servers') }}">
+                                <a href="{{ URL::to('admin/promo_mail/servers') }}" class="{{ classActivePath('promo_mail.servers') }}">
+                                    <i class="fa fa-server"></i>
+                                    <span>SMTP Servers</span>
+                                </a>
+                            </li>
+                            <li class="{{ classActivePath('promo_mail.sending-domains') }}">
+                                <a href="{{ URL::to('admin/promo_mail/sending-domains') }}" class="{{ classActivePath('promo_mail.sending-domains') }}">
+                                    <i class="fa fa-shield"></i>
+                                    <span>Sending Domains</span>
+                                </a>
+                            </li>
+                            <li class="{{ classActivePath('promo_mail.tracking-domains') }}">
+                                <a href="{{ URL::to('admin/promo_mail/tracking-domains') }}" class="{{ classActivePath('promo_mail.tracking-domains') }}">
+                                    <i class="fa fa-link"></i>
+                                    <span>Tracking Domains</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="has_sub">
                         <a href="javascript:void(0);" class="waves-effect"><i
                                 class="fa fa-edit"></i><span>{{ trans('words.pages') }}</span><span
                                 class="menu-arrow"></span></a>

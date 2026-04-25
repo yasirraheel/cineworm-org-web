@@ -317,6 +317,24 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::post('payment_gateway/coingate', 'PaymentGatewayController@coingate');
         Route::post('payment_gateway/banktransfer', 'PaymentGatewayController@banktransfer');
 
+        Route::get('promo_mail/servers', 'PromotionalMailController@servers');
+        Route::get('promo_mail/servers/add', 'PromotionalMailController@addServer');
+        Route::get('promo_mail/servers/edit/{id}', 'PromotionalMailController@editServer');
+        Route::post('promo_mail/servers/save', 'PromotionalMailController@saveServer');
+        Route::get('promo_mail/servers/delete/{id}', 'PromotionalMailController@deleteServer');
+
+        Route::get('promo_mail/sending-domains', 'PromotionalMailController@sendingDomains');
+        Route::get('promo_mail/sending-domains/add', 'PromotionalMailController@addSendingDomain');
+        Route::get('promo_mail/sending-domains/edit/{id}', 'PromotionalMailController@editSendingDomain');
+        Route::post('promo_mail/sending-domains/save', 'PromotionalMailController@saveSendingDomain');
+        Route::get('promo_mail/sending-domains/delete/{id}', 'PromotionalMailController@deleteSendingDomain');
+
+        Route::get('promo_mail/tracking-domains', 'PromotionalMailController@trackingDomains');
+        Route::get('promo_mail/tracking-domains/add', 'PromotionalMailController@addTrackingDomain');
+        Route::get('promo_mail/tracking-domains/edit/{id}', 'PromotionalMailController@editTrackingDomain');
+        Route::post('promo_mail/tracking-domains/save', 'PromotionalMailController@saveTrackingDomain');
+        Route::get('promo_mail/tracking-domains/delete/{id}', 'PromotionalMailController@deleteTrackingDomain');
+
         Route::post('ajax_status', 'ActionsController@ajax_status');
         Route::post('ajax_delete', 'ActionsController@ajax_delete');
 
