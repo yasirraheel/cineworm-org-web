@@ -20,9 +20,16 @@
     font-size: 12px;
     font-weight: 700;
     letter-spacing: .04em;
-    margin-bottom: 14px;
-    padding: 6px 12px;
+    left: 50%;
+    padding: 6px 16px;
+    position: absolute;
+    top: 12px;
+    transform: translateX(-50%);
     text-transform: uppercase;
+    z-index: 2;
+  }
+  .membership-plan-list.is-current-plan h3 {
+    padding-top: 34px;
   }
   .membership-plan-disabled-btn {
     background: #4c465f !important;
@@ -162,7 +169,7 @@
             </ul>
             @endif
             @if($isCurrentPlan)
-            <span class="vfx-item-btn-danger membership-plan-disabled-btn text-uppercase mb-30 d-inline-block">{{trans('words.current_plan')}}</span>
+            <span class="vfx-item-btn-danger membership-plan-disabled-btn text-uppercase mb-30 d-inline-block">Active</span>
             @else
             <a href="{{ URL::to('payment_method/'.$plan_data->id) }}" class="vfx-item-btn-danger text-uppercase mb-30" title="plan">{{trans('words.select_plan')}}</a>
             @endif
