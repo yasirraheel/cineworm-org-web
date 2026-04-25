@@ -23,12 +23,15 @@
     text-transform: none;
   }
   .membership-plan-features li::before {
-    color: #fe0278;
-    content: "\f00c";
-    font-family: FontAwesome;
+    border-bottom: 2px solid #fe0278;
+    border-right: 2px solid #fe0278;
+    content: "";
+    height: 12px;
     left: 0;
     position: absolute;
-    top: 0;
+    top: 3px;
+    transform: rotate(45deg);
+    width: 6px;
   }
 </style>
   
