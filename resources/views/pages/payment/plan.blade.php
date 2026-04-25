@@ -7,6 +7,31 @@
 @section('content')
 
 <style type="text/css">
+  .membership-plan-list.is-current-plan {
+    border: 2px solid #fe0278;
+    box-shadow: 0 18px 50px rgba(254, 2, 120, 0.22);
+    position: relative;
+  }
+  .membership-plan-current-badge {
+    background: linear-gradient(90deg, #fe0278, #fe8805);
+    border-radius: 999px;
+    color: #fff;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    margin-bottom: 14px;
+    padding: 6px 12px;
+    text-transform: uppercase;
+  }
+  .membership-plan-disabled-btn {
+    background: #4c465f !important;
+    border: 1px solid #6a647b;
+    box-shadow: none !important;
+    cursor: not-allowed;
+    opacity: .72;
+    pointer-events: none;
+  }
   .membership-plan-features {
     list-style: none;
     margin: 22px auto 26px;
@@ -101,9 +126,13 @@
         @php
           $includedPlanNames = $plan_data->getIncludedPlanNames();
           $directFeatureLabels = $plan_data->getDirectFeatureLabels();
+          $isCurrentPlan = Auth::check() && Auth::user()->plan_id == $plan_data->id;
         @endphp
         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-            <div class="membership-plan-list">
+            <div class="membership-plan-list @if($isCurrentPlan) is-current-plan @endif">
+            @if($isCurrentPlan)
+            <div class="membership-plan-current-badge">{{trans('words.current_plan')}}</div>
+            @endif
             <h3>{{$plan_data->plan_name}}</h3>
             <h1>
               <span>{{html_entity_decode(getCurrencySymbols(getcong('currency_code')))}}</span>
@@ -132,7 +161,11 @@
               @endforeach
             </ul>
             @endif
+            @if($isCurrentPlan)
+            <span class="vfx-item-btn-danger membership-plan-disabled-btn text-uppercase mb-30 d-inline-block">{{trans('words.current_plan')}}</span>
+            @else
             <a href="{{ URL::to('payment_method/'.$plan_data->id) }}" class="vfx-item-btn-danger text-uppercase mb-30" title="plan">{{trans('words.select_plan')}}</a>
+            @endif
           </div>
         </div>
         @endforeach  
