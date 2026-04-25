@@ -9,29 +9,40 @@
 <style type="text/css">
   .membership-plan-features {
     list-style: none;
-    margin: 18px 0 24px;
+    margin: 22px auto 26px;
+    max-width: 260px;
     padding: 0;
     text-align: left;
   }
   .membership-plan-features li {
     color: #ffffff;
+    display: flex;
+    align-items: flex-start;
     font-size: 14px;
     line-height: 22px;
-    margin-bottom: 8px;
-    padding-left: 22px;
+    margin-bottom: 10px;
+    min-height: 22px;
+    padding-left: 28px;
     position: relative;
     text-transform: none;
   }
   .membership-plan-features li::before {
     border-bottom: 2px solid #fe0278;
     border-right: 2px solid #fe0278;
+    box-sizing: border-box;
     content: "";
+    flex: 0 0 auto;
     height: 12px;
-    left: 0;
+    left: 4px;
     position: absolute;
-    top: 3px;
+    top: 4px;
     transform: rotate(45deg);
     width: 6px;
+  }
+  @media only screen and (max-width: 575px) {
+    .membership-plan-features {
+      max-width: 230px;
+    }
   }
 </style>
   
