@@ -98,6 +98,7 @@ class UsersController extends MainAdminController
 			$rule=array(
 		        'name' => 'required',
 		        'email' => ['required', 'email', 'max:255', User::uniqueEmailRule($inputs['id'])],
+                'subscription_plan' => 'nullable|exists:subscription_plan,id',
                 'user_image' => 'mimes:jpg,jpeg,gif,png'
 		   		 );
 
@@ -108,6 +109,7 @@ class UsersController extends MainAdminController
 		        'name' => 'required',
 		        'email' => ['required', 'email', 'max:255', User::uniqueEmailRule()],
 		        'password' => 'required|min:8|max:15',
+                'subscription_plan' => 'nullable|exists:subscription_plan,id',
                 'user_image' => 'mimes:jpg,jpeg,gif,png'
 		   		 );
 		}
@@ -147,10 +149,16 @@ class UsersController extends MainAdminController
             $user->user_image = $hardPath.'-b.jpg';
         }
 
-        //Get Plan info
-        // $plan_id=$inputs['subscription_plan'];
-        // $plan_info = SubscriptionPlan::where('id',$plan_id)->where('status','1')->first();
-        // $plan_days=$plan_info->plan_days;
+        $plan_id = !empty($inputs['subscription_plan']) ? (int) $inputs['subscription_plan'] : null;
+        $plan_info = null;
+
+        if ($plan_id) {
+            $plan_info = SubscriptionPlan::active()->where('id', $plan_id)->first();
+
+            if (!$plan_info) {
+                return redirect()->back()->withErrors(['subscription_plan' => 'Selected plan is invalid or inactive.'])->withInput();
+            }
+        }
 
         $emailChanged = $user->exists && $user->email !== $inputs['email'];
 
@@ -164,13 +172,10 @@ class UsersController extends MainAdminController
         $user->phone = $inputs['phone'];
         $user->user_address = $inputs['user_address'];
 
-        if(empty($inputs['id']) && $inputs['exp_date']=="")
-        {
-            $user->exp_date = strtotime(date('m/d/Y', strtotime("+$plan_days days")));
-        }
-        else
-        {
+        if (!empty($inputs['exp_date'])) {
             $user->exp_date = strtotime($inputs['exp_date']);
+        } elseif ($plan_info) {
+            $user->exp_date = strtotime(date('m/d/Y', strtotime('+' . (int) $plan_info->plan_days . ' days')));
         }
 
         $allowedUserTypes = ['Admin', 'Moderator', 'Sub_Admin', 'User'];
@@ -181,7 +186,11 @@ class UsersController extends MainAdminController
         }
 
 
-        // $user->plan_id = $plan_id;
+        if ($plan_info) {
+            $user->plan_id = $plan_info->id;
+            $user->plan_amount = $plan_info->plan_price;
+        }
+
         if (array_key_exists('email_verified', $inputs)) {
             if ($inputs['email_verified'] == '1') {
                 if (empty($user->email_verified_at) || $emailChanged) {
