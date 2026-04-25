@@ -14,22 +14,21 @@
   }
   .membership-plan-current-badge {
     background: linear-gradient(90deg, #fe0278, #fe8805);
-    border-radius: 999px;
+    border-radius: 0 0 12px 12px;
     color: #fff;
     display: inline-block;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: .04em;
-    left: 50%;
-    padding: 6px 16px;
+    left: 18px;
+    padding: 6px 14px;
     position: absolute;
-    top: 12px;
-    transform: translateX(-50%);
+    top: 0;
     text-transform: uppercase;
     z-index: 2;
   }
   .membership-plan-list.is-current-plan h3 {
-    padding-top: 34px;
+    padding-top: 18px;
   }
   .membership-plan-disabled-btn {
     background: #4c465f !important;
