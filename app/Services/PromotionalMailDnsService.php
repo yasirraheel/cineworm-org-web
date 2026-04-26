@@ -314,6 +314,11 @@ class PromotionalMailDnsService
 
     protected function lookupTxtRecords(string $hostname): array
     {
+        $publicLookup = $this->lookupTxtRecordsViaPublicDns($hostname);
+        if ($publicLookup['resolved']) {
+            return $publicLookup['records'];
+        }
+
         $records = [];
 
         try {
@@ -338,6 +343,60 @@ class PromotionalMailDnsService
         $shellRecords = $this->lookupTxtRecordsViaShell($hostname);
 
         return !empty($shellRecords) ? $shellRecords : [];
+    }
+
+    protected function lookupTxtRecordsViaPublicDns(string $hostname): array
+    {
+        $endpoints = [
+            [
+                'url' => 'https://cloudflare-dns.com/dns-query?name=' . rawurlencode($hostname) . '&type=TXT',
+                'headers' => [
+                    'accept: application/dns-json',
+                ],
+            ],
+            [
+                'url' => 'https://dns.google/resolve?name=' . rawurlencode($hostname) . '&type=TXT',
+                'headers' => [],
+            ],
+        ];
+
+        foreach ($endpoints as $endpoint) {
+            $body = $this->fetchUrl($endpoint['url'], $endpoint['headers']);
+            if ($body === null || $body === '') {
+                continue;
+            }
+
+            $json = json_decode($body, true);
+            if (!is_array($json) || !array_key_exists('Status', $json)) {
+                continue;
+            }
+
+            if ((int) $json['Status'] !== 0) {
+                return [
+                    'resolved' => true,
+                    'records' => [],
+                ];
+            }
+
+            $records = [];
+            foreach (($json['Answer'] ?? []) as $answer) {
+                if ((int) ($answer['type'] ?? 0) !== 16 || empty($answer['data'])) {
+                    continue;
+                }
+
+                $records[] = trim((string) $answer['data'], '"');
+            }
+
+            return [
+                'resolved' => true,
+                'records' => $records,
+            ];
+        }
+
+        return [
+            'resolved' => false,
+            'records' => [],
+        ];
     }
 
     protected function lookupTxtRecordsViaShell(string $hostname): array
@@ -401,6 +460,57 @@ class PromotionalMailDnsService
         } catch (\Throwable $exception) {
             return '';
         }
+    }
+
+    protected function fetchUrl(string $url, array $headers = []): ?string
+    {
+        if (function_exists('curl_init')) {
+            try {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+                if (!empty($headers)) {
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                }
+
+                $response = curl_exec($ch);
+                $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($response !== false && $httpCode >= 200 && $httpCode < 500) {
+                    return (string) $response;
+                }
+            } catch (\Throwable $exception) {
+            }
+        }
+
+        if (ini_get('allow_url_fopen')) {
+            try {
+                $context = stream_context_create([
+                    'http' => [
+                        'method' => 'GET',
+                        'timeout' => 20,
+                        'header' => implode("\r\n", $headers),
+                    ],
+                    'ssl' => [
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ],
+                ]);
+
+                $response = @file_get_contents($url, false, $context);
+                if ($response !== false) {
+                    return (string) $response;
+                }
+            } catch (\Throwable $exception) {
+            }
+        }
+
+        return null;
     }
 
     protected function findOpensslConfig(): ?string
