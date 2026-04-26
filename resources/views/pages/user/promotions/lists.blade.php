@@ -60,7 +60,7 @@
                                         <td>{{ $list->description ?: '-' }}</td>
                                         <td class="text-right">
                                             <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts') }}" class="btn btn-sm btn-danger">Add / Import Contacts</a>
-                                            <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts/sample-file') }}" class="btn btn-sm btn-default">Sample CSV</a>
+                                            <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts/sample-file') }}" class="btn btn-sm promotion-btn-secondary">Sample CSV</a>
                                         </td>
                                     </tr>
                                 @empty

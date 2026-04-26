@@ -11,6 +11,19 @@
         text-transform: uppercase;
     }
 
+    .promotion-nav-tabs .btn-default {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #ffffff !important;
+    }
+
+    .promotion-nav-tabs .btn-default:hover,
+    .promotion-nav-tabs .btn-default:focus {
+        background: #ff0f28;
+        border-color: #ff0f28;
+        color: #ffffff !important;
+    }
+
     .promotion-panel,
     .promotion-card {
         background: rgba(20, 20, 20, 0.92);
@@ -114,6 +127,19 @@
 
     .promotion-panel .btn {
         border-radius: 10px;
+    }
+
+    .promotion-btn-secondary {
+        background: transparent;
+        border: 1px solid #ff0f28;
+        color: #ffffff !important;
+    }
+
+    .promotion-btn-secondary:hover,
+    .promotion-btn-secondary:focus {
+        background: #ff0f28;
+        border-color: #ff0f28;
+        color: #ffffff !important;
     }
 
     .promotion-header {

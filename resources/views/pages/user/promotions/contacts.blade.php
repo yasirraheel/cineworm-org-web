@@ -43,7 +43,7 @@
                 <div class="promotion-panel">
                     <div class="clearfix" style="margin-bottom:18px;">
                         <h3 style="color:#fff;margin-top:0;float:left;">Import Contacts</h3>
-                        <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts/sample-file') }}" class="btn btn-sm btn-default pull-right">Download Sample CSV</a>
+                        <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts/sample-file') }}" class="btn btn-sm promotion-btn-secondary pull-right">Download Sample CSV</a>
                     </div>
                     <p class="promotion-help-text">Upload a CSV file or paste CSV rows using this format: <strong>name, email, company, tags</strong>.</p>
                     <form method="post" action="{{ URL::to('promotions/lists/'.$list->id.'/contacts/import') }}" enctype="multipart/form-data">
@@ -56,7 +56,7 @@
                             <label class="promotion-label">Paste CSV Rows</label>
                             <textarea name="import_source" rows="7" class="form-control promotion-textarea" placeholder="name,email,company,tags&#10;John Doe,john@example.com,Studio X,investor"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-default">Import Contacts</button>
+                        <button type="submit" class="btn promotion-btn-secondary">Import Contacts</button>
                     </form>
                 </div>
             </div>
