@@ -14,7 +14,12 @@
         <div class="row">
             <div class="col-md-5">
                 <div class="promotion-panel">
-                    <h3 style="color:#fff;margin-top:0;">Create Email List</h3>
+                    <div class="promotion-header">
+                        <div>
+                            <h3>Create Email List</h3>
+                            <p class="promotion-help-text">Create a list first, then open it to add contacts manually or import them by CSV.</p>
+                        </div>
+                    </div>
                     <form method="post" action="{{ URL::to('promotions/lists/save') }}">
                         @csrf
                         <div class="form-group">
@@ -31,7 +36,12 @@
             </div>
             <div class="col-md-7">
                 <div class="promotion-panel">
-                    <h3 style="color:#fff;margin-top:0;">Your Lists</h3>
+                    <div class="promotion-header">
+                        <div>
+                            <h3>Your Lists</h3>
+                            <p class="promotion-help-text">Use the action buttons to open manual add and CSV import for any list.</p>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table promotion-table">
                             <thead>
@@ -39,7 +49,7 @@
                                     <th>Name</th>
                                     <th>Contacts</th>
                                     <th>Description</th>
-                                    <th></th>
+                                    <th class="text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -49,7 +59,8 @@
                                         <td>{{ $list->contacts_count }}</td>
                                         <td>{{ $list->description ?: '-' }}</td>
                                         <td class="text-right">
-                                            <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts') }}" class="btn btn-sm btn-danger">Manage Contacts</a>
+                                            <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts') }}" class="btn btn-sm btn-danger">Add / Import Contacts</a>
+                                            <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts/sample-file') }}" class="btn btn-sm btn-default">Sample CSV</a>
                                         </td>
                                     </tr>
                                 @empty
