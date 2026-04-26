@@ -84,8 +84,14 @@ class CronMonitorController extends MainAdminController
 
         try {
             app()->instance('cron.run_trigger', 'admin_panel');
-            Artisan::call('task:cron');
-            \Session::flash('flash_message', 'Cron command executed successfully.');
+            $exitCode = Artisan::call('task:cron');
+
+            if ((int) $exitCode === 0) {
+                \Session::flash('flash_message', 'Cron command executed successfully.');
+            } else {
+                $output = trim(Artisan::output());
+                \Session::flash('error_flash_message', $output ?: 'Cron command failed. Check logs for details.');
+            }
         } catch (\Throwable $exception) {
             \Session::flash('error_flash_message', $exception->getMessage());
         }
@@ -101,7 +107,17 @@ class CronMonitorController extends MainAdminController
 
         try {
             app()->instance('cron.run_trigger', 'http_trigger');
-            Artisan::call('task:cron');
+            $exitCode = Artisan::call('task:cron');
+
+            if ((int) $exitCode !== 0) {
+                $output = trim(Artisan::output());
+
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => $output ?: 'Cron command failed. Check logs for details.',
+                    'time' => now()->toDateTimeString(),
+                ], 500);
+            }
 
             return response()->json([
                 'status' => 'success',
