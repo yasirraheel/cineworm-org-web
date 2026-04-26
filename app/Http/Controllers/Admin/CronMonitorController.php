@@ -14,7 +14,7 @@ class CronMonitorController extends MainAdminController
 
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->except('trigger');
 
         parent::__construct();
         $this->cronMonitor = new CronMonitorService();
@@ -42,8 +42,8 @@ class CronMonitorController extends MainAdminController
         $projectPath = base_path();
         $phpBinary = defined('PHP_BINARY') && !empty(PHP_BINARY) ? PHP_BINARY : 'php';
         $artisanPath = base_path('artisan');
-        $scheduleCommand = '* * * * * '.escapeshellarg($phpBinary).' '.escapeshellarg($artisanPath).' schedule:run >> /dev/null 2>&1';
-        $taskCommand = '* * * * * '.escapeshellarg($phpBinary).' '.escapeshellarg($artisanPath).' task:cron >> /dev/null 2>&1';
+        $scheduleCommand = '* * * * * '.$phpBinary.' '.$artisanPath.' schedule:run > /dev/null 2>&1';
+        $taskCommand = '* * * * * '.$phpBinary.' '.$artisanPath.' task:cron > /dev/null 2>&1';
         $triggerUrl = URL::to('cron/task-run/'.$this->cronMonitor->getTriggerToken());
 
         $campaignStats = [
