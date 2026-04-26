@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Mail\SendEmail;
+use App\Services\PromotionalCampaignService;
 use App\User;
 use Illuminate\Support\Facades\DB;
 
@@ -45,27 +46,23 @@ class TaskCron extends Command
     public function handle()
     {   
         \Log::info("Cron is working fine!");
-        
-       
-        //$TomorrowDate = strtotime(date('Y-m-d', strtotime('+1 days', strtotime(date('Y-m-d')))));
 
         $TodayDate=strtotime(date('Y-m-d'));
 
-         $users = DB::table('users')
-                    ->where('status',1)
-                    ->where('exp_date','=',$TodayDate)
-                    ->get();
+        $users = DB::table('users')
+            ->where('status',1)
+            ->where('exp_date','=',$TodayDate)
+            ->get();
 
-         if (count( $users)<=0)
-         {
-            echo "No Subscription renew data found";
-            exit;
-         }  
+        foreach ($users as $user_data) {
+            Mail::to($user_data->email)->send(new SendEmail($user_data));
+        }
 
-         foreach ($users as $user_data) {
-             
-            Mail::to($user_data->email)->send(new SendEmail($user_data));     
-         } 
+        try {
+            (new PromotionalCampaignService())->processDueCampaigns(5, 25);
+        } catch (\Throwable $exception) {
+            \Log::error('Promotional campaign cron failed: '.$exception->getMessage());
+        }
 
         $this->info('Demo:Cron Cummand Run successfully!');
     }

@@ -89,7 +89,7 @@ class UserController extends Controller
             'promotion_services' => [
                 'title' => 'Promotion Services',
                 'button_text' => 'Promotion Services',
-                'url' => 'javascript:void(0);',
+                'url' => URL('promotions'),
             ],
             'crowdfunding_link_sharing' => [
                 'title' => 'Crowdfunding Link Sharing',

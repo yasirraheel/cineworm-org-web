@@ -435,6 +435,21 @@ Route::post('profile', 'UserController@editprofile');
 Route::post('phone_update', 'UserController@phone_update');
 Route::get('watchlist', 'UserController@my_watchlist');
 Route::get('account_delete', 'UserController@account_delete');
+Route::get('promotions', 'UserPromotionController@index');
+Route::get('promotions/lists', 'UserPromotionController@lists');
+Route::post('promotions/lists/save', 'UserPromotionController@saveList');
+Route::get('promotions/lists/{id}/contacts', 'UserPromotionController@contacts');
+Route::post('promotions/lists/{id}/contacts/save', 'UserPromotionController@saveContact');
+Route::post('promotions/lists/{id}/contacts/import', 'UserPromotionController@importContacts');
+Route::get('promotions/lists/{list_id}/contacts/delete/{contact_id}', 'UserPromotionController@deleteContact');
+Route::get('promotions/campaigns', 'UserPromotionController@campaigns');
+Route::get('promotions/campaigns/create', 'UserPromotionController@campaignForm');
+Route::get('promotions/campaigns/edit/{id}', 'UserPromotionController@campaignForm');
+Route::post('promotions/campaigns/save', 'UserPromotionController@saveCampaign');
+Route::get('promotions/campaigns/{id}', 'UserPromotionController@showCampaign');
+Route::post('promotions/campaigns/{id}/launch', 'UserPromotionController@launchCampaign');
+Route::post('promotions/campaigns/{id}/pause', 'UserPromotionController@pauseCampaign');
+Route::post('promotions/campaigns/{id}/resume', 'UserPromotionController@resumeCampaign');
 
 
 
