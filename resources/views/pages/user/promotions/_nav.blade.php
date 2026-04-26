@@ -38,12 +38,33 @@
         margin-bottom: 8px;
     }
 
+    .promotion-panel h3,
+    .promotion-panel h4,
+    .promotion-panel p,
+    .promotion-panel strong,
+    .promotion-panel label,
+    .promotion-card h3,
+    .promotion-card h4,
+    .promotion-card p,
+    .promotion-card strong,
+    .promotion-card label {
+        color: #fff;
+    }
+
+    .promotion-panel .form-group {
+        margin-bottom: 22px;
+    }
+
     .promotion-input,
     .promotion-textarea,
     .promotion-select {
         background: #2e2e32;
         border: 1px solid rgba(255, 255, 255, 0.08);
         color: #fff;
+        border-radius: 10px;
+        min-height: 48px;
+        padding: 12px 16px;
+        width: 100%;
     }
 
     .promotion-input:focus,
@@ -55,11 +76,102 @@
         box-shadow: none;
     }
 
+    select.promotion-select.form-control {
+        height: 48px !important;
+        line-height: 24px !important;
+        padding-top: 11px !important;
+        padding-bottom: 11px !important;
+        padding-right: 42px !important;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image:
+            linear-gradient(45deg, transparent 50%, #ffffff 50%),
+            linear-gradient(135deg, #ffffff 50%, transparent 50%);
+        background-position:
+            calc(100% - 20px) calc(50% - 3px),
+            calc(100% - 14px) calc(50% - 3px);
+        background-size: 6px 6px, 6px 6px;
+        background-repeat: no-repeat;
+    }
+
+    select.promotion-select.form-control[multiple] {
+        min-height: 180px !important;
+        height: auto !important;
+        background-image: none;
+        padding-right: 16px !important;
+    }
+
+    .promotion-select option {
+        background: #2e2e32;
+        color: #fff;
+    }
+
+    .promotion-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .promotion-panel .btn {
+        border-radius: 10px;
+    }
+
+    .promotion-panel .row {
+        margin-left: -12px;
+        margin-right: -12px;
+    }
+
+    .promotion-panel .row > [class*="col-"] {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
     .promotion-table th,
     .promotion-table td,
     .promotion-table p,
     .promotion-table span,
     .promotion-table strong {
         color: #fff;
+    }
+
+    .promotion-table tbody tr td {
+        vertical-align: middle;
+    }
+
+    .promotion-table .label {
+        display: inline-block;
+        min-width: 82px;
+        text-align: center;
+        border-radius: 999px;
+        padding: 7px 12px;
+    }
+
+    .tox-tinymce {
+        border-radius: 14px !important;
+        overflow: hidden !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .tox .tox-toolbar,
+    .tox .tox-toolbar__primary,
+    .tox .tox-menubar {
+        background: #f5f5f5 !important;
+    }
+
+    .tox .tox-edit-area__iframe,
+    .tox .tox-edit-area {
+        background: #ffffff !important;
+    }
+
+    @media only screen and (max-width: 991px) {
+        .promotion-nav-tabs .btn {
+            width: 100%;
+            margin-right: 0;
+        }
+
+        .promotion-panel,
+        .promotion-card {
+            padding: 18px;
+        }
     }
 </style>
