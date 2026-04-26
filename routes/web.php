@@ -441,6 +441,7 @@ Route::post('promotions/lists/save', 'UserPromotionController@saveList');
 Route::get('promotions/lists/{id}/contacts', 'UserPromotionController@contacts');
 Route::post('promotions/lists/{id}/contacts/save', 'UserPromotionController@saveContact');
 Route::post('promotions/lists/{id}/contacts/import', 'UserPromotionController@importContacts');
+Route::get('promotions/lists/{id}/contacts/sample-file', 'UserPromotionController@downloadSampleContactsFile');
 Route::get('promotions/lists/{list_id}/contacts/delete/{contact_id}', 'UserPromotionController@deleteContact');
 Route::get('promotions/campaigns', 'UserPromotionController@campaigns');
 Route::get('promotions/campaigns/create', 'UserPromotionController@campaignForm');

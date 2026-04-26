@@ -14,7 +14,10 @@
         <div class="row">
             <div class="col-md-5">
                 <div class="promotion-panel">
-                    <h3 style="color:#fff;margin-top:0;">Add Contact</h3>
+                    <div class="clearfix" style="margin-bottom:18px;">
+                        <h3 style="color:#fff;margin-top:0;float:left;">Add Contact Manually</h3>
+                        <span class="promotion-help-text pull-right" style="margin-top:8px;">Add one email at a time</span>
+                    </div>
                     <form method="post" action="{{ URL::to('promotions/lists/'.$list->id.'/contacts/save') }}">
                         @csrf
                         <div class="form-group">
@@ -38,7 +41,11 @@
                 </div>
 
                 <div class="promotion-panel">
-                    <h3 style="color:#fff;margin-top:0;">Import Contacts</h3>
+                    <div class="clearfix" style="margin-bottom:18px;">
+                        <h3 style="color:#fff;margin-top:0;float:left;">Import Contacts</h3>
+                        <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts/sample-file') }}" class="btn btn-sm btn-default pull-right">Download Sample CSV</a>
+                    </div>
+                    <p class="promotion-help-text">Upload a CSV file or paste CSV rows using this format: <strong>name, email, company, tags</strong>.</p>
                     <form method="post" action="{{ URL::to('promotions/lists/'.$list->id.'/contacts/import') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">

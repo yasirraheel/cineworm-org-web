@@ -12,26 +12,26 @@
         @include('pages.user.promotions._nav')
 
         <div class="promotion-panel">
-            <div class="row">
-                <div class="col-md-8">
-                    <h3 style="color:#fff;margin-top:0;">{{ $campaign->name }}</h3>
+            <div class="promotion-header">
+                <div>
+                    <h3>{{ $campaign->name }}</h3>
                     <p class="promotion-help-text">{{ $campaign->subject }}</p>
                     <p><span class="label label-{{ $campaign->getStatusBadgeClass() }}">{{ ucfirst($campaign->status) }}</span></p>
                 </div>
-                <div class="col-md-4 text-right">
+                <div class="promotion-actions">
                     @if(in_array($campaign->status, [\App\PromotionalCampaign::STATUS_DRAFT, \App\PromotionalCampaign::STATUS_SCHEDULED], true))
                         <a href="{{ URL::to('promotions/campaigns/edit/'.$campaign->id) }}" class="btn btn-default">Edit</a>
-                        <form action="{{ URL::to('promotions/campaigns/'.$campaign->id.'/launch') }}" method="post" style="display:inline-block;">
+                        <form action="{{ URL::to('promotions/campaigns/'.$campaign->id.'/launch') }}" method="post" class="promotion-inline-form">
                             @csrf
                             <button type="submit" class="btn btn-danger">{{ $campaign->scheduled_at ? 'Schedule Campaign' : 'Launch Now' }}</button>
                         </form>
                     @elseif($campaign->status === \App\PromotionalCampaign::STATUS_RUNNING)
-                        <form action="{{ URL::to('promotions/campaigns/'.$campaign->id.'/pause') }}" method="post" style="display:inline-block;">
+                        <form action="{{ URL::to('promotions/campaigns/'.$campaign->id.'/pause') }}" method="post" class="promotion-inline-form">
                             @csrf
                             <button type="submit" class="btn btn-warning">Pause</button>
                         </form>
                     @elseif($campaign->status === \App\PromotionalCampaign::STATUS_PAUSED)
-                        <form action="{{ URL::to('promotions/campaigns/'.$campaign->id.'/resume') }}" method="post" style="display:inline-block;">
+                        <form action="{{ URL::to('promotions/campaigns/'.$campaign->id.'/resume') }}" method="post" class="promotion-inline-form">
                             @csrf
                             <button type="submit" class="btn btn-danger">Resume</button>
                         </form>
@@ -48,25 +48,30 @@
         </div>
 
         <div class="promotion-panel">
-            <div class="row">
+            <div class="row promotion-meta">
                 <div class="col-md-6">
-                    <p><strong style="color:#fff;">List:</strong> <span class="promotion-help-text">{{ optional($campaign->contactList)->name ?: '-' }}</span></p>
-                    <p><strong style="color:#fff;">SMTP Server:</strong> <span class="promotion-help-text">{{ optional($campaign->smtpServer)->server_name ?: '-' }}</span></p>
-                    <p><strong style="color:#fff;">Sending Domain:</strong> <span class="promotion-help-text">{{ optional($campaign->sendingDomain)->domain ?: '-' }}</span></p>
+                    <p><strong>List:</strong> <span class="promotion-help-text">{{ optional($campaign->contactList)->name ?: '-' }}</span></p>
+                    <p><strong>SMTP Server:</strong> <span class="promotion-help-text">{{ optional($campaign->smtpServer)->server_name ?: '-' }}</span></p>
+                    <p><strong>Sending Domain:</strong> <span class="promotion-help-text">{{ optional($campaign->sendingDomain)->domain ?: '-' }}</span></p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong style="color:#fff;">From:</strong> <span class="promotion-help-text">{{ $campaign->from_name }} &lt;{{ $campaign->from_email }}&gt;</span></p>
-                    <p><strong style="color:#fff;">Scheduled At:</strong> <span class="promotion-help-text">{{ $campaign->scheduled_at ? $campaign->scheduled_at->format('M d, Y H:i') : 'Send immediately' }}</span></p>
-                    <p><strong style="color:#fff;">Progress:</strong> <span class="promotion-help-text">{{ $campaign->getProgressPercentage() }}%</span></p>
+                    <p><strong>From:</strong> <span class="promotion-help-text">{{ $campaign->from_name }} &lt;{{ $campaign->from_email }}&gt;</span></p>
+                    <p><strong>Scheduled At:</strong> <span class="promotion-help-text">{{ $campaign->scheduled_at ? $campaign->scheduled_at->format('M d, Y H:i') : 'Send immediately' }}</span></p>
+                    <p><strong>Progress:</strong> <span class="promotion-help-text">{{ $campaign->getProgressPercentage() }}%</span></p>
                 </div>
             </div>
             @if($campaign->last_error)
-                <div class="alert alert-danger" style="margin-top:15px;">{{ $campaign->last_error }}</div>
+                <div class="alert alert-danger promotion-alert">{{ $campaign->last_error }}</div>
             @endif
         </div>
 
         <div class="promotion-panel">
-            <h3 style="color:#fff;margin-top:0;">Recent Delivery Log</h3>
+            <div class="promotion-header">
+                <div>
+                    <h3>Recent Delivery Log</h3>
+                    <p class="promotion-help-text">Track recent send activity, failures, and delivery progress for this campaign.</p>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table promotion-table">
                     <thead>

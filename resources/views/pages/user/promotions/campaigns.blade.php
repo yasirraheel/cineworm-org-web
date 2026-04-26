@@ -12,9 +12,14 @@
         @include('pages.user.promotions._nav')
 
         <div class="promotion-panel">
-            <div class="clearfix">
-                <h3 style="color:#fff;margin-top:0;float:left;">Your Campaigns</h3>
-                <a href="{{ URL::to('promotions/campaigns/create') }}" class="btn btn-danger pull-right">Create Campaign</a>
+            <div class="promotion-header">
+                <div>
+                    <h3>Your Campaigns</h3>
+                    <p class="promotion-help-text">Manage drafted, scheduled, running, and completed promotional email campaigns.</p>
+                </div>
+                <div class="promotion-actions">
+                    <a href="{{ URL::to('promotions/campaigns/create') }}" class="btn btn-danger">Create Campaign</a>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table promotion-table">

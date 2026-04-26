@@ -116,6 +116,41 @@
         border-radius: 10px;
     }
 
+    .promotion-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .promotion-header h3,
+    .promotion-header h4 {
+        margin-top: 0;
+        margin-bottom: 6px;
+    }
+
+    .promotion-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .promotion-inline-form {
+        display: inline-block;
+        margin: 0;
+    }
+
+    .promotion-meta p {
+        margin-bottom: 12px;
+    }
+
+    .promotion-alert {
+        margin-top: 18px;
+        border-radius: 10px;
+    }
+
     .promotion-panel .row {
         margin-left: -12px;
         margin-right: -12px;
@@ -136,6 +171,10 @@
 
     .promotion-table tbody tr td {
         vertical-align: middle;
+    }
+
+    .promotion-table td .promotion-help-text {
+        margin-top: 6px;
     }
 
     .promotion-table .label {
@@ -167,6 +206,24 @@
         .promotion-nav-tabs .btn {
             width: 100%;
             margin-right: 0;
+        }
+
+        .promotion-header {
+            flex-direction: column;
+        }
+
+        .promotion-actions {
+            width: 100%;
+            justify-content: stretch;
+        }
+
+        .promotion-actions .btn,
+        .promotion-actions .promotion-inline-form {
+            width: 100%;
+        }
+
+        .promotion-actions .promotion-inline-form .btn {
+            width: 100%;
         }
 
         .promotion-panel,

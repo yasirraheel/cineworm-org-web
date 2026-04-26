@@ -12,6 +12,7 @@ use App\PromotionalTrackingDomain;
 use App\Services\PromotionalCampaignService;
 use App\SubscriptionPlan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -242,6 +243,36 @@ class UserPromotionController extends Controller
         \Session::flash('flash_message', $imported . ' contacts imported successfully.');
 
         return redirect()->back();
+    }
+
+    public function downloadSampleContactsFile($listId)
+    {
+        if ($redirect = $this->ensurePromotionAccess()) {
+            return $redirect;
+        }
+
+        $list = PromotionalContactList::where('user_id', Auth::id())->findOrFail($listId);
+        $filename = 'sample_contacts_list_' . $list->id . '.csv';
+        $rows = [
+            ['name', 'email', 'company', 'tags'],
+            ['John Doe', 'john@example.com', 'Studio X', 'vip,investor'],
+            ['Jane Smith', 'jane@example.com', 'Press House', 'press,media'],
+            ['Alex Brown', 'alex@example.com', 'Brand Partner', 'partner,sponsor'],
+        ];
+
+        $callback = function () use ($rows) {
+            $handle = fopen('php://output', 'w');
+
+            foreach ($rows as $row) {
+                fputcsv($handle, $row);
+            }
+
+            fclose($handle);
+        };
+
+        return Response::streamDownload($callback, $filename, [
+            'Content-Type' => 'text/csv',
+        ]);
     }
 
     public function deleteContact($listId, $contactId)
