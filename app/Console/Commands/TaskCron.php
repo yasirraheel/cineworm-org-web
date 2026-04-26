@@ -3,10 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Mail\SendEmail;
+use App\PromotionalCampaign;
 use App\Services\PromotionalCampaignService;
+use App\Services\CronMonitorService;
 use App\User;
 use Illuminate\Support\Facades\DB;
-
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -44,26 +45,48 @@ class TaskCron extends Command
      * @return int
      */
     public function handle()
-    {   
-        \Log::info("Cron is working fine!");
-
-        $TodayDate=strtotime(date('Y-m-d'));
-
-        $users = DB::table('users')
-            ->where('status',1)
-            ->where('exp_date','=',$TodayDate)
-            ->get();
-
-        foreach ($users as $user_data) {
-            Mail::to($user_data->email)->send(new SendEmail($user_data));
-        }
+    {
+        $trigger = app()->bound('cron.run_trigger') ? app('cron.run_trigger') : 'scheduler';
+        $monitor = new CronMonitorService();
+        $monitor->markStart($trigger);
 
         try {
-            (new PromotionalCampaignService())->processDueCampaigns(5, 25);
-        } catch (\Throwable $exception) {
-            \Log::error('Promotional campaign cron failed: '.$exception->getMessage());
-        }
+            \Log::info("Cron is working fine!");
 
-        $this->info('Demo:Cron Cummand Run successfully!');
+            $TodayDate=strtotime(date('Y-m-d'));
+
+            $users = DB::table('users')
+                ->where('status',1)
+                ->where('exp_date','=',$TodayDate)
+                ->get();
+
+            foreach ($users as $user_data) {
+                Mail::to($user_data->email)->send(new SendEmail($user_data));
+            }
+
+            (new PromotionalCampaignService())->processDueCampaigns(5, 25);
+
+            $monitor->markSuccess('Cron completed successfully.', [
+                'campaigns_checked' => PromotionalCampaign::whereIn('status', [
+                    PromotionalCampaign::STATUS_SCHEDULED,
+                    PromotionalCampaign::STATUS_RUNNING,
+                ])->count(),
+                'running_campaigns_seen' => PromotionalCampaign::where('status', PromotionalCampaign::STATUS_RUNNING)->count(),
+                'scheduled_campaigns_seen' => PromotionalCampaign::where('status', PromotionalCampaign::STATUS_SCHEDULED)->count(),
+            ]);
+
+            $this->info('Demo:Cron Cummand Run successfully!');
+
+            return 0;
+        } catch (\Throwable $exception) {
+            \Log::error('Task cron failed: '.$exception->getMessage());
+            $monitor->markFailure($exception->getMessage(), [
+                'running_campaigns_seen' => PromotionalCampaign::where('status', PromotionalCampaign::STATUS_RUNNING)->count(),
+                'scheduled_campaigns_seen' => PromotionalCampaign::where('status', PromotionalCampaign::STATUS_SCHEDULED)->count(),
+            ]);
+            $this->error($exception->getMessage());
+
+            return 1;
+        }
     }
 }

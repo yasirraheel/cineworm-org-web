@@ -186,6 +186,12 @@
                                     <span>Tracking Domains</span>
                                 </a>
                             </li>
+                            <li class="{{ classActivePath('cron_monitor') }}">
+                                <a href="{{ URL::to('admin/cron_monitor') }}" class="{{ classActivePath('cron_monitor') }}">
+                                    <i class="fa fa-clock-o"></i>
+                                    <span>Cron Monitor</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 

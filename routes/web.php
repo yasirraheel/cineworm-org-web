@@ -339,6 +339,9 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::post('promo_mail/tracking-domains/save', 'PromotionalMailController@saveTrackingDomain');
         Route::get('promo_mail/tracking-domains/delete/{id}', 'PromotionalMailController@deleteTrackingDomain');
 
+        Route::get('cron_monitor', 'CronMonitorController@index');
+        Route::post('cron_monitor/run-now', 'CronMonitorController@runNow');
+
         Route::post('ajax_status', 'ActionsController@ajax_status');
         Route::post('ajax_delete', 'ActionsController@ajax_delete');
 
@@ -428,6 +431,7 @@ Route::get('logout', 'IndexController@logout');
 
 Route::get('logout_user_remotely/{session_id}', 'IndexController@logout_user_remotely');
 Route::get('check_user_remotely_logout_or_not/{session_id}', 'IndexController@check_user_remotely_logout_or_not');
+Route::get('cron/task-run/{token}', 'Admin\CronMonitorController@trigger');
 
 Route::get('dashboard', 'UserController@dashboard');
 Route::get('profile', 'UserController@profile');
