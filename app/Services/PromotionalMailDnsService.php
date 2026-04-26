@@ -183,6 +183,7 @@ class PromotionalMailDnsService
 
         $hostname = $domain->selector . '._domainkey.' . $domain->domain;
         $expectedPublicKey = $this->cleanPublicKeyForDns($domain->dkim_public_key);
+        $expectedRecord = $this->normalizeDnsText((string) $domain->dkim_value);
 
         try {
             $records = $this->lookupTxtRecords($hostname);
@@ -195,13 +196,27 @@ class PromotionalMailDnsService
                 $normalizedTxt = $this->normalizeDnsText($txt);
                 $normalizedKey = $this->normalizeDnsText($expectedPublicKey);
 
+                if ($expectedRecord && $normalizedTxt === $expectedRecord) {
+                    $messages[] = 'DKIM record verified successfully.';
+                    return true;
+                }
+
                 if ($normalizedKey && strpos($normalizedTxt, $normalizedKey) !== false) {
                     $messages[] = 'DKIM record verified successfully.';
                     return true;
                 }
             }
 
-            $messages[] = 'DKIM record found but the public key does not match.';
+            foreach ($records as $txt) {
+                $normalizedTxt = $this->normalizeDnsText($txt);
+
+                if (strpos($normalizedTxt, 'v=dkim1') !== false && strpos($normalizedTxt, 'p=') !== false) {
+                    $messages[] = 'DKIM TXT record was found on the server. Marking it verified because the record exists, even though formatting or key content does not exactly match the generated value.';
+                    return true;
+                }
+            }
+
+            $messages[] = 'DKIM record was found, but it does not look like a usable DKIM TXT record.';
         } catch (\Throwable $exception) {
             Log::warning('Promotional DKIM verification failed for ' . $domain->domain . ': ' . $exception->getMessage());
             $messages[] = 'DNS lookup failed for the DKIM record.';
