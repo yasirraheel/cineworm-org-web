@@ -4,6 +4,9 @@
 @section('head_url', Request::url())
 
 @section('content')
+@php
+    $defaultPromotionHtml = '<p>Hello [[name]],</p><p>Write your campaign content here.</p>';
+@endphp
 <div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
     <div class="container-fluid"><div class="row"><div class="col-xl-12"><h2>{{ $campaign ? 'Edit Campaign' : 'Create Campaign' }}</h2></div></div></div>
 </div>
@@ -118,7 +121,7 @@
 
                 <div class="form-group">
                     <label class="promotion-label">Email Body</label>
-                    <textarea name="html_content" id="promotion-editor" class="form-control promotion-textarea" rows="18">{{ old('html_content', $campaign->html_content ?? '<p>Hello {{name}},</p><p>Write your campaign content here.</p>') }}</textarea>
+                    <textarea name="html_content" id="promotion-editor" class="form-control promotion-textarea" rows="18">{{ old('html_content', $campaign->html_content ?? $defaultPromotionHtml) }}</textarea>
                 </div>
 
                 <div class="text-right">
