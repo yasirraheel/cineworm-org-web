@@ -104,20 +104,51 @@ class PromotionalCampaignService
 
         $this->configureMailer($server, $campaign);
 
+        $preferredFromEmail = strtolower(trim((string) ($campaign->from_email ?: '')));
+        $preferredFromName = trim((string) ($campaign->from_name ?: ''));
+        $serverFromEmail = strtolower(trim((string) ($server->sender_email ?: '')));
+        $serverFromName = trim((string) ($server->from_name ?: $server->server_name ?: ''));
+
+        if (empty($preferredFromEmail) && empty($serverFromEmail)) {
+            $campaign->status = PromotionalCampaign::STATUS_FAILED;
+            $campaign->last_error = 'No sender email is configured for this campaign or SMTP server.';
+            $campaign->save();
+
+            return;
+        }
+
         foreach ($pendingSends as $send) {
             try {
-                Mail::mailer('smtp')->send([], [], function ($message) use ($campaign, $server, $send) {
-                    $message->to($send->email)
-                        ->from($campaign->from_email ?: $server->sender_email, $campaign->from_name ?: $server->from_name ?: $server->server_name)
-                        ->subject($campaign->subject)
-                        ->setBody($campaign->html_content, 'text/html');
+                $fromEmail = $preferredFromEmail ?: $serverFromEmail;
+                $fromName = $preferredFromName ?: $serverFromName;
 
-                    if (!empty($campaign->reply_to_email)) {
-                        $message->replyTo($campaign->reply_to_email);
-                    } elseif (!empty($server->reply_to_email)) {
-                        $message->replyTo($server->reply_to_email);
+                try {
+                    $this->sendCampaignEmail($campaign, $server, $send, $fromEmail, $fromName);
+                } catch (\Throwable $firstException) {
+                    $canRetryWithServerSender = !empty($preferredFromEmail)
+                        && !empty($serverFromEmail)
+                        && strcasecmp($preferredFromEmail, $serverFromEmail) !== 0;
+
+                    if (!$canRetryWithServerSender) {
+                        throw $firstException;
                     }
-                });
+
+                    try {
+                        $this->sendCampaignEmail($campaign, $server, $send, $serverFromEmail, $serverFromName);
+                        \Log::warning('Campaign send retried with SMTP sender address.', [
+                            'campaign_id' => $campaign->id,
+                            'send_id' => $send->id,
+                            'preferred_from' => $preferredFromEmail,
+                            'fallback_from' => $serverFromEmail,
+                            'initial_error' => $this->truncateError($firstException->getMessage()),
+                        ]);
+                    } catch (\Throwable $secondException) {
+                        throw new \RuntimeException(
+                            'Initial send failed: '.$this->truncateError($firstException->getMessage())
+                            .' | Fallback failed: '.$this->truncateError($secondException->getMessage())
+                        );
+                    }
+                }
 
                 $send->status = PromotionalCampaignSend::STATUS_SENT;
                 $send->sent_at = now();
@@ -130,13 +161,20 @@ class PromotionalCampaignService
                 $campaign->save();
             } catch (\Throwable $exception) {
                 $send->status = PromotionalCampaignSend::STATUS_FAILED;
-                $send->error_message = $exception->getMessage();
+                $send->error_message = $this->truncateError($exception->getMessage());
                 $send->save();
 
                 $campaign->processed_contacts = (int) $campaign->processed_contacts + 1;
                 $campaign->failed_count = (int) $campaign->failed_count + 1;
-                $campaign->last_error = $exception->getMessage();
+                $campaign->last_error = $this->truncateError($exception->getMessage());
                 $campaign->save();
+
+                \Log::error('Campaign send failed.', [
+                    'campaign_id' => $campaign->id,
+                    'send_id' => $send->id,
+                    'recipient' => $send->email,
+                    'error' => $this->truncateError($exception->getMessage()),
+                ]);
             }
         }
 
@@ -150,10 +188,37 @@ class PromotionalCampaignService
             ->count();
 
         if ($pendingCount === 0 && $campaign->status === PromotionalCampaign::STATUS_RUNNING) {
-            $campaign->status = PromotionalCampaign::STATUS_COMPLETED;
+            $campaign->status = ((int) $campaign->success_count === 0 && (int) $campaign->failed_count > 0)
+                ? PromotionalCampaign::STATUS_FAILED
+                : PromotionalCampaign::STATUS_COMPLETED;
             $campaign->completed_at = now();
             $campaign->save();
         }
+    }
+
+    protected function sendCampaignEmail(PromotionalCampaign $campaign, PromotionalSmtpServer $server, PromotionalCampaignSend $send, $fromEmail, $fromName)
+    {
+        Mail::mailer('smtp')->send([], [], function ($message) use ($campaign, $server, $send, $fromEmail, $fromName) {
+            $message->to($send->email)
+                ->from($fromEmail, $fromName)
+                ->subject($campaign->subject)
+                ->setBody($campaign->html_content, 'text/html');
+
+            if (!empty($campaign->reply_to_email)) {
+                $message->replyTo($campaign->reply_to_email);
+            } elseif (!empty($server->reply_to_email)) {
+                $message->replyTo($server->reply_to_email);
+            }
+        });
+    }
+
+    protected function truncateError($message, $limit = 1000)
+    {
+        $cleanMessage = trim((string) $message);
+
+        return strlen($cleanMessage) > $limit
+            ? substr($cleanMessage, 0, $limit - 3).'...'
+            : $cleanMessage;
     }
 
     protected function configureMailer(PromotionalSmtpServer $server, PromotionalCampaign $campaign)
