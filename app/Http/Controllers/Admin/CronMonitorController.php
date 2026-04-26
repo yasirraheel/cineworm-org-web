@@ -40,9 +40,10 @@ class CronMonitorController extends MainAdminController
         $page_title = 'Cron Monitor';
         $status = $this->cronMonitor->getStatus();
         $projectPath = base_path();
-        $phpBinary = 'php';
-        $scheduleCommand = '* * * * * cd "'.$projectPath.'" && '.$phpBinary.' artisan schedule:run >> /dev/null 2>&1';
-        $taskCommand = '* * * * * cd "'.$projectPath.'" && '.$phpBinary.' artisan task:cron >> /dev/null 2>&1';
+        $phpBinary = defined('PHP_BINARY') && !empty(PHP_BINARY) ? PHP_BINARY : 'php';
+        $artisanPath = base_path('artisan');
+        $scheduleCommand = '* * * * * '.escapeshellarg($phpBinary).' '.escapeshellarg($artisanPath).' schedule:run >> /dev/null 2>&1';
+        $taskCommand = '* * * * * '.escapeshellarg($phpBinary).' '.escapeshellarg($artisanPath).' task:cron >> /dev/null 2>&1';
         $triggerUrl = URL::to('cron/task-run/'.$this->cronMonitor->getTriggerToken());
 
         $campaignStats = [
