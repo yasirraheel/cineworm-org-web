@@ -201,8 +201,13 @@ class PromotionalCampaignService
         Mail::mailer('smtp')->send([], [], function ($message) use ($campaign, $server, $send, $fromEmail, $fromName) {
             $message->to($send->email)
                 ->from($fromEmail, $fromName)
-                ->subject($campaign->subject)
-                ->setBody($campaign->html_content, 'text/html');
+                ->subject($campaign->subject);
+
+            $message->html((string) $campaign->html_content);
+
+            if (!empty($campaign->plain_text)) {
+                $message->text((string) $campaign->plain_text);
+            }
 
             if (!empty($campaign->reply_to_email)) {
                 $message->replyTo($campaign->reply_to_email);
