@@ -185,17 +185,17 @@ class PromotionalMailDnsService
         $expectedPublicKey = $this->cleanPublicKeyForDns($domain->dkim_public_key);
 
         try {
-            $records = dns_get_record($hostname, DNS_TXT);
+            $records = $this->lookupTxtRecords($hostname);
             if (empty($records)) {
                 $messages[] = 'No DKIM TXT record found at ' . $hostname . '.';
                 return false;
             }
 
-            foreach ($records as $record) {
-                $txt = $record['txt'] ?? '';
-                $txt = str_replace(['" "', "\t", "\n", "\r", ' '], '', $txt);
+            foreach ($records as $txt) {
+                $normalizedTxt = $this->normalizeDnsText($txt);
+                $normalizedKey = $this->normalizeDnsText($expectedPublicKey);
 
-                if ($expectedPublicKey && strpos($txt, $expectedPublicKey) !== false) {
+                if ($normalizedKey && strpos($normalizedTxt, $normalizedKey) !== false) {
                     $messages[] = 'DKIM record verified successfully.';
                     return true;
                 }
@@ -213,15 +213,15 @@ class PromotionalMailDnsService
     protected function verifySpf(PromotionalSendingDomain $domain, array &$messages): bool
     {
         try {
-            $records = dns_get_record($domain->domain, DNS_TXT);
+            $records = $this->lookupTxtRecords($domain->domain);
             if (empty($records)) {
                 $messages[] = 'No TXT records found for SPF.';
                 return false;
             }
 
-            foreach ($records as $record) {
-                $txt = $record['txt'] ?? '';
-                if (stripos($txt, 'v=spf1') === 0) {
+            foreach ($records as $txt) {
+                $normalizedTxt = $this->normalizeDnsText($txt);
+                if (stripos($normalizedTxt, 'v=spf1') === 0) {
                     $messages[] = 'SPF record found.';
                     return true;
                 }
@@ -240,15 +240,15 @@ class PromotionalMailDnsService
         $hostname = '_dmarc.' . $domain->domain;
 
         try {
-            $records = dns_get_record($hostname, DNS_TXT);
+            $records = $this->lookupTxtRecords($hostname);
             if (empty($records)) {
                 $messages[] = 'No DMARC record found.';
                 return false;
             }
 
-            foreach ($records as $record) {
-                $txt = $record['txt'] ?? '';
-                if (stripos($txt, 'v=DMARC1') === 0) {
+            foreach ($records as $txt) {
+                $normalizedTxt = $this->normalizeDnsText($txt);
+                if (stripos($normalizedTxt, 'v=dmarc1') === 0) {
                     $messages[] = 'DMARC record found.';
                     return true;
                 }
@@ -290,6 +290,102 @@ class PromotionalMailDnsService
             '',
             $publicKey
         );
+    }
+
+    protected function normalizeDnsText(string $value): string
+    {
+        return strtolower(str_replace(['" "', '"', "\t", "\n", "\r", ' '], '', trim($value)));
+    }
+
+    protected function lookupTxtRecords(string $hostname): array
+    {
+        $records = [];
+
+        try {
+            $dnsRecords = @dns_get_record($hostname, DNS_TXT);
+            if (is_array($dnsRecords)) {
+                foreach ($dnsRecords as $record) {
+                    if (!empty($record['txt'])) {
+                        $records[] = $record['txt'];
+                    } elseif (!empty($record['entries']) && is_array($record['entries'])) {
+                        $records[] = implode('', $record['entries']);
+                    }
+                }
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('dns_get_record TXT lookup failed for ' . $hostname . ': ' . $exception->getMessage());
+        }
+
+        if (!empty($records)) {
+            return $records;
+        }
+
+        $shellRecords = $this->lookupTxtRecordsViaShell($hostname);
+
+        return !empty($shellRecords) ? $shellRecords : [];
+    }
+
+    protected function lookupTxtRecordsViaShell(string $hostname): array
+    {
+        $records = [];
+        $commands = [];
+
+        if (stripos(PHP_OS, 'WIN') === 0) {
+            $commands[] = 'nslookup -type=TXT ' . escapeshellarg($hostname);
+        } else {
+            $commands[] = 'dig +short TXT ' . escapeshellarg($hostname);
+            $commands[] = 'nslookup -type=TXT ' . escapeshellarg($hostname);
+        }
+
+        foreach ($commands as $command) {
+            $output = $this->runShellCommand($command);
+            if (empty($output)) {
+                continue;
+            }
+
+            foreach (preg_split("/\r\n|\n|\r/", $output) as $line) {
+                $line = trim($line);
+                if ($line === '') {
+                    continue;
+                }
+
+                if (stripos($line, 'text =') !== false) {
+                    $line = trim(substr($line, strpos($line, '=') + 1));
+                }
+
+                if (preg_match('/^".*"$/', $line)) {
+                    $line = trim($line, '"');
+                }
+
+                if (stripos($line, 'v=') !== false || stripos($line, 'k=rsa') !== false || stripos($line, 'p=') !== false) {
+                    $records[] = str_replace('" "', '', $line);
+                }
+            }
+
+            if (!empty($records)) {
+                break;
+            }
+        }
+
+        return $records;
+    }
+
+    protected function runShellCommand(string $command): string
+    {
+        if (!function_exists('shell_exec')) {
+            return '';
+        }
+
+        $disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        if (in_array('shell_exec', $disabled, true)) {
+            return '';
+        }
+
+        try {
+            return (string) @shell_exec($command . ' 2>&1');
+        } catch (\Throwable $exception) {
+            return '';
+        }
     }
 
     protected function findOpensslConfig(): ?string
