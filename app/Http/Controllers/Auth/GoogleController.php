@@ -80,12 +80,7 @@ class GoogleController extends Controller
                   }
     
                     //Save History
-                    $user_device_obj = new UsersDeviceHistory;
-    
-                    $user_device_obj->user_id = $user_id;
-                    $user_device_obj->user_device_name=$user_device_name;   
-                    $user_device_obj->user_session_name=Session::getId();   
-                    $user_device_obj->save();
+                    save_user_device_history($user_id, $user_device_name, Session::getId());
     
                 }
     
@@ -138,12 +133,7 @@ class GoogleController extends Controller
                   }
     
                     //Save History
-                    $user_device_obj = new UsersDeviceHistory;
-    
-                    $user_device_obj->user_id = $user_id;
-                    $user_device_obj->user_device_name=$user_device_name;   
-                    $user_device_obj->user_session_name=Session::getId();   
-                    $user_device_obj->save();
+                    save_user_device_history($user_id, $user_device_name, Session::getId());
     
                 }
     

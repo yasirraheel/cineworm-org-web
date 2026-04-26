@@ -143,6 +143,40 @@ if (! function_exists('user_device_limit_reached')) {
     }
 }
 
+if (! function_exists('get_user_plan_device_limit')) {
+
+    function get_user_plan_device_limit($plan_id)
+    {
+        if (empty($plan_id)) {
+            return 0;
+        }
+
+        $plan_info = SubscriptionPlan::find($plan_id);
+
+        return $plan_info ? (int) $plan_info->plan_device_limit : 0;
+    }
+}
+
+if (! function_exists('save_user_device_history')) {
+
+    function save_user_device_history($user_id, $user_device_name, $user_session_name)
+    {
+        if (empty($user_id) || empty($user_session_name)) {
+            return null;
+        }
+
+        return UsersDeviceHistory::updateOrCreate(
+            [
+                'user_id' => $user_id,
+                'user_session_name' => $user_session_name,
+            ],
+            [
+                'user_device_name' => $user_device_name ?: 'Unknown Device',
+            ]
+        );
+    }
+}
+
 if (! function_exists('check_watchlist')) {
 
     function check_watchlist($user_id,$post_id,$post_type)

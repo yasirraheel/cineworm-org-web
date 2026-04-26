@@ -46,6 +46,32 @@ AbstractDeviceParser::setVersionTruncation(AbstractDeviceParser::VERSION_TRUNCAT
 
 class IndexController extends Controller
 {
+    protected function detectCurrentDeviceName()
+    {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+        if (empty($userAgent)) {
+            return 'Unknown Device';
+        }
+
+        $dd = new DeviceDetector($userAgent);
+        $dd->parse();
+
+        if ($dd->isBot()) {
+            return 'Bot Device';
+        }
+
+        $osInfo = $dd->getOs();
+        $device = $dd->getDeviceName();
+        $brand = $dd->getBrandName();
+        $model = $dd->getModel();
+
+        if ($brand) {
+            return trim($brand . ' ' . $model . ' ' . ($osInfo['platform'] ?? '') . ' ' . $device);
+        }
+
+        return trim(($osInfo['name'] ?? 'Unknown') . ($osInfo['version'] ?? '') . ' ' . ($osInfo['platform'] ?? '') . ' ' . $device);
+    }
 
 
     public function index()
@@ -549,40 +575,7 @@ class IndexController extends Controller
         } else {
 
             $user_id = Auth::user()->id;
-            /***Save Device***/
-            $userAgent = $_SERVER['HTTP_USER_AGENT']; // change this to the useragent you want to parse
-
-            $dd = new DeviceDetector($userAgent);
-
-            $dd->parse();
-
-            if ($dd->isBot()) {
-                // handle bots,spiders,crawlers,...
-                $botInfo = $dd->getBot();
-            } else {
-                $clientInfo = $dd->getClient(); // holds information about browser, feed reader, media player, ...
-                $osInfo = $dd->getOs();
-                $device = $dd->getDeviceName();
-                $brand = $dd->getBrandName();
-                $model = $dd->getModel();
-
-
-                if ($brand) {
-                    $user_device_name = $brand . ' ' . $model . ' ' . $osInfo['platform'] . ' ' . $device;
-                } else {
-                    $user_device_name = $osInfo['name'] . $osInfo['version'] . ' ' . $osInfo['platform'] . ' ' . $device;
-                }
-
-                //Save History
-                $user_device_obj = new UsersDeviceHistory;
-
-                $user_device_obj->user_id = $user_id;
-                $user_device_obj->user_device_name = $user_device_name;
-                $user_device_obj->user_session_name = Session::getId();
-                $user_device_obj->save();
-            }
-
-            /***Save Device End***/
+            save_user_device_history($user_id, $this->detectCurrentDeviceName(), Session::getId());
 
             return redirect('dashboard');
         }
@@ -751,16 +744,25 @@ class IndexController extends Controller
 
     public function check_user_remotely_logout_or_not($user_session_name)
     {
-
-
         $user_device_obj = UsersDeviceHistory::where('user_session_name', $user_session_name)->first();
-        //dd($user_device_obj);
-        //exit;
 
         if ($user_device_obj) {
             echo "true";
-        } else {
-            echo "false";
+            return;
         }
+
+        if (Auth::check()) {
+            $user_id = Auth::id();
+            $device_limit = get_user_plan_device_limit(Auth::user()->plan_id);
+            $active_devices = UsersDeviceHistory::where('user_id', $user_id)->count();
+
+            if ($device_limit === 0 || $active_devices < $device_limit) {
+                save_user_device_history($user_id, $this->detectCurrentDeviceName(), $user_session_name);
+                echo "true";
+                return;
+            }
+        }
+
+        echo "false";
     }
 }
