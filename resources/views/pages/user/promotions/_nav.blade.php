@@ -175,3 +175,31 @@
         }
     }
 </style>
+
+<script type="text/javascript">
+    (function () {
+        function normalizePromotionSelects() {
+            var selects = document.querySelectorAll('select.promotion-select');
+
+            selects.forEach(function (select) {
+                if (!select.hasAttribute('multiple')) {
+                    select.removeAttribute('size');
+                    select.size = 1;
+                }
+
+                var next = select.nextElementSibling;
+                if (next && next.classList && next.classList.contains('nice-select')) {
+                    next.parentNode.removeChild(next);
+                }
+
+                select.style.display = 'block';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', normalizePromotionSelects);
+        window.addEventListener('load', normalizePromotionSelects);
+        setTimeout(normalizePromotionSelects, 300);
+        setTimeout(normalizePromotionSelects, 1200);
+        setTimeout(normalizePromotionSelects, 3000);
+    })();
+</script>
