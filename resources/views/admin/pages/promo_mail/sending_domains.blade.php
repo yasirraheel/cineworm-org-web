@@ -15,8 +15,7 @@
                             <div class="col-md-8">
                                 <h4 class="header-title m-t-0">Sending Domains</h4>
                                 <p>
-                                    Add the brand/domain used in the sender address, then publish SPF, DKIM, and DMARC records.
-                                    Verification is kept dynamic in admin for now so your team can update status after DNS propagation.
+                                    Add the brand/domain used in the sender address, then open its DNS Records page to publish and verify DKIM, SPF, and DMARC.
                                 </p>
                             </div>
                             <div class="col-md-4 text-right">
@@ -52,7 +51,7 @@
                                                 @if($domain->verified_at)
                                                     Verified {{ \Carbon\Carbon::parse($domain->verified_at)->format('M d, Y H:i') }}
                                                 @else
-                                                    Waiting for all checks
+                                                    {{ $domain->verification_score }}/3 checks passed
                                                 @endif
                                             </div>
                                         </td>
@@ -65,6 +64,9 @@
                                             @endif
                                         </td>
                                         <td>
+                                            <a href="{{ URL::to('admin/promo_mail/sending-domains/dns/'.$domain->id) }}" class="btn btn-primary btn-sm">
+                                                <i class="fa fa-shield"></i>
+                                            </a>
                                             <a href="{{ URL::to('admin/promo_mail/sending-domains/edit/'.$domain->id) }}" class="btn btn-success btn-sm">
                                                 <i class="fa fa-edit"></i>
                                             </a>

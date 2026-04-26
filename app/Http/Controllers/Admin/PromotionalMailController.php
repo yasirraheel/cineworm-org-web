@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\PromotionalSendingDomain;
 use App\PromotionalSmtpServer;
 use App\PromotionalTrackingDomain;
+use App\Services\PromotionalMailDnsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -13,11 +14,14 @@ use Illuminate\Support\Facades\Crypt;
 
 class PromotionalMailController extends MainAdminController
 {
+    protected $dnsService;
+
     public function __construct()
     {
         $this->middleware('auth');
 
         parent::__construct();
+        $this->dnsService = new PromotionalMailDnsService();
     }
 
     protected function ensureAdminAccess()
@@ -263,6 +267,27 @@ class PromotionalMailController extends MainAdminController
         return view('admin.pages.promo_mail.sending_domain_form', compact('page_title', 'servers', 'domain'));
     }
 
+    public function sendingDomainDns($id)
+    {
+        if ($redirect = $this->ensureAdminAccess()) {
+            return $redirect;
+        }
+
+        $page_title = 'DNS Records';
+        $domain = PromotionalSendingDomain::with('smtpServer')->findOrFail($id);
+        $this->dnsService->initializeDomain($domain);
+        $domain = $domain->fresh(['smtpServer']);
+        $dnsRecords = $this->dnsService->getDnsRecords($domain);
+        $opensslCheck = empty($dnsRecords['dkim']['value']) ? $this->dnsService->checkOpenSslReadiness() : null;
+
+        return view('admin.pages.promo_mail.sending_domain_dns', compact(
+            'page_title',
+            'domain',
+            'dnsRecords',
+            'opensslCheck'
+        ));
+    }
+
     public function saveSendingDomain(Request $request)
     {
         if ($redirect = $this->ensureAdminAccess()) {
@@ -272,7 +297,7 @@ class PromotionalMailController extends MainAdminController
         $data = \Request::except(array('_token'));
 
         $rule = array(
-            'domain' => 'required',
+            'domain' => 'required|regex:/^[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$/|unique:promotional_sending_domains,domain,'.(!empty($request->id) ? (int) $request->id : 'NULL').',id',
             'selector' => 'required',
             'dkim_type' => 'required',
             'dmarc_policy' => 'required',
@@ -286,29 +311,89 @@ class PromotionalMailController extends MainAdminController
 
         $inputs = $request->all();
         $domain = !empty($inputs['id']) ? PromotionalSendingDomain::findOrFail($inputs['id']) : new PromotionalSendingDomain;
+        $isNewDomain = empty($inputs['id']);
 
         $domain->smtp_server_id = !empty($inputs['smtp_server_id']) ? (int) $inputs['smtp_server_id'] : null;
-        $domain->domain = trim($inputs['domain']);
+        $domain->domain = strtolower(trim($inputs['domain']));
         $domain->selector = trim($inputs['selector']);
         $domain->dkim_type = $inputs['dkim_type'];
-        $domain->dkim_value = $inputs['dkim_value'] ?? null;
         $domain->return_path_subdomain = $inputs['return_path_subdomain'] ?? null;
-        $domain->spf_value = $inputs['spf_value'] ?? null;
         $domain->dmarc_policy = $inputs['dmarc_policy'];
         $domain->dmarc_report_email = $inputs['dmarc_report_email'] ?? null;
         $domain->dmarc_alignment = $inputs['dmarc_alignment'] ?? 'relaxed';
-        $domain->dkim_status = !empty($inputs['dkim_status']) ? 1 : 0;
-        $domain->spf_status = !empty($inputs['spf_status']) ? 1 : 0;
-        $domain->dmarc_status = !empty($inputs['dmarc_status']) ? 1 : 0;
-        $domain->status = (int) ($inputs['status'] ?? 0);
-        $domain->verified_at = ($domain->dkim_status && $domain->spf_status && $domain->dmarc_status)
-            ? ($domain->verified_at ?: Carbon::now())
-            : null;
+
+        $requiresReverification = $isNewDomain || $domain->isDirty([
+            'smtp_server_id',
+            'domain',
+            'selector',
+            'return_path_subdomain',
+            'dmarc_policy',
+            'dmarc_report_email',
+            'dmarc_alignment',
+        ]);
+
+        if ($requiresReverification) {
+            $domain->dkim_status = 0;
+            $domain->spf_status = 0;
+            $domain->dmarc_status = 0;
+            $domain->verified_at = null;
+            $domain->dns_checked_at = null;
+            $domain->status = 0;
+        }
+
         $domain->save();
+        $this->dnsService->initializeDomain($domain);
 
         \Session::flash('flash_message', !empty($inputs['id']) ? trans('words.successfully_updated') : trans('words.added'));
 
-        return redirect('admin/promo_mail/sending-domains');
+        return redirect('admin/promo_mail/sending-domains/dns/'.$domain->id);
+    }
+
+    public function verifySendingDomain($id)
+    {
+        if ($redirect = $this->ensureAdminAccess()) {
+            return $redirect;
+        }
+
+        try {
+            $domain = PromotionalSendingDomain::findOrFail($id);
+            $this->dnsService->initializeDomain($domain);
+            $results = $this->dnsService->verifyDns($domain->fresh());
+
+            return response()->json([
+                'resp_status' => 'success',
+                'resp_msg' => $results['dkim']
+                    ? 'DNS verification completed.'
+                    : 'Verification is incomplete. Please check your DNS records and try again.',
+                'dkim' => $results['dkim'],
+                'spf' => $results['spf'],
+                'dmarc' => $results['dmarc'],
+                'messages' => $results['messages'],
+                'verified_at' => optional($domain->fresh()->verified_at)->format('M d, Y h:i A'),
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'resp_status' => 'failed',
+                'resp_msg' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function regenerateSendingDomainKeys($id)
+    {
+        if ($redirect = $this->ensureAdminAccess()) {
+            return $redirect;
+        }
+
+        try {
+            $domain = PromotionalSendingDomain::findOrFail($id);
+            $this->dnsService->generateKeyPair($domain, $domain->selector ?: 'xsender');
+            \Session::flash('flash_message', 'DKIM keys regenerated successfully.');
+        } catch (\Throwable $exception) {
+            \Session::flash('error_flash_message', $exception->getMessage());
+        }
+
+        return redirect('admin/promo_mail/sending-domains/dns/'.$id);
     }
 
     public function deleteSendingDomain($id)

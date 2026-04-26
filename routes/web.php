@@ -327,6 +327,9 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('promo_mail/sending-domains', 'PromotionalMailController@sendingDomains');
         Route::get('promo_mail/sending-domains/add', 'PromotionalMailController@addSendingDomain');
         Route::get('promo_mail/sending-domains/edit/{id}', 'PromotionalMailController@editSendingDomain');
+        Route::get('promo_mail/sending-domains/dns/{id}', 'PromotionalMailController@sendingDomainDns');
+        Route::get('promo_mail/sending-domains/verify/{id}', 'PromotionalMailController@verifySendingDomain');
+        Route::post('promo_mail/sending-domains/regenerate/{id}', 'PromotionalMailController@regenerateSendingDomainKeys');
         Route::post('promo_mail/sending-domains/save', 'PromotionalMailController@saveSendingDomain');
         Route::get('promo_mail/sending-domains/delete/{id}', 'PromotionalMailController@deleteSendingDomain');
 

@@ -40,4 +40,17 @@
         color: #ffffff;
         background-color: #343436;
     }
+
+    .promo-mail-page .dns-record-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .promo-mail-page .input-group .btn {
+        height: 100%;
+    }
+
+    .promo-mail-page .form-text {
+        color: #b8c6db !important;
+    }
 </style>
