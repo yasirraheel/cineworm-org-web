@@ -1,7 +1,59 @@
 @extends("admin.admin_app")
 
 @section("content")
-<div class="content-page">
+<style>
+    .cron-monitor-page .card-box,
+    .cron-monitor-page .card-box p,
+    .cron-monitor-page .card-box li,
+    .cron-monitor-page .card-box label,
+    .cron-monitor-page .card-box strong,
+    .cron-monitor-page .card-box span,
+    .cron-monitor-page .card-box td,
+    .cron-monitor-page .card-box th,
+    .cron-monitor-page .card-box div {
+        color: #f2f4f8;
+    }
+
+    .cron-monitor-page .text-muted,
+    .cron-monitor-page .helper-text,
+    .cron-monitor-page .card-box .text-muted {
+        color: #c7d2e0 !important;
+    }
+
+    .cron-monitor-page .card-box ul,
+    .cron-monitor-page .card-box ol {
+        padding-left: 22px;
+    }
+
+    .cron-monitor-page .card-box li {
+        margin-bottom: 8px;
+    }
+
+    .cron-monitor-page code {
+        background: #ffffff;
+        color: #d61f3e;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 90%;
+    }
+
+    .cron-monitor-page .form-control[readonly],
+    .cron-monitor-page textarea.form-control[readonly],
+    .cron-monitor-page input.form-control[readonly] {
+        background: #35353a;
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .cron-monitor-page .table-bordered > tbody > tr > td,
+    .cron-monitor-page .table-bordered > tbody > tr > th,
+    .cron-monitor-page .table-bordered > thead > tr > th,
+    .cron-monitor-page .table-bordered > thead > tr > td {
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+</style>
+
+<div class="content-page cron-monitor-page">
     <div class="content">
         <div class="container-fluid">
             <div class="row">
@@ -85,7 +137,7 @@
                             <div class="col-md-6">
                                 <div class="card-box">
                                     <h4 class="header-title m-t-0">Why Campaigns Stay Scheduled</h4>
-                                    <ul class="m-b-0">
+                                    <ul class="m-b-0 helper-text">
                                         <li>If server cron is not running every minute, scheduled campaigns will never start.</li>
                                         <li>If Laravel scheduler is configured, it will call <code>task:cron</code> automatically.</li>
                                         <li>If your hosting only supports URL cron, use the secure trigger URL shown below.</li>
@@ -139,7 +191,7 @@
                             <div class="col-md-6">
                                 <div class="card-box">
                                     <h4 class="header-title m-t-0">Setup Guide</h4>
-                                    <ol class="m-b-0">
+                                    <ol class="m-b-0 helper-text">
                                         <li>Prefer a server cron that runs every minute.</li>
                                         <li>Use the recommended <code>schedule:run</code> command if shell cron is available.</li>
                                         <li>If shell cron is unavailable, paste the secure URL trigger into your hosting cron URL field.</li>
@@ -221,6 +273,17 @@
 </div>
 
 <script type="text/javascript">
+    function cronMonitorToast(icon, title) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2200,
+            icon: icon,
+            title: title
+        });
+    }
+
     document.addEventListener('click', function (event) {
         var button = event.target.closest('.copy-btn');
 
@@ -231,15 +294,27 @@
         var value = button.getAttribute('data-copy') || '';
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(value);
-        } else {
-            var textarea = document.createElement('textarea');
-            textarea.value = value;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
+            navigator.clipboard.writeText(value).then(function () {
+                cronMonitorToast('success', 'Copied to clipboard');
+            }).catch(function () {
+                cronMonitorToast('error', 'Copy failed');
+            });
+            return;
         }
+
+        var textarea = document.createElement('textarea');
+        textarea.value = value;
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
+            cronMonitorToast('success', 'Copied to clipboard');
+        } catch (error) {
+            cronMonitorToast('error', 'Copy failed');
+        }
+
+        document.body.removeChild(textarea);
     });
 
     @if(Session::has('flash_message'))
