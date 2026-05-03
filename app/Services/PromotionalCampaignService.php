@@ -91,10 +91,16 @@ class PromotionalCampaignService
             return;
         }
 
+        $allowedBatchSize = $this->getAllowedBatchSize($server, $batchSize);
+
+        if ($allowedBatchSize <= 0) {
+            return;
+        }
+
         $pendingSends = PromotionalCampaignSend::where('campaign_id', $campaign->id)
             ->where('status', PromotionalCampaignSend::STATUS_PENDING)
             ->orderBy('id')
-            ->limit($batchSize)
+            ->limit($allowedBatchSize)
             ->get();
 
         if ($pendingSends->isEmpty()) {
@@ -179,6 +185,75 @@ class PromotionalCampaignService
         }
 
         $this->completeCampaignIfDone($campaign->fresh());
+    }
+
+    protected function getAllowedBatchSize(PromotionalSmtpServer $server, $requestedBatchSize): int
+    {
+        $requestedBatchSize = max(1, (int) $requestedBatchSize);
+        $now = Carbon::now();
+
+        $sentQuery = PromotionalCampaignSend::where('status', PromotionalCampaignSend::STATUS_SENT)
+            ->whereHas('campaign', function ($query) use ($server) {
+                $query->where('smtp_server_id', $server->id);
+            });
+
+        $sentToday = (clone $sentQuery)
+            ->where('sent_at', '>=', $now->copy()->startOfDay())
+            ->count();
+
+        if ((int) $server->max_messages_per_day > 0) {
+            $remainingToday = (int) $server->max_messages_per_day - $sentToday;
+
+            if ($remainingToday <= 0) {
+                return 0;
+            }
+
+            $requestedBatchSize = min($requestedBatchSize, $remainingToday);
+        }
+
+        $lastSentAt = (clone $sentQuery)->max('sent_at');
+        $lastSentAt = $lastSentAt ? Carbon::parse($lastSentAt) : null;
+
+        $minDelay = max(0, (int) $server->min_delay_per_message);
+        $maxDelay = max($minDelay, (int) $server->max_delay_per_message);
+
+        if ($maxDelay > 0) {
+            $delaySeconds = $minDelay > 0 ? $minDelay : $maxDelay;
+
+            if ($lastSentAt) {
+                if ($lastSentAt->copy()->addSeconds($delaySeconds)->gt($now)) {
+                    return 0;
+                }
+            }
+
+            return min($requestedBatchSize, 1);
+        }
+
+        $pauseAfterMessages = (int) $server->pause_after_messages;
+        $pauseDuration = (int) $server->pause_duration;
+
+        if ($pauseAfterMessages > 0 && $pauseDuration > 0) {
+            $counterMessages = $sentToday;
+
+            if ((int) $server->reset_counter_after_messages > 0 && $sentToday > 0) {
+                $counterMessages = $sentToday % (int) $server->reset_counter_after_messages;
+                $counterMessages = $counterMessages === 0 ? (int) $server->reset_counter_after_messages : $counterMessages;
+            }
+
+            if ($lastSentAt && $counterMessages > 0 && $counterMessages % $pauseAfterMessages === 0) {
+                if ($lastSentAt->copy()->addSeconds($pauseDuration)->gt($now)) {
+                    return 0;
+                }
+            }
+
+            $messagesUntilPause = $pauseAfterMessages - ($counterMessages % $pauseAfterMessages);
+
+            if ($messagesUntilPause > 0) {
+                $requestedBatchSize = min($requestedBatchSize, $messagesUntilPause);
+            }
+        }
+
+        return $requestedBatchSize;
     }
 
     protected function completeCampaignIfDone(PromotionalCampaign $campaign)
