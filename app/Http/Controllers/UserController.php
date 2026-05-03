@@ -79,57 +79,112 @@ class UserController extends Controller
             }
         }
 
-        $dashboardCards = [];
-        $featureCardConfig = [
-            'film_uploads' => [
-                'title' => 'Add/ Upload Video',
-                'button_text' => 'Add Video',
-                'url' => URL('admin/movies/add_movie'),
+        $dashboardFeatureLinks = [];
+        $featureLinkConfig = [
+            'watch_content' => [
+                'title' => 'Watch Content',
+                'url' => URL('/'),
+                'icon' => 'fa fa-play-circle',
             ],
-            'promotion_services' => [
-                'title' => 'Promotion Services',
-                'button_text' => 'Promotion Services',
-                'url' => URL('promotions'),
+            'donate_to_projects' => [
+                'title' => 'Donate to Projects',
+                'url' => getcong('donation_link') ? stripslashes(getcong('donation_link')) : 'javascript:void(0);',
+                'icon' => 'fa fa-heart',
             ],
-            'crowdfunding_link_sharing' => [
-                'title' => 'Crowdfunding Link Sharing',
-                'button_text' => 'Crowdfunding Link Sharing',
-                'url' => 'javascript:void(0);',
+            'play_games' => [
+                'title' => 'Play Games',
+                'url' => URL('game/remote-control'),
+                'icon' => 'fa fa-gamepad',
             ],
-            'project_showcase_page' => [
-                'title' => 'Project Showcase Page',
-                'button_text' => 'Project Showcase Page',
-                'url' => 'javascript:void(0);',
-            ],
-            'website_link_sharing' => [
-                'title' => 'Website Link Sharing',
-                'button_text' => 'Website Link Sharing',
-                'url' => 'javascript:void(0);',
-            ],
-            'deal_plus_access' => [
-                'title' => 'Deal Plus Access',
-                'button_text' => 'Deal Plus Access',
-                'url' => 'javascript:void(0);',
-            ],
-            'photo_gallery' => [
-                'title' => 'Photo Gallery',
-                'button_text' => 'Photo Gallery',
-                'url' => 'javascript:void(0);',
+            'basic_user_account' => [
+                'title' => 'Basic User Account',
+                'url' => URL('dashboard'),
+                'icon' => 'fa fa-user-circle',
             ],
             'personal_profile_page' => [
                 'title' => 'Personal Profile Page',
-                'button_text' => 'Personal Profile Page',
+                'url' => URL('profile'),
+                'icon' => 'fa fa-id-card',
+            ],
+            'film_uploads' => [
+                'title' => 'Film Uploads',
+                'url' => URL('admin/movies/add_movie'),
+                'icon' => 'fa fa-upload',
+            ],
+            'promotion_services' => [
+                'title' => 'Promotion Services',
+                'url' => URL('promotions'),
+                'icon' => 'fa fa-bullhorn',
+            ],
+            'deal_plus_access' => [
+                'title' => 'Deal Plus Access',
                 'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-handshake-o',
+            ],
+            'crowdfunding_link_sharing' => [
+                'title' => 'Crowdfunding Link Sharing',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-link',
+            ],
+            'website_link_sharing' => [
+                'title' => 'Website Link Sharing',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-globe',
+            ],
+            'photo_gallery' => [
+                'title' => 'Photo Gallery',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-image',
+            ],
+            'project_showcase_page' => [
+                'title' => 'Project Showcase Page',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-film',
+            ],
+            'film_project_space' => [
+                'title' => 'Film Project Space',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-folder-open',
+            ],
+            'film_editing_access' => [
+                'title' => 'Film Editing Access',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-cut',
+            ],
+            'colour_grading_access' => [
+                'title' => 'Colour Grading Access',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-adjust',
+            ],
+            'advanced_film_showcase' => [
+                'title' => 'Advanced Film Showcase',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-star',
+            ],
+            'pro_creator_tools' => [
+                'title' => 'Pro Creator Tools',
+                'url' => 'javascript:void(0);',
+                'icon' => 'fa fa-wrench',
+            ],
+            'extended_media_uploads' => [
+                'title' => 'Extended Media Uploads',
+                'url' => URL('admin/movies/add_movie'),
+                'icon' => 'fa fa-cloud-upload',
+            ],
+            'priority_promotion' => [
+                'title' => 'Priority Promotion',
+                'url' => URL('promotions'),
+                'icon' => 'fa fa-rocket',
             ],
         ];
 
-        foreach ($featureCardConfig as $featureKey => $cardConfig) {
+        foreach ($featureLinkConfig as $featureKey => $linkConfig) {
             if (in_array($featureKey, $planFeatureKeys, true)) {
-                $dashboardCards[] = $cardConfig;
+                $dashboardFeatureLinks[] = $linkConfig;
             }
         }
 
-        return view('pages.user.dashboard',compact('user','transactions_list','recently_watched','currentPlan','dashboardCards'));
+        return view('pages.user.dashboard',compact('user','transactions_list','recently_watched','currentPlan','dashboardFeatureLinks'));
     }
 
     public function profile()

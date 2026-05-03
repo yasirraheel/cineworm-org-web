@@ -29,9 +29,71 @@
     text-decoration: none;
   }
 
+  .dashboard-feature-sidebar {
+    margin-top: 22px;
+  }
+
+  .dashboard-feature-sidebar h6 {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .dashboard-feature-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dashboard-feature-links a {
+    align-items: center;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 5px;
+    color: #ffffff;
+    display: flex;
+    font-size: 14px;
+    font-weight: 600;
+    gap: 10px;
+    line-height: 20px;
+    padding: 10px 12px;
+    text-decoration: none;
+    transition: all .2s ease;
+  }
+
+  .dashboard-feature-links a:hover {
+    background: #fe0278;
+    border-color: #fe0278;
+    color: #ffffff;
+  }
+
+  .dashboard-feature-links i {
+    flex: 0 0 18px;
+    text-align: center;
+  }
+
   @media only screen and (max-width: 991px) {
     .dashboard-card-col {
       margin-bottom: 25px;
+    }
+
+    .dashboard-feature-sidebar {
+      margin-bottom: 25px;
+    }
+
+    .dashboard-feature-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media only screen and (max-width: 575px) {
+    .dashboard-feature-links {
+      grid-template-columns: 1fr;
     }
   }
 </style>
@@ -79,6 +141,20 @@
                 <a href="{{ URL::to('profile') }}" class="vfx-item-btn-danger text-uppercase"><i class="fa fa-edit"></i>{{trans('words.edit')}}</a><br /><br />
 
                 <a href="#" class="vfx-item-btn-danger text-uppercase data_remove"><i class="fa fa-trash"></i>Account Delete</a>
+
+                @if(!empty($dashboardFeatureLinks))
+                <div class="dashboard-feature-sidebar">
+                  <h6>Plan Access</h6>
+                  <div class="dashboard-feature-links">
+                    @foreach($dashboardFeatureLinks as $featureLink)
+                      <a href="{{ $featureLink['url'] }}">
+                        <i class="{{ $featureLink['icon'] }}"></i>
+                        <span>{{ $featureLink['title'] }}</span>
+                      </a>
+                    @endforeach
+                  </div>
+                </div>
+                @endif
               </div>
             </div>
             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
@@ -118,16 +194,6 @@
                     @endif
                   </div>
                 </div>
-                @foreach($dashboardCards as $dashboardCard)
-                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">
-                  <div class="member-ship-option">
-                    <h5 class="color-up">{{ $dashboardCard['title'] }}</h5>
-                    <div class="mt-3">
-                      <a href="{{ $dashboardCard['url'] }}" class="vfx-item-btn-danger text-uppercase dashboard-card-action">{{ $dashboardCard['button_text'] }}</a>
-                    </div>
-                  </div>
-                </div>
-                @endforeach
               </div>
             </div>
           </div>
