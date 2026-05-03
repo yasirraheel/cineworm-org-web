@@ -125,6 +125,8 @@ class PromotionalCampaignService
 
         foreach ($pendingSends as $send) {
             try {
+                $this->waitBeforeNextSend($server);
+
                 $fromEmail = $preferredFromEmail ?: $serverFromEmail;
                 $fromName = $preferredFromName ?: $serverFromName;
 
@@ -214,21 +216,6 @@ class PromotionalCampaignService
         $lastSentAt = (clone $sentQuery)->max('sent_at');
         $lastSentAt = $lastSentAt ? Carbon::parse($lastSentAt) : null;
 
-        $minDelay = max(0, (int) $server->min_delay_per_message);
-        $maxDelay = max($minDelay, (int) $server->max_delay_per_message);
-
-        if ($maxDelay > 0) {
-            $delaySeconds = $minDelay > 0 ? $minDelay : $maxDelay;
-
-            if ($lastSentAt) {
-                if ($lastSentAt->copy()->addSeconds($delaySeconds)->gt($now)) {
-                    return 0;
-                }
-            }
-
-            return min($requestedBatchSize, 1);
-        }
-
         $pauseAfterMessages = (int) $server->pause_after_messages;
         $pauseDuration = (int) $server->pause_duration;
 
@@ -254,6 +241,24 @@ class PromotionalCampaignService
         }
 
         return $requestedBatchSize;
+    }
+
+    protected function waitBeforeNextSend(PromotionalSmtpServer $server): void
+    {
+        $minDelay = max(0, (int) $server->min_delay_per_message);
+        $maxDelay = max($minDelay, (int) $server->max_delay_per_message);
+
+        if ($maxDelay <= 0) {
+            return;
+        }
+
+        $delaySeconds = $maxDelay > $minDelay
+            ? random_int($minDelay, $maxDelay)
+            : $maxDelay;
+
+        if ($delaySeconds > 0) {
+            sleep($delaySeconds);
+        }
     }
 
     protected function completeCampaignIfDone(PromotionalCampaign $campaign)
