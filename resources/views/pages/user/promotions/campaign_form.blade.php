@@ -87,12 +87,6 @@
                     </div>
                 </div>
 
-                <div class="promo-form-group">
-                    <label class="promo-label">Preview Text <span style="color:rgba(255,255,255,0.3);font-weight:500;">(optional)</span></label>
-                    <input type="text" name="preview_text" class="promo-input form-control"
-                           value="{{ old('preview_text', $campaign->preview_text ?? '') }}"
-                           placeholder="Short summary shown in inbox previews…">
-                </div>
             </div>
 
             {{-- ── Section 2: Sender Identity ── --}}
