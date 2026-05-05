@@ -1,29 +1,16 @@
-@extends('site_app')
-
-@section('head_title', 'My Films | '.getcong('site_name'))
-@section('head_url', Request::url())
+@extends('admin.admin_app')
 
 @section('content')
-<div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xl-12">
-                <h2>My Films</h2>
-                <nav id="breadcrumbs"><ul>
-                    <li><a href="{{ URL::to('/') }}">Home</a></li>
-                    <li><a href="{{ URL::to('dashboard') }}">Dashboard</a></li>
-                    <li>My Films</li>
-                </ul></nav>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="content-page">
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card-box">
 
-<div class="vfx-item-ptb vfx-item-info">
-    <div class="container-fluid">
-
-        <style>
+<style>
             .ufilm-header {
+
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -262,7 +249,12 @@
             </div>
         @endif
 
+                    </div>{{-- /card-box --}}
+                </div>
+            </div>
+        </div>
     </div>
+    @include('admin.copyright')
 </div>
 
 @if(Session::has('flash_message'))
