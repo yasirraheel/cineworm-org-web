@@ -5,66 +5,101 @@
 
 @section('content')
 <div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
-    <div class="container-fluid"><div class="row"><div class="col-xl-12"><h2>Email Lists</h2></div></div></div>
+    <div class="container-fluid"><div class="row"><div class="col-xl-12">
+        <h2>Email Lists</h2>
+        <nav id="breadcrumbs"><ul>
+            <li><a href="{{ URL::to('/') }}">Home</a></li>
+            <li><a href="{{ URL::to('promotions') }}">Promotions</a></li>
+            <li>Email Lists</li>
+        </ul></nav>
+    </div></div></div>
 </div>
+
 <div class="vfx-item-ptb vfx-item-info">
     <div class="container-fluid">
         @include('pages.user.promotions._nav')
 
         <div class="row">
-            <div class="col-md-5">
-                <div class="promotion-panel">
-                    <div class="promotion-header">
+            {{-- ── Create List ── --}}
+            <div class="col-md-4">
+                <div class="promo-panel" style="position:sticky;top:20px;">
+                    <div class="promo-panel-header" style="margin-bottom:20px;">
                         <div>
-                            <h3>Create Email List</h3>
-                            <p class="promotion-help-text">Create a list first, then open it to add contacts manually or import them by CSV.</p>
+                            <h3><i class="fa fa-plus-circle" style="color:#ff0f28;margin-right:8px;"></i>Create New List</h3>
+                            <p class="promo-subtitle">Lists group your contacts. Create a list first, then add contacts manually or import via CSV.</p>
                         </div>
                     </div>
                     <form method="post" action="{{ URL::to('promotions/lists/save') }}">
                         @csrf
-                        <div class="form-group">
-                            <label class="promotion-label">List Name</label>
-                            <input type="text" name="name" class="form-control promotion-input" value="{{ old('name') }}" required>
+                        <div class="promo-form-group">
+                            <label class="promo-label">List Name <span style="color:#ff0f28;">*</span></label>
+                            <input type="text" name="name" class="promo-input form-control"
+                                   value="{{ old('name') }}" placeholder="e.g. Film Investors" required>
                         </div>
-                        <div class="form-group">
-                            <label class="promotion-label">Description</label>
-                            <textarea name="description" class="form-control promotion-textarea" rows="4">{{ old('description') }}</textarea>
+                        <div class="promo-form-group">
+                            <label class="promo-label">Description <span style="color:rgba(255,255,255,0.3);font-weight:500;">(optional)</span></label>
+                            <textarea name="description" class="promo-textarea form-control" rows="3"
+                                      placeholder="What is this list for?">{{ old('description') }}</textarea>
                         </div>
-                        <button type="submit" class="btn btn-danger">Save List</button>
+                        <button type="submit" class="promo-btn promo-btn-primary" style="width:100%;justify-content:center;">
+                            <i class="fa fa-save"></i> Create List
+                        </button>
                     </form>
                 </div>
             </div>
-            <div class="col-md-7">
-                <div class="promotion-panel">
-                    <div class="promotion-header">
+
+            {{-- ── Lists Table ── --}}
+            <div class="col-md-8">
+                <div class="promo-panel">
+                    <div class="promo-panel-header">
                         <div>
                             <h3>Your Lists</h3>
-                            <p class="promotion-help-text">Use the action buttons to open manual add and CSV import for any list.</p>
+                            <p class="promo-subtitle">Open a list to add or import contacts, then use it in a campaign.</p>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table promotion-table">
+                    <div class="promo-table-wrap">
+                        <table class="promo-table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
+                                    <th>List Name</th>
                                     <th>Contacts</th>
                                     <th>Description</th>
-                                    <th class="text-right">Actions</th>
+                                    <th style="text-align:right;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($lists as $list)
                                     <tr>
-                                        <td><strong>{{ $list->name }}</strong></td>
-                                        <td>{{ $list->contacts_count }}</td>
-                                        <td>{{ $list->description ?: '-' }}</td>
-                                        <td class="text-right">
-                                            <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts') }}" class="btn btn-sm btn-danger">Add / Import Contacts</a>
-                                            <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts/sample-file') }}" class="btn btn-sm promotion-btn-secondary">Sample CSV</a>
+                                        <td>
+                                            <strong style="color:#fff;">{{ $list->name }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="promo-badge promo-badge-info">
+                                                <i class="fa fa-users" style="font-size:10px;"></i>
+                                                {{ $list->contacts_count }}
+                                            </span>
+                                        </td>
+                                        <td style="color:rgba(255,255,255,0.45);font-size:13px;max-width:180px;">{{ $list->description ?: '—' }}</td>
+                                        <td>
+                                            <div class="promo-table-actions">
+                                                <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts') }}"
+                                                   class="promo-btn promo-btn-primary promo-btn-sm">
+                                                    <i class="fa fa-users"></i> Manage Contacts
+                                                </a>
+                                                <a href="{{ URL::to('promotions/lists/'.$list->id.'/contacts/sample-file') }}"
+                                                   class="promo-btn promo-btn-ghost promo-btn-sm">
+                                                    <i class="fa fa-download"></i> Sample CSV
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr><td colspan="4" class="text-center">No email lists found.</td></tr>
+                                    <tr>
+                                        <td colspan="4" class="promo-table-empty">
+                                            <i class="fa fa-list-ul" style="font-size:32px;display:block;margin-bottom:14px;opacity:0.18;"></i>
+                                            No lists yet. Create your first list on the left.
+                                        </td>
+                                    </tr>
                                 @endforelse
                             </tbody>
                         </table>
