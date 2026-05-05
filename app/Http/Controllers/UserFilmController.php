@@ -53,7 +53,9 @@ class UserFilmController extends Controller
             ->orderBy('id', 'DESC')
             ->paginate(12);
 
-        return view('pages.user.films.index', compact('films'));
+        $page_title = 'My Films';
+
+        return view('pages.user.films.index', compact('films', 'page_title'));
     }
 
     // ── Upload form ────────────────────────────────────────────────────────
@@ -68,7 +70,9 @@ class UserFilmController extends Controller
         $actor_list    = ActorDirector::where('ad_type', 'actor')->orderBy('ad_name')->get();
         $director_list = ActorDirector::where('ad_type', 'director')->orderBy('ad_name')->get();
 
-        return view('pages.user.films.create', compact('genre_list', 'language_list', 'actor_list', 'director_list'));
+        $page_title = 'Upload Film';
+
+        return view('pages.user.films.create', compact('genre_list', 'language_list', 'actor_list', 'director_list', 'page_title'));
     }
 
     // ── Save new film ──────────────────────────────────────────────────────
