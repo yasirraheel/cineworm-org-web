@@ -108,7 +108,7 @@ class UserController extends Controller
             ],
             'film_uploads' => [
                 'title' => 'Film Uploads',
-                'url' => URL('admin/movies/add_movie'),
+                'url' => URL('user/films'),
                 'icon' => 'fa fa-upload',
             ],
             'promotion_services' => [
@@ -168,7 +168,7 @@ class UserController extends Controller
             ],
             'extended_media_uploads' => [
                 'title' => 'Extended Media Uploads',
-                'url' => URL('admin/movies/add_movie'),
+                'url' => URL('user/films/upload'),
                 'icon' => 'fa fa-cloud-upload',
             ],
             'priority_promotion' => [

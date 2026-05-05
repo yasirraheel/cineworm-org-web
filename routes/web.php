@@ -456,6 +456,12 @@ Route::post('promotions/campaigns/{id}/launch', 'UserPromotionController@launchC
 Route::post('promotions/campaigns/{id}/pause', 'UserPromotionController@pauseCampaign');
 Route::post('promotions/campaigns/{id}/resume', 'UserPromotionController@resumeCampaign');
 
+// User Film Uploads
+Route::get('user/films', 'UserFilmController@index');
+Route::get('user/films/upload', 'UserFilmController@create');
+Route::post('user/films/store', 'UserFilmController@store');
+Route::delete('user/films/{id}/delete', 'UserFilmController@destroy');
+Route::post('user/films/{id}/delete', 'UserFilmController@destroy'); // fallback for non-JS
 
 
 Route::get('membership_plan', 'UserController@membership_plan');
