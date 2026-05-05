@@ -39,7 +39,6 @@
     text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 7px;
 }
 .fu-input,
-.fu-select,
 .fu-textarea {
     width: 100% !important;
     background: #1e1e24 !important;
@@ -54,31 +53,99 @@
     outline: none !important;
     box-shadow: none !important;
 }
-.fu-input:focus, .fu-select:focus, .fu-textarea:focus {
+/* Single-select — closed dropdown with custom arrow */
+select.fu-select:not([multiple]) {
+    width: 100% !important;
+    background: #1e1e24 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center !important;
+    background-color: #1e1e24 !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: 1px solid rgba(255,255,255,0.13) !important;
+    border-radius: 9px !important;
+    color: #fff !important;
+    font-size: 13.5px !important;
+    padding: 10px 40px 10px 14px !important;
+    height: 46px !important;
+    line-height: 1.4 !important;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+}
+/* Multi-select — open list */
+select.fu-select[multiple] {
+    width: 100% !important;
+    background: #1e1e24 !important;
+    background-color: #1e1e24 !important;
+    border: 1px solid rgba(255,255,255,0.13) !important;
+    border-radius: 9px !important;
+    color: #fff !important;
+    font-size: 13.5px !important;
+    padding: 8px 4px !important;
+    min-height: 150px !important;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+select.fu-select option { background: #1e1e24 !important; color: #fff !important; padding: 6px 10px !important; }
+select.fu-select option:checked, select.fu-select option:hover { background: #2a1a1e !important; }
+
+.fu-input:focus, select.fu-select:focus, .fu-textarea:focus {
     border-color: #ff0f28 !important;
     box-shadow: 0 0 0 3px rgba(255,15,40,0.16) !important;
     color: #fff !important;
-    background: #1e1e24 !important;
+    background-color: #1e1e24 !important;
 }
 .fu-input::placeholder, .fu-textarea::placeholder { color: rgba(255,255,255,0.28) !important; }
-.fu-input:-webkit-autofill, .fu-select:-webkit-autofill, .fu-textarea:-webkit-autofill {
+.fu-input:-webkit-autofill, select.fu-select:-webkit-autofill, .fu-textarea:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 1000px #1e1e24 inset !important;
     -webkit-text-fill-color: #fff !important;
 }
-.fu-select option { background: #1e1e24; color: #fff; }
+
+/* ── Radio toggle pills ──────────────────────────────────────────────────── */
+.fu-radio-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.fu-radio-group input[type=radio] { display: none; }
+.fu-radio-group label {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 18px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 9px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    background: rgba(255,255,255,0.03);
+    user-select: none;
+}
+.fu-radio-group label:before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.25);
+    background: transparent;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+}
+.fu-radio-group input[type=radio]:checked + label {
+    border-color: #ff0f28;
+    background: rgba(255,15,40,0.1);
+    color: #fff;
+}
+.fu-radio-group input[type=radio]:checked + label:before {
+    background: #ff0f28;
+    border-color: #ff0f28;
+    box-shadow: 0 0 0 2px rgba(255,15,40,0.3);
+}
 
 .fu-hint {
     font-size: 12px; color: rgba(255,255,255,0.35);
     margin: 5px 0 0; line-height: 1.5;
 }
 .fu-fg { margin-bottom: 18px; }
-
-.fu-radio-group { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 6px; }
-.fu-radio-group label {
-    display: inline-flex; align-items: center; gap: 7px;
-    color: rgba(255,255,255,0.75); font-size: 13.5px; cursor: pointer;
-}
-.fu-radio-group input[type=radio] { accent-color: #ff0f28; width: 15px; height: 15px; }
 
 .fu-info-box {
     display: flex; gap: 10px; align-items: flex-start;
@@ -203,12 +270,10 @@
                     <div class="fu-fg">
                         <label class="fu-label">Are you the owner? *</label>
                         <div class="fu-radio-group">
-                            <label>
-                                <input type="radio" name="is_owner" id="is_owner_yes" value="1"> Yes, I am the owner
-                            </label>
-                            <label>
-                                <input type="radio" name="is_owner" id="is_owner_no" value="0" checked> No, sharing someone else's work
-                            </label>
+                            <input type="radio" name="is_owner" id="is_owner_yes" value="1">
+                            <label for="is_owner_yes">Yes, I am the owner</label>
+                            <input type="radio" name="is_owner" id="is_owner_no" value="0" checked>
+                            <label for="is_owner_no">No, sharing someone else's work</label>
                         </div>
                         <p class="fu-hint">Owners receive digital awards based on likes.</p>
                     </div>
@@ -227,7 +292,7 @@
 
                     <div class="fu-fg">
                         <label class="fu-label">Genre(s) *</label>
-                        <select name="genres[]" id="movie_genre_id" class="fu-select" multiple style="min-height:140px;">
+                        <select name="genres[]" id="movie_genre_id" class="fu-select" multiple>
                             @foreach($genre_list as $g)
                                 <option value="{{ $g->id }}" @if(is_array(old('genres')) && in_array($g->id, old('genres'))) selected @endif>
                                     {{ $g->genre_name }}
@@ -296,8 +361,10 @@
                     <div class="fu-fg">
                         <label class="fu-label">Video Quality (480p / 720p / 1080p)</label>
                         <div class="fu-radio-group">
-                            <label><input type="radio" name="video_quality" value="1"> Active</label>
-                            <label><input type="radio" name="video_quality" value="0" checked> Inactive</label>
+                            <input type="radio" name="video_quality" id="vq_active" value="1">
+                            <label for="vq_active">Active</label>
+                            <input type="radio" name="video_quality" id="vq_inactive" value="0" checked>
+                            <label for="vq_inactive">Inactive</label>
                         </div>
                     </div>
 
@@ -355,8 +422,10 @@
                     <div class="fu-fg">
                         <label class="fu-label">Subtitles</label>
                         <div class="fu-radio-group">
-                            <label><input type="radio" name="subtitle_on_off" id="inlineRadio5" value="1"> Active</label>
-                            <label><input type="radio" name="subtitle_on_off" id="inlineRadio6" value="0" checked> Inactive</label>
+                            <input type="radio" name="subtitle_on_off" id="inlineRadio5" value="1">
+                            <label for="inlineRadio5">Active</label>
+                            <input type="radio" name="subtitle_on_off" id="inlineRadio6" value="0" checked>
+                            <label for="inlineRadio6">Inactive</label>
                         </div>
                     </div>
 
