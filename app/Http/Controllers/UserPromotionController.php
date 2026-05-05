@@ -315,17 +315,11 @@ class UserPromotionController extends Controller
         $page_title = $id ? 'Edit Campaign' : 'Create Campaign';
         $campaign = $id ? PromotionalCampaign::where('user_id', Auth::id())->findOrFail($id) : null;
         $lists = PromotionalContactList::withCount('contacts')->where('user_id', Auth::id())->where('status', 1)->orderBy('name')->get();
-        $servers = PromotionalSmtpServer::where('status', 1)->orderBy('is_default', 'desc')->orderBy('server_name')->get();
-        $sendingDomains = PromotionalSendingDomain::where('status', 1)->where('dkim_status', 1)->orderBy('domain')->get();
-        $trackingDomains = PromotionalTrackingDomain::where('status', 1)->orderBy('domain')->get();
 
         return view('pages.user.promotions.campaign_form', compact(
             'page_title',
             'campaign',
-            'lists',
-            'servers',
-            'sendingDomains',
-            'trackingDomains'
+            'lists'
         ));
     }
 
@@ -336,62 +330,63 @@ class UserPromotionController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
-            'contact_list_id' => 'required|integer',
-            'smtp_server_id' => 'required|integer',
-            'subject' => 'required|max:255',
-            'from_name' => 'required|max:255',
-            'from_email' => 'required|email|max:255',
+            'name'           => 'required|max:255',
+            'contact_list_id'=> 'required|integer',
+            'subject'        => 'required|max:255',
+            'from_name'      => 'required|max:255',
             'reply_to_email' => 'nullable|email|max:255',
-            'html_content' => 'required',
-            'scheduled_at' => 'nullable|date',
+            'html_content'   => 'required',
+            'scheduled_at'   => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator->messages())->withInput();
         }
 
+        // Verify the contact list belongs to this user
         $list = PromotionalContactList::where('user_id', Auth::id())->findOrFail($request->contact_list_id);
-        $server = PromotionalSmtpServer::where('status', 1)->findOrFail($request->smtp_server_id);
-        $sendingDomain = !empty($request->sending_domain_id) ? PromotionalSendingDomain::where('status', 1)->findOrFail($request->sending_domain_id) : null;
-        $trackingDomain = !empty($request->tracking_domain_id) ? PromotionalTrackingDomain::where('status', 1)->findOrFail($request->tracking_domain_id) : null;
 
-        if ($sendingDomain && !str_ends_with(strtolower($request->from_email), '@' . strtolower($sendingDomain->domain))) {
-            \Session::flash('error_flash_message', 'From email must match the selected sending domain.');
+        // Randomly pick one of the active SMTP servers (backend-only)
+        $server = PromotionalSmtpServer::where('status', 1)->inRandomOrder()->first();
+        if (!$server) {
+            \Session::flash('error_flash_message', 'No active SMTP servers are configured. Please contact the administrator.');
             return redirect()->back()->withInput();
         }
 
-        if ($sendingDomain && !empty($sendingDomain->smtp_server_id) && (int) $sendingDomain->smtp_server_id !== (int) $server->id) {
-            \Session::flash('error_flash_message', 'Selected sending domain belongs to a different SMTP server.');
-            return redirect()->back()->withInput();
-        }
+        // Derive from_email from the chosen SMTP server's sender address
+        $fromEmail = $server->sender_email ?: $server->username;
+
+        // Default reply_to to logged-in user's email if not provided
+        $replyTo = $request->filled('reply_to_email')
+            ? $request->reply_to_email
+            : Auth::user()->email;
 
         $campaign = !empty($request->id)
             ? PromotionalCampaign::where('user_id', Auth::id())->findOrFail($request->id)
             : new PromotionalCampaign();
 
-        $campaign->user_id = Auth::id();
-        $campaign->smtp_server_id = $server->id;
-        $campaign->sending_domain_id = $sendingDomain ? $sendingDomain->id : null;
-        $campaign->tracking_domain_id = $trackingDomain ? $trackingDomain->id : null;
-        $campaign->contact_list_id = $list->id;
-        $campaign->name = trim($request->name);
-        $campaign->subject = trim($request->subject);
-        $campaign->preview_text = $request->preview_text;
-        $campaign->from_name = trim($request->from_name);
-        $campaign->from_email = strtolower(trim($request->from_email));
-        $campaign->reply_to_email = $request->reply_to_email;
-        $campaign->html_content = $request->html_content;
-        $campaign->plain_text = trim(strip_tags($request->html_content));
-        $campaign->scheduled_at = $request->scheduled_at ? date('Y-m-d H:i:s', strtotime($request->scheduled_at)) : null;
-        $campaign->status = PromotionalCampaign::STATUS_DRAFT;
-        $campaign->started_at = null;
-        $campaign->completed_at = null;
-        $campaign->total_contacts = 0;
+        $campaign->user_id          = Auth::id();
+        $campaign->smtp_server_id   = $server->id;
+        $campaign->sending_domain_id  = null;
+        $campaign->tracking_domain_id = null;
+        $campaign->contact_list_id  = $list->id;
+        $campaign->name             = trim($request->name);
+        $campaign->subject          = trim($request->subject);
+        $campaign->preview_text     = $request->preview_text;
+        $campaign->from_name        = trim($request->from_name);
+        $campaign->from_email       = strtolower(trim($fromEmail));
+        $campaign->reply_to_email   = $replyTo;
+        $campaign->html_content     = $request->html_content;
+        $campaign->plain_text       = trim(strip_tags($request->html_content));
+        $campaign->scheduled_at     = $request->scheduled_at ? date('Y-m-d H:i:s', strtotime($request->scheduled_at)) : null;
+        $campaign->status           = PromotionalCampaign::STATUS_DRAFT;
+        $campaign->started_at       = null;
+        $campaign->completed_at     = null;
+        $campaign->total_contacts   = 0;
         $campaign->processed_contacts = 0;
-        $campaign->success_count = 0;
-        $campaign->failed_count = 0;
-        $campaign->last_error = null;
+        $campaign->success_count    = 0;
+        $campaign->failed_count     = 0;
+        $campaign->last_error       = null;
         $campaign->save();
 
         PromotionalCampaignSend::where('campaign_id', $campaign->id)->delete();

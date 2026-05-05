@@ -32,12 +32,12 @@
             @csrf
             <input type="hidden" name="id" value="{{ $campaign->id ?? null }}">
 
-            {{-- ── Section 1: Basics ── --}}
+            {{-- ── Section 1: Campaign Basics ── --}}
             <div class="promo-panel">
                 <div class="promo-panel-header">
                     <div>
                         <h3><i class="fa fa-tag" style="color:#ff0f28;margin-right:8px;"></i>Campaign Details</h3>
-                        <p class="promo-subtitle">Give your campaign a name, subject line, and link it to an email list.</p>
+                        <p class="promo-subtitle">Give your campaign a name, subject line, and choose which list to send to.</p>
                     </div>
                 </div>
 
@@ -61,7 +61,9 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="promo-input-hint">No list? <a href="{{ URL::to('promotions/lists') }}" style="color:#ff0f28;">Create one first →</a></p>
+                            @if($lists->isEmpty())
+                                <p class="promo-input-hint">No lists yet. <a href="{{ URL::to('promotions/lists') }}" style="color:#ff0f28;">Create one first →</a></p>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -72,7 +74,7 @@
                             <label class="promo-label">Email Subject <span style="color:#ff0f28;">*</span></label>
                             <input type="text" name="subject" class="promo-input form-control"
                                    value="{{ old('subject', $campaign->subject ?? '') }}"
-                                   placeholder="e.g. 🎬 Exclusive offer for {{  '[[name]]'  }}" required>
+                                   placeholder="e.g. 🎬 Exclusive offer for {{ '[[name]]' }}" required>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -93,12 +95,14 @@
                 </div>
             </div>
 
-            {{-- ── Section 2: Sender & Server ── --}}
+            {{-- ── Section 2: Sender Identity ── --}}
             <div class="promo-panel">
                 <div class="promo-panel-header">
                     <div>
-                        <h3><i class="fa fa-server" style="color:#ff0f28;margin-right:8px;"></i>Sender & Server Settings</h3>
-                        <p class="promo-subtitle">Configure who the email appears to come from and which server sends it.</p>
+                        <h3><i class="fa fa-user-circle" style="color:#ff0f28;margin-right:8px;"></i>Sender Identity</h3>
+                        <p class="promo-subtitle">
+                            Set the display name recipients will see. The sending email address is handled automatically by the system.
+                        </p>
                     </div>
                 </div>
 
@@ -107,68 +111,26 @@
                         <div class="promo-form-group">
                             <label class="promo-label">From Name <span style="color:#ff0f28;">*</span></label>
                             <input type="text" name="from_name" class="promo-input form-control"
-                                   value="{{ old('from_name', $campaign->from_name ?? Auth::user()->name) }}" required>
+                                   value="{{ old('from_name', $campaign->from_name ?? Auth::user()->name) }}"
+                                   placeholder="Your name or brand name" required>
+                            <p class="promo-input-hint">This is the name recipients see in their inbox.</p>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="promo-form-group">
-                            <label class="promo-label">From Email <span style="color:#ff0f28;">*</span></label>
-                            <input type="email" name="from_email" class="promo-input form-control"
-                                   value="{{ old('from_email', $campaign->from_email ?? Auth::user()->email) }}" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-6">
                         <div class="promo-form-group">
                             <label class="promo-label">Reply-To Email</label>
                             <input type="email" name="reply_to_email" class="promo-input form-control"
-                                   value="{{ old('reply_to_email', $campaign->reply_to_email ?? Auth::user()->email) }}">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="promo-form-group">
-                            <label class="promo-label">SMTP Server <span style="color:#ff0f28;">*</span></label>
-                            <select name="smtp_server_id" class="promo-select form-control" required>
-                                <option value="">— Select SMTP Server —</option>
-                                @foreach($servers as $server)
-                                    <option value="{{ $server->id }}" @if(old('smtp_server_id', $campaign->smtp_server_id ?? '') == $server->id) selected @endif>
-                                        {{ $server->server_name }}@if($server->is_default) (Default)@endif
-                                    </option>
-                                @endforeach
-                            </select>
+                                   value="{{ old('reply_to_email', $campaign->reply_to_email ?? Auth::user()->email) }}"
+                                   placeholder="{{ Auth::user()->email }}">
+                            <p class="promo-input-hint">Replies will go here. Defaults to your account email.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="promo-form-group">
-                            <label class="promo-label">Sending Domain <span style="color:rgba(255,255,255,0.3);font-weight:500;">(optional)</span></label>
-                            <select name="sending_domain_id" class="promo-select form-control">
-                                <option value="">— Select Verified Sending Domain —</option>
-                                @foreach($sendingDomains as $domain)
-                                    <option value="{{ $domain->id }}" @if(old('sending_domain_id', $campaign->sending_domain_id ?? '') == $domain->id) selected @endif>
-                                        {{ $domain->domain }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="promo-form-group">
-                            <label class="promo-label">Tracking Domain <span style="color:rgba(255,255,255,0.3);font-weight:500;">(optional)</span></label>
-                            <select name="tracking_domain_id" class="promo-select form-control">
-                                <option value="">— No Tracking Domain —</option>
-                                @foreach($trackingDomains as $domain)
-                                    <option value="{{ $domain->id }}" @if(old('tracking_domain_id', $campaign->tracking_domain_id ?? '') == $domain->id) selected @endif>
-                                        {{ $domain->domain }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
+                {{-- Info note about auto-assigned SMTP --}}
+                <div class="promo-alert promo-alert-info" style="margin-top:0;">
+                    <i class="fa fa-info-circle" style="flex-shrink:0;margin-top:1px;"></i>
+                    <span>The sending email address and mail server are automatically assigned by the system to ensure best deliverability.</span>
                 </div>
             </div>
 
@@ -177,7 +139,10 @@
                 <div class="promo-panel-header">
                     <div>
                         <h3><i class="fa fa-pencil-square-o" style="color:#ff0f28;margin-right:8px;"></i>Email Body</h3>
-                        <p class="promo-subtitle">Compose your email using the rich text editor. Use <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;font-size:12px;">[[name]]</code> to personalize with contact names.</p>
+                        <p class="promo-subtitle">
+                            Compose your email below. Use <code style="background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:4px;font-size:12px;">[[name]]</code>
+                            to personalise with each contact's name.
+                        </p>
                     </div>
                 </div>
                 <div class="promo-form-group" style="margin-bottom:0;">
@@ -186,7 +151,7 @@
             </div>
 
             {{-- ── Actions ── --}}
-            <div style="display:flex;justify-content:flex-end;gap:12px;margin-bottom:40px;">
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-bottom:40px;flex-wrap:wrap;">
                 <a href="{{ URL::to('promotions/campaigns') }}" class="promo-btn promo-btn-ghost">
                     <i class="fa fa-times"></i> Cancel
                 </a>
