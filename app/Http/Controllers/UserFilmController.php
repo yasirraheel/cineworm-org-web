@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Genres;
+use App\Language;
 use App\Movies;
-use App\SubscriptionPlan;
 use App\ActorDirector;
+use App\SubscriptionPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -62,9 +63,12 @@ class UserFilmController extends Controller
             return $redirect;
         }
 
-        $genre_list = Genres::orderBy('genre_name')->get();
+        $genre_list    = Genres::orderBy('genre_name')->get();
+        $language_list = Language::orderBy('language_name')->get();
+        $actor_list    = ActorDirector::where('ad_type', 'actor')->orderBy('ad_name')->get();
+        $director_list = ActorDirector::where('ad_type', 'director')->orderBy('ad_name')->get();
 
-        return view('pages.user.films.create', compact('genre_list'));
+        return view('pages.user.films.create', compact('genre_list', 'language_list', 'actor_list', 'director_list'));
     }
 
     // ── Save new film ──────────────────────────────────────────────────────
@@ -75,32 +79,57 @@ class UserFilmController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'video_title'       => 'required|max:255',
-            'genres'            => 'required|array|min:1',
-            'video_url'         => 'required|url',
-            'video_description' => 'nullable|string',
-            'poster_link'       => 'nullable|url',
+            'video_title' => 'required|max:255',
+            'genres'      => 'required|array|min:1',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator->messages())->withInput();
         }
 
-        $videoUrl   = trim($request->video_url);
-        $video_type = 'URL';
-        $video_image = '';
+        // ── Resolve actors ────────────────────────────────────────────────
+        $actorIds    = [];
+        $directorIds = [];
 
-        // Auto-detect YouTube
-        if (stripos($videoUrl, 'youtube.com') !== false || stripos($videoUrl, 'youtu.be') !== false) {
-            $video_type = 'YouTube';
-            parse_str(parse_url($videoUrl, PHP_URL_QUERY), $query);
-            if (!empty($query['v'])) {
-                $video_image = 'https://img.youtube.com/vi/' . $query['v'] . '/hqdefault.jpg';
+        if (!empty($request->actors)) {
+            foreach (explode(',', $request->actors) as $name) {
+                $id = $this->resolveActorDirector('actor', trim($name));
+                if ($id) $actorIds[] = $id;
             }
-        } elseif (stripos($videoUrl, 'vimeo.com') !== false) {
+        }
+        if (!empty($request->director)) {
+            foreach (explode(',', $request->director) as $name) {
+                $id = $this->resolveActorDirector('director', trim($name));
+                if ($id) $directorIds[] = $id;
+            }
+        }
+
+        // ── Resolve video URL by type ─────────────────────────────────────
+        $video_type = $request->video_type;
+        if ($video_type === 'Local')  $video_url = $request->video_url_local;
+        elseif ($video_type === 'URL')   $video_url = $request->video_url;
+        elseif ($video_type === 'HLS')   $video_url = $request->video_url_hls;
+        elseif ($video_type === 'DASH')  $video_url = $request->video_url_dash;
+        elseif ($video_type === 'Embed') $video_url = $request->video_embed_code;
+        else                             $video_url = $request->video_url;
+
+        $video_url   = trim((string) $video_url);
+        $video_image = '';
+        $fileId      = null;
+
+        // Auto-detect YouTube / Vimeo
+        if (stripos($video_url, 'youtube.com') !== false || stripos($video_url, 'youtu.be') !== false) {
+            $video_type = 'YouTube';
+            parse_str(parse_url($video_url, PHP_URL_QUERY), $q);
+            if (!empty($q['v'])) {
+                $video_image = 'https://img.youtube.com/vi/' . $q['v'] . '/hqdefault.jpg';
+            }
+        } elseif (stripos($video_url, 'vimeo.com') !== false) {
             $video_type = 'Vimeo';
-        } elseif (stripos($videoUrl, 'drive.google.com') !== false) {
+        } elseif (stripos($video_url, 'drive.google.com') !== false) {
             $video_type = 'GoogleDrive';
+            preg_match('/\/d\/(.*?)\//', $video_url, $m);
+            if (!empty($m[1])) $fileId = $m[1];
         }
 
         $movie = new Movies();
@@ -109,15 +138,29 @@ class UserFilmController extends Controller
         $movie->video_slug        = Str::slug($request->video_title, '-');
         $movie->video_description = addslashes(trim($request->video_description ?? ''));
         $movie->movie_genre_id    = implode(',', $request->genres);
-        $movie->movie_lang_id     = 0;
-        $movie->video_url         = $videoUrl;
+        $movie->movie_lang_id     = $request->movie_language ?? 0;
+        $movie->video_url         = $video_url;
         $movie->video_type        = $video_type;
-        $movie->is_owner          = 1;
-        $movie->status            = 0; // Pending admin approval
+        $movie->video_quality     = $request->video_quality ?? 0;
+        $movie->is_owner          = $request->is_owner ?? 0;
+        $movie->upcoming          = $request->upcoming ?? 0;
         $movie->funding_url       = $request->funding_url ?? '';
         $movie->webpage_url       = $request->webpage_url ?? '';
+        $movie->imdb_rating       = $request->imdb_rating ?? '';
+        $movie->content_rating    = $request->content_rating ?? '';
+        $movie->file_id           = $fileId;
+        $movie->status            = 0; // Pending admin approval
 
-        // Poster image
+        // Multi-quality URLs
+        $movie->video_url_480  = $request->video_url_480  ?? '';
+        $movie->video_url_720  = $request->video_url_720  ?? '';
+        $movie->video_url_1080 = $request->video_url_1080 ?? '';
+
+        // Actors / Directors
+        $movie->actor_id    = !empty($actorIds)    ? implode(',', $actorIds)    : null;
+        $movie->director_id = !empty($directorIds) ? implode(',', $directorIds) : null;
+
+        // Poster
         if ($request->filled('poster_link')) {
             $movie->video_image       = $request->poster_link;
             $movie->video_image_thumb = $request->poster_link;
@@ -126,11 +169,38 @@ class UserFilmController extends Controller
             $movie->video_image_thumb = $video_image;
         }
 
+        // Subtitles
+        $movie->subtitle_on_off    = $request->subtitle_on_off    ?? 0;
+        $movie->subtitle_language1 = $request->subtitle_language1 ?? '';
+        $movie->subtitle_url1      = $request->subtitle_url1      ?? '';
+        $movie->subtitle_language2 = $request->subtitle_language2 ?? '';
+        $movie->subtitle_url2      = $request->subtitle_url2      ?? '';
+        $movie->subtitle_language3 = $request->subtitle_language3 ?? '';
+        $movie->subtitle_url3      = $request->subtitle_url3      ?? '';
+
+        if (!empty($movie->subtitle_url1) || !empty($movie->subtitle_url2) || !empty($movie->subtitle_url3)) {
+            $movie->subtitle_on_off = 1;
+        }
+
         $movie->save();
 
         \Session::flash('flash_message', 'Your film has been submitted for review. It will go live once approved by our team.');
-
         return redirect('user/films');
+    }
+
+    // ── Helper: find or create actor/director ─────────────────────────────
+    private function resolveActorDirector(string $type, string $name): ?int
+    {
+        if (!$name) return null;
+        $slug = Str::slug($name, '-');
+        $existing = ActorDirector::where('ad_type', $type)->where('ad_slug', $slug)->first();
+        if ($existing) return $existing->id;
+        $ad = new ActorDirector();
+        $ad->ad_type = $type;
+        $ad->ad_name = addslashes($name);
+        $ad->ad_slug = $slug;
+        $ad->save();
+        return $ad->id;
     }
 
     // ── Delete own film ────────────────────────────────────────────────────
