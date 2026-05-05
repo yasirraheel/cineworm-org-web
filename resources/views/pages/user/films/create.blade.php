@@ -39,71 +39,71 @@
     text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 7px;
 }
 .fu-input,
+.fu-select,
 .fu-textarea {
     width: 100% !important;
     background: #1e1e24 !important;
     background-color: #1e1e24 !important;
     border: 1px solid rgba(255,255,255,0.13) !important;
-    border-radius: 9px !important;
-    color: #fff !important;
-    font-size: 13.5px !important;
-    padding: 10px 14px !important;
+    border-radius: 10px !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+    padding: 12px 16px !important;
     transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
     box-sizing: border-box !important;
     outline: none !important;
     box-shadow: none !important;
 }
-/* Single-select — closed dropdown with custom arrow */
-select.fu-select:not([multiple]) {
-    width: 100% !important;
-    background: #1e1e24 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center !important;
+
+.fu-input:focus, .fu-input:active,
+.fu-select:focus, .fu-select:active,
+.fu-textarea:focus, .fu-textarea:active {
+    border-color: #ff0f28 !important;
+    background: #1e1e24 !important;
     background-color: #1e1e24 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(255,15,40,0.18) !important;
+    outline: none !important;
+}
+
+.fu-input:-webkit-autofill,
+.fu-input:-webkit-autofill:hover,
+.fu-input:-webkit-autofill:focus,
+.fu-select:-webkit-autofill,
+.fu-textarea:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #1e1e24 inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+    border-color: rgba(255,255,255,0.13) !important;
+}
+
+.fu-input::placeholder, .fu-textarea::placeholder { color: rgba(255,255,255,0.3) !important; }
+
+/* ── Select: closed dropdown with arrow (exactly like promo-select) ─────── */
+.fu-select {
+    height: 46px !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
-    border: 1px solid rgba(255,255,255,0.13) !important;
-    border-radius: 9px !important;
-    color: #fff !important;
-    font-size: 13.5px !important;
-    padding: 10px 40px 10px 14px !important;
-    height: 46px !important;
-    line-height: 1.4 !important;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
-    box-sizing: border-box !important;
-    outline: none !important;
-    box-shadow: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.5)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 16px center !important;
+    background-color: #1e1e24 !important;
+    padding-right: 42px !important;
     cursor: pointer !important;
 }
-/* Multi-select — open list */
-select.fu-select[multiple] {
-    width: 100% !important;
-    background: #1e1e24 !important;
-    background-color: #1e1e24 !important;
-    border: 1px solid rgba(255,255,255,0.13) !important;
-    border-radius: 9px !important;
-    color: #fff !important;
-    font-size: 13.5px !important;
-    padding: 8px 4px !important;
-    min-height: 150px !important;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
-    box-sizing: border-box !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
-select.fu-select option { background: #1e1e24 !important; color: #fff !important; padding: 6px 10px !important; }
-select.fu-select option:checked, select.fu-select option:hover { background: #2a1a1e !important; }
 
-.fu-input:focus, select.fu-select:focus, .fu-textarea:focus {
-    border-color: #ff0f28 !important;
-    box-shadow: 0 0 0 3px rgba(255,15,40,0.16) !important;
-    color: #fff !important;
-    background-color: #1e1e24 !important;
+.fu-select option { background: #1a1a1e; color: #fff; }
+
+/* ── Multi-select overrides back to auto height, no arrow ───────────────── */
+select.fu-select[multiple] {
+    height: auto !important;
+    min-height: 160px !important;
+    background-image: none !important;
+    padding-right: 16px !important;
 }
-.fu-input::placeholder, .fu-textarea::placeholder { color: rgba(255,255,255,0.28) !important; }
-.fu-input:-webkit-autofill, select.fu-select:-webkit-autofill, .fu-textarea:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 1000px #1e1e24 inset !important;
-    -webkit-text-fill-color: #fff !important;
-}
+
+.fu-textarea { min-height: 110px; resize: vertical; }
 
 /* ── Radio toggle pills ──────────────────────────────────────────────────── */
 .fu-radio-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
