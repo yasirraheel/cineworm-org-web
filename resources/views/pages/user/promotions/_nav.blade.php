@@ -274,42 +274,83 @@
     .promo-input,
     .promo-select,
     .promo-textarea {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        color: #fff;
-        font-size: 14px;
-        padding: 12px 16px;
-        transition: border-color 0.18s ease, background 0.18s ease;
-        box-sizing: border-box;
-        outline: none;
+        width: 100% !important;
+        background: #1e1e24 !important;
+        background-color: #1e1e24 !important;
+        border: 1px solid rgba(255, 255, 255, 0.13) !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
+        font-size: 14px !important;
+        padding: 12px 16px !important;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
+        box-sizing: border-box !important;
+        outline: none !important;
+        box-shadow: none !important;
     }
 
     .promo-input:focus,
+    .promo-input:active,
     .promo-select:focus,
-    .promo-textarea:focus {
-        border-color: #ff0f28;
-        background: rgba(255, 15, 40, 0.06);
-        box-shadow: none;
+    .promo-select:active,
+    .promo-textarea:focus,
+    .promo-textarea:active {
+        border-color: #ff0f28 !important;
+        background: #1e1e24 !important;
+        background-color: #1e1e24 !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 0 3px rgba(255, 15, 40, 0.18) !important;
+        outline: none !important;
+    }
+
+    /* Override Bootstrap .form-control focus */
+    .promo-input.form-control,
+    .promo-select.form-control,
+    .promo-textarea.form-control {
+        background: #1e1e24 !important;
+        background-color: #1e1e24 !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.13) !important;
+        box-shadow: none !important;
+    }
+
+    .promo-input.form-control:focus,
+    .promo-select.form-control:focus,
+    .promo-textarea.form-control:focus {
+        background: #1e1e24 !important;
+        background-color: #1e1e24 !important;
+        color: #ffffff !important;
+        border-color: #ff0f28 !important;
+        box-shadow: 0 0 0 3px rgba(255, 15, 40, 0.18) !important;
+    }
+
+    /* Browser autofill override */
+    .promo-input:-webkit-autofill,
+    .promo-input:-webkit-autofill:hover,
+    .promo-input:-webkit-autofill:focus,
+    .promo-select:-webkit-autofill,
+    .promo-textarea:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 1000px #1e1e24 inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.13) !important;
     }
 
     .promo-input::placeholder,
     .promo-textarea::placeholder {
-        color: rgba(255, 255, 255, 0.25);
+        color: rgba(255, 255, 255, 0.3) !important;
     }
 
     .promo-select {
-        height: 46px;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 16px center;
-        padding-right: 42px;
-        cursor: pointer;
-        background-color: rgba(255, 255, 255, 0.04);
+        height: 46px !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.5)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 16px center !important;
+        background-color: #1e1e24 !important;
+        padding-right: 42px !important;
+        cursor: pointer !important;
     }
 
     .promo-select option {
