@@ -260,7 +260,7 @@ select.fu-select[multiple] {
 
                     <div class="fu-fg">
                         <label class="fu-label">Upcoming?</label>
-                        <select name="upcoming" id="upcoming" class="fu-select">
+                        <select name="upcoming" id="upcoming" class="fu-select form-control">
                             <option value="0">No — release now</option>
                             <option value="1">Yes — upcoming film</option>
                         </select>
@@ -280,7 +280,7 @@ select.fu-select[multiple] {
 
                     <div class="fu-fg">
                         <label class="fu-label">Language *</label>
-                        <select name="movie_language" id="movie_language" class="fu-select">
+                        <select name="movie_language" id="movie_language" class="fu-select form-control">
                             <option value="">— Select Language —</option>
                             @foreach($language_list as $lang)
                                 <option value="{{ $lang->id }}" @if(old('movie_language') == $lang->id) selected @endif>
@@ -350,7 +350,7 @@ select.fu-select[multiple] {
 
                     <div class="fu-fg">
                         <label class="fu-label">Video Upload Type</label>
-                        <select name="video_type" id="video_type" class="fu-select">
+                        <select name="video_type" id="video_type" class="fu-select form-control">
                             <option value="" disabled selected>Select video type</option>
                             <option value="URL"   @if(old('video_type')=='URL')   selected @endif>URL (Direct MP4)</option>
                             <option value="HLS"   @if(old('video_type')=='HLS')   selected @endif>HLS / m3u8 / MPEG-DASH / YouTube / Vimeo</option>
