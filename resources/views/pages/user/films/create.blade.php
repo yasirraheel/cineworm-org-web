@@ -39,15 +39,45 @@
                             </div>
                         @endif
 
+                        <div id="result" class="m-t-15"></div>
+
                         <form method="POST" action="{{ URL::to('user/films/store') }}"
                               class="form-horizontal" name="movie_form" id="movie_form">
                             @csrf
+
+                            <input type="hidden" id="from" name="from" value="movie">
+                            <input type="hidden" name="imdb_id" id="imdb_id" value="{{ old('imdb_id') }}">
+                            <input type="hidden" name="imdb_votes" id="imdb_votes" value="{{ old('imdb_votes') }}">
+                            <input type="hidden" name="imdb_rating" id="imdb_rating" value="{{ old('imdb_rating') }}">
+                            <input type="hidden" name="content_rating" id="content_rating" value="{{ old('content_rating') }}">
+                            <input type="hidden" name="release_date" id="release_date" value="{{ old('release_date') }}">
+                            <input type="hidden" name="duration" id="duration" value="{{ old('duration') }}">
 
                             <div class="row">
 
                                 {{-- ── LEFT: Film Info ── --}}
                                 <div class="col-md-6">
                                     <h4 class="m-t-0 m-b-30 header-title" style="font-size:20px;">Film Information</h4>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Import From IMDb</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" name="imdb_id_title" id="imdb_id_title" value=""
+                                                   class="form-control"
+                                                   placeholder="Enter IMDb ID (e.g. tt1469304)"
+                                                   @if (!getcong('omdb_api_key')) disabled @endif>
+                                            <small class="form-text text-muted">Use an IMDb ID to auto-fill film details.</small>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" id="import_movie_btn"
+                                                    class="btn btn-primary waves-effect waves-light text-uppercase mt-1 pt-2 pb-2 pl-3 pr-3"
+                                                    @if (!getcong('omdb_api_key')) disabled @endif>
+                                                {{ trans('words.fetch') }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <hr />
 
                                     <div class="form-group row">
                                         <label class="col-sm-3 col-form-label">Film Title *</label>
@@ -424,6 +454,60 @@
     $(document).ready(function(){
         $('#upcoming').on('change', function(){
             $('#hide_when_upcoming').toggle($(this).val() != '1');
+        });
+
+        $(document).on('click', '#import_movie_btn', function() {
+            var from = $("#from").val();
+            var id = $("#imdb_id_title").val();
+
+            if (from !== '' && id !== '') {
+                $('.card-box').addClass('payment_loading');
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{{ URL::to("user/films/find_imdb_movie") }}',
+                    data: "id=" + encodeURIComponent(id) + "&from=" + encodeURIComponent(from),
+                    dataType: 'json',
+                    beforeSend: function() {
+                        $("#import_movie_btn").html('Fetching...');
+                    },
+                    success: function(response) {
+                        $('.card-box').removeClass('payment_loading');
+
+                        if (response.imdb_status === 'success') {
+                            $("#imdb_id").val(response.imdbid || '');
+                            $("#imdb_rating").val(response.imdb_rating || '');
+                            $("#imdb_votes").val(response.imdb_votes || '');
+                            $("#content_rating").val(response.content_rating || '');
+                            $("#release_date").val(response.released || '');
+                            $("#duration").val(response.runtime || '');
+                            $("#movie_language").val(response.language || '').trigger('change');
+                            $("#movie_genre_id").val(response.genre || []).trigger('change');
+                            $("#video_title").val(response.title || '');
+                            $("#actors").val((response.actor_name_list || []).join(', '));
+                            $("#director").val((response.director_name_list || []).join(', '));
+                            $("#poster_link").val(response.poster || response.thumbnail || '');
+
+                            if (typeof tinyMCE !== 'undefined' && tinyMCE.activeEditor) {
+                                tinyMCE.activeEditor.setContent(response.plot || '');
+                            }
+
+                            $('#result').html('<div class="alert alert-success alert-dismissable m-t-15"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>Data imported successfully.</div>');
+                        } else {
+                            $('#result').html('<div class="alert alert-danger alert-dismissable m-t-15"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>No data found in IMDb database.</div>');
+                        }
+
+                        $('#import_movie_btn').html('{{ trans('words.fetch') }}');
+                    },
+                    error: function() {
+                        $('.card-box').removeClass('payment_loading');
+                        $('#import_movie_btn').html('{{ trans('words.fetch') }}');
+                        $('#result').html('<div class="alert alert-danger alert-dismissable m-t-15"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>Unable to fetch IMDb data right now.</div>');
+                    }
+                });
+            } else {
+                Swal.fire('Error', 'Please input IMDb ID', 'error');
+            }
         });
     });
 </script>

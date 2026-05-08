@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Admin\ImportImdbController;
 use App\Genres;
 use App\Language;
 use App\Movies;
@@ -73,6 +74,15 @@ class UserFilmController extends Controller
         $page_title = 'Upload Film';
 
         return view('pages.user.films.create', compact('genre_list', 'language_list', 'actor_list', 'director_list', 'page_title'));
+    }
+
+    public function findImdbMovie(Request $request)
+    {
+        if ($redirect = $this->ensureFilmUploadAccess()) {
+            return $redirect;
+        }
+
+        return app(ImportImdbController::class)->find_imdb_movie();
     }
 
     // ── Save new film ──────────────────────────────────────────────────────
@@ -150,8 +160,12 @@ class UserFilmController extends Controller
         $movie->upcoming          = $request->upcoming ?? 0;
         $movie->funding_url       = $request->funding_url ?? '';
         $movie->webpage_url       = $request->webpage_url ?? '';
+        $movie->imdb_id           = $request->imdb_id ?? '';
         $movie->imdb_rating       = $request->imdb_rating ?? '';
+        $movie->imdb_votes        = $request->imdb_votes ?? '';
         $movie->content_rating    = $request->content_rating ?? '';
+        $movie->duration          = $request->duration ?? '';
+        $movie->release_date      = $request->filled('release_date') ? strtotime($request->release_date) : null;
         $movie->file_id           = $fileId;
         $movie->status            = 0; // Pending admin approval
 

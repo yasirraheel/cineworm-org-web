@@ -170,6 +170,11 @@ class ImportImdbController extends MainAdminController
             }
 
             $response['actors']=$actors_names;
+            $response['actor_name_list'] = isset($actors_names)
+                ? array_values(array_filter(array_map(function ($optionHtml) {
+                    return trim(strip_tags($optionHtml));
+                }, $actors_names)))
+                : [];
 
             $crew_length = count($result->credits->crew);
  
@@ -260,6 +265,11 @@ class ImportImdbController extends MainAdminController
             }
              
             $response['director']=$director_names;
+            $response['director_name_list'] = isset($director_names)
+                ? array_values(array_filter(array_map(function ($optionHtml) {
+                    return trim(strip_tags($optionHtml));
+                }, $director_names)))
+                : [];
  
             $response['plot']  = $result->overview;
  
@@ -297,8 +307,7 @@ class ImportImdbController extends MainAdminController
         //echo $obj->Title;
          //echo $_GET['id'];
 
-         echo json_encode($response);
-         exit;
+         return response()->json($response);
     }
  
 }

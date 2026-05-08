@@ -32,15 +32,6 @@
                                         <span>{{ trans('words.subscription_plan') }}</span>
                                     </a>
                                 </div>
-                                @if (getcong('donation_link'))
-                                    <div class="signup-btn-item" style="float:right;">
-                                        <a href="{{ stripslashes(getcong('donation_link')) }}" title="Donate"
-                                            target="_blank" rel="noopener noreferrer">
-                                            <i class="fa fa-heart" aria-hidden="true"></i>
-                                            <span>Donate</span>
-                                        </a>
-                                    </div>
-                                @endif
                             </div>
                         </div>
                     </div>

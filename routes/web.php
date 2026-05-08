@@ -459,6 +459,7 @@ Route::post('promotions/campaigns/{id}/resume', 'UserPromotionController@resumeC
 // User Film Uploads
 Route::get('user/films', 'UserFilmController@index');
 Route::get('user/films/upload', 'UserFilmController@create');
+Route::get('user/films/find_imdb_movie', 'UserFilmController@findImdbMovie');
 Route::post('user/films/store', 'UserFilmController@store');
 Route::delete('user/films/{id}/delete', 'UserFilmController@destroy');
 Route::post('user/films/{id}/delete', 'UserFilmController@destroy'); // fallback for non-JS
