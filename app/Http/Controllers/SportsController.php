@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\RssFeed;
+use App\Services\RssFeedService;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 
@@ -247,47 +248,7 @@ class SportsController extends Controller
         // Fetch RSS News from database
         $rss_news = [];
         try {
-            // Fetch active RSS feeds from database
-            $rss_feeds = RssFeed::where('status', 1)->get();
-
-            // Set context options with User-Agent header (required by some RSS feeds)
-            $options = [
-                'http' => [
-                    'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n"
-                ]
-            ];
-            $context = stream_context_create($options);
-
-            foreach ($rss_feeds as $feed) {
-                $rss_content = @file_get_contents($feed->url, false, $context);
-                if ($rss_content) {
-                    $rss = simplexml_load_string($rss_content);
-                    if ($rss) {
-                        $count = 0;
-                        foreach ($rss->channel->item as $item) {
-                            if(count($rss_news) >= 20) break; // Limit total items to 20
-
-                            $image = '';
-                            if (isset($item->enclosure) && isset($item->enclosure['url'])) {
-                                $image = (string)$item->enclosure['url'];
-                            }
-
-                            $rss_news[] = [
-                                'headline' => (string)$item->title,
-                                'details' => (string)$item->description,
-                                'created_at' => (string)$item->pubDate,
-                                'link' => (string)$item->link,
-                                'image' => $image,
-                                'feed_name' => $feed->name
-                            ];
-                            $count++;
-                        }
-                    }
-                }
-
-                // Break if we've reached the limit
-                if(count($rss_news) >= 20) break;
-            }
+            $rss_news = app(RssFeedService::class)->fetchItems(20, 10);
         } catch (\Exception $e) {
             \Log::error("RSS Fetch Error: " . $e->getMessage());
         }

@@ -8,6 +8,7 @@ use App\Services\PromotionalCampaignService;
 use App\Services\CronMonitorService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -61,9 +62,17 @@ class TaskCron extends Command
                 ->get();
 
             foreach ($users as $user_data) {
+                $expiryMailKey = 'task_cron_expiry_email_sent:' . ($user_data->id ?? 'unknown') . ':' . date('Y-m-d');
+
+                if (Cache::has($expiryMailKey)) {
+                    continue;
+                }
+
                 try {
                     Mail::to($user_data->email)->send(new SendEmail($user_data));
+                    Cache::put($expiryMailKey, true, now()->endOfDay());
                 } catch (\Throwable $exception) {
+                    Cache::put($expiryMailKey, true, now()->endOfDay());
                     $expiryEmailFailures++;
                     \Log::warning('Task cron expiry email failed: '.$exception->getMessage(), [
                         'user_id' => $user_data->id ?? null,

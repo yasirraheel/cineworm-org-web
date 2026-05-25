@@ -28,6 +28,7 @@ use Intervention\Image\Facades\Image;
 
 use App\Models\NewsTicker;
 use App\Models\RssFeed;
+use App\Services\RssFeedService;
 use ProtoneMedia\LaravelFFMpeg;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider;
@@ -188,56 +189,7 @@ class IndexController extends Controller
         try {
             // Cache RSS feed results for 30 minutes to improve performance and avoid blocking
             $rss_news = Cache::remember('home_rss_news', 30 * 60, function () {
-                $rss_items = [];
-
-                // Fetch active RSS feeds from database
-                $rss_feeds = RssFeed::where('status', 1)->get();
-
-                // Set context options with User-Agent header (required by some RSS feeds)
-                $options = [
-                    'http' => [
-                        'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n"
-                    ]
-                ];
-                $context = stream_context_create($options);
-
-                foreach ($rss_feeds as $feed) {
-                    $rss_content = @file_get_contents($feed->url, false, $context);
-                    if ($rss_content) {
-                        $rss = simplexml_load_string($rss_content);
-                        if ($rss) {
-                            $feed_count = 0;
-                            foreach ($rss->channel->item as $item) {
-                                if ($feed_count >= 10) break; // Limit items per feed to allow mixing
-
-                                $image = '';
-                                // Try to find image
-                                if (isset($item->enclosure) && isset($item->enclosure['url'])) {
-                                    $image = (string)$item->enclosure['url'];
-                                }
-
-                                $rss_items[] = [
-                                    'headline' => (string)$item->title,
-                                    'details' => (string)$item->description,
-                                    'created_at' => (string)$item->pubDate,
-                                    'timestamp' => strtotime((string)$item->pubDate),
-                                    'link' => (string)$item->link,
-                                    'image' => $image,
-                                    'feed_name' => $feed->name
-                                ];
-                                $feed_count++;
-                            }
-                        }
-                    }
-                }
-
-                // Sort by timestamp descending
-                usort($rss_items, function ($a, $b) {
-                    return $b['timestamp'] - $a['timestamp'];
-                });
-
-                // Limit to top 20
-                return array_slice($rss_items, 0, 20);
+                return app(RssFeedService::class)->fetchItems(20, 10);
             });
 
         } catch (\Exception $e) {
