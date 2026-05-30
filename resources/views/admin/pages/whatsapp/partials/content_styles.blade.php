@@ -82,6 +82,35 @@
         border-radius: 4px;
     }
 
+    .whatsapp-connected-box {
+        min-height: 315px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border: 1px solid rgba(16, 196, 105, 0.35);
+        background: rgba(16, 196, 105, 0.08);
+        border-radius: 4px;
+        padding: 24px;
+    }
+
+    .whatsapp-connected-box i {
+        display: inline-flex;
+        width: 58px;
+        height: 58px;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+        border-radius: 50%;
+        background: #10c469;
+        color: #ffffff;
+        font-size: 26px;
+    }
+
+    .whatsapp-connected-box h4 {
+        margin-bottom: 8px;
+    }
+
     .whatsapp-inline-alert {
         display: none;
         padding: 10px 12px;

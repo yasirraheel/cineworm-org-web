@@ -115,8 +115,17 @@
 
                             <div class="col-lg-7">
                                 <div class="card-box">
-                                    <h4 class="header-title m-t-0">QR Code</h4>
-                                    <div class="whatsapp-qr-box">
+                                    <h4 class="header-title m-t-0" id="wa-session-panel-title">{{ $currentStatus === 'connected' ? 'Session Connected' : 'QR Code' }}</h4>
+                                    <div id="wa-connected-box" class="whatsapp-connected-box" style="{{ $currentStatus === 'connected' ? '' : 'display:none;' }}">
+                                        <div>
+                                            <i class="fa fa-check"></i>
+                                            <h4>WhatsApp is connected</h4>
+                                            <p class="m-b-0">
+                                                Campaigns and test messages can now use this linked WhatsApp session.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div id="wa-qr-box" class="whatsapp-qr-box" style="{{ $currentStatus === 'connected' ? 'display:none;' : '' }}">
                                         <img id="wa-qr-image" src="{{ $status['qrDataUrl'] ?? '' }}" alt="WhatsApp QR Code" style="{{ !empty($status['qrDataUrl']) ? '' : 'display:none;' }}">
                                         <p id="wa-qr-empty" class="text-muted m-b-0" style="{{ !empty($status['qrDataUrl']) ? 'display:none;' : '' }}">
                                             Click Connect / QR. The QR code will appear here when WhatsApp is ready.
@@ -231,6 +240,9 @@
         var statusText = document.getElementById('wa-status-text');
         var connectedNumber = document.getElementById('wa-connected-number');
         var lastError = document.getElementById('wa-last-error');
+        var sessionPanelTitle = document.getElementById('wa-session-panel-title');
+        var connectedBox = document.getElementById('wa-connected-box');
+        var qrBox = document.getElementById('wa-qr-box');
         var qrImage = document.getElementById('wa-qr-image');
         var qrEmpty = document.getElementById('wa-qr-empty');
         var connectForm = document.getElementById('wa-connect-form');
@@ -255,19 +267,25 @@
                 if (current === 'connected') {
                     connectForm.style.display = 'none';
                     logoutForm.style.display = 'inline-block';
+                    sessionPanelTitle.textContent = 'Session Connected';
+                    connectedBox.style.display = '';
+                    qrBox.style.display = 'none';
                 } else {
                     connectForm.style.display = 'inline-block';
                     logoutForm.style.display = 'none';
+                    sessionPanelTitle.textContent = 'QR Code';
+                    connectedBox.style.display = 'none';
+                    qrBox.style.display = '';
                 }
             }
 
-            if (data.qrDataUrl) {
+            if (current !== 'connected' && data.qrDataUrl) {
                 qrImage.src = data.qrDataUrl;
                 qrImage.style.display = '';
                 qrEmpty.style.display = 'none';
             } else {
                 qrImage.style.display = 'none';
-                qrEmpty.style.display = '';
+                qrEmpty.style.display = current === 'connected' ? 'none' : '';
             }
         }
 
