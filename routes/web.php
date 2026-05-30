@@ -85,6 +85,12 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
 
         Route::get('settings', 'SettingsController@settings');
 
+        Route::get('whatsapp', 'WhatsappController@index');
+        Route::post('whatsapp/connect', 'WhatsappController@connect');
+        Route::get('whatsapp/status', 'WhatsappController@status');
+        Route::post('whatsapp/send', 'WhatsappController@send');
+        Route::post('whatsapp/logout', 'WhatsappController@logout');
+
         Route::get('find_imdb_movie', 'ImportImdbController@find_imdb_movie');
         Route::get('find_imdb_show', 'ImportImdbShowController@find_imdb_show');
         Route::get('find_imdb_episode', 'ImportImdbShowController@find_imdb_episode');
@@ -244,6 +250,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('web_ads_settings/delete/{id}', 'SettingsController@web_ads_settings_delete');
 
         Route::post('createBtn', 'SettingsController@createBtnBanner');
+        Route::get('editBtn/{id}', 'SettingsController@editBtnBanner');
+        Route::post('updateBtn/{id}', 'SettingsController@updateBtnBanner');
         Route::get('deleteBtn/{id}', 'SettingsController@deleteBtnBanner');
 
 

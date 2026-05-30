@@ -8,7 +8,7 @@
                     <div class="col-lg-12">
                         <div class="card-box">
                             {!! Form::open([
-                                'url' => ['admin/createBtn'],
+                                'url' => isset($editItem) && $editItem ? ['admin/updateBtn', $editItem->id] : ['admin/createBtn'],
                                 'class' => 'form-horizontal',
                                 'name' => 'settings_form',
                                 'id' => 'settings_form',
@@ -18,7 +18,7 @@
 
 
 
-                            <h5 class="mb-4" style="color:#f9f9f9"><i class="fa fa-buysellads pr-2"></i> <b>Banner Ads</b>
+                            <h5 class="mb-4" style="color:#f9f9f9"><i class="fa fa-buysellads pr-2"></i> <b>{{ $page_title }}</b>
                             </h5>
 
                             {{-- <div class="alert alert-info"><b>Note:</b> Leave empty if not want to display</div> --}}
@@ -32,6 +32,7 @@
 
                                         <div class="input-group">
                                             <input type="text" name="home_top_text" id="home_top_text"
+                                                value="{{ old('home_top_text', $editItem->image ?? '') }}"
                                                 class="form-control" readonly>
                                             <div class="input-group-append">
                                                 <button type="button"
@@ -44,6 +45,11 @@
                                             class="form-text text-muted">({{ trans('words.recommended_resolution') }} :
                                             180x50)</small>
                                         <div id="home_top_text_holder" style="margin-top:5px;max-height:100px;"></div>
+                                        @if (!empty($editItem->image))
+                                            <div style="margin-top:10px;">
+                                                <img src="{{ url($editItem->image) }}" alt="Banner Ad" class="img-thumbnail" width="180">
+                                            </div>
+                                        @endif
                                     </div>
                                 @endif
                             </div>
@@ -60,14 +66,24 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">{{ trans('Button Title') }} *</label>
                                     <div class="col-sm-8">
-                                        <input type="text" name="title" value="" class="form-control">
+                                        <input type="text" name="title" value="{{ old('title', $editItem->title ?? '') }}" class="form-control">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">{{ trans('Color') }} *</label>
                                     <div class="col-sm-8">
-                                        <input type="text" name="color" value="" class="form-control">
+                                        <input type="text" name="color" value="{{ old('color', $editItem->color ?? '') }}" class="form-control">
                                         <p>Get color code from <a href="https://colorhunt.co/" target="_blank">here</a> color code example (EFB036)</p>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">{{ trans('Placement') }} *</label>
+                                    <div class="col-sm-8">
+                                        <select name="placement" class="form-control">
+                                            @foreach ($buttonPlacements as $placementValue => $placementLabel)
+                                                <option value="{{ $placementValue }}" {{ old('placement', $editItem->placement ?? \App\Models\ButtonsBanners::PLACEMENT_DEFAULT) == $placementValue ? 'selected' : '' }}>{{ $placementLabel }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             @endif
@@ -75,15 +91,20 @@
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">{{ trans('Ad URL') }} *</label>
                                 <div class="col-sm-8">
-                                    <input type="text" name="ad_url" value="" class="form-control">
+                                    <input type="text" name="ad_url" value="{{ old('ad_url', $editItem->link ?? '') }}" class="form-control">
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <div class="offset-sm-3 col-sm-9 pl-1">
                                     <button type="submit" class="btn btn-primary waves-effect waves-light">
-                                        {{ trans('words.save_settings') }}
+                                        {{ isset($editItem) && $editItem ? trans('Update') : trans('words.save_settings') }}
                                     </button>
+                                    @if (isset($editItem) && $editItem)
+                                        <a href="{{ url('admin/' . $type) }}" class="btn btn-secondary waves-effect waves-light">
+                                            {{ trans('Cancel') }}
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                             {!! Form::close() !!}
@@ -95,6 +116,9 @@
                                     <tr>
                                         <th>Type</th>
                                         <th>Title/ Image</th>
+                                        @if ($type == 'buttons')
+                                            <th>Placement</th>
+                                        @endif
                                         <th>Link</th>
                                         <th>Action</th>
                                     </tr>
@@ -118,10 +142,18 @@
                                             </td>
 
                                             @endif
+                                            @if ($type == 'buttons')
+                                                <td>{{ $buttonPlacements[$api->placement ?? \App\Models\ButtonsBanners::PLACEMENT_DEFAULT] ?? 'Default player/sidebar top' }}</td>
+                                            @endif
                                             <td>
                                                 {{ $api->link }}
                                             </td>
                                             <td>
+                                                <a href="{{ url('admin/editBtn/' . $api->id) }}"
+                                                    class="btn btn-icon waves-effect waves-light btn-primary m-b-5"
+                                                    data-toggle="tooltip" title="Edit">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
                                                 <a href="{{ url('admin/deleteBtn/' . $api->id) }}"
                                                     class="btn btn-icon waves-effect waves-light btn-danger m-b-5 data_remove"
                                                     data-toggle="tooltip" title="Remove" data-id="{{ $api->id }}">

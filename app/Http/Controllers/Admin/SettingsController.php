@@ -795,7 +795,10 @@ class SettingsController extends MainAdminController
           $data = ButtonsBanners::where('type', 'banners')->paginate(10);
       }
 
-        return view('admin.pages.settings.buttons_banner', compact('data','page_title','type'));
+        $buttonPlacements = ButtonsBanners::buttonPlacements();
+        $editItem = null;
+
+        return view('admin.pages.settings.buttons_banner', compact('data','page_title','type','buttonPlacements','editItem'));
         // return view('admin.pages.settings.buttons_banner');
     }
     public function createBtnBanner(Request $request)
@@ -807,6 +810,7 @@ class SettingsController extends MainAdminController
         'type' => 'required|in:buttons,banners', // Type is required and must be either 'buttons' or 'banners'
         'ad_url' => 'nullable|url|max:255', // Ad URL is optional
         'color' => 'nullable',
+        'placement' => 'nullable|in:' . implode(',', array_keys(ButtonsBanners::buttonPlacements())),
     ]);
 
     // Adjust values based on the type
@@ -815,6 +819,7 @@ class SettingsController extends MainAdminController
         $validatedData['color'] = ''; // Set title to an empty string for banners
     } elseif ($request->type === 'buttons') {
         $validatedData['home_top_text'] = ''; // Set image to an empty string for buttons
+        $validatedData['placement'] = $validatedData['placement'] ?? ButtonsBanners::PLACEMENT_DEFAULT;
     }
 
     // Ensure all required fields are not null and set defaults
@@ -822,6 +827,7 @@ class SettingsController extends MainAdminController
     $validatedData['image'] = $validatedData['home_top_text'] ?? ''; // Default image to empty string
     $validatedData['link'] = $validatedData['ad_url'] ?? ''; // Default link to empty string
     $validatedData['color'] = $validatedData['color'] ?? ''; // Default link to empty string
+    $validatedData['placement'] = $validatedData['placement'] ?? ButtonsBanners::PLACEMENT_DEFAULT;
 
     // Save the validated data into the database
     $component = ButtonsBanners::create($validatedData);
@@ -829,6 +835,50 @@ class SettingsController extends MainAdminController
     // Redirect back with success message
     return redirect()->back()->with('flash_message', 'Button/Banner created successfully!');
 }
+
+    public function editBtnBanner($id)
+    {
+        $editItem = ButtonsBanners::findOrFail($id);
+        $type = $editItem->type;
+        $page_title = $type === 'buttons' ? 'Edit Button' : 'Edit Banner';
+        $data = ButtonsBanners::where('type', $type)->paginate(10);
+        $buttonPlacements = ButtonsBanners::buttonPlacements();
+
+        return view('admin.pages.settings.buttons_banner', compact('data', 'page_title', 'type', 'buttonPlacements', 'editItem'));
+    }
+
+    public function updateBtnBanner(Request $request, $id)
+    {
+        $btnBanner = ButtonsBanners::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'home_top_text' => 'nullable|string|max:255',
+            'type' => 'required|in:buttons,banners',
+            'ad_url' => 'nullable|url|max:255',
+            'color' => 'nullable',
+            'placement' => 'nullable|in:' . implode(',', array_keys(ButtonsBanners::buttonPlacements())),
+        ]);
+
+        if ($request->type === 'banners') {
+            $validatedData['title'] = '';
+            $validatedData['color'] = '';
+            $validatedData['home_top_text'] = $validatedData['home_top_text'] ?? $btnBanner->image;
+        } elseif ($request->type === 'buttons') {
+            $validatedData['home_top_text'] = '';
+            $validatedData['placement'] = $validatedData['placement'] ?? ButtonsBanners::PLACEMENT_DEFAULT;
+        }
+
+        $validatedData['title'] = $validatedData['title'] ?? '';
+        $validatedData['image'] = $validatedData['home_top_text'] ?? '';
+        $validatedData['link'] = $validatedData['ad_url'] ?? '';
+        $validatedData['color'] = $validatedData['color'] ?? '';
+        $validatedData['placement'] = $validatedData['placement'] ?? ButtonsBanners::PLACEMENT_DEFAULT;
+
+        $btnBanner->update($validatedData);
+
+        return redirect('admin/' . $request->type)->with('flash_message', 'Button/Banner updated successfully!');
+    }
 
 
     public function deleteBtnBanner($id){

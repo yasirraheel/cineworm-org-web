@@ -320,6 +320,12 @@
                         </a>
 
                     </li>
+                    <li class="{{ classActivePath('whatsapp') }}">
+                        <a href="{{ URL::to('admin/whatsapp') }}" class="waves-effect">
+                            <i class="fa fa-whatsapp"></i>
+                            <span>WhatsApp Web</span>
+                        </a>
+                    </li>
                     <li class="{{ classActivePath('chat') }}">
                         <a href="{{ URL::to('/admin/clear-cache') }}" class="waves-effect">
                             <i class="fa fa-cogs"></i>

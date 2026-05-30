@@ -571,13 +571,14 @@
                 <!-- Video Player -->
                 <div class="col-md-9 p-0" id="main-player-column">
                     @php
-                        $buttons = get_web_button_banner('buttons'); // Fetch all button components
+                        $playerButtons = get_web_button_banner('buttons', \App\Models\ButtonsBanners::PLACEMENT_DEFAULT);
+                        $belowNewsGamesButtons = get_web_button_banner('buttons', \App\Models\ButtonsBanners::PLACEMENT_BELOW_NEWS_GAMES);
                         $banners = get_web_button_banner('banners'); // Fetch all banner components
                     @endphp
 
-                    @if ($buttons->isNotEmpty())
+                    @if ($playerButtons->isNotEmpty())
                         <div class="player-buttons-container mb-2 px-3 py-2">
-                            @foreach ($buttons as $button)
+                            @foreach ($playerButtons as $button)
                                 <a href="{{ $button->link ?? '#' }}" class="btn btn-primary mb-2 flex-shrink-0"
                                     style="padding: 8px 16px; font-size: 14px; font-weight: bold; border-radius: 8px;
                                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -802,6 +803,37 @@
                             <span>Play Watermelon</span>
                         </button>
                     </div>
+
+                    @if ($belowNewsGamesButtons->isNotEmpty())
+                        <div class="sidebar-buttons-container mt-2 px-2 pt-2">
+                            @foreach ($belowNewsGamesButtons as $button)
+                                <a href="{{ $button->link ?? '#' }}" class="btn btn-primary w-100 mb-2"
+                                    style="padding: 8px 12px; font-size: 14px; font-weight: bold; border-radius: 8px;
+                                           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                                           background-color: #{{ $button->color ? $button->color : '007bff' }};
+                                           font-family: 'Perpetua', serif; text-align: center;
+                                           text-decoration: none; color: #fff;
+                                           position: relative;
+                                           display: inline-block;
+                                           overflow: hidden;
+                                           border: 3px solid #00008B;
+                                           transition: all 0.3s ease-in-out;"
+                                    onmouseover="this.style.borderImage='linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff00ff) 1';
+                                                 this.style.borderStyle='solid';
+                                                 this.style.borderWidth='3px';
+                                                 this.style.borderRadius='8px';
+                                                 this.style.borderColor='transparent';"
+                                    onmouseout="this.style.borderImage='none';
+                                                this.style.borderColor='#00008B';
+                                                this.style.borderStyle='solid';
+                                                this.style.borderWidth='3px';
+                                                this.style.borderRadius='8px';"
+                                    target="_blank">
+                                    {{ $button->title }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
 

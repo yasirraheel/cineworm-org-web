@@ -145,7 +145,7 @@
                     <!-- Right Side News Ticker and Banners -->
                     <div class="col-md-3 d-none d-md-flex flex-column justify-content-start" style="max-height: 100%;">
                         @php
-                            $buttons = get_web_button_banner('buttons');
+                            $buttons = get_web_button_banner('buttons', \App\Models\ButtonsBanners::PLACEMENT_DEFAULT);
                             $banners = get_web_button_banner('banners');
                         @endphp
 

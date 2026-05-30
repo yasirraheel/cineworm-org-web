@@ -77,10 +77,15 @@ if (! function_exists('get_web_banner')) {
     }
 }
 if (! function_exists('get_web_button_banner')) {
-    function get_web_button_banner($type)
+    function get_web_button_banner($type, $placement = null)
     {
-        // Fetch all records from the WebAds table where type matches
-        return ButtonsBanners::where('type', $type)->get();
+        $query = ButtonsBanners::where('type', $type);
+
+        if ($placement !== null && $type === 'buttons') {
+            $query->where('placement', $placement);
+        }
+
+        return $query->get();
     }
 }
 
