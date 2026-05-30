@@ -55,6 +55,16 @@ function normalizeNumber(value) {
   return String(value || '').replace(/[^\d]/g, '');
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function randomInt(min, max) {
+  const safeMin = Math.max(0, Number(min) || 0);
+  const safeMax = Math.max(safeMin, Number(max) || safeMin);
+  return Math.floor(Math.random() * (safeMax - safeMin + 1)) + safeMin;
+}
+
 function clearQrIdleTimer() {
   if (qrIdleTimer) {
     clearTimeout(qrIdleTimer);
@@ -207,6 +217,8 @@ app.get('/qr', requireApiKey, (req, res) => {
 app.post('/send', requireApiKey, async (req, res) => {
   const number = normalizeNumber(req.body.number);
   const message = String(req.body.message || '').trim();
+  const validateNumber = req.body.validateNumber !== false;
+  const typingPresence = req.body.typingPresence !== false;
 
   if (!number || number.length < 8) {
     return res.status(422).json({ ok: false, error: 'A valid phone number is required.' });
@@ -221,9 +233,43 @@ app.post('/send', requireApiKey, async (req, res) => {
   }
 
   const jid = `${number}@s.whatsapp.net`;
-  const response = await sock.sendMessage(jid, { text: message });
 
-  return res.json({ ok: true, jid, response });
+  try {
+    if (validateNumber && typeof sock.onWhatsApp === 'function') {
+      const matches = await sock.onWhatsApp(jid);
+      const isRegistered = Array.isArray(matches) && matches.some((item) => item?.exists);
+
+      if (!isRegistered) {
+        return res.status(422).json({ ok: false, error: 'This number is not registered on WhatsApp.', jid });
+      }
+    }
+
+    if (typingPresence) {
+      try {
+        await sock.presenceSubscribe(jid);
+        await sock.sendPresenceUpdate('composing', jid);
+        await sleep(randomInt(900, 2400));
+        await sock.sendPresenceUpdate('paused', jid);
+      } catch (presenceError) {
+        logger.debug(presenceError, 'Unable to publish typing presence');
+      }
+    }
+
+    const response = await sock.sendMessage(jid, {
+      text: message,
+      linkPreview: false,
+    });
+
+    return res.json({
+      ok: true,
+      jid,
+      messageId: response?.key?.id || null,
+      response,
+    });
+  } catch (error) {
+    logger.warn(error, 'WhatsApp send failed');
+    return res.status(500).json({ ok: false, error: error.message || 'WhatsApp send failed.', jid });
+  }
 });
 
 app.post('/logout', requireApiKey, async (req, res) => {

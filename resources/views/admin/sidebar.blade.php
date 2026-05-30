@@ -320,11 +320,29 @@
                         </a>
 
                     </li>
-                    <li class="{{ classActivePath('whatsapp') }}">
-                        <a href="{{ URL::to('admin/whatsapp') }}" class="waves-effect">
+                    <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect">
                             <i class="fa fa-whatsapp"></i>
                             <span>WhatsApp Web</span>
+                            <span class="menu-arrow"></span>
                         </a>
+                        <ul class="list-unstyled">
+                            <li class="{{ classActivePath('whatsapp') }}">
+                                <a href="{{ URL::to('admin/whatsapp') }}" class="{{ classActivePath('whatsapp') }}">
+                                    <i class="fa fa-dashboard"></i><span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ URL::to('admin/whatsapp/lists') }}">
+                                    <i class="fa fa-address-book"></i><span>Mobile Lists</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ URL::to('admin/whatsapp/campaigns') }}">
+                                    <i class="fa fa-send"></i><span>Campaigns</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="{{ classActivePath('chat') }}">
                         <a href="{{ URL::to('/admin/clear-cache') }}" class="waves-effect">

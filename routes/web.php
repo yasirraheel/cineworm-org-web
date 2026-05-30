@@ -86,6 +86,22 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('settings', 'SettingsController@settings');
 
         Route::get('whatsapp', 'WhatsappController@index');
+        Route::get('whatsapp/lists', 'WhatsappController@lists');
+        Route::post('whatsapp/lists/save', 'WhatsappController@saveList');
+        Route::get('whatsapp/lists/{id}/contacts', 'WhatsappController@contacts');
+        Route::post('whatsapp/lists/{id}/contacts/save', 'WhatsappController@saveContact');
+        Route::post('whatsapp/lists/{id}/contacts/import', 'WhatsappController@importContacts');
+        Route::get('whatsapp/lists/{id}/contacts/sample-file', 'WhatsappController@downloadSampleContactsFile');
+        Route::get('whatsapp/lists/{list_id}/contacts/delete/{contact_id}', 'WhatsappController@deleteContact');
+        Route::get('whatsapp/campaigns', 'WhatsappController@campaigns');
+        Route::get('whatsapp/campaigns/create', 'WhatsappController@campaignForm');
+        Route::get('whatsapp/campaigns/edit/{id}', 'WhatsappController@campaignForm');
+        Route::post('whatsapp/campaigns/save', 'WhatsappController@saveCampaign');
+        Route::get('whatsapp/campaigns/{id}', 'WhatsappController@showCampaign');
+        Route::post('whatsapp/campaigns/{id}/launch', 'WhatsappController@launchCampaign');
+        Route::post('whatsapp/campaigns/{id}/pause', 'WhatsappController@pauseCampaign');
+        Route::post('whatsapp/campaigns/{id}/resume', 'WhatsappController@resumeCampaign');
+        Route::post('whatsapp/campaigns/{id}/process', 'WhatsappController@processCampaign');
         Route::post('whatsapp/connect', 'WhatsappController@connect');
         Route::get('whatsapp/status', 'WhatsappController@status');
         Route::post('whatsapp/send', 'WhatsappController@send');

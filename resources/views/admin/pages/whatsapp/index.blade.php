@@ -1,104 +1,7 @@
 @extends("admin.admin_app")
 
 @section("content")
-<style>
-    .whatsapp-admin-page .card-box,
-    .whatsapp-admin-page .card-box p,
-    .whatsapp-admin-page .card-box label,
-    .whatsapp-admin-page .card-box strong,
-    .whatsapp-admin-page .card-box span,
-    .whatsapp-admin-page .card-box td,
-    .whatsapp-admin-page .card-box th,
-    .whatsapp-admin-page .card-box div {
-        color: #f2f4f8;
-    }
-
-    .whatsapp-admin-page .text-muted,
-    .whatsapp-admin-page .helper-text {
-        color: #c7d2e0 !important;
-    }
-
-    .whatsapp-admin-page .form-control {
-        background: #25262b;
-        color: #ffffff;
-        border-color: rgba(255, 255, 255, 0.12);
-    }
-
-    .whatsapp-admin-page .form-control:focus {
-        background: #2d2f36;
-        color: #ffffff;
-        border-color: #10c469;
-    }
-
-    .whatsapp-status-badge {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 4px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0;
-    }
-
-    .whatsapp-status-connected {
-        background: #10c469;
-        color: #ffffff;
-    }
-
-    .whatsapp-status-qr,
-    .whatsapp-status-connecting {
-        background: #f9c851;
-        color: #1f1f1f;
-    }
-
-    .whatsapp-status-unavailable,
-    .whatsapp-status-error,
-    .whatsapp-status-disconnected,
-    .whatsapp-status-logged_out {
-        background: #ff5b5b;
-        color: #ffffff;
-    }
-
-    .whatsapp-qr-box {
-        min-height: 350px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: #1f2025;
-        border-radius: 4px;
-        padding: 20px;
-    }
-
-    .whatsapp-qr-box img {
-        width: 320px;
-        max-width: 100%;
-        background: #ffffff;
-        padding: 12px;
-        border-radius: 4px;
-    }
-
-    .whatsapp-inline-alert {
-        display: none;
-        padding: 10px 12px;
-        border-radius: 4px;
-        margin-bottom: 15px;
-        font-weight: 600;
-    }
-
-    .whatsapp-inline-alert.success {
-        display: block;
-        background: rgba(16, 196, 105, 0.16);
-        border: 1px solid rgba(16, 196, 105, 0.45);
-        color: #ffffff;
-    }
-
-    .whatsapp-inline-alert.error {
-        display: block;
-        background: rgba(255, 91, 91, 0.16);
-        border: 1px solid rgba(255, 91, 91, 0.45);
-        color: #ffffff;
-    }
-</style>
+@include('admin.pages.whatsapp.partials.content_styles')
 
 @php
     $currentStatus = $status['status'] ?? 'unavailable';
@@ -110,11 +13,13 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card-box">
+                        @include('admin.pages.whatsapp.partials.nav')
+
                         <div class="row m-b-20">
                             <div class="col-md-8">
                                 <h4 class="header-title m-t-0 m-b-10">{{ $page_title }}</h4>
                                 <p class="text-muted m-b-0">
-                                    Connect a WhatsApp Web session, scan the QR code, and send a basic test message.
+                                    Manage the WhatsApp Web session, mobile lists, campaign pacing, and delivery logs from one place.
                                 </p>
                             </div>
                             <div class="col-md-4 text-right">
@@ -125,13 +30,40 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-lg-6">
+                            <div class="col-md-3">
+                                <div class="card-box whatsapp-metric">
+                                    <h3 class="m-t-0">{{ $listsCount }}</h3>
+                                    <p class="m-b-0">Mobile lists</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card-box whatsapp-metric">
+                                    <h3 class="m-t-0">{{ $contactsCount }}</h3>
+                                    <p class="m-b-0">Imported numbers</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card-box whatsapp-metric">
+                                    <h3 class="m-t-0">{{ $campaignsCount }}</h3>
+                                    <p class="m-b-0">Campaigns</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card-box whatsapp-metric">
+                                    <h3 class="m-t-0">{{ $runningCampaignsCount }}</h3>
+                                    <p class="m-b-0">Running now</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-5">
                                 <div class="card-box">
                                     <h4 class="header-title m-t-0">Connection</h4>
                                     <table class="table table-bordered">
                                         <tbody>
                                             <tr>
-                                                <th style="width: 180px;">Status</th>
+                                                <th style="width: 170px;">Status</th>
                                                 <td id="wa-status-text">{{ ucfirst(str_replace('_', ' ', $currentStatus)) }}</td>
                                             </tr>
                                             <tr>
@@ -148,7 +80,7 @@
                                     <form method="post" action="{{ URL::to('admin/whatsapp/connect') }}" style="display:inline-block;">
                                         @csrf
                                         <button type="submit" class="btn btn-success">
-                                            <i class="fa fa-qrcode"></i> Connect / Generate QR
+                                            <i class="fa fa-qrcode"></i> Connect / QR
                                         </button>
                                     </form>
 
@@ -168,11 +100,11 @@
                                         <div class="form-group">
                                             <label>Phone Number</label>
                                             <input type="text" name="number" class="form-control" placeholder="923001234567" value="{{ old('number') }}" required>
-                                            <small class="helper-text">Use country code without plus sign, for example 923001234567.</small>
+                                            <small>Use country code without plus sign.</small>
                                         </div>
                                         <div class="form-group">
                                             <label>Message</label>
-                                            <textarea name="message" class="form-control" rows="5" required>{{ old('message') }}</textarea>
+                                            <textarea name="message" class="form-control" rows="4" required>{{ old('message') }}</textarea>
                                         </div>
                                         <button type="submit" class="btn btn-primary" id="wa-send-button">
                                             <i class="fa fa-send"></i> Send Message
@@ -181,20 +113,108 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
+                            <div class="col-lg-7">
                                 <div class="card-box">
                                     <h4 class="header-title m-t-0">QR Code</h4>
                                     <div class="whatsapp-qr-box">
                                         <img id="wa-qr-image" src="{{ $status['qrDataUrl'] ?? '' }}" alt="WhatsApp QR Code" style="{{ !empty($status['qrDataUrl']) ? '' : 'display:none;' }}">
                                         <p id="wa-qr-empty" class="text-muted m-b-0" style="{{ !empty($status['qrDataUrl']) ? 'display:none;' : '' }}">
-                                            Click Connect / Generate QR. The QR code will appear here when WhatsApp is ready.
+                                            Click Connect / QR. The QR code will appear here when WhatsApp is ready.
                                         </p>
                                     </div>
                                     <p class="helper-text m-t-10 m-b-0">
-                                        Open WhatsApp on your phone, use Linked Devices, and scan this QR code.
+                                        Campaigns only send while this session is connected. The server validates numbers and uses paced batches for safer delivery.
                                     </p>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <div class="card-box">
+                                    <div class="row m-b-15">
+                                        <div class="col-sm-7">
+                                            <h4 class="header-title m-t-0">Recent Campaigns</h4>
+                                        </div>
+                                        <div class="col-sm-5 text-right">
+                                            <a href="{{ URL::to('admin/whatsapp/campaigns/create') }}" class="btn btn-success btn-sm">
+                                                <i class="fa fa-plus"></i> New Campaign
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Campaign</th>
+                                                    <th>Status</th>
+                                                    <th>Progress</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            @forelse($campaigns as $campaign)
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ $campaign->name }}</strong>
+                                                        <div>{{ optional($campaign->contactList)->name ?: 'List missing' }}</div>
+                                                    </td>
+                                                    <td><span class="badge badge-{{ $campaign->getStatusBadgeClass() }}">{{ ucfirst($campaign->status) }}</span></td>
+                                                    <td>
+                                                        <div>{{ $campaign->processed_contacts }}/{{ $campaign->total_contacts }}</div>
+                                                        <div class="whatsapp-progress"><span style="width: {{ $campaign->getProgressPercentage() }}%;"></span></div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ URL::to('admin/whatsapp/campaigns/'.$campaign->id) }}" class="btn btn-primary btn-sm">
+                                                            <i class="fa fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr><td colspan="4" class="text-center">No WhatsApp campaigns yet.</td></tr>
+                                            @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="card-box">
+                                    <h4 class="header-title m-t-0">Recent Delivery Log</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Phone</th>
+                                                    <th>Status</th>
+                                                    <th>Time</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            @forelse($recentSends as $send)
+                                                <tr>
+                                                    <td>{{ $send->phone }}</td>
+                                                    <td><span class="badge badge-{{ $send->status === 'sent' ? 'success' : ($send->status === 'failed' ? 'danger' : 'warning') }}">{{ ucfirst($send->status) }}</span></td>
+                                                    <td>{{ $send->updated_at ? $send->updated_at->format('M d, H:i') : '-' }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr><td colspan="3" class="text-center">No delivery logs yet.</td></tr>
+                                            @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-box" style="border: 1px dashed rgba(255,255,255,0.22);">
+                            <h4 class="header-title">Ban Protection Defaults</h4>
+                            <ul class="m-b-0">
+                                <li>Use country-code numbers only, and import opted-in contacts.</li>
+                                <li>Campaigns send in batches, use random delay windows, pause after every group, and respect daily limits.</li>
+                                <li>The sidecar checks whether a number exists on WhatsApp before sending and avoids link previews by default.</li>
+                                <li>Keep the first campaigns small, then raise limits slowly after delivery looks healthy.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -240,11 +260,7 @@
         }
 
         function pollStatus() {
-            fetch(statusUrl, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
+            fetch(statusUrl, { headers: { 'Accept': 'application/json' } })
                 .then(function (response) { return response.json(); })
                 .then(updateStatus)
                 .catch(function () {
@@ -252,18 +268,17 @@
                 });
         }
 
-        pollStatus();
-        setInterval(pollStatus, 5000);
-
         function showSendAlert(type, message) {
             sendAlert.className = 'whatsapp-inline-alert ' + type;
             sendAlert.textContent = message;
         }
 
+        pollStatus();
+        setInterval(pollStatus, 5000);
+
         if (sendForm) {
             sendForm.addEventListener('submit', function (event) {
                 event.preventDefault();
-
                 sendButton.disabled = true;
                 sendButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...';
                 sendAlert.className = 'whatsapp-inline-alert';
@@ -271,18 +286,12 @@
 
                 fetch(sendForm.action, {
                     method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                     body: new FormData(sendForm)
                 })
                     .then(function (response) {
                         return response.json().then(function (data) {
-                            if (!response.ok || !data.ok) {
-                                throw data;
-                            }
-
+                            if (!response.ok || !data.ok) { throw data; }
                             return data;
                         });
                     })
@@ -292,8 +301,7 @@
                         pollStatus();
                     })
                     .catch(function (error) {
-                        var message = error && error.error ? error.error : 'Message could not be sent.';
-                        showSendAlert('error', message);
+                        showSendAlert('error', error && error.error ? error.error : 'Message could not be sent.');
                     })
                     .finally(function () {
                         sendButton.disabled = false;
@@ -304,39 +312,5 @@
     })();
 </script>
 
-<script type="text/javascript">
-    @if (Session::has('flash_message'))
-        Swal.fire({
-            icon: 'success',
-            title: '{{ Session::get('flash_message') }}',
-            showConfirmButton: false,
-            timer: 3000,
-            background: "#1a2234",
-            color: "#fff"
-        });
-    @endif
-
-    @if (Session::has('error_flash_message'))
-        Swal.fire({
-            icon: 'error',
-            title: '{{ Session::get('error_flash_message') }}',
-            showConfirmButton: true,
-            confirmButtonColor: '#10c469',
-            background: "#1a2234",
-            color: "#fff"
-        });
-    @endif
-
-    @if (count($errors) > 0)
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html: '<p>@foreach ($errors->all() as $error) {{ $error }}<br/> @endforeach</p>',
-            showConfirmButton: true,
-            confirmButtonColor: '#10c469',
-            background: "#1a2234",
-            color: "#fff"
-        });
-    @endif
-</script>
+@include('admin.pages.whatsapp.partials.flash')
 @endsection

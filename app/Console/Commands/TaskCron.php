@@ -6,7 +6,9 @@ use App\Mail\SendEmail;
 use App\PromotionalCampaign;
 use App\Services\PromotionalCampaignService;
 use App\Services\CronMonitorService;
+use App\Services\WhatsappCampaignService;
 use App\Services\WhatsappServerService;
+use App\WhatsappCampaign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -84,6 +86,7 @@ class TaskCron extends Command
 
             (new PromotionalCampaignService())->processDueCampaigns(5, 25);
             (new WhatsappServerService())->ensureRunning();
+            (new WhatsappCampaignService())->processDueCampaigns(3, 10);
 
             $monitor->markSuccess('Cron completed successfully.', [
                 'campaigns_checked' => PromotionalCampaign::whereIn('status', [
@@ -92,6 +95,10 @@ class TaskCron extends Command
                 ])->count(),
                 'running_campaigns_seen' => PromotionalCampaign::where('status', PromotionalCampaign::STATUS_RUNNING)->count(),
                 'scheduled_campaigns_seen' => PromotionalCampaign::where('status', PromotionalCampaign::STATUS_SCHEDULED)->count(),
+                'whatsapp_campaigns_checked' => WhatsappCampaign::whereIn('status', [
+                    WhatsappCampaign::STATUS_SCHEDULED,
+                    WhatsappCampaign::STATUS_RUNNING,
+                ])->count(),
                 'expiry_email_failures' => $expiryEmailFailures,
             ]);
 
