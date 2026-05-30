@@ -16,6 +16,7 @@ const host = process.env.WA_SERVER_HOST || '127.0.0.1';
 const port = Number(process.env.WA_SERVER_PORT || 3025);
 const apiKey = process.env.WA_SERVER_API_KEY || 'change-this-long-random-key';
 const authDir = process.env.WA_AUTH_DIR || 'auth';
+const qrIdleTimeoutMs = Number(process.env.WA_QR_IDLE_TIMEOUT_MS || 120000);
 
 let sock = null;
 let lastQr = null;
@@ -24,6 +25,9 @@ let connectionStatus = 'disconnected';
 let connectedNumber = null;
 let lastError = null;
 let starting = false;
+let manualStop = false;
+let reconnectAllowed = false;
+let qrIdleTimer = null;
 
 app.use(express.json({ limit: '1mb' }));
 
@@ -51,11 +55,47 @@ function normalizeNumber(value) {
   return String(value || '').replace(/[^\d]/g, '');
 }
 
+function clearQrIdleTimer() {
+  if (qrIdleTimer) {
+    clearTimeout(qrIdleTimer);
+    qrIdleTimer = null;
+  }
+}
+
+function scheduleQrIdleStop() {
+  clearQrIdleTimer();
+
+  qrIdleTimer = setTimeout(() => {
+    stopSocket('disconnected', 'QR expired because no admin scanned it in time.').catch((error) => {
+      lastError = error.message;
+      logger.error(error, 'Failed to stop idle WhatsApp QR socket');
+    });
+  }, qrIdleTimeoutMs);
+}
+
 async function clearAuthState() {
   await fs.rm(authDir, { recursive: true, force: true });
   lastQr = null;
   lastQrDataUrl = null;
   connectedNumber = null;
+}
+
+async function stopSocket(status = 'disconnected', message = null) {
+  clearQrIdleTimer();
+
+  const activeSock = sock;
+  manualStop = true;
+  reconnectAllowed = false;
+  sock = null;
+  connectionStatus = status;
+  lastError = message;
+  lastQr = null;
+  lastQrDataUrl = null;
+  connectedNumber = null;
+
+  if (activeSock && typeof activeSock.end === 'function') {
+    activeSock.end(new Error(message || status));
+  }
 }
 
 async function startSocket() {
@@ -68,6 +108,8 @@ async function startSocket() {
   }
 
   starting = true;
+  manualStop = false;
+  reconnectAllowed = false;
   connectionStatus = 'connecting';
   lastError = null;
 
@@ -94,10 +136,13 @@ async function startSocket() {
         lastQr = qr;
         lastQrDataUrl = await QRCode.toDataURL(qr, { margin: 1, width: 320 });
         connectionStatus = 'qr';
+        scheduleQrIdleStop();
       }
 
       if (connection === 'open') {
+        clearQrIdleTimer();
         connectionStatus = 'connected';
+        reconnectAllowed = true;
         connectedNumber = sock?.user?.id || null;
         lastQr = null;
         lastQrDataUrl = null;
@@ -105,17 +150,20 @@ async function startSocket() {
       }
 
       if (connection === 'close') {
+        clearQrIdleTimer();
         const statusCode = lastDisconnect?.error?.output?.statusCode;
         const loggedOut = statusCode === DisconnectReason.loggedOut;
+        const shouldReconnect = !manualStop && !loggedOut && reconnectAllowed;
 
-        connectionStatus = loggedOut ? 'logged_out' : 'disconnected';
+        connectionStatus = manualStop ? connectionStatus : (loggedOut ? 'logged_out' : 'disconnected');
         connectedNumber = null;
         lastQr = null;
         lastQrDataUrl = null;
-        lastError = lastDisconnect?.error?.message || null;
+        lastError = manualStop ? lastError : (lastDisconnect?.error?.message || null);
         sock = null;
+        manualStop = false;
 
-        if (!loggedOut) {
+        if (shouldReconnect) {
           setTimeout(() => {
             startSocket().catch((error) => {
               lastError = error.message;
@@ -187,10 +235,8 @@ app.post('/logout', requireApiKey, async (req, res) => {
     }
   }
 
-  sock = null;
-  connectionStatus = 'connecting';
+  await stopSocket('logged_out', null);
   await clearAuthState();
-  await startSocket();
 
   res.json(serializeStatus());
 });

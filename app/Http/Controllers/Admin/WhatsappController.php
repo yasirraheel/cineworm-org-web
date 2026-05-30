@@ -14,6 +14,10 @@ class WhatsappController extends Controller
         $page_title = 'WhatsApp Web';
         $status = $this->requestServer('get', '/status');
 
+        if (in_array($status['status'] ?? 'unavailable', ['disconnected', 'logged_out'], true)) {
+            $status = $this->requestServer('post', '/connect');
+        }
+
         return view('admin.pages.whatsapp.index', compact('page_title', 'status'));
     }
 
