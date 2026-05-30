@@ -76,6 +76,10 @@
                                             </tr>
                                         </tbody>
                                     </table>
+                                    <div id="wa-device-removed-alert" class="alert alert-warning" style="{{ !empty($status['lastError']) && stripos($status['lastError'], 'removed this linked device') !== false ? '' : 'display:none;' }}">
+                                        <strong>WhatsApp removed this linked device.</strong><br>
+                                        Open WhatsApp on your phone, go to Linked Devices, remove old Cineworm/Admin sessions, wait a few minutes, then connect again.
+                                    </div>
 
                                     <form id="wa-connect-form" method="post" action="{{ URL::to('admin/whatsapp/connect') }}" style="{{ $currentStatus === 'connected' ? 'display:none;' : 'display:inline-block;' }}">
                                         @csrf
@@ -240,6 +244,7 @@
         var statusText = document.getElementById('wa-status-text');
         var connectedNumber = document.getElementById('wa-connected-number');
         var lastError = document.getElementById('wa-last-error');
+        var deviceRemovedAlert = document.getElementById('wa-device-removed-alert');
         var sessionPanelTitle = document.getElementById('wa-session-panel-title');
         var connectedBox = document.getElementById('wa-connected-box');
         var qrBox = document.getElementById('wa-qr-box');
@@ -262,6 +267,10 @@
             statusText.textContent = label(current);
             connectedNumber.textContent = data.connectedNumber || 'Not connected';
             lastError.textContent = data.lastError || 'None';
+
+            if (deviceRemovedAlert) {
+                deviceRemovedAlert.style.display = data.lastError && data.lastError.indexOf('removed this linked device') !== -1 ? '' : 'none';
+            }
 
             if (connectForm && logoutForm) {
                 if (current === 'connected') {

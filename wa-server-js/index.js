@@ -167,15 +167,17 @@ async function startSocket() {
       if (connection === 'close') {
         clearQrIdleTimer();
         const statusCode = lastDisconnect?.error?.output?.statusCode;
+        const errorMessage = lastDisconnect?.error?.message || null;
         const loggedOut = statusCode === DisconnectReason.loggedOut;
         const restartRequired = statusCode === DisconnectReason.restartRequired;
+        const deviceRemoved = loggedOut && /device_removed|conflict/i.test(errorMessage || '');
         const shouldReconnect = !manualStop && !loggedOut && (reconnectAllowed || sessionHadQr || restartRequired);
 
         const failedBeforeOpen = !manualStop && !reconnectAllowed && !loggedOut;
         const staleFailure = failedBeforeOpen && !sessionHadQr && !restartRequired;
         unopenedFailureCount = staleFailure ? unopenedFailureCount + 1 : 0;
 
-        if (staleFailure && unopenedFailureCount >= 1) {
+        if (deviceRemoved || (staleFailure && unopenedFailureCount >= 1)) {
           await clearAuthState();
         }
 
@@ -186,7 +188,11 @@ async function startSocket() {
         lastError = manualStop ? lastError : (
           staleFailure
             ? 'Previous WhatsApp session was stale. Auth was cleared; click Connect / QR to generate a new QR code.'
-            : (shouldReconnect ? 'WhatsApp pairing completed. Reconnecting session...' : (lastDisconnect?.error?.message || null))
+            : (
+              deviceRemoved
+                ? 'WhatsApp removed this linked device. Open WhatsApp Linked Devices, remove old Cineworm sessions, wait a few minutes, then connect again.'
+                : (shouldReconnect ? 'WhatsApp pairing completed. Reconnecting session...' : errorMessage)
+            )
         );
         sock = null;
         manualStop = false;
