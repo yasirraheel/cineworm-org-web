@@ -29,6 +29,7 @@ let manualStop = false;
 let reconnectAllowed = false;
 let qrIdleTimer = null;
 let unopenedFailureCount = 0;
+let sessionHadQr = false;
 
 app.use(express.json({ limit: '1mb' }));
 
@@ -121,6 +122,7 @@ async function startSocket() {
   starting = true;
   manualStop = false;
   reconnectAllowed = false;
+  sessionHadQr = false;
   connectionStatus = 'connecting';
   lastError = null;
 
@@ -144,6 +146,7 @@ async function startSocket() {
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
+        sessionHadQr = true;
         lastQr = qr;
         lastQrDataUrl = await QRCode.toDataURL(qr, { margin: 1, width: 320 });
         connectionStatus = 'qr';
@@ -165,26 +168,29 @@ async function startSocket() {
         clearQrIdleTimer();
         const statusCode = lastDisconnect?.error?.output?.statusCode;
         const loggedOut = statusCode === DisconnectReason.loggedOut;
-        const shouldReconnect = !manualStop && !loggedOut && reconnectAllowed;
+        const restartRequired = statusCode === DisconnectReason.restartRequired;
+        const shouldReconnect = !manualStop && !loggedOut && (reconnectAllowed || sessionHadQr || restartRequired);
 
         const failedBeforeOpen = !manualStop && !reconnectAllowed && !loggedOut;
-        unopenedFailureCount = failedBeforeOpen ? unopenedFailureCount + 1 : 0;
+        const staleFailure = failedBeforeOpen && !sessionHadQr && !restartRequired;
+        unopenedFailureCount = staleFailure ? unopenedFailureCount + 1 : 0;
 
-        if (failedBeforeOpen && unopenedFailureCount >= 1) {
+        if (staleFailure && unopenedFailureCount >= 1) {
           await clearAuthState();
         }
 
-        connectionStatus = manualStop ? connectionStatus : (loggedOut || failedBeforeOpen ? 'logged_out' : 'disconnected');
+        connectionStatus = manualStop ? connectionStatus : (loggedOut || staleFailure ? 'logged_out' : 'disconnected');
         connectedNumber = null;
         lastQr = null;
         lastQrDataUrl = null;
         lastError = manualStop ? lastError : (
-          failedBeforeOpen
+          staleFailure
             ? 'Previous WhatsApp session was stale. Auth was cleared; click Connect / QR to generate a new QR code.'
-            : (lastDisconnect?.error?.message || null)
+            : (shouldReconnect ? 'WhatsApp pairing completed. Reconnecting session...' : (lastDisconnect?.error?.message || null))
         );
         sock = null;
         manualStop = false;
+        sessionHadQr = false;
 
         if (shouldReconnect) {
           setTimeout(() => {
