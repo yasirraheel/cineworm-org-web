@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\WhatsappServerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
@@ -11,6 +12,8 @@ class WhatsappController extends Controller
 {
     public function index()
     {
+        app(WhatsappServerService::class)->ensureRunning();
+
         $page_title = 'WhatsApp Web';
         $status = $this->requestServer('get', '/status');
 
@@ -36,6 +39,8 @@ class WhatsappController extends Controller
 
     public function status()
     {
+        app(WhatsappServerService::class)->ensureRunning();
+
         return response()->json($this->requestServer('get', '/status'));
     }
 

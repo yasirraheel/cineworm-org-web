@@ -6,6 +6,7 @@ use App\Mail\SendEmail;
 use App\PromotionalCampaign;
 use App\Services\PromotionalCampaignService;
 use App\Services\CronMonitorService;
+use App\Services\WhatsappServerService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -82,6 +83,7 @@ class TaskCron extends Command
             }
 
             (new PromotionalCampaignService())->processDueCampaigns(5, 25);
+            (new WhatsappServerService())->ensureRunning();
 
             $monitor->markSuccess('Cron completed successfully.', [
                 'campaigns_checked' => PromotionalCampaign::whereIn('status', [
