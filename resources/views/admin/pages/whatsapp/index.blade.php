@@ -77,14 +77,14 @@
                                         </tbody>
                                     </table>
 
-                                    <form method="post" action="{{ URL::to('admin/whatsapp/connect') }}" style="display:inline-block;">
+                                    <form id="wa-connect-form" method="post" action="{{ URL::to('admin/whatsapp/connect') }}" style="{{ $currentStatus === 'connected' ? 'display:none;' : 'display:inline-block;' }}">
                                         @csrf
                                         <button type="submit" class="btn btn-success">
                                             <i class="fa fa-qrcode"></i> Connect / QR
                                         </button>
                                     </form>
 
-                                    <form method="post" action="{{ URL::to('admin/whatsapp/logout') }}" style="display:inline-block;">
+                                    <form id="wa-logout-form" method="post" action="{{ URL::to('admin/whatsapp/logout') }}" style="{{ $currentStatus === 'connected' ? 'display:inline-block;' : 'display:none;' }}">
                                         @csrf
                                         <button type="submit" class="btn btn-danger">
                                             <i class="fa fa-sign-out"></i> Logout
@@ -233,6 +233,8 @@
         var lastError = document.getElementById('wa-last-error');
         var qrImage = document.getElementById('wa-qr-image');
         var qrEmpty = document.getElementById('wa-qr-empty');
+        var connectForm = document.getElementById('wa-connect-form');
+        var logoutForm = document.getElementById('wa-logout-form');
         var sendForm = document.getElementById('wa-send-form');
         var sendButton = document.getElementById('wa-send-button');
         var sendAlert = document.getElementById('wa-send-alert');
@@ -248,6 +250,16 @@
             statusText.textContent = label(current);
             connectedNumber.textContent = data.connectedNumber || 'Not connected';
             lastError.textContent = data.lastError || 'None';
+
+            if (connectForm && logoutForm) {
+                if (current === 'connected') {
+                    connectForm.style.display = 'none';
+                    logoutForm.style.display = 'inline-block';
+                } else {
+                    connectForm.style.display = 'inline-block';
+                    logoutForm.style.display = 'none';
+                }
+            }
 
             if (data.qrDataUrl) {
                 qrImage.src = data.qrDataUrl;

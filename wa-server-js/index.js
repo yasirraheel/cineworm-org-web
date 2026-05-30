@@ -28,6 +28,7 @@ let starting = false;
 let manualStop = false;
 let reconnectAllowed = false;
 let qrIdleTimer = null;
+let unopenedFailureCount = 0;
 
 app.use(express.json({ limit: '1mb' }));
 
@@ -153,6 +154,7 @@ async function startSocket() {
         clearQrIdleTimer();
         connectionStatus = 'connected';
         reconnectAllowed = true;
+        unopenedFailureCount = 0;
         connectedNumber = sock?.user?.id || null;
         lastQr = null;
         lastQrDataUrl = null;
@@ -165,11 +167,22 @@ async function startSocket() {
         const loggedOut = statusCode === DisconnectReason.loggedOut;
         const shouldReconnect = !manualStop && !loggedOut && reconnectAllowed;
 
-        connectionStatus = manualStop ? connectionStatus : (loggedOut ? 'logged_out' : 'disconnected');
+        const failedBeforeOpen = !manualStop && !reconnectAllowed && !loggedOut;
+        unopenedFailureCount = failedBeforeOpen ? unopenedFailureCount + 1 : 0;
+
+        if (failedBeforeOpen && unopenedFailureCount >= 1) {
+          await clearAuthState();
+        }
+
+        connectionStatus = manualStop ? connectionStatus : (loggedOut || failedBeforeOpen ? 'logged_out' : 'disconnected');
         connectedNumber = null;
         lastQr = null;
         lastQrDataUrl = null;
-        lastError = manualStop ? lastError : (lastDisconnect?.error?.message || null);
+        lastError = manualStop ? lastError : (
+          failedBeforeOpen
+            ? 'Previous WhatsApp session was stale. Auth was cleared; click Connect / QR to generate a new QR code.'
+            : (lastDisconnect?.error?.message || null)
+        );
         sock = null;
         manualStop = false;
 
