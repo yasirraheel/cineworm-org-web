@@ -21,7 +21,7 @@
     </div>
 </div>
 
-<div class="vfx-item-ptb vfx-item-info">
+<div class="edit-profile-area vfx-item-ptb vfx-item-info">
     <div class="container-fluid">
         <div class="profile-section">
             <div class="row">
@@ -39,59 +39,53 @@
                         </div>
                     @endif
 
-                    <div class="promo-panel">
-                        <div class="promo-panel-header">
-                            <div>
-                                <h3><i class="fa fa-plus-circle" style="color:#ff0f28;margin-right:8px;"></i> Create Job Listing</h3>
+                    <div class="edit-profile-form">
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-12">
+                                <h3 style="color:#fff;margin-bottom:10px;"><i class="fa fa-plus-circle" style="color:#e50914;margin-right:8px;"></i> Create Job Listing</h3>
                             </div>
                         </div>
 
-                        <form method="post" action="{{ URL::to('user/jobs/store') }}">
+                        <form method="post" action="{{ URL::to('user/jobs/store') }}" class="row">
                             @csrf
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="promo-form-group">
-                                        <label class="promo-label">Job Title <span style="color:#ff0f28;">*</span></label>
-                                        <input type="text" name="title" class="promo-input form-control" value="{{ old('title') }}" placeholder="e.g. Video Editor" required>
-                                    </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="form-group mb-3">
+                                    <label>Job Title *</label>
+                                    <input type="text" name="title" class="form-control" value="{{ old('title') }}" placeholder="e.g. Video Editor" required>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="promo-form-group">
-                                        <label class="promo-label">Company Name <span style="color:#ff0f28;">*</span></label>
-                                        <input type="text" name="company" class="promo-input form-control" value="{{ old('company') }}" placeholder="e.g. Warner Bros" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="promo-form-group">
-                                        <label class="promo-label">Location <span style="color:#ff0f28;">*</span></label>
-                                        <input type="text" name="location" class="promo-input form-control" value="{{ old('location') }}" placeholder="e.g. Los Angeles, CA or Remote" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="promo-form-group">
-                                        <label class="promo-label">Salary <span style="color:rgba(255,255,255,0.3);font-weight:500;">(optional)</span></label>
-                                        <input type="text" name="salary" class="promo-input form-control" value="{{ old('salary') }}" placeholder="e.g. $50k - $70k">
-                                    </div>
+                            
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <div class="form-group mb-3">
+                                    <label>Company Name *</label>
+                                    <input type="text" name="company" class="form-control" value="{{ old('company') }}" placeholder="e.g. Warner Bros" required>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="promo-form-group">
-                                        <label class="promo-label">Job Description</label>
-                                        <textarea name="description" class="promo-textarea form-control" rows="8" placeholder="Describe the job requirements and responsibilities...">{{ old('description') }}</textarea>
-                                    </div>
+                            
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <div class="form-group mb-3">
+                                    <label>Location *</label>
+                                    <input type="text" name="location" class="form-control" value="{{ old('location') }}" placeholder="e.g. Los Angeles, CA or Remote" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                <div class="form-group mb-3">
+                                    <label>Salary (optional)</label>
+                                    <input type="text" name="salary" class="form-control" value="{{ old('salary') }}" placeholder="e.g. $50k - $70k">
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="form-group mb-3">
+                                    <label>Job Description</label>
+                                    <textarea name="description" class="form-control" rows="8" placeholder="Describe the job requirements and responsibilities...">{{ old('description') }}</textarea>
                                 </div>
                             </div>
 
-                            <div style="display:flex;justify-content:flex-end;gap:12px;margin-bottom:20px;">
-                                <a href="{{ URL::to('user/jobs') }}" class="promo-btn promo-btn-ghost">
-                                    <i class="fa fa-times"></i> Cancel
-                                </a>
-                                <button type="submit" class="promo-btn promo-btn-primary">
-                                    <i class="fa fa-paper-plane"></i> Submit for Approval
-                                </button>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-30 text-right" style="text-align: right;">
+                                <a href="{{ URL::to('user/jobs') }}" class="btn btn-default" style="color: #fff; border: 1px solid #fff; padding: 10px 20px; text-transform: uppercase; margin-right: 10px; text-decoration: none;">Cancel</a>
+                                <button type="submit" class="vfx-item-btn-danger text-uppercase">Submit for Approval</button>
                             </div>
                         </form>
                     </div>

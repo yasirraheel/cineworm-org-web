@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<div class="vfx-item-ptb vfx-item-info">
+<div class="edit-profile-area vfx-item-ptb vfx-item-info">
     <div class="container-fluid">
         <div class="profile-section">
             <div class="row">
@@ -35,64 +35,57 @@
                     </div>
                     @endif
 
-                    <div class="promo-panel">
-                        <div class="promo-panel-header">
-                            <div>
-                                <h3><i class="fa fa-briefcase" style="color:#ff0f28;margin-right:8px;"></i> Job Listings</h3>
-                                <p class="promo-subtitle">Manage your job listings. All jobs require admin approval before they appear live.</p>
+                    <div class="edit-profile-form">
+                        
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-md-6">
+                                <h3 style="color:#fff;margin-bottom:5px;"><i class="fa fa-briefcase" style="color:#e50914;margin-right:8px;"></i> Job Listings</h3>
+                                <p style="color:#ccc;font-size:14px;">Manage your job listings. All jobs require admin approval.</p>
                             </div>
-                            <div class="promo-panel-actions">
-                                <a href="{{ URL::to('user/jobs/create') }}" class="promo-btn promo-btn-primary">
+                            <div class="col-md-6 text-right" style="text-align: right; padding-top: 10px;">
+                                <a href="{{ URL::to('user/jobs/create') }}" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none;">
                                     <i class="fa fa-plus"></i> Post a Job
                                 </a>
                             </div>
                         </div>
 
-                        <div class="promo-table-wrap">
-                            <table class="promo-table">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped" style="color: #fff; border-color: rgba(255,255,255,0.1);">
                                 <thead>
                                     <tr>
-                                        <th>Title</th>
-                                        <th>Company</th>
-                                        <th>Location</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
+                                        <th style="border-color: rgba(255,255,255,0.1);">Title</th>
+                                        <th style="border-color: rgba(255,255,255,0.1);">Company</th>
+                                        <th style="border-color: rgba(255,255,255,0.1);">Location</th>
+                                        <th style="border-color: rgba(255,255,255,0.1);">Status</th>
+                                        <th style="border-color: rgba(255,255,255,0.1);">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($jobs as $job)
                                         <tr>
-                                            <td style="color:rgba(255,255,255,0.85);font-weight:500;">{{ $job->title }}</td>
-                                            <td style="color:rgba(255,255,255,0.55);font-size:13px;">{{ $job->company }}</td>
-                                            <td style="color:rgba(255,255,255,0.45);font-size:13px;">{{ $job->location }}</td>
-                                            <td>
+                                            <td style="border-color: rgba(255,255,255,0.1);">{{ $job->title }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1);">{{ $job->company }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1);">{{ $job->location }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1);">
                                                 @if($job->status == 1)
-                                                    <span class="promo-badge promo-badge-success">
-                                                        <span class="promo-badge-dot"></span>
-                                                        Approved
-                                                    </span>
+                                                    <span class="badge" style="background-color: #28a745; padding: 5px 10px;">Approved</span>
                                                 @else
-                                                    <span class="promo-badge promo-badge-warning">
-                                                        <span class="promo-badge-dot"></span>
-                                                        Pending
-                                                    </span>
+                                                    <span class="badge" style="background-color: #ffc107; color:#000; padding: 5px 10px;">Pending</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <div class="promo-table-actions">
-                                                    <a href="{{ URL::to('user/jobs/edit/'.$job->id) }}" class="promo-btn promo-btn-ghost promo-btn-sm">
-                                                        <i class="fa fa-pencil"></i> Edit
-                                                    </a>
-                                                    <a href="{{ URL::to('user/jobs/delete/'.$job->id) }}" class="promo-btn promo-btn-danger-ghost promo-btn-sm" onclick="return confirm('Are you sure you want to delete this job listing?');">
-                                                        <i class="fa fa-trash"></i> Delete
-                                                    </a>
-                                                </div>
+                                            <td style="border-color: rgba(255,255,255,0.1);">
+                                                <a href="{{ URL::to('user/jobs/edit/'.$job->id) }}" class="btn btn-sm btn-info" title="Edit">
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                                <a href="{{ URL::to('user/jobs/delete/'.$job->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this job listing?');" title="Delete">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="promo-table-empty">
-                                                <i class="fa fa-briefcase" style="font-size:32px;display:block;margin-bottom:14px;opacity:0.18;"></i>
+                                            <td colspan="5" class="text-center" style="border-color: rgba(255,255,255,0.1); padding: 30px;">
+                                                <i class="fa fa-briefcase" style="font-size:32px;display:block;margin-bottom:14px;opacity:0.2;"></i>
                                                 No job listings yet.
                                             </td>
                                         </tr>
@@ -100,7 +93,11 @@
                                 </tbody>
                             </table>
                         </div>
-                        @include('_particles.pagination', ['paginator' => $jobs])
+                        
+                        <div style="margin-top:20px;">
+                            @include('_particles.pagination', ['paginator' => $jobs])
+                        </div>
+
                     </div>
                 </div>
             </div>
