@@ -7,6 +7,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box">
+                        <div class="page-title-right">
+                            <a href="{{ URL::to('admin/job_listings/add') }}" class="btn btn-danger btn-sm"><i class="fa fa-plus"></i> Add Job</a>
+                        </div>
                         <h4 class="page-title">{{ $page_title }}</h4>
                     </div>
                 </div>

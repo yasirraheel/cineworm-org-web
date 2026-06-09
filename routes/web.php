@@ -214,6 +214,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
 
         // Admin Job Listings
         Route::get('job_listings', 'JobListingController@index');
+        Route::get('job_listings/add', 'JobListingController@create');
+        Route::post('job_listings/store', 'JobListingController@store');
         Route::get('job_listings/show/{id}', 'JobListingController@show');
         Route::get('job_listings/approve/{id}', 'JobListingController@approve');
         Route::get('job_listings/unapprove/{id}', 'JobListingController@unapprove');

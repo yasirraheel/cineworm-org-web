@@ -5,12 +5,43 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\JobListing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobListingController extends Controller
 {
     public function __construct()
     {
         $this->middleware('admin');
+    }
+
+    public function create()
+    {
+        $page_title = 'Add Job Listing';
+        return view('admin.pages.jobs.add', compact('page_title'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required',
+            'company' => 'required',
+            'location' => 'required',
+            'description' => 'required'
+        ]);
+
+        $job = new JobListing;
+        $job->user_id = Auth::user()->id; // Assigned to the admin creating it
+        $job->title = $request->title;
+        $job->company = $request->company;
+        $job->location = $request->location;
+        $job->salary = $request->salary;
+        $job->contact_details = $request->contact_details;
+        $job->description = $request->description;
+        $job->status = $request->status ?? 1; // Default to approved since admin creates it
+        $job->save();
+
+        \Session::flash('flash_message', 'Job Listing Added');
+        return redirect('admin/job_listings');
     }
 
     public function index()
