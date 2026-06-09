@@ -58,10 +58,17 @@
                                 </div>
                             </div>
                             
-                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                 <div class="form-group mb-3">
                                     <label>Salary (optional)</label>
                                     <input type="text" name="salary" class="form-control" value="{{ old('salary') }}" placeholder="e.g. $50k - $70k">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <div class="form-group mb-3">
+                                    <label>Contact Details</label>
+                                    <input type="text" name="contact_details" class="form-control" value="{{ old('contact_details') }}" placeholder="e.g. email@example.com or link">
                                 </div>
                             </div>
                             

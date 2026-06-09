@@ -61,6 +61,7 @@ class UserJobController extends Controller
         $job->company = $request->company;
         $job->location = $request->location;
         $job->salary = $request->salary;
+        $job->contact_details = $request->contact_details;
         $job->status = 0; // Default to pending
         $job->save();
 
@@ -97,6 +98,7 @@ class UserJobController extends Controller
         $job->company = $request->company;
         $job->location = $request->location;
         $job->salary = $request->salary;
+        $job->contact_details = $request->contact_details;
         // If they edit, should it go back to pending? Usually yes.
         $job->status = 0; 
         $job->save();

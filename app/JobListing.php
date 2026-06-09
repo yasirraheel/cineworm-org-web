@@ -15,6 +15,7 @@ class JobListing extends Model
         'company',
         'location',
         'salary',
+        'contact_details',
         'status',
     ];
 
