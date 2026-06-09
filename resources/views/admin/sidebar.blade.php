@@ -121,7 +121,12 @@
                                         class="fa fa-users"></i><span>{{ trans('words.deleted_users') }}</span></a>
                             </li>
                         </ul>
+                    </li>
 
+                    <li class="{{ classActivePath('job_listings') }}">
+                        <a href="{{ URL::to('admin/job_listings') }}" class="waves-effect {{ classActivePath('job_listings') }}">
+                            <i class="fa fa-briefcase"></i><span>Job Listings</span>
+                        </a>
                     </li>
 
                     <li class="has_sub">

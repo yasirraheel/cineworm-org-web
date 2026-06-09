@@ -37,6 +37,7 @@ class SubscriptionPlan extends Model
         'pro_creator_tools' => 'Pro Creator Tools',
         'extended_media_uploads' => 'Extended Media Uploads',
         'priority_promotion' => 'Priority Promotion',
+        'job_listing' => 'Job Listing',
     ];
 
     public function scopeActive($query)

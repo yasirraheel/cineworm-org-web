@@ -106,6 +106,11 @@
             'url' => URL('promotions'),
             'icon' => 'fa fa-rocket',
         ],
+        'job_listing' => [
+            'title' => 'Job Listing',
+            'url' => URL('user/jobs'),
+            'icon' => 'fa fa-briefcase',
+        ],
     ];
 
     foreach ($featureLinkConfig as $featureKey => $linkConfig) {

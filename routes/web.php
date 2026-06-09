@@ -212,6 +212,12 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::post('subscription_plan/add_edit_plan', 'SubscriptionPlanController@addnew');
         Route::get('subscription_plan/delete/{id}', 'SubscriptionPlanController@delete');
 
+        // Admin Job Listings
+        Route::get('job_listings', 'JobListingController@index');
+        Route::get('job_listings/approve/{id}', 'JobListingController@approve');
+        Route::get('job_listings/unapprove/{id}', 'JobListingController@unapprove');
+        Route::get('job_listings/delete/{id}', 'JobListingController@delete');
+
         Route::get('transactions', 'TransactionsController@transactions_list');
         Route::post('transactions/export', 'TransactionsController@transactions_export');
 
@@ -487,6 +493,14 @@ Route::get('user/films/find_imdb_movie', 'UserFilmController@findImdbMovie');
 Route::post('user/films/store', 'UserFilmController@store');
 Route::delete('user/films/{id}/delete', 'UserFilmController@destroy');
 Route::post('user/films/{id}/delete', 'UserFilmController@destroy'); // fallback for non-JS
+
+// User Job Listings
+Route::get('user/jobs', 'UserJobController@index');
+Route::get('user/jobs/create', 'UserJobController@create');
+Route::post('user/jobs/store', 'UserJobController@store');
+Route::get('user/jobs/edit/{id}', 'UserJobController@edit');
+Route::post('user/jobs/update/{id}', 'UserJobController@update');
+Route::get('user/jobs/delete/{id}', 'UserJobController@destroy');
 
 
 Route::get('membership_plan', 'UserController@membership_plan');
