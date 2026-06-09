@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('job_listings');
+
         Schema::create('job_listings', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->integer('user_id');
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('company')->nullable();
@@ -21,8 +23,6 @@ return new class extends Migration
             $table->string('salary')->nullable();
             $table->tinyInteger('status')->default(0)->comment('0: Pending, 1: Approved');
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
