@@ -195,8 +195,9 @@ class IndexController extends Controller
         } catch (\Exception $e) {
              \Log::error("RSS Fetch Error: " . $e->getMessage());
         }
+        $job_listings = \App\JobListing::where('status', 1)->orderBy('id', 'desc')->take(10)->get();
 
-        return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers', 'rss_news'));
+        return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers', 'rss_news', 'job_listings'));
     }
 
     public function getRandomMovie(Request $request)

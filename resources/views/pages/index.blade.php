@@ -755,6 +755,32 @@
                                         @endforeach
                                     @endif
 
+                                    @if(isset($job_listings) && count($job_listings) > 0)
+                                        @php $has_news = true; @endphp
+                                        @foreach($job_listings as $job)
+                                            <div class="news-item" style="background: rgba(40, 167, 69, 0.05); padding: 10px; border-radius: 5px; border-left: 3px solid #28a745; margin-bottom: 20px;">
+                                                <div class="news-headline" style="color: #fff;">
+                                                    <span class="breaking-badge" style="background: #28a745; padding: 3px 8px; font-weight: bold;">JOB</span>
+                                                    {{ $job->title }}
+                                                </div>
+                                                <div class="news-details" style="color: #bbb;">
+                                                    <strong>{{ $job->company }}</strong> - {{ $job->location }}
+                                                </div>
+                                                <span class="news-time">
+                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($job->created_at)->diffForHumans() }}
+                                                </span>
+                                                <a href="#" onclick="event.preventDefault(); $(this).next('.job-inline-details').slideToggle();" style="display: block; font-size: 12px; color: #fe8805; margin-top: 5px; font-weight: bold;">
+                                                    <i class="fa fa-chevron-down"></i> View Details
+                                                </a>
+                                                <div class="job-inline-details" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #ddd; line-height: 1.5;">
+                                                    <strong>Salary:</strong> {{ $job->salary ?? 'N/A' }}<br>
+                                                    <strong>Contact:</strong> {{ $job->contact_details ?? 'N/A' }}<br><br>
+                                                    {!! nl2br(e($job->description)) !!}
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+
                                     @if(!$has_news)
                                         <p style="color: #888; padding: 15px;">No news updates at the moment.</p>
                                     @endif
