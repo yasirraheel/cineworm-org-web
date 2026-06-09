@@ -65,10 +65,10 @@
                                                 @endif
                                             </td>
                                             <td style="border-color: rgba(255,255,255,0.1);">
-                                                <a href="{{ URL::to('user/jobs/edit/'.$job->id) }}" title="Edit" style="display:inline-block; padding:6px 10px; background:rgba(255,255,255,0.08); color:#fff; border-radius:6px; margin-right:4px; transition:0.2s;">
-                                                    <i class="fa fa-pencil"></i>
+                                                <a href="{{ URL::to('user/jobs/edit/'.$job->id) }}" title="Edit" style="color: #4CAF50; font-size: 18px; margin-right: 15px; text-decoration: none;">
+                                                    <i class="fa fa-edit"></i>
                                                 </a>
-                                                <a href="{{ URL::to('user/jobs/delete/'.$job->id) }}" onclick="return confirm('Are you sure you want to delete this job listing?');" title="Delete" style="display:inline-block; padding:6px 10px; background:rgba(229,9,20,0.15); color:#e50914; border-radius:6px; transition:0.2s;">
+                                                <a href="{{ URL::to('user/jobs/delete/'.$job->id) }}" onclick="return confirm('Are you sure you want to delete this job listing?');" title="Delete" style="color: #e50914; font-size: 18px; text-decoration: none;">
                                                     <i class="fa fa-trash"></i>
                                                 </a>
                                             </td>
