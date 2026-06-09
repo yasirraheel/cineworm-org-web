@@ -716,68 +716,61 @@
                                         $has_news = false;
                                     @endphp
 
-                                    @if(isset($news_tickers) && count($news_tickers) > 0)
+                                    @if(isset($mixed_feed) && count($mixed_feed) > 0)
                                         @php $has_news = true; @endphp
-                                        @foreach($news_tickers as $news)
-                                            <div class="news-item">
-                                                <div class="news-headline">
-                                                    @if($news->is_breaking)
-                                                        <span class="breaking-badge">BREAKING</span>
-                                                    @endif
-                                                    {{ $news->headline }}
+                                        @foreach($mixed_feed as $item)
+                                            @if($item['type'] == 'news_ticker')
+                                                <div class="news-item">
+                                                    <div class="news-headline">
+                                                        @if($item['is_breaking'])
+                                                            <span class="breaking-badge">BREAKING</span>
+                                                        @endif
+                                                        {{ $item['headline'] }}
+                                                    </div>
+                                                    <div class="news-details">
+                                                        {!! \Illuminate\Support\Str::limit(strip_tags($item['details']), 150) !!}
+                                                    </div>
+                                                    <span class="news-time">
+                                                        <i class="fa fa-clock-o"></i> {{ $item['created_at']->diffForHumans() }}
+                                                    </span>
                                                 </div>
-                                                <div class="news-details">
-                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news->details), 150) !!}
+                                            @elseif($item['type'] == 'rss')
+                                                <div class="news-item">
+                                                    <div class="news-headline">
+                                                        <span class="breaking-badge" style="background: #007bff;">{{ $item['feed_name'] }}</span>
+                                                        {{ $item['headline'] }}
+                                                    </div>
+                                                    <div class="news-details">
+                                                        {!! \Illuminate\Support\Str::limit(strip_tags($item['details']), 150) !!}
+                                                    </div>
+                                                    <span class="news-time">
+                                                        <i class="fa fa-clock-o"></i> {{ $item['created_at']->diffForHumans() }}
+                                                    </span>
+                                                    <a href="javascript:void(0)" class="read-dw-news" data-link="{{ $item['link'] }}" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read Full Story</a>
                                                 </div>
-                                                <span class="news-time">
-                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news->created_at)->diffForHumans() }}
-                                                </span>
-                                            </div>
-                                        @endforeach
-                                    @endif
-
-                                    @if(isset($rss_news) && count($rss_news) > 0)
-                                        @php $has_news = true; @endphp
-                                        @foreach($rss_news as $news)
-                                            <div class="news-item">
-                                                <div class="news-headline">
-                                                    <span class="breaking-badge" style="background: #007bff;">{{ $news['feed_name'] }}</span>
-                                                    {{ $news['headline'] }}
+                                            @elseif($item['type'] == 'job')
+                                                @php $job = $item['job']; @endphp
+                                                <div class="news-item" style="background: rgba(40, 167, 69, 0.05); padding: 10px; border-radius: 5px; border-left: 3px solid #28a745; margin-bottom: 20px;">
+                                                    <div class="news-headline" style="color: #fff;">
+                                                        <span class="breaking-badge" style="background: #28a745; padding: 3px 8px; font-weight: bold;">JOB</span>
+                                                        {{ $job->title }}
+                                                    </div>
+                                                    <div class="news-details" style="color: #bbb;">
+                                                        <strong>{{ $job->company }}</strong> - {{ $job->location }}
+                                                    </div>
+                                                    <span class="news-time">
+                                                        <i class="fa fa-clock-o"></i> {{ $item['created_at']->diffForHumans() }}
+                                                    </span>
+                                                    <a href="javascript:void(0)" onclick="$(this).next('.job-inline-details').slideToggle();" style="display: block; font-size: 12px; color: #fe8805; margin-top: 5px; font-weight: bold;">
+                                                        <i class="fa fa-chevron-down"></i> View Details
+                                                    </a>
+                                                    <div class="job-inline-details" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #ddd; line-height: 1.5;">
+                                                        <strong>Salary:</strong> {{ $job->salary ?? 'N/A' }}<br>
+                                                        <strong>Contact:</strong> {{ $job->contact_details ?? 'N/A' }}<br><br>
+                                                        {!! nl2br(e($job->description)) !!}
+                                                    </div>
                                                 </div>
-                                                <div class="news-details">
-                                                    {!! \Illuminate\Support\Str::limit(strip_tags($news['details']), 150) !!}
-                                                </div>
-                                                <span class="news-time">
-                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($news['created_at'])->diffForHumans() }}
-                                                </span>
-                                                <a href="#" class="read-dw-news" data-link="{{ $news['link'] }}" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read Full Story</a>
-                                            </div>
-                                        @endforeach
-                                    @endif
-
-                                    @if(isset($job_listings) && count($job_listings) > 0)
-                                        @php $has_news = true; @endphp
-                                        @foreach($job_listings as $job)
-                                            <div class="news-item" style="background: rgba(40, 167, 69, 0.05); padding: 10px; border-radius: 5px; border-left: 3px solid #28a745; margin-bottom: 20px;">
-                                                <div class="news-headline" style="color: #fff;">
-                                                    <span class="breaking-badge" style="background: #28a745; padding: 3px 8px; font-weight: bold;">JOB</span>
-                                                    {{ $job->title }}
-                                                </div>
-                                                <div class="news-details" style="color: #bbb;">
-                                                    <strong>{{ $job->company }}</strong> - {{ $job->location }}
-                                                </div>
-                                                <span class="news-time">
-                                                    <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::parse($job->created_at)->diffForHumans() }}
-                                                </span>
-                                                <a href="#" onclick="event.preventDefault(); $(this).next('.job-inline-details').slideToggle();" style="display: block; font-size: 12px; color: #fe8805; margin-top: 5px; font-weight: bold;">
-                                                    <i class="fa fa-chevron-down"></i> View Details
-                                                </a>
-                                                <div class="job-inline-details" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #ddd; line-height: 1.5;">
-                                                    <strong>Salary:</strong> {{ $job->salary ?? 'N/A' }}<br>
-                                                    <strong>Contact:</strong> {{ $job->contact_details ?? 'N/A' }}<br><br>
-                                                    {!! nl2br(e($job->description)) !!}
-                                                </div>
-                                            </div>
+                                            @endif
                                         @endforeach
                                     @endif
 

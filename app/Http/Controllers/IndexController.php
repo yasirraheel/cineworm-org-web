@@ -187,17 +187,56 @@ class IndexController extends Controller
 
         $rss_news = [];
         try {
-            // Cache RSS feed results for 30 minutes to improve performance and avoid blocking
             $rss_news = Cache::remember('home_rss_news', 30 * 60, function () {
                 return app(RssFeedService::class)->fetchItems(20, 10);
             });
-
         } catch (\Exception $e) {
              \Log::error("RSS Fetch Error: " . $e->getMessage());
         }
+
         $job_listings = \App\JobListing::where('status', 1)->orderBy('id', 'desc')->take(10)->get();
 
-        return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'news_tickers', 'rss_news', 'job_listings'));
+        $mixed_feed = [];
+        
+        foreach($news_tickers as $news) {
+            $mixed_feed[] = [
+                'type' => 'news_ticker',
+                'is_breaking' => $news->is_breaking,
+                'headline' => $news->headline,
+                'details' => $news->details,
+                'created_at' => \Carbon\Carbon::parse($news->created_at),
+                'link' => null
+            ];
+        }
+
+        foreach($rss_news as $news) {
+            $mixed_feed[] = [
+                'type' => 'rss',
+                'feed_name' => $news['feed_name'],
+                'headline' => $news['headline'],
+                'details' => $news['details'],
+                'created_at' => \Carbon\Carbon::parse($news['created_at']),
+                'link' => $news['link']
+            ];
+        }
+
+        foreach($job_listings as $job) {
+            $mixed_feed[] = [
+                'type' => 'job',
+                'job' => $job,
+                'created_at' => \Carbon\Carbon::parse($job->created_at)
+            ];
+        }
+
+        usort($mixed_feed, function($a, $b) {
+            // Keep breaking news tickers at the top regardless of time
+            if ($a['type'] == 'news_ticker' && $a['is_breaking'] && (!isset($b['is_breaking']) || !$b['is_breaking'])) return -1;
+            if ($b['type'] == 'news_ticker' && $b['is_breaking'] && (!isset($a['is_breaking']) || !$a['is_breaking'])) return 1;
+            
+            return $b['created_at'] <=> $a['created_at'];
+        });
+
+        return view('pages.index', compact('movies_info', 'genres', 'slider', 'recently_watched', 'upcoming_movies', 'upcoming_series', 'home_sections', 'movies_list', 'pagination_limit', 'random_movie', 'user_has_liked', 'mixed_feed'));
     }
 
     public function getRandomMovie(Request $request)
