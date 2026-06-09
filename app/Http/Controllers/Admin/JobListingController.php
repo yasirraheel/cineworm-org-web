@@ -20,6 +20,13 @@ class JobListingController extends Controller
         return view('admin.pages.jobs.index', compact('jobs', 'page_title'));
     }
 
+    public function show($id)
+    {
+        $job = JobListing::with('user')->findOrFail($id);
+        $page_title = 'Job Details';
+        return view('admin.pages.jobs.show', compact('job', 'page_title'));
+    }
+
     public function approve($id)
     {
         $job = JobListing::findOrFail($id);

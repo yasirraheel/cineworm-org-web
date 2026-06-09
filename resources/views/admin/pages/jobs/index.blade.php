@@ -7,12 +7,6 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box">
-                        <div class="page-title-right">
-                            <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ URL::to('admin/dashboard') }}">Home</a></li>
-                                <li class="breadcrumb-item active">{{ $page_title }}</li>
-                            </ol>
-                        </div>
                         <h4 class="page-title">{{ $page_title }}</h4>
                     </div>
                 </div>
@@ -59,6 +53,7 @@
                                                     @endif
                                                 </td>
                                                 <td>
+                                                    <a href="{{ URL::to('admin/job_listings/show/'.$job->id) }}" class="btn btn-icon waves-effect waves-light btn-info m-b-5 m-r-5" data-toggle="tooltip" title="View Details"> <i class="fa fa-eye"></i> </a>
                                                     @if($job->status == 1)
                                                         <a href="{{ URL::to('admin/job_listings/unapprove/'.$job->id) }}" class="btn btn-icon waves-effect waves-light btn-warning m-b-5 m-r-5" data-toggle="tooltip" title="Unapprove"> <i class="fa fa-times"></i> </a>
                                                     @else

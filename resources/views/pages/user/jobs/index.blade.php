@@ -65,6 +65,9 @@
                                                 @endif
                                             </td>
                                             <td style="border-color: rgba(255,255,255,0.1);">
+                                                <a href="{{ URL::to('user/jobs/show/'.$job->id) }}" title="View" style="color: #03a9f4; font-size: 18px; margin-right: 15px; text-decoration: none;">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
                                                 <a href="{{ URL::to('user/jobs/edit/'.$job->id) }}" title="Edit" style="color: #4CAF50; font-size: 18px; margin-right: 15px; text-decoration: none;">
                                                     <i class="fa fa-edit"></i>
                                                 </a>

@@ -214,6 +214,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
 
         // Admin Job Listings
         Route::get('job_listings', 'JobListingController@index');
+        Route::get('job_listings/show/{id}', 'JobListingController@show');
         Route::get('job_listings/approve/{id}', 'JobListingController@approve');
         Route::get('job_listings/unapprove/{id}', 'JobListingController@unapprove');
         Route::get('job_listings/delete/{id}', 'JobListingController@delete');
@@ -498,6 +499,7 @@ Route::post('user/films/{id}/delete', 'UserFilmController@destroy'); // fallback
 Route::get('user/jobs', 'UserJobController@index');
 Route::get('user/jobs/create', 'UserJobController@create');
 Route::post('user/jobs/store', 'UserJobController@store');
+Route::get('user/jobs/show/{id}', 'UserJobController@show');
 Route::get('user/jobs/edit/{id}', 'UserJobController@edit');
 Route::post('user/jobs/update/{id}', 'UserJobController@update');
 Route::get('user/jobs/delete/{id}', 'UserJobController@destroy');

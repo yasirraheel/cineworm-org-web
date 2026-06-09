@@ -69,6 +69,12 @@ class UserJobController extends Controller
         return redirect('user/jobs');
     }
 
+    public function show($id)
+    {
+        $job = JobListing::where('id', $id)->where('user_id', Auth::user()->id)->firstOrFail();
+        return view('pages.user.jobs.show', compact('job'));
+    }
+
     public function edit($id)
     {
         $job = JobListing::where('id', $id)->where('user_id', Auth::user()->id)->firstOrFail();
