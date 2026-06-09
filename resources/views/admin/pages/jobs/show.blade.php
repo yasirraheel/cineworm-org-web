@@ -38,7 +38,7 @@
 
                             <div class="row mb-3" style="color: #fff;">
                                 <div class="col-md-3" style="color: #ccc;"><strong>Salary:</strong></div>
-                                <div class="col-md-9">{{ $job->salary ?? 'N/A' }}</div>
+                                <div class="col-md-9">{{ $job->salary ? html_entity_decode(getCurrencySymbols(getcong('currency_code'))).' '.$job->salary : 'N/A' }}</div>
                             </div>
 
                             <div class="row mb-3" style="color: #fff;">

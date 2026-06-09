@@ -61,7 +61,7 @@
                                     </tr>
                                     <tr>
                                         <th style="border-color: rgba(255,255,255,0.1); color: #ccc;">Salary</th>
-                                        <td style="border-color: rgba(255,255,255,0.1);">{{ $job->salary ?? 'N/A' }}</td>
+                                        <td style="border-color: rgba(255,255,255,0.1);">{{ $job->salary ? html_entity_decode(getCurrencySymbols(getcong('currency_code'))).' '.$job->salary : 'N/A' }}</td>
                                     </tr>
                                     <tr>
                                         <th style="border-color: rgba(255,255,255,0.1); color: #ccc;">Contact Details</th>

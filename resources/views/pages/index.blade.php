@@ -765,7 +765,7 @@
                                                         <i class="fa fa-chevron-down"></i> View Details
                                                     </a>
                                                     <div class="job-inline-details" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #ddd; line-height: 1.5;">
-                                                        <strong>Salary:</strong> {{ $job->salary ?? 'N/A' }}<br>
+                                                        <strong>Salary:</strong> {{ $job->salary ? html_entity_decode(getCurrencySymbols(getcong('currency_code'))).' '.$job->salary : 'N/A' }}<br>
                                                         <strong>Contact:</strong> {{ $job->contact_details ?? 'N/A' }}<br><br>
                                                         {!! nl2br(e($job->description)) !!}
                                                     </div>
