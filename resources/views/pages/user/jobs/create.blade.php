@@ -28,17 +28,6 @@
                 @include('pages.user._sidebar')
                 <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                     
-                    @if (count($errors) > 0)
-                        <div class="alert alert-danger">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
                     <div class="edit-profile-form">
                         <div class="row" style="margin-bottom: 20px;">
                             <div class="col-12">

@@ -60,11 +60,11 @@
                                                 </td>
                                                 <td>
                                                     @if($job->status == 1)
-                                                        <a href="{{ URL::to('admin/job_listings/unapprove/'.$job->id) }}" class="btn btn-warning btn-sm" title="Unapprove"><i class="fa fa-times"></i> Unapprove</a>
+                                                        <a href="{{ URL::to('admin/job_listings/unapprove/'.$job->id) }}" class="btn btn-icon waves-effect waves-light btn-warning m-b-5 m-r-5" data-toggle="tooltip" title="Unapprove"> <i class="fa fa-times"></i> </a>
                                                     @else
-                                                        <a href="{{ URL::to('admin/job_listings/approve/'.$job->id) }}" class="btn btn-success btn-sm" title="Approve"><i class="fa fa-check"></i> Approve</a>
+                                                        <a href="{{ URL::to('admin/job_listings/approve/'.$job->id) }}" class="btn btn-icon waves-effect waves-light btn-success m-b-5 m-r-5" data-toggle="tooltip" title="Approve"> <i class="fa fa-check"></i> </a>
                                                     @endif
-                                                    <a href="{{ URL::to('admin/job_listings/delete/'.$job->id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');" title="Delete"><i class="fa fa-trash"></i></a>
+                                                    <a href="{{ URL::to('admin/job_listings/delete/'.$job->id) }}" class="btn btn-icon waves-effect waves-light btn-danger m-b-5 m-r-5" onclick="return confirm('Are you sure?');" data-toggle="tooltip" title="Delete"><i class="fa fa-remove"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -72,9 +72,9 @@
                                 </table>
                             </div>
                             
-                            <div class="mt-3">
-                                @include('_particles.pagination', ['paginator' => $jobs])
-                            </div>
+                            <nav class="paging_simple_numbers">
+                                @include('admin.pagination', ['paginator' => $jobs])
+                            </nav>
 
                         </div>
                     </div>

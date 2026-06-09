@@ -26,15 +26,6 @@
             <div class="row">
                 @include('pages.user._sidebar')
                 <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
-                    @if(Session::has('flash_message'))
-                    <div class="alert alert-success">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        {{ Session::get('flash_message') }}
-                    </div>
-                    @endif
-
                     <div class="edit-profile-form">
                         
                         <div class="row" style="margin-bottom: 20px;">
@@ -74,10 +65,10 @@
                                                 @endif
                                             </td>
                                             <td style="border-color: rgba(255,255,255,0.1);">
-                                                <a href="{{ URL::to('user/jobs/edit/'.$job->id) }}" class="btn btn-sm btn-info" title="Edit">
+                                                <a href="{{ URL::to('user/jobs/edit/'.$job->id) }}" title="Edit" style="display:inline-block; padding:6px 10px; background:rgba(255,255,255,0.08); color:#fff; border-radius:6px; margin-right:4px; transition:0.2s;">
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
-                                                <a href="{{ URL::to('user/jobs/delete/'.$job->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this job listing?');" title="Delete">
+                                                <a href="{{ URL::to('user/jobs/delete/'.$job->id) }}" onclick="return confirm('Are you sure you want to delete this job listing?');" title="Delete" style="display:inline-block; padding:6px 10px; background:rgba(229,9,20,0.15); color:#e50914; border-radius:6px; transition:0.2s;">
                                                     <i class="fa fa-trash"></i>
                                                 </a>
                                             </td>
@@ -104,4 +95,32 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    @if (Session::has('flash_message'))
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: false,
+        })
+        Toast.fire({
+            icon: 'success',
+            title: '{{ Session::get('flash_message') }}'
+        })
+    @endif
+    @if (count($errors) > 0)
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            html: '<p>@foreach ($errors->all() as $error) {{ $error }}<br/> @endforeach</p>',
+            showConfirmButton: true,
+            confirmButtonColor: '#10c469',
+            background: "#1a2234",
+            color: "#fff"
+        })
+    @endif
+</script>
+
 @endsection
