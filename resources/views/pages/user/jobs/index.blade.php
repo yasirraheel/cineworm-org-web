@@ -41,22 +41,22 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped" style="color: #fff; border-color: rgba(255,255,255,0.1);">
+                            <table class="table table-bordered" style="color: #fff; border-color: rgba(255,255,255,0.1);">
                                 <thead>
                                     <tr>
-                                        <th style="border-color: rgba(255,255,255,0.1);">Title</th>
-                                        <th style="border-color: rgba(255,255,255,0.1);">Company</th>
-                                        <th style="border-color: rgba(255,255,255,0.1);">Location</th>
-                                        <th style="border-color: rgba(255,255,255,0.1);">Status</th>
-                                        <th style="border-color: rgba(255,255,255,0.1);">Actions</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Title</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Company</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Location</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Status</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($jobs as $job)
                                         <tr>
-                                            <td style="border-color: rgba(255,255,255,0.1);">{{ $job->title }}</td>
-                                            <td style="border-color: rgba(255,255,255,0.1);">{{ $job->company }}</td>
-                                            <td style="border-color: rgba(255,255,255,0.1);">{{ $job->location }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $job->title }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $job->company }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $job->location }}</td>
                                             <td style="border-color: rgba(255,255,255,0.1);">
                                                 @if($job->status == 1)
                                                     <span class="badge" style="background-color: #28a745; padding: 5px 10px;">Approved</span>
