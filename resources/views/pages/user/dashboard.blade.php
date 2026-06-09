@@ -118,6 +118,7 @@
 <!-- End Breadcrumb -->
 
 <!-- Start Dashboard Page -->
+
 <div class="vfx-item-ptb vfx-item-info">
   <div class="container-fluid">
     <div class="row">
@@ -126,37 +127,7 @@
 
         <div class="profile-section">
           <div class="row">
-            <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
-              <div class="img-profile">
-                @if(Auth::User()->user_image)
-                <img src="{{ URL::asset('upload/'.Auth::User()->user_image) }}" class="img-rounded" alt="profile pic" title="profile pic">
-                @else
-                <img src="{{ URL::asset('site_assets/images/user-avatar.png') }}" class="img-rounded" alt="profile_img" title="profile pic">
-                @endif
-
-              </div>
-              <div class="profile_title_item">
-                <h5>{{Auth::User()->name}}</h5>
-                <p>{{Auth::User()->email}}</p>
-                <a href="{{ URL::to('profile') }}" class="vfx-item-btn-danger text-uppercase"><i class="fa fa-edit"></i>{{trans('words.edit')}}</a><br /><br />
-
-                <a href="#" class="vfx-item-btn-danger text-uppercase data_remove"><i class="fa fa-trash"></i>Account Delete</a>
-
-                @if(!empty($dashboardFeatureLinks))
-                <div class="dashboard-feature-sidebar">
-                  <h6>Plan Access</h6>
-                  <div class="dashboard-feature-links">
-                    @foreach($dashboardFeatureLinks as $featureLink)
-                      <a href="{{ $featureLink['url'] }}">
-                        <i class="{{ $featureLink['icon'] }}"></i>
-                        <span>{{ $featureLink['title'] }}</span>
-                      </a>
-                    @endforeach
-                  </div>
-                </div>
-                @endif
-              </div>
-            </div>
+            @include('pages.user._sidebar')
             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
               <div class="row dashboard-card-grid">
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">

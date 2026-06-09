@@ -1,0 +1,210 @@
+@php
+    $currentPlan = null;
+    $planFeatureKeys = [];
+
+    if (!empty(Auth::User()->plan_id)) {
+        $currentPlan = \App\SubscriptionPlan::find(Auth::User()->plan_id);
+        if ($currentPlan) {
+            $planFeatureKeys = $currentPlan->getEffectiveFeatureKeys();
+        }
+    }
+
+    $dashboardFeatureLinks = [];
+    $featureLinkConfig = [
+        'watch_content' => [
+            'title' => 'Watch Content',
+            'url' => URL('/'),
+            'icon' => 'fa fa-play-circle',
+        ],
+        'donate_to_projects' => [
+            'title' => 'Donate to Projects',
+            'url' => getcong('donation_link') ? stripslashes(getcong('donation_link')) : 'javascript:void(0);',
+            'icon' => 'fa fa-heart',
+        ],
+        'play_games' => [
+            'title' => 'Play Games',
+            'url' => URL('game/remote-control'),
+            'icon' => 'fa fa-gamepad',
+        ],
+        'basic_user_account' => [
+            'title' => 'Basic User Account',
+            'url' => URL('dashboard'),
+            'icon' => 'fa fa-user-circle',
+        ],
+        'personal_profile_page' => [
+            'title' => 'Personal Profile Page',
+            'url' => URL('profile'),
+            'icon' => 'fa fa-id-card',
+        ],
+        'film_uploads' => [
+            'title' => 'Film Uploads',
+            'url' => URL('user/films'),
+            'icon' => 'fa fa-upload',
+        ],
+        'promotion_services' => [
+            'title' => 'Promotion Services',
+            'url' => URL('promotions'),
+            'icon' => 'fa fa-bullhorn',
+        ],
+        'deal_plus_access' => [
+            'title' => 'Deal Plus Access',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-handshake-o',
+        ],
+        'crowdfunding_link_sharing' => [
+            'title' => 'Crowdfunding Link Sharing',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-link',
+        ],
+        'website_link_sharing' => [
+            'title' => 'Website Link Sharing',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-globe',
+        ],
+        'photo_gallery' => [
+            'title' => 'Photo Gallery',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-image',
+        ],
+        'project_showcase_page' => [
+            'title' => 'Project Showcase Page',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-film',
+        ],
+        'film_project_space' => [
+            'title' => 'Film Project Space',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-folder-open',
+        ],
+        'film_editing_access' => [
+            'title' => 'Film Editing Access',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-cut',
+        ],
+        'colour_grading_access' => [
+            'title' => 'Colour Grading Access',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-adjust',
+        ],
+        'advanced_film_showcase' => [
+            'title' => 'Advanced Film Showcase',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-star',
+        ],
+        'pro_creator_tools' => [
+            'title' => 'Pro Creator Tools',
+            'url' => 'javascript:void(0);',
+            'icon' => 'fa fa-wrench',
+        ],
+        'extended_media_uploads' => [
+            'title' => 'Extended Media Uploads',
+            'url' => URL('user/films/upload'),
+            'icon' => 'fa fa-cloud-upload',
+        ],
+        'priority_promotion' => [
+            'title' => 'Priority Promotion',
+            'url' => URL('promotions'),
+            'icon' => 'fa fa-rocket',
+        ],
+    ];
+
+    foreach ($featureLinkConfig as $featureKey => $linkConfig) {
+        if (in_array($featureKey, $planFeatureKeys, true)) {
+            $dashboardFeatureLinks[] = $linkConfig;
+        }
+    }
+@endphp
+<style>
+  .dashboard-feature-sidebar {
+    margin-top: 22px;
+  }
+
+  .dashboard-feature-sidebar h6 {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .dashboard-feature-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dashboard-feature-links a {
+    align-items: center;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 5px;
+    color: #ffffff;
+    display: flex;
+    font-size: 14px;
+    font-weight: 600;
+    gap: 10px;
+    line-height: 20px;
+    padding: 10px 12px;
+    text-decoration: none;
+    transition: all .2s ease;
+  }
+
+  .dashboard-feature-links a:hover {
+    background: #fe0278;
+    border-color: #fe0278;
+    color: #ffffff;
+  }
+
+  .dashboard-feature-links i {
+    flex: 0 0 18px;
+    text-align: center;
+  }
+
+  @media only screen and (max-width: 991px) {
+    .dashboard-feature-sidebar {
+      margin-bottom: 25px;
+    }
+
+    .dashboard-feature-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media only screen and (max-width: 575px) {
+    .dashboard-feature-links {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
+  <div class="img-profile">
+    @if(Auth::User()->user_image)
+    <img src="{{ URL::asset('upload/'.Auth::User()->user_image) }}" class="img-rounded" alt="profile pic" title="profile pic">
+    @else
+    <img src="{{ URL::asset('site_assets/images/user-avatar.png') }}" class="img-rounded" alt="profile_img" title="profile pic">
+    @endif
+  </div>
+  <div class="profile_title_item">
+    <h5>{{Auth::User()->name}}</h5>
+    <p>{{Auth::User()->email}}</p>
+    <a href="{{ URL::to('profile') }}" class="vfx-item-btn-danger text-uppercase"><i class="fa fa-edit"></i>{{trans('words.edit')}}</a><br /><br />
+    <a href="#" class="vfx-item-btn-danger text-uppercase data_remove"><i class="fa fa-trash"></i>Account Delete</a>
+
+    @if(!empty($dashboardFeatureLinks))
+    <div class="dashboard-feature-sidebar">
+      <h6>Plan Access</h6>
+      <div class="dashboard-feature-links">
+        @foreach($dashboardFeatureLinks as $featureLink)
+          <a href="{{ $featureLink['url'] }}">
+            <i class="{{ $featureLink['icon'] }}"></i>
+            <span>{{ $featureLink['title'] }}</span>
+          </a>
+        @endforeach
+      </div>
+    </div>
+    @endif
+  </div>
+</div>

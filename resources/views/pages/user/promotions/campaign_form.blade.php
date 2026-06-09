@@ -26,7 +26,11 @@
 
 <div class="vfx-item-ptb vfx-item-info">
     <div class="container-fluid">
-        @include('pages.user.promotions._nav')
+        <div class="profile-section">
+            <div class="row">
+                @include('pages.user._sidebar')
+                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
+                    @include('pages.user.promotions._nav')
 
         <form method="post" action="{{ URL::to('promotions/campaigns/save') }}" id="campaign-form">
             @csrf
@@ -154,6 +158,9 @@
                 </button>
             </div>
         </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
