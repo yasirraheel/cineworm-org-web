@@ -104,25 +104,27 @@
            }) 
     @endif
 
-    $(".data_remove_link").click(function (e) {
-      e.preventDefault();
-      var href = $(this).attr("href");
-      Swal.fire({
-        title: '{{trans('words.dlt_warning')}}',
-        text: "{{trans('words.dlt_warning_text')}}",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: '{{trans('words.dlt_confirm')}}',
-        cancelButtonText: "{{trans('words.btn_cancel')}}",
-        background:"#1a2234",
-        color:"#fff"
-      }).then((result) => {
-        if(result.isConfirmed) {
-           window.location.href = href;
-        }
-      })
+    document.addEventListener("DOMContentLoaded", function(event) {
+        $(".data_remove_link").click(function (e) {
+          e.preventDefault();
+          var href = $(this).attr("href");
+          Swal.fire({
+            title: '{{trans('words.dlt_warning')}}',
+            text: "{{trans('words.dlt_warning_text')}}",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '{{trans('words.dlt_confirm')}}',
+            cancelButtonText: "{{trans('words.btn_cancel')}}",
+            background:"#1a2234",
+            color:"#fff"
+          }).then((result) => {
+            if(result.isConfirmed) {
+               window.location.href = href;
+            }
+          })
+        });
     });
 </script>
 
