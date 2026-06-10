@@ -720,33 +720,52 @@
                                         @php $has_news = true; @endphp
                                         @foreach($mixed_feed as $item)
                                             @if($item['type'] == 'news_ticker')
-                                                <div class="news-item">
-                                                    <div class="news-headline">
-                                                        @if($item['is_breaking'])
-                                                            <span class="breaking-badge">BREAKING</span>
-                                                        @endif
+                                                @php
+                                                    $is_admin = $item['is_admin'] ?? false;
+                                                    $theme_color = $is_admin ? '#e50914' : '#fe8805'; // Red for admin, Orange for user
+                                                    $badge_text = $is_admin ? 'NEWS' : 'USER NEWS';
+                                                    if ($item['is_breaking']) $badge_text = 'BREAKING';
+                                                @endphp
+                                                <div class="news-item" style="background: {{ $is_admin ? 'rgba(229, 9, 20, 0.05)' : 'rgba(254, 136, 5, 0.05)' }}; padding: 10px; border-radius: 5px; border-left: 3px solid {{ $theme_color }}; margin-bottom: 20px;">
+                                                    <div class="news-headline" style="color: #fff;">
+                                                        <span class="breaking-badge" style="background: {{ $theme_color }}; padding: 3px 8px; font-weight: bold;">{{ $badge_text }}</span>
                                                         {{ $item['headline'] }}
                                                     </div>
-                                                    <div class="news-details">
-                                                        {!! \Illuminate\Support\Str::limit(strip_tags($item['details']), 150) !!}
+                                                    <div class="news-details" style="color: #bbb;">
+                                                        {!! \Illuminate\Support\Str::limit(strip_tags($item['details']), 100) !!}
                                                     </div>
                                                     <span class="news-time">
                                                         <i class="fa fa-clock-o"></i> {{ $item['created_at']->diffForHumans() }}
+                                                        @if(!$is_admin && $item['user_name'])
+                                                            &bull; by <strong>{{ $item['user_name'] }}</strong>
+                                                        @endif
                                                     </span>
+                                                    <a href="javascript:void(0)" onclick="$(this).next('.news-inline-details').slideToggle();" style="display: block; font-size: 12px; color: #fe8805; margin-top: 5px; font-weight: bold;">
+                                                        <i class="fa fa-chevron-down"></i> Read More
+                                                    </a>
+                                                    <div class="news-inline-details" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #ddd; line-height: 1.5;">
+                                                        {!! $item['details'] !!}
+                                                    </div>
                                                 </div>
                                             @elseif($item['type'] == 'rss')
-                                                <div class="news-item">
-                                                    <div class="news-headline">
-                                                        <span class="breaking-badge" style="background: #007bff;">{{ $item['feed_name'] }}</span>
+                                                <div class="news-item" style="background: rgba(0, 123, 255, 0.05); padding: 10px; border-radius: 5px; border-left: 3px solid #007bff; margin-bottom: 20px;">
+                                                    <div class="news-headline" style="color: #fff;">
+                                                        <span class="breaking-badge" style="background: #007bff; padding: 3px 8px; font-weight: bold;">{{ $item['feed_name'] }}</span>
                                                         {{ $item['headline'] }}
                                                     </div>
-                                                    <div class="news-details">
-                                                        {!! \Illuminate\Support\Str::limit(strip_tags($item['details']), 150) !!}
+                                                    <div class="news-details" style="color: #bbb;">
+                                                        {!! \Illuminate\Support\Str::limit(strip_tags($item['details']), 100) !!}
                                                     </div>
                                                     <span class="news-time">
                                                         <i class="fa fa-clock-o"></i> {{ $item['created_at']->diffForHumans() }}
                                                     </span>
-                                                    <a href="javascript:void(0)" class="read-dw-news" data-link="{{ $item['link'] }}" style="display: block; font-size: 11px; color: #fe8805; margin-top: 5px;">Read Full Story</a>
+                                                    <a href="javascript:void(0)" onclick="$(this).next('.rss-inline-details').slideToggle();" style="display: block; font-size: 12px; color: #fe8805; margin-top: 5px; font-weight: bold;">
+                                                        <i class="fa fa-chevron-down"></i> Read More
+                                                    </a>
+                                                    <div class="rss-inline-details" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #ddd; line-height: 1.5;">
+                                                        {!! $item['details'] !!}
+                                                        <a href="javascript:void(0)" class="read-dw-news" data-link="{{ $item['link'] }}" style="display: inline-block; background: #fe8805; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 11px; margin-top: 10px; text-decoration: none;">Read Full Story on Source</a>
+                                                    </div>
                                                 </div>
                                             @elseif($item['type'] == 'job')
                                                 @php $job = $item['job']; @endphp

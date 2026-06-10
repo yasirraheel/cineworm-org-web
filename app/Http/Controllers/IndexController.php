@@ -183,7 +183,7 @@ class IndexController extends Controller
         $home_sections = HomeSections::where('status', 1)->orderby('id')->get();
         // user_has_liked
 
-        $news_tickers = NewsTicker::where('status', 1)->orderBy('is_breaking', 'desc')->orderBy('created_at', 'desc')->get();
+        $news_tickers = NewsTicker::with('user')->where('status', 1)->orderBy('is_breaking', 'desc')->orderBy('created_at', 'desc')->get();
 
         $rss_news = [];
         try {
@@ -205,6 +205,9 @@ class IndexController extends Controller
                 'headline' => $news->headline,
                 'details' => $news->details,
                 'created_at' => \Carbon\Carbon::parse($news->created_at),
+                'user_id' => $news->user_id,
+                'user_name' => optional($news->user)->name,
+                'is_admin' => optional($news->user)->usertype === 'Admin',
                 'link' => null
             ];
         }
