@@ -17,20 +17,24 @@ class UserNewsTickerController extends Controller
     private function hasNewsTickerFeature()
     {
         $user = Auth::user();
-        $plan = $user->subscription_plan;
+        if (!$user->plan_id) {
+            return false;
+        }
+
+        $plan = \App\SubscriptionPlan::find($user->plan_id);
 
         if (!$plan) {
             return false;
         }
 
-        $features = $plan->features ?? [];
+        $features = $plan->getEffectiveFeatureKeys();
         return in_array('news_ticker', $features);
     }
 
     public function index()
     {
         if (!$this->hasNewsTickerFeature()) {
-            \Session::flash('flash_message', 'Your current plan does not support News Tickers.');
+            \Session::flash('error_flash_message', 'Your current plan does not support News Tickers.');
             return redirect('dashboard');
         }
 
@@ -41,7 +45,7 @@ class UserNewsTickerController extends Controller
     public function create()
     {
         if (!$this->hasNewsTickerFeature()) {
-            \Session::flash('flash_message', 'Your current plan does not support News Tickers.');
+            \Session::flash('error_flash_message', 'Your current plan does not support News Tickers.');
             return redirect('dashboard');
         }
 
@@ -51,7 +55,7 @@ class UserNewsTickerController extends Controller
     public function store(Request $request)
     {
         if (!$this->hasNewsTickerFeature()) {
-            \Session::flash('flash_message', 'Your current plan does not support News Tickers.');
+            \Session::flash('error_flash_message', 'Your current plan does not support News Tickers.');
             return redirect('dashboard');
         }
 
