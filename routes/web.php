@@ -508,6 +508,11 @@ Route::get('user/jobs/edit/{id}', 'UserJobController@edit');
 Route::post('user/jobs/update/{id}', 'UserJobController@update');
 Route::get('user/jobs/delete/{id}', 'UserJobController@destroy');
 
+// User News Tickers
+Route::get('user/news_tickers', 'UserNewsTickerController@index');
+Route::get('user/news_tickers/create', 'UserNewsTickerController@create');
+Route::post('user/news_tickers/store', 'UserNewsTickerController@store');
+
 
 Route::get('membership_plan', 'UserController@membership_plan');
 Route::get('payment_method/{plan_id}', 'UserController@payment_method');
