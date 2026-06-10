@@ -27,9 +27,21 @@ class RssFeedService
                 }
 
                 $pubDate = (string) $item->pubDate;
+                
+                $contentNamespaces = $item->getNameSpaces(true);
+                $fullContent = '';
+                if (isset($contentNamespaces['content'])) {
+                    $contentXml = $item->children($contentNamespaces['content']);
+                    if (isset($contentXml->encoded)) {
+                        $fullContent = (string) $contentXml->encoded;
+                    }
+                }
+                
+                $details = !empty($fullContent) ? $fullContent : (string) $item->description;
+
                 $rssItems[] = [
                     'headline' => (string) $item->title,
-                    'details' => (string) $item->description,
+                    'details' => $details,
                     'created_at' => $pubDate,
                     'timestamp' => strtotime($pubDate) ?: 0,
                     'link' => (string) $item->link,
