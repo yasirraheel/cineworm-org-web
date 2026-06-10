@@ -254,37 +254,7 @@ function showSuggestions(inputString) {
   @endif
 @endif
 
-@if(Auth::user()->usertype!="Admin" AND Auth::user()->usertype!="Sub_Admin")
 
-<script type="text/javascript">
-
-  function executeQuery() {
-  $.ajax({
-    url: "{{url('check_user_remotely_logout_or_not/'.Session::getId())}}",
-    success: function(data) {
-
-      if(data=="false")
-      {
-         jQuery('#logout_remotly').modal('show');
-
-         var timer = setTimeout(function() {
-                  window.location="{{ URL::to('/') }}"
-              }, 5000);
-      }
-
-    }
-  });
-  setTimeout(executeQuery, 10000); // you could choose not to continue on failure...
-}
-
-$(document).ready(function() {
-  // run the first time; all subsequent calls will take care of themselves
-  setTimeout(executeQuery, 10000);
-});
-
-</script>
-
-@endif
 
 
 @endif
