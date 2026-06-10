@@ -741,7 +741,7 @@
                                                         @endif
                                                     </span>
                                                     <a href="javascript:void(0)" onclick="$(this).next('.news-inline-details').slideToggle();" style="display: block; font-size: 12px; color: #fe8805; margin-top: 5px; font-weight: bold;">
-                                                        <i class="fa fa-chevron-down"></i> Read More
+                                                        <i class="fa fa-chevron-down"></i> Read Full Story
                                                     </a>
                                                     <div class="news-inline-details" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #ddd; line-height: 1.5;">
                                                         {!! $item['details'] !!}
@@ -760,11 +760,10 @@
                                                         <i class="fa fa-clock-o"></i> {{ $item['created_at']->diffForHumans() }}
                                                     </span>
                                                     <a href="javascript:void(0)" onclick="$(this).next('.rss-inline-details').slideToggle();" style="display: block; font-size: 12px; color: #fe8805; margin-top: 5px; font-weight: bold;">
-                                                        <i class="fa fa-chevron-down"></i> Read More
+                                                        <i class="fa fa-chevron-down"></i> Read Full Story
                                                     </a>
                                                     <div class="rss-inline-details" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #ddd; line-height: 1.5;">
                                                         {!! $item['details'] !!}
-                                                        <a href="javascript:void(0)" class="read-dw-news" data-link="{{ $item['link'] }}" style="display: inline-block; background: #fe8805; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 11px; margin-top: 10px; text-decoration: none;">Read Full Story on Source</a>
                                                     </div>
                                                 </div>
                                             @elseif($item['type'] == 'job')
