@@ -308,8 +308,7 @@
 
   Toast.fire({
     icon: 'success',
-    title: '{{ Session::get('
-    flash_message ') }}'
+    title: '{{ Session::get('flash_message') }}'
   })
 
   @endif
@@ -330,8 +329,7 @@
 
   Toast.fire({
     icon: 'success',
-    title: '{{ Session::get('
-    success ') }}'
+    title: '{{ Session::get('success') }}'
   })
 
   @endif
@@ -352,8 +350,7 @@
 
   Toast.fire({
     icon: 'error',
-    title: '{{ Session::get('
-    error_flash_message ') }}'
+    title: '{{ Session::get('error_flash_message') }}'
   })
 
   @endif
