@@ -121,18 +121,29 @@
 @endphp
 <style>
   .dashboard-feature-sidebar {
-    margin-top: 22px;
+    margin-top: 25px;
+    text-align: left;
+  }
+
+  .plan-group {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   }
 
   .dashboard-feature-sidebar h6 {
-    color: #ffffff;
-    font-size: 15px;
+    color: #fe0278;
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 12px;
-    margin-top: 20px;
+    margin-bottom: 15px;
+    margin-top: 0;
     text-transform: uppercase;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(254, 2, 120, 0.3);
+    padding-bottom: 10px;
+    letter-spacing: 0.5px;
   }
 
   .dashboard-feature-links {
@@ -145,16 +156,16 @@
 
   .dashboard-feature-links a {
     align-items: center;
-    background: rgba(255, 255, 255, .05);
-    border: 1px solid rgba(255, 255, 255, .08);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 5px;
     color: #ffffff;
     display: flex;
     font-size: 14px;
-    font-weight: 600;
-    gap: 10px;
+    font-weight: 500;
+    gap: 12px;
     line-height: 20px;
-    padding: 10px 12px;
+    padding: 12px 15px;
     text-decoration: none;
     transition: all .2s ease;
   }
@@ -163,30 +174,33 @@
     background: #fe0278;
     border-color: #fe0278;
     color: #ffffff;
+    transform: translateX(4px);
   }
   
   .dashboard-feature-links a.locked-feature {
-    background: rgba(0, 0, 0, 0.2);
-    color: rgba(255, 255, 255, 0.4);
-    border-color: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.4);
+    color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.02);
   }
   
   .dashboard-feature-links a.locked-feature:hover {
-    background: rgba(254, 2, 120, 0.2);
-    border-color: rgba(254, 2, 120, 0.5);
-    color: rgba(255, 255, 255, 0.8);
+    background: rgba(254, 2, 120, 0.1);
+    border-color: rgba(254, 2, 120, 0.3);
+    color: rgba(255, 255, 255, 0.6);
+    transform: none;
     cursor: pointer;
   }
 
   .dashboard-feature-links i {
     flex: 0 0 18px;
     text-align: center;
+    font-size: 16px;
   }
   
   .dashboard-feature-links i.fa-lock {
     margin-left: auto;
     color: #fe0278;
-    opacity: 0.7;
+    opacity: 0.5;
     flex: 0 0 auto;
   }
 
@@ -228,28 +242,30 @@
             $directFeatures = $plan->getDirectFeatureKeys();
             if (empty($directFeatures)) continue;
         @endphp
-        <h6>{{ $plan->plan_name }}</h6>
-        <div class="dashboard-feature-links">
-          @foreach($directFeatures as $featureKey)
-            @if(isset($featureLinkConfig[$featureKey]))
-                @php 
-                    $featureLink = $featureLinkConfig[$featureKey]; 
-                    $hasAccess = in_array($featureKey, $planFeatureKeys, true);
-                @endphp
-                @if($hasAccess)
-                    <a href="{{ $featureLink['url'] }}">
-                        <i class="{{ $featureLink['icon'] }}"></i>
-                        <span>{{ $featureLink['title'] }}</span>
-                    </a>
-                @else
-                    <a href="javascript:void(0);" class="locked-feature" onclick="showUpgradeWarning('{{ addslashes($plan->plan_name) }}', '{{ addslashes($featureLink['title']) }}')">
-                        <i class="{{ $featureLink['icon'] }}"></i>
-                        <span>{{ $featureLink['title'] }}</span>
-                        <i class="fa fa-lock"></i>
-                    </a>
-                @endif
-            @endif
-          @endforeach
+        <div class="plan-group">
+          <h6>{{ $plan->plan_name }}</h6>
+          <div class="dashboard-feature-links">
+            @foreach($directFeatures as $featureKey)
+              @if(isset($featureLinkConfig[$featureKey]))
+                  @php 
+                      $featureLink = $featureLinkConfig[$featureKey]; 
+                      $hasAccess = in_array($featureKey, $planFeatureKeys, true);
+                  @endphp
+                  @if($hasAccess)
+                      <a href="{{ $featureLink['url'] }}">
+                          <i class="{{ $featureLink['icon'] }}"></i>
+                          <span>{{ $featureLink['title'] }}</span>
+                      </a>
+                  @else
+                      <a href="javascript:void(0);" class="locked-feature" onclick="showUpgradeWarning('{{ addslashes($plan->plan_name) }}', '{{ addslashes($featureLink['title']) }}')">
+                          <i class="{{ $featureLink['icon'] }}"></i>
+                          <span>{{ $featureLink['title'] }}</span>
+                          <i class="fa fa-lock"></i>
+                      </a>
+                  @endif
+              @endif
+            @endforeach
+          </div>
         </div>
       @endforeach
     </div>
