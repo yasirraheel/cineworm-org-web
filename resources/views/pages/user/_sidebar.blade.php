@@ -9,7 +9,8 @@
         }
     }
 
-    $dashboardFeatureLinks = [];
+    $activePlans = \App\SubscriptionPlan::active()->orderBy('plan_price')->get();
+
     $featureLinkConfig = [
         'watch_content' => [
             'title' => 'Watch Content',
@@ -117,12 +118,6 @@
             'icon' => 'fa fa-newspaper-o',
         ],
     ];
-
-    foreach ($featureLinkConfig as $featureKey => $linkConfig) {
-        if (in_array($featureKey, $planFeatureKeys, true)) {
-            $dashboardFeatureLinks[] = $linkConfig;
-        }
-    }
 @endphp
 <style>
   .dashboard-feature-sidebar {
@@ -134,7 +129,10 @@
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 12px;
+    margin-top: 20px;
     text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 8px;
   }
 
   .dashboard-feature-links {
@@ -166,10 +164,30 @@
     border-color: #fe0278;
     color: #ffffff;
   }
+  
+  .dashboard-feature-links a.locked-feature {
+    background: rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .dashboard-feature-links a.locked-feature:hover {
+    background: rgba(254, 2, 120, 0.2);
+    border-color: rgba(254, 2, 120, 0.5);
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+  }
 
   .dashboard-feature-links i {
     flex: 0 0 18px;
     text-align: center;
+  }
+  
+  .dashboard-feature-links i.fa-lock {
+    margin-left: auto;
+    color: #fe0278;
+    opacity: 0.7;
+    flex: 0 0 auto;
   }
 
   @media only screen and (max-width: 991px) {
@@ -203,18 +221,56 @@
     <a href="{{ URL::to('profile') }}" class="vfx-item-btn-danger text-uppercase"><i class="fa fa-edit"></i>{{trans('words.edit')}}</a><br /><br />
     <a href="#" class="vfx-item-btn-danger text-uppercase data_remove"><i class="fa fa-trash"></i>Account Delete</a>
 
-    @if(!empty($dashboardFeatureLinks))
+    @if(count($activePlans) > 0)
     <div class="dashboard-feature-sidebar">
-      <h6>Plan Access</h6>
-      <div class="dashboard-feature-links">
-        @foreach($dashboardFeatureLinks as $featureLink)
-          <a href="{{ $featureLink['url'] }}">
-            <i class="{{ $featureLink['icon'] }}"></i>
-            <span>{{ $featureLink['title'] }}</span>
-          </a>
-        @endforeach
-      </div>
+      @foreach($activePlans as $plan)
+        @php
+            $directFeatures = $plan->getDirectFeatureKeys();
+            if (empty($directFeatures)) continue;
+        @endphp
+        <h6>{{ $plan->plan_name }}</h6>
+        <div class="dashboard-feature-links">
+          @foreach($directFeatures as $featureKey)
+            @if(isset($featureLinkConfig[$featureKey]))
+                @php 
+                    $featureLink = $featureLinkConfig[$featureKey]; 
+                    $hasAccess = in_array($featureKey, $planFeatureKeys, true);
+                @endphp
+                @if($hasAccess)
+                    <a href="{{ $featureLink['url'] }}">
+                        <i class="{{ $featureLink['icon'] }}"></i>
+                        <span>{{ $featureLink['title'] }}</span>
+                    </a>
+                @else
+                    <a href="javascript:void(0);" class="locked-feature" onclick="showUpgradeWarning('{{ addslashes($plan->plan_name) }}', '{{ addslashes($featureLink['title']) }}')">
+                        <i class="{{ $featureLink['icon'] }}"></i>
+                        <span>{{ $featureLink['title'] }}</span>
+                        <i class="fa fa-lock"></i>
+                    </a>
+                @endif
+            @endif
+          @endforeach
+        </div>
+      @endforeach
     </div>
     @endif
   </div>
 </div>
+
+<script>
+function showUpgradeWarning(planName, featureName) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Upgrade Required',
+        html: 'You need to subscribe to the <strong>' + planName + '</strong> plan to access <strong>' + featureName + '</strong>.',
+        confirmButtonText: 'View Plans',
+        confirmButtonColor: '#fe0278',
+        showCancelButton: true,
+        cancelButtonText: 'Close'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{{ URL::to('membership_plan') }}";
+        }
+    });
+}
+</script>
