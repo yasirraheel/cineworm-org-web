@@ -1,4 +1,8 @@
 <div class="left side-menu">
+    @php
+        $pendingNewsCount = \App\Models\NewsTicker::where('status', 0)->count();
+        $pendingJobsCount = \App\JobListing::where('status', 0)->count();
+    @endphp
     <div class="sidebar-inner slimscrollleft">
         @if (Auth::User()->usertype == 'Admin')
             <div id="sidebar-menu">
@@ -23,7 +27,11 @@
                                 class="fa fa-trophy"></i><span>Awards</span></a></li>
 
                     <li><a href="{{ URL::to('admin/news_ticker') }}" class="waves-effect {{ classActivePath('news_ticker') }}"><i
-                                class="fa fa-newspaper-o"></i><span>News Ticker</span></a></li>
+                                class="fa fa-newspaper-o"></i><span>News Ticker</span>
+                                @if($pendingNewsCount > 0)
+                                    <span class="badge badge-danger pull-right" style="background-color: #f05050; border-radius: 10px; padding: 3px 7px;">{{ $pendingNewsCount }}</span>
+                                @endif
+                                </a></li>
                     <li><a href="{{ URL::to('admin/rss_feeds') }}" class="waves-effect {{ classActivePath('rss_feeds') }}"><i
                                 class="fa fa-rss"></i><span>RSS Feeds</span></a></li>
                     <li><a href="{{ URL::to('admin/home_sections') }}" class="waves-effect {{ classActivePath('home_sections') }}"><i
@@ -126,6 +134,9 @@
                     <li class="{{ classActivePath('job_listings') }}">
                         <a href="{{ URL::to('admin/job_listings') }}" class="waves-effect {{ classActivePath('job_listings') }}">
                             <i class="fa fa-briefcase"></i><span>Job Listings</span>
+                            @if($pendingJobsCount > 0)
+                                <span class="badge badge-danger pull-right" style="background-color: #f05050; border-radius: 10px; padding: 3px 7px;">{{ $pendingJobsCount }}</span>
+                            @endif
                         </a>
                     </li>
 
