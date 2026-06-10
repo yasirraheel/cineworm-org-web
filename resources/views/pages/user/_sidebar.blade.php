@@ -50,7 +50,7 @@
         'deal_plus_access' => [
             'title' => 'Deal Plus Access',
             'url' => 'javascript:void(0);',
-            'icon' => 'fa fa-handshake-o',
+            'icon' => 'fa fa-handshake',
         ],
         'crowdfunding_link_sharing' => [
             'title' => 'Crowdfunding Link Sharing',
@@ -100,7 +100,7 @@
         'extended_media_uploads' => [
             'title' => 'Extended Media Uploads',
             'url' => URL('user/films/upload'),
-            'icon' => 'fa fa-cloud-upload',
+            'icon' => 'fa fa-cloud-upload-alt',
         ],
         'priority_promotion' => [
             'title' => 'Priority Promotion',
@@ -115,7 +115,7 @@
         'news_ticker' => [
             'title' => 'News Ticker',
             'url' => URL('user/news_tickers'),
-            'icon' => 'fa fa-newspaper-o',
+            'icon' => 'fa fa-newspaper',
         ],
     ];
 @endphp
