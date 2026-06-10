@@ -134,4 +134,33 @@
     @include("admin.copyright")
 </div>
 
+<script type="text/javascript">
+    @if(Session::has('flash_message'))     
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: false,
+      })
+
+      Toast.fire({
+        icon: 'success',
+        title: '{{ Session::get('flash_message') }}'
+      })     
+    @endif
+
+    @if (count($errors) > 0)
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            html: '<p>@foreach ($errors->all() as $error) {{$error}}<br/> @endforeach</p>',
+            showConfirmButton: true,
+            confirmButtonColor: '#10c469',
+            background:"#1a2234",
+            color:"#fff"
+           }) 
+    @endif
+</script>
+
 @endsection
