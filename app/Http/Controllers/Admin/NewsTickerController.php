@@ -27,7 +27,7 @@ class NewsTickerController extends MainAdminController
         }
 
         $page_title = 'News Ticker';
-        $list = NewsTicker::orderBy('id', 'desc')->paginate(10);
+        $list = NewsTicker::with('user')->orderBy('id', 'desc')->paginate(10);
         $edit = null;
 
         return view('admin.pages.news_ticker.index', compact('page_title', 'list', 'edit'));
@@ -42,7 +42,7 @@ class NewsTickerController extends MainAdminController
         }
 
         $page_title = 'Edit News Ticker';
-        $list = NewsTicker::orderBy('id', 'desc')->paginate(10);
+        $list = NewsTicker::with('user')->orderBy('id', 'desc')->paginate(10);
         $edit = NewsTicker::findOrFail($id);
 
         return view('admin.pages.news_ticker.index', compact('page_title', 'list', 'edit'));
@@ -99,6 +99,40 @@ class NewsTickerController extends MainAdminController
         $obj->delete();
 
         \Session::flash('flash_message', trans('words.successfully_deleted'));
+
+        return redirect()->back();
+    }
+
+    public function approve($id)
+    {
+        if(Auth::User()->usertype!="Admin" AND Auth::User()->usertype!="Sub_Admin")
+        {
+            \Session::flash('flash_message', trans('words.access_denied'));
+            return redirect('dashboard');
+        }
+
+        $obj = NewsTicker::findOrFail($id);
+        $obj->status = 1;
+        $obj->save();
+
+        \Session::flash('flash_message', 'News Ticker Approved');
+
+        return redirect()->back();
+    }
+
+    public function unapprove($id)
+    {
+        if(Auth::User()->usertype!="Admin" AND Auth::User()->usertype!="Sub_Admin")
+        {
+            \Session::flash('flash_message', trans('words.access_denied'));
+            return redirect('dashboard');
+        }
+
+        $obj = NewsTicker::findOrFail($id);
+        $obj->status = 0;
+        $obj->save();
+
+        \Session::flash('flash_message', 'News Ticker Unapproved');
 
         return redirect()->back();
     }

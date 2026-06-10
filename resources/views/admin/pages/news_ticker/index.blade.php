@@ -70,6 +70,7 @@
                             <thead>
                                 <tr>
                                     <th>Headline</th>
+                                    <th>Submitted By</th>
                                     <th>Breaking</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -80,6 +81,13 @@
                                 <tr>
                                     <td>{{ $item->headline }}</td>
                                     <td>
+                                        @if($item->user)
+                                            <span class="badge badge-info">{{ $item->user->name }}</span>
+                                        @else
+                                            <span class="badge badge-primary">Admin</span>
+                                        @endif
+                                    </td>
+                                    <td>
                                         @if($item->is_breaking)
                                             <span class="badge badge-danger">Yes</span>
                                         @else
@@ -88,13 +96,22 @@
                                     </td>
                                     <td>
                                         @if($item->status)
-                                            <span class="badge badge-success">{{trans('words.active')}}</span>
+                                            <span class="badge badge-success">{{trans('words.active')}} / Approved</span>
                                         @else
-                                            <span class="badge badge-danger">{{trans('words.inactive')}}</span>
+                                            <span class="badge badge-warning text-white">Pending / {{trans('words.inactive')}}</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('admin/news_ticker/edit/'.$item->id) }}" class="btn btn-icon waves-effect waves-light btn-success m-r-5" data-toggle="tooltip" title="{{trans('words.edit')}}">
+                                        @if($item->status == 0)
+                                            <a href="{{ url('admin/news_ticker/approve/'.$item->id) }}" class="btn btn-icon waves-effect waves-light btn-success m-r-5" data-toggle="tooltip" title="Approve">
+                                                <i class="fa fa-check"></i>
+                                            </a>
+                                        @else
+                                            <a href="{{ url('admin/news_ticker/unapprove/'.$item->id) }}" class="btn btn-icon waves-effect waves-light btn-warning m-r-5" data-toggle="tooltip" title="Unapprove">
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                        @endif
+                                        <a href="{{ url('admin/news_ticker/edit/'.$item->id) }}" class="btn btn-icon waves-effect waves-light btn-primary m-r-5" data-toggle="tooltip" title="{{trans('words.edit')}}">
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         <a href="{{ url('admin/news_ticker/delete/'.$item->id) }}" class="btn btn-icon waves-effect waves-light btn-danger m-r-5" onclick="return confirm('{{trans('words.dlt_warning_text')}}')" data-toggle="tooltip" title="{{trans('words.remove')}}">

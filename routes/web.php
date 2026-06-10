@@ -236,6 +236,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::post('news_ticker/save', 'NewsTickerController@save');
         Route::get('news_ticker/edit/{id}', 'NewsTickerController@edit');
         Route::get('news_ticker/delete/{id}', 'NewsTickerController@delete');
+        Route::get('news_ticker/approve/{id}', 'NewsTickerController@approve');
+        Route::get('news_ticker/unapprove/{id}', 'NewsTickerController@unapprove');
 
         Route::get('rss_feeds', 'RssFeedController@index');
         Route::post('rss_feeds/save', 'RssFeedController@save');

@@ -38,6 +38,7 @@ class SubscriptionPlan extends Model
         'extended_media_uploads' => 'Extended Media Uploads',
         'priority_promotion' => 'Priority Promotion',
         'job_listing' => 'Job Listing',
+        'news_ticker' => 'News Ticker',
     ];
 
     public function scopeActive($query)

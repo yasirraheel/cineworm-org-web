@@ -111,6 +111,11 @@
             'url' => URL('user/jobs'),
             'icon' => 'fa fa-briefcase',
         ],
+        'news_ticker' => [
+            'title' => 'News Ticker',
+            'url' => URL('user/news_tickers'),
+            'icon' => 'fa fa-newspaper-o',
+        ],
     ];
 
     foreach ($featureLinkConfig as $featureKey => $linkConfig) {
