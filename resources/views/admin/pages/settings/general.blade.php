@@ -379,7 +379,19 @@
                                             copyText.select();
                                             copyText.setSelectionRange(0, 99999);
                                             document.execCommand("copy");
-                                            alert("Copied the URL: " + copyText.value);
+                                            
+                                            const Toast = Swal.mixin({
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 3000,
+                                                timerProgressBar: false,
+                                            });
+
+                                            Toast.fire({
+                                                icon: 'success',
+                                                title: 'URL Copied Successfully!'
+                                            });
                                         }
                                     </script>
 
