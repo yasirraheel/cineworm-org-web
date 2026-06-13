@@ -360,6 +360,28 @@
                                             <input type="text" name="zoom_client_secret" value="{{ isset($settings->zoom_client_secret) ? stripslashes($settings->zoom_client_secret) : null }}" class="form-control" placeholder="Enter Zoom Client Secret">
                                         </div>
                                     </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Redirect URL for OAuth <br><small>(Copy and paste this into Zoom)</small></label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" id="zoom_callback_url" value="{{ url('user/zoom/callback') }}" class="form-control" readonly="readonly">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary" type="button" onclick="copyZoomUrl()">Copy</button>
+                                                </div>
+                                            </div>
+                                            <small class="form-text text-muted">Paste this exact URL into both the <strong>Redirect URL for OAuth</strong> and <strong>OAuth Allow Lists</strong> sections in your Zoom App.</small>
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                        function copyZoomUrl() {
+                                            var copyText = document.getElementById("zoom_callback_url");
+                                            copyText.select();
+                                            copyText.setSelectionRange(0, 99999);
+                                            document.execCommand("copy");
+                                            alert("Copied the URL: " + copyText.value);
+                                        }
+                                    </script>
 
                                     <hr />
                                     <h4 class="m-t-0 header-title">{{ trans('words.footer_icon') }}
