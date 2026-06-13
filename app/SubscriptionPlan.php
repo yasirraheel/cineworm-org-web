@@ -39,6 +39,7 @@ class SubscriptionPlan extends Model
         'priority_promotion' => 'Priority Promotion',
         'job_listing' => 'Job Listing',
         'news_ticker' => 'News Ticker',
+        'live_broadcast' => 'Live Broadcast',
     ];
 
     public function scopeActive($query)

@@ -117,6 +117,11 @@
             'url' => URL('user/news_tickers'),
             'icon' => 'fa fa-newspaper',
         ],
+        'live_broadcast' => [
+            'title' => 'Live Broadcast',
+            'url' => URL('user/live_broadcasts'),
+            'icon' => 'fa fa-podcast',
+        ],
     ];
 @endphp
 <style>
