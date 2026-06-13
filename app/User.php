@@ -24,7 +24,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password', 'user_image', 'mobile', 'remember_token','usertype'];
+    protected $fillable = ['name', 'email', 'password', 'user_image', 'mobile', 'remember_token','usertype', 'zoom_access_token', 'zoom_refresh_token', 'zoom_account_id'];
 
     /**
      * The attributes that should be hidden for arrays.

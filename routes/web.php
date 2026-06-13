@@ -515,7 +515,12 @@ Route::post('user/news_tickers/store', 'UserNewsTickerController@store');
 
 // User Live Broadcasts
 Route::get('user/live_broadcasts', 'UserLiveBroadcastController@index');
+Route::get('user/live_broadcasts/create', 'UserLiveBroadcastController@create');
+Route::post('user/live_broadcasts/create', 'UserLiveBroadcastController@store');
 
+// Zoom OAuth
+Route::get('user/zoom/connect', 'ZoomOAuthController@connect');
+Route::get('user/zoom/callback', 'ZoomOAuthController@callback');
 
 Route::get('membership_plan', 'UserController@membership_plan');
 Route::get('payment_method/{plan_id}', 'UserController@payment_method');

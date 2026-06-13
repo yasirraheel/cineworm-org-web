@@ -120,6 +120,8 @@ class SettingsController extends MainAdminController
         $settings->gdpr_cookie_url = addslashes($inputs['gdpr_cookie_url']);
 
         $settings->tmdb_api_key = trim($inputs['tmdb_api_key']);
+        $settings->zoom_client_id = trim($inputs['zoom_client_id'] ?? '');
+        $settings->zoom_client_secret = trim($inputs['zoom_client_secret'] ?? '');
 
 	    $settings->save();
         Cache::forget('site_settings');

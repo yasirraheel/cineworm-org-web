@@ -346,6 +346,22 @@
 
 
                                     <hr />
+                                    <h4 class="m-t-0 header-title" id="zoomapi_id">Zoom Server-to-Server OAuth App API</h4>
+                                    <br />
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Zoom Client ID</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" name="zoom_client_id" value="{{ isset($settings->zoom_client_id) ? stripslashes($settings->zoom_client_id) : null }}" class="form-control" placeholder="Enter Zoom Client ID">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Zoom Client Secret</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" name="zoom_client_secret" value="{{ isset($settings->zoom_client_secret) ? stripslashes($settings->zoom_client_secret) : null }}" class="form-control" placeholder="Enter Zoom Client Secret">
+                                        </div>
+                                    </div>
+
+                                    <hr />
                                     <h4 class="m-t-0 header-title">{{ trans('words.footer_icon') }}
                                         <small id="emailHelp" class="form-text text-muted pt-1">Leave empty if you don't
                                             want to display the social icon.</small>
