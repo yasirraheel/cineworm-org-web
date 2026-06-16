@@ -122,6 +122,7 @@ class SettingsController extends MainAdminController
         $settings->tmdb_api_key = trim($inputs['tmdb_api_key']);
         $settings->zoom_client_id = trim($inputs['zoom_client_id'] ?? '');
         $settings->zoom_client_secret = trim($inputs['zoom_client_secret'] ?? '');
+        $settings->zoom_account_reference = trim($inputs['zoom_account_reference'] ?? '');
 
 	    $settings->save();
         Cache::forget('site_settings');

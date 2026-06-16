@@ -361,6 +361,13 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Zoom Account Reference <br><small>(For your memory only)</small></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" name="zoom_account_reference" value="{{ isset($settings->zoom_account_reference) ? stripslashes($settings->zoom_account_reference) : null }}" class="form-control" placeholder="e.g. admin@cineworm.org">
+                                            <small class="form-text text-muted">A note to remember which Zoom account was used to generate these credentials.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
                                         <label class="col-sm-3 col-form-label">Redirect URL for OAuth <br><small>(Copy and paste this into Zoom)</small></label>
                                         <div class="col-sm-8">
                                             <div class="input-group">
