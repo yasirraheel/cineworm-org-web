@@ -32,3 +32,8 @@ check_*.php
 # Logs
 /storage/logs/*.log
 *.log
+
+ffmpeg*
+ffmpeg.tar.xz
+public/test_exec.php
+
