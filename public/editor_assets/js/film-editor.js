@@ -95,11 +95,17 @@ const FilmEditor = (function() {
         // Load existing timeline data
         if (window.EDITOR_CONFIG.timelineData) {
             state.timeline = window.EDITOR_CONFIG.timelineData;
+            // If the database returned an empty array [], convert it to an object {}
+            if (Array.isArray(state.timeline)) {
+                state.timeline = {};
+            }
             if (!state.timeline.clips) state.timeline.clips = [];
             if (!state.timeline.audioTracks) state.timeline.audioTracks = [];
             if (!state.timeline.colorGrading) {
                 state.timeline.colorGrading = { brightness: 0, contrast: 100, saturation: 100, warmth: 0, sepia: 0 };
             }
+        } else {
+            state.timeline = { clips: [], audioTracks: [], colorGrading: { brightness: 0, contrast: 100, saturation: 100, warmth: 0, sepia: 0 } };
         }
 
         // Parse clips from DOM
