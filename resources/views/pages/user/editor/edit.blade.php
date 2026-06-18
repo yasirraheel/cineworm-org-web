@@ -397,6 +397,10 @@
 </div>
 
 <!-- ═══ PROJECT DATA (for JS) ═══ -->
+@php
+    $defaultTimeline = ['clips' => [], 'audioTracks' => [], 'colorGrading' => ['brightness' => 0, 'contrast' => 1.0, 'saturation' => 1.0, 'warmth' => 0, 'sepia' => 0]];
+    $timelineJson = $project->timeline_data ?? $defaultTimeline;
+@endphp
 <script>
     window.EDITOR_CONFIG = {
         projectId: {{ $project->id }},
@@ -407,9 +411,10 @@
         exportUrl: '{{ URL::to("user/editor/{$project->id}/export") }}',
         exportStatusUrl: '{{ URL::to("user/editor/{$project->id}/export-status") }}',
         downloadUrl: '{{ URL::to("user/editor/{$project->id}/download") }}',
-        timelineData: @json($project->timeline_data ?? ['clips' => [], 'audioTracks' => [], 'colorGrading' => ['brightness' => 0, 'contrast' => 1.0, 'saturation' => 1.0, 'warmth' => 0, 'sepia' => 0]])
+        timelineData: @json($timelineJson)
     };
 </script>
+
 <script src="{{ URL::asset('editor_assets/js/film-editor.js') }}"></script>
 
 </body>
