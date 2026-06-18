@@ -170,16 +170,18 @@ class VideoEditorController extends Controller
                     ->where('user_id', Auth::id())
                     ->firstOrFail();
 
+        \Log::info('saveTimeline payload', ['all' => $request->all(), 'timeline_data_type' => gettype($request->timeline_data)]);
+
         // Validate that timeline_data is an array (since Laravel decodes application/json automatically)
         $validator = Validator::make($request->all(), [
-            'timeline_data' => 'required|array',
+            'timeline_data' => 'required',
             'total_duration' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid timeline data.',
+                'message' => 'Validation failed: ' . $validator->errors()->first(),
                 'data'    => $validator->messages(),
             ], 422);
         }
