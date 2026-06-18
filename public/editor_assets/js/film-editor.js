@@ -268,9 +268,7 @@ const FilmEditor = (function() {
             const formData = new FormData();
             formData.append('clip_id', clipId);
 
-            ajax(window.EDITOR_CONFIG.deleteClipUrl, 'POST', null, function(err, resp) {
-                // We'll use FormData for delete too
-            });
+            // (Dummy ajax call removed)
 
             // Delete via form data POST
             const xhr = new XMLHttpRequest();
@@ -576,29 +574,20 @@ const FilmEditor = (function() {
         document.getElementById('sourceReel').classList.add('spinning');
         document.getElementById('masterReel').classList.add('spinning');
 
-        // Load the correct clip at the current playhead position
+        // Immediately sync the video element to the correct clip/time
         loadClipAtPlayhead();
 
-        // rAF loop only updates the visual playhead — the video drives its own time
-        function tick() {
+        let lastTime = performance.now();
+        function tick(now) {
             if (!state.isPlaying) return;
+            
+            // We must have 'now' from requestAnimationFrame
+            if (!now) now = performance.now();
+            
+            const delta = (now - lastTime) / 1000;
+            lastTime = now;
 
-            const video = document.getElementById('previewVideo');
-
-            // Sync playhead with actual video time
-            if (video.src && !video.paused && !video.ended) {
-                // Find which clip is loaded and compute global time from video.currentTime
-                let elapsed = 0;
-                for (let i = 0; i < state.timeline.clips.length; i++) {
-                    const tc = state.timeline.clips[i];
-                    const clipDuration = (tc.outPoint || 0) - (tc.inPoint || 0);
-                    if (video.dataset.currentClipId == tc.clipId) {
-                        state.playheadPosition = elapsed + (video.currentTime - (tc.inPoint || 0));
-                        break;
-                    }
-                    elapsed += clipDuration;
-                }
-            }
+            state.playheadPosition += delta;
 
             if (state.playheadPosition >= state.totalDuration) {
                 state.playheadPosition = state.totalDuration;
@@ -607,6 +596,7 @@ const FilmEditor = (function() {
             }
 
             updatePlayhead();
+            loadClipAtPlayhead();
             state.animationFrame = requestAnimationFrame(tick);
         }
         state.animationFrame = requestAnimationFrame(tick);
@@ -666,24 +656,26 @@ const FilmEditor = (function() {
                 if (String(video.dataset.currentClipId) !== String(tc.clipId)) {
                     // New clip — set src, wait for it to be ready, then seek and play
                     video.dataset.currentClipId = String(tc.clipId);
-
-                    const onReady = function() {
+                    
+                    video.onloadedmetadata = function() {
                         video.currentTime = targetTime;
+                    };
+
+                    video.oncanplay = function() {
                         if (state.isPlaying) {
-                            video.play().catch(function() {});
+                            video.play().catch(function(e) { console.error('Play failed:', e); });
                         }
                     };
 
-                    video.oncanplay = onReady;
                     video.src = clip.filepath;
                     video.load();
                 } else {
                     // Same clip — just ensure we are playing
-                    if (Math.abs(video.currentTime - targetTime) > 0.3) {
+                    if (Math.abs(video.currentTime - targetTime) > 0.25) {
                         video.currentTime = targetTime;
                     }
                     if (state.isPlaying && video.paused) {
-                        video.play().catch(function() {});
+                        video.play().catch(function(e) { console.error('Play failed:', e); });
                     }
                 }
 

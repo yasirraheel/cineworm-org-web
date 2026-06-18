@@ -170,9 +170,9 @@ class VideoEditorController extends Controller
                     ->where('user_id', Auth::id())
                     ->firstOrFail();
 
-        // Validate that timeline_data is valid JSON
+        // Validate that timeline_data is an array (since Laravel decodes application/json automatically)
         $validator = Validator::make($request->all(), [
-            'timeline_data' => 'required|json',
+            'timeline_data' => 'required|array',
             'total_duration' => 'nullable|numeric|min:0',
         ]);
 
@@ -185,7 +185,7 @@ class VideoEditorController extends Controller
         }
 
         $project->update([
-            'timeline_data'  => json_decode($request->timeline_data, true),
+            'timeline_data'  => $request->timeline_data,
             'total_duration' => $request->total_duration ?? $project->total_duration,
         ]);
 
