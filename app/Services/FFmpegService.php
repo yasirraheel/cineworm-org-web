@@ -52,7 +52,7 @@ class FFmpegService
              . \escapeshellarg($videoPath)
              . ' 2>&1';
 
-        $output = \shell_exec($cmd);
+        $output = $this->runProcCommand($cmd);
         $data   = \json_decode($output, true);
 
         if (!$data) {
@@ -136,7 +136,7 @@ class FFmpegService
                  . ' ' . \escapeshellarg($outPath)
                  . ' 2>&1';
 
-            \shell_exec($cmd);
+            $this->runProcCommand($cmd);
 
             if (\file_exists($outPath)) {
                 $filenames[] = $filename;
@@ -313,7 +313,7 @@ class FFmpegService
         Log::info("FFmpegService::exportTimeline – command: {$cmd}");
 
         // Launch as a background process (non-blocking)
-        \exec($cmd);
+        $this->runProcBackgroundCommand($cmd);
 
         // Store the expected output path on the project
         $project->update([
@@ -363,5 +363,63 @@ class FFmpegService
         }
 
         return $result;
+    }
+
+    // =====================================================================
+    //  Helper: Run a command using proc_open and wait for output
+    // =====================================================================
+    private function runProcCommand(string $cmd): string
+    {
+        if (!\function_exists('proc_open')) {
+            Log::error("FFmpegService::runProcCommand - proc_open is disabled.");
+            return '';
+        }
+
+        $descriptorspec = [
+            0 => ["pipe", "r"],  // stdin
+            1 => ["pipe", "w"],  // stdout
+            2 => ["pipe", "w"]   // stderr
+        ];
+
+        $process = \proc_open($cmd, $descriptorspec, $pipes);
+        $output = '';
+
+        if (\is_resource($process)) {
+            $output = \stream_get_contents($pipes[1]);
+            
+            \fclose($pipes[0]);
+            \fclose($pipes[1]);
+            \fclose($pipes[2]);
+            
+            \proc_close($process);
+        }
+
+        return $output;
+    }
+
+    // =====================================================================
+    //  Helper: Run a command in the background using proc_open
+    // =====================================================================
+    private function runProcBackgroundCommand(string $cmd): void
+    {
+        if (!\function_exists('proc_open')) {
+            Log::error("FFmpegService::runProcBackgroundCommand - proc_open is disabled.");
+            return;
+        }
+
+        $descriptorspec = [
+            0 => ["pipe", "r"],
+            1 => ["pipe", "w"],
+            2 => ["pipe", "w"]
+        ];
+
+        $process = \proc_open($cmd, $descriptorspec, $pipes);
+
+        if (\is_resource($process)) {
+            \fclose($pipes[0]);
+            \fclose($pipes[1]);
+            \fclose($pipes[2]);
+            \proc_close($process);
+        }
     }
 }
