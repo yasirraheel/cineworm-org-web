@@ -127,7 +127,8 @@ class FFmpegService
         $outPattern = $outputDir . '/thumb_%03d.jpg';
         
         $cmd = \escapeshellarg(self::FFMPEG_PATH)
-             . ' -y -threads 1 -i ' . \escapeshellarg($videoPath)
+             . ' -y -i ' . \escapeshellarg($videoPath)
+             . ' -threads 1'
              . ' -vf "fps=' . $fpsRate . ',scale=160:-2"'
              . ' -vframes ' . $count
              . ' -q:v 3'
