@@ -499,6 +499,20 @@ Route::post('user/films/store', 'UserFilmController@store');
 Route::delete('user/films/{id}/delete', 'UserFilmController@destroy');
 Route::post('user/films/{id}/delete', 'UserFilmController@destroy'); // fallback for non-JS
 
+// Video Editor
+Route::get('user/editor', 'VideoEditorController@index');
+Route::get('user/editor/create', 'VideoEditorController@create');
+Route::post('user/editor/store', 'VideoEditorController@store');
+Route::get('user/editor/{id}', 'VideoEditorController@edit');
+Route::post('user/editor/{id}/save', 'VideoEditorController@saveTimeline');
+Route::post('user/editor/{id}/upload-clip', 'VideoEditorController@uploadClip');
+Route::post('user/editor/{id}/delete-clip', 'VideoEditorController@deleteClip');
+Route::post('user/editor/{id}/export', 'VideoEditorController@exportProject');
+Route::get('user/editor/{id}/export-status', 'VideoEditorController@exportStatus');
+Route::get('user/editor/{id}/download', 'VideoEditorController@downloadExport');
+Route::delete('user/editor/{id}/delete', 'VideoEditorController@destroy');
+Route::post('user/editor/{id}/delete', 'VideoEditorController@destroy');
+
 // User Job Listings
 Route::get('user/jobs', 'UserJobController@index');
 Route::get('user/jobs/create', 'UserJobController@create');

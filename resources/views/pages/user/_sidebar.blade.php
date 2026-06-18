@@ -79,7 +79,7 @@
         ],
         'film_editing_access' => [
             'title' => 'Film Editing Access',
-            'url' => 'javascript:void(0);',
+            'url' => URL('user/editor'),
             'icon' => 'fa fa-cut',
         ],
         'colour_grading_access' => [
