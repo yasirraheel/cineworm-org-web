@@ -98,7 +98,7 @@ const FilmEditor = (function() {
             if (!state.timeline.clips) state.timeline.clips = [];
             if (!state.timeline.audioTracks) state.timeline.audioTracks = [];
             if (!state.timeline.colorGrading) {
-                state.timeline.colorGrading = { brightness: 0, contrast: 1.0, saturation: 1.0, warmth: 0, sepia: 0 };
+                state.timeline.colorGrading = { brightness: 0, contrast: 100, saturation: 100, warmth: 0, sepia: 0 };
             }
         }
 
@@ -656,19 +656,11 @@ const FilmEditor = (function() {
                 if (String(video.dataset.currentClipId) !== String(tc.clipId)) {
                     // New clip — set src, wait for it to be ready, then seek and play
                     video.dataset.currentClipId = String(tc.clipId);
-                    
-                    video.onloadedmetadata = function() {
-                        video.currentTime = targetTime;
-                    };
-
-                    video.oncanplay = function() {
-                        if (state.isPlaying) {
-                            video.play().catch(function(e) { console.error('Play failed:', e); });
-                        }
-                    };
-
                     video.src = clip.filepath;
-                    video.load();
+                    video.currentTime = targetTime;
+                    if (state.isPlaying) {
+                        video.play().catch(function(e) { console.error('Play failed:', e); });
+                    }
                 } else {
                     // Same clip — just ensure we are playing
                     if (Math.abs(video.currentTime - targetTime) > 0.25) {
@@ -701,9 +693,19 @@ const FilmEditor = (function() {
     function applyVideoFilters(video) {
         const g = state.timeline.colorGrading || {};
         let filters = [];
-        const brightness = (g.brightness || 0) / 100;
-        const contrast = (g.contrast || 100) / 100;
-        const saturation = (g.saturation || 100) / 100;
+        
+        // Handle both new style (100 = default) and old style (1.0 = default from early bug)
+        let rawBrightness = g.brightness !== undefined ? g.brightness : 0;
+        let rawContrast = g.contrast !== undefined ? g.contrast : 100;
+        let rawSaturation = g.saturation !== undefined ? g.saturation : 100;
+        
+        // If old state was saved as 1.0 instead of 100, fix it dynamically
+        if (rawContrast <= 2.0 && rawContrast > 0) rawContrast *= 100;
+        if (rawSaturation <= 2.0 && rawSaturation > 0) rawSaturation *= 100;
+
+        const brightness = rawBrightness / 100;
+        const contrast = rawContrast / 100;
+        const saturation = rawSaturation / 100;
         const sepia = (g.sepia || 0) / 100;
 
         filters.push(`brightness(${1 + brightness})`);
