@@ -139,7 +139,7 @@
         <!-- Preview Monitor -->
         <div class="preview-area">
             <div class="preview-monitor" id="previewMonitor">
-                <video id="previewVideo" preload="auto" crossorigin="anonymous"></video>
+                <video id="previewVideo" preload="auto"></video>
                 <div class="preview-placeholder" id="previewPlaceholder">
                     <i class="fa fa-film"></i>
                     <p>Add clips to the timeline to preview</p>

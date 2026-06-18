@@ -576,26 +576,37 @@ const FilmEditor = (function() {
         document.getElementById('sourceReel').classList.add('spinning');
         document.getElementById('masterReel').classList.add('spinning');
 
-        // Immediately sync the video element to the correct clip/time
-        // then start the animation loop
-        updateVideoPlayback();
+        // Load the correct clip at the current playhead position
+        loadClipAtPlayhead();
 
-        const video = document.getElementById('previewVideo');
-
-        let lastTime = performance.now();
-        function tick(now) {
+        // rAF loop only updates the visual playhead — the video drives its own time
+        function tick() {
             if (!state.isPlaying) return;
-            const delta = (now - lastTime) / 1000;
-            lastTime = now;
 
-            state.playheadPosition += delta;
+            const video = document.getElementById('previewVideo');
+
+            // Sync playhead with actual video time
+            if (video.src && !video.paused && !video.ended) {
+                // Find which clip is loaded and compute global time from video.currentTime
+                let elapsed = 0;
+                for (let i = 0; i < state.timeline.clips.length; i++) {
+                    const tc = state.timeline.clips[i];
+                    const clipDuration = (tc.outPoint || 0) - (tc.inPoint || 0);
+                    if (video.dataset.currentClipId == tc.clipId) {
+                        state.playheadPosition = elapsed + (video.currentTime - (tc.inPoint || 0));
+                        break;
+                    }
+                    elapsed += clipDuration;
+                }
+            }
+
             if (state.playheadPosition >= state.totalDuration) {
                 state.playheadPosition = state.totalDuration;
                 pausePlayback();
                 return;
             }
+
             updatePlayhead();
-            updateVideoPlayback();
             state.animationFrame = requestAnimationFrame(tick);
         }
         state.animationFrame = requestAnimationFrame(tick);
@@ -633,11 +644,11 @@ const FilmEditor = (function() {
         seekTo(state.playheadPosition + (1/30));
     }
 
-    function updateVideoPlayback() {
+    // Load the right video clip for the current playhead position and seek to correct time
+    function loadClipAtPlayhead() {
         const video = document.getElementById('previewVideo');
         const placeholder = document.getElementById('previewPlaceholder');
 
-        // Find which clip the playhead is in
         let elapsed = 0;
         for (let i = 0; i < state.timeline.clips.length; i++) {
             const tc = state.timeline.clips[i];
@@ -650,45 +661,49 @@ const FilmEditor = (function() {
                 placeholder.style.display = 'none';
                 video.style.display = 'block';
 
-                // If video source changed, update it and wait for canplay before seeking
-                if (video.dataset.currentClipId != tc.clipId) {
-                    video.dataset.currentClipId = tc.clipId;
-                    video.src = clip.filepath;
+                const targetTime = (tc.inPoint || 0) + (state.playheadPosition - elapsed);
 
-                    const targetTime = (tc.inPoint || 0) + (state.playheadPosition - elapsed);
-                    video.addEventListener('canplay', function onCanPlay() {
-                        video.removeEventListener('canplay', onCanPlay);
+                if (String(video.dataset.currentClipId) !== String(tc.clipId)) {
+                    // New clip — set src, wait for it to be ready, then seek and play
+                    video.dataset.currentClipId = String(tc.clipId);
+
+                    const onReady = function() {
                         video.currentTime = targetTime;
                         if (state.isPlaying) {
-                            video.play().catch(() => {});
+                            video.play().catch(function() {});
                         }
-                    }, { once: true });
+                    };
+
+                    video.oncanplay = onReady;
+                    video.src = clip.filepath;
                     video.load();
                 } else {
-                    // Seek to correct position within the clip
-                    const clipTime = (tc.inPoint || 0) + (state.playheadPosition - elapsed);
-                    if (Math.abs(video.currentTime - clipTime) > 0.15) {
-                        video.currentTime = clipTime;
+                    // Same clip — just ensure we are playing
+                    if (Math.abs(video.currentTime - targetTime) > 0.3) {
+                        video.currentTime = targetTime;
                     }
-                    // Resume play if not already playing and we are in play mode
                     if (state.isPlaying && video.paused) {
-                        video.play().catch(() => {});
+                        video.play().catch(function() {});
                     }
                 }
 
-                // Apply grading filters to video
                 applyVideoFilters(video);
                 return;
             }
             elapsed += clipDuration;
         }
 
-        // No clip at playhead
+        // Nothing at playhead
         placeholder.style.display = '';
         video.style.display = 'none';
+        video.oncanplay = null;
         video.pause();
         video.removeAttribute('src');
         video.dataset.currentClipId = '';
+    }
+
+    function updateVideoPlayback() {
+        loadClipAtPlayhead();
     }
 
     function applyVideoFilters(video) {
