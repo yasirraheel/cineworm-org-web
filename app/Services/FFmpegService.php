@@ -109,24 +109,25 @@ class FFmpegService
 
         $filenames = [];
         $interval  = $duration / $count;
+        $fpsRate   = \round(1 / $interval, 3); // Frames per second
+
+        // We run a single ffmpeg command to extract all thumbnails efficiently!
+        // fps=fpsRate,scale=160:-1 extracts frames evenly and scales them
+        $outPattern = $outputDir . '/thumb_%03d.jpg';
+        
+        $cmd = \escapeshellarg(self::FFMPEG_PATH)
+             . ' -y -i ' . \escapeshellarg($videoPath)
+             . ' -vf "fps=' . $fpsRate . ',scale=160:-1"'
+             . ' -vframes ' . $count
+             . ' -q:v 3'
+             . ' ' . \escapeshellarg($outPattern)
+             . ' 2>&1';
+
+        $this->runProcCommand($cmd);
 
         for ($i = 0; $i < $count; $i++) {
-            // Seek to the computed timestamp
-            $timestamp = \round($i * $interval, 2);
-            $filename  = \sprintf('thumb_%03d.jpg', $i + 1);
-            $outPath   = $outputDir . '/' . $filename;
-
-            // -ss before -i for fast seeking, scale to 160px wide keeping aspect ratio
-            $cmd = \escapeshellarg(self::FFMPEG_PATH)
-                 . ' -y -ss ' . \escapeshellarg((string) $timestamp)
-                 . ' -i ' . \escapeshellarg($videoPath)
-                 . ' -vframes 1 -vf "scale=160:-1"'
-                 . ' -q:v 3'
-                 . ' ' . \escapeshellarg($outPath)
-                 . ' 2>&1';
-
-            $this->runProcCommand($cmd);
-
+            $filename = \sprintf('thumb_%03d.jpg', $i + 1);
+            $outPath  = $outputDir . '/' . $filename;
             if (\file_exists($outPath)) {
                 $filenames[] = $filename;
             }
