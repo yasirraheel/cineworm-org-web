@@ -6,28 +6,29 @@
 
 /* ── CSS Custom Properties ─────────────────────────────────────────────────── */
 :root {
-    --editor-bg: #0a0a0e;
+    --editor-bg: #0c0c12;
     --bench-bg: #111117;
-    --panel-bg: #16161e;
-    --panel-border: rgba(255,255,255,0.08);
+    --panel-bg: #161620;
+    --panel-border: rgba(255,255,255,0.1);
     --accent: #fe0278;
     --accent-glow: rgba(254,2,120,0.3);
     --accent-dim: rgba(254,2,120,0.12);
     --accent-dark: #c8005f;
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255,255,255,0.6);
-    --text-muted: rgba(255,255,255,0.3);
+    --text-primary: #f0f0f5;
+    --text-secondary: rgba(255,255,255,0.75);
+    --text-muted: rgba(255,255,255,0.45);
+    --text-label: rgba(255,255,255,0.55);
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
     --film-strip-bg: #1a1a22;
-    --sprocket-color: rgba(254,2,120,0.15);
-    --crt-glow: rgba(254,2,120,0.06);
-    --metal-light: #3a3a48;
-    --metal-dark: #1e1e28;
-    --reel-color: #2a2a35;
+    --sprocket-color: rgba(254,2,120,0.18);
+    --metal-light: #44445a;
+    --metal-mid: #2e2e40;
+    --metal-dark: #1e1e2c;
+    --reel-color: #2e2e3c;
     --reel-spoke: rgba(254,2,120,0.35);
-    --grain-opacity: 0.025;
+    --grain-opacity: 0.02;
 }
 
 /* ── Reset & Base ──────────────────────────────────────────────────────────── */
@@ -62,8 +63,8 @@ html, body {
 
 /* ── Top Bar ───────────────────────────────────────────────────────────────── */
 .editor-topbar {
-    height: 50px;
-    background: linear-gradient(180deg, #1c1c28 0%, #14141e 100%);
+    height: 52px;
+    background: linear-gradient(180deg, #1e1e2c 0%, #16161e 100%);
     border-bottom: 1px solid var(--panel-border);
     display: flex;
     align-items: center;
@@ -71,7 +72,7 @@ html, body {
     padding: 0 20px;
     position: relative;
     z-index: 100;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
 }
 .editor-topbar-left {
     display: flex;
@@ -89,13 +90,13 @@ html, body {
     font-weight: 700;
 }
 .editor-topbar-back:hover {
-    transform: translateX(-2px);
+    transform: translateX(-3px);
     color: #ff4d9a;
 }
 .editor-topbar-title {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 800;
-    color: var(--text-primary);
+    color: #fff;
     max-width: 300px;
     white-space: nowrap;
     overflow: hidden;
@@ -103,8 +104,8 @@ html, body {
 }
 .editor-topbar-divider {
     width: 1px;
-    height: 22px;
-    background: rgba(255,255,255,0.1);
+    height: 24px;
+    background: rgba(255,255,255,0.12);
 }
 .editor-topbar-center {
     display: flex;
@@ -120,7 +121,7 @@ html, body {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 8px 18px;
+    padding: 9px 20px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: 700;
@@ -131,14 +132,14 @@ html, body {
     letter-spacing: 0.5px;
 }
 .editor-topbar-btn.btn-save {
-    background: rgba(254,2,120,0.1);
+    background: rgba(254,2,120,0.12);
     color: var(--accent);
-    border: 1px solid rgba(254,2,120,0.25);
+    border: 1px solid rgba(254,2,120,0.3);
 }
 .editor-topbar-btn.btn-save:hover {
-    background: rgba(254,2,120,0.2);
+    background: rgba(254,2,120,0.22);
     border-color: var(--accent);
-    box-shadow: 0 0 12px rgba(254,2,120,0.15);
+    box-shadow: 0 0 14px rgba(254,2,120,0.15);
 }
 .editor-topbar-btn.btn-save.saving {
     opacity: 0.5;
@@ -147,34 +148,35 @@ html, body {
 .editor-topbar-btn.btn-export {
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
     color: #fff;
-    box-shadow: 0 2px 10px var(--accent-glow);
+    box-shadow: 0 3px 12px var(--accent-glow);
 }
 .editor-topbar-btn.btn-export:hover {
-    box-shadow: 0 4px 20px var(--accent-glow);
+    box-shadow: 0 5px 22px var(--accent-glow);
     transform: translateY(-1px);
 }
 .editor-topbar-status {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--text-label);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
+    font-weight: 600;
 }
 .editor-topbar-status .dot {
-    width: 7px; height: 7px;
+    width: 8px; height: 8px;
     border-radius: 50%;
     background: var(--success);
-    box-shadow: 0 0 6px rgba(16,185,129,0.4);
+    box-shadow: 0 0 8px rgba(16,185,129,0.5);
 }
 .editor-topbar-status.unsaved .dot {
     background: var(--warning);
-    box-shadow: 0 0 6px rgba(245,158,11,0.4);
+    box-shadow: 0 0 8px rgba(245,158,11,0.5);
 }
 
 /* ── Main Layout ───────────────────────────────────────────────────────────── */
 .editor-main {
     display: flex;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 52px);
     overflow: hidden;
 }
 
@@ -196,57 +198,55 @@ html, body {
     justify-content: space-between;
 }
 .editor-panel-header h4 {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
 }
-.editor-panel-header h4 i { color: var(--accent); font-size: 13px; }
+.editor-panel-header h4 i { color: var(--accent); font-size: 14px; }
 
 /* ── Reel Animation ────────────────────────────────────────────────────────── */
 .reel-container {
-    padding: 16px;
+    padding: 14px 16px;
     display: flex;
     justify-content: center;
     border-bottom: 1px solid var(--panel-border);
-    background: linear-gradient(180deg, rgba(254,2,120,0.015) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(254,2,120,0.02) 0%, transparent 100%);
 }
 .reel {
-    width: 90px;
-    height: 90px;
-    position: relative;
+    width: 80px;
+    text-align: center;
 }
 .reel-outer {
-    width: 100%;
-    height: 100%;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     border: 3px solid var(--reel-color);
     position: relative;
     animation: reel-spin 3s linear infinite paused;
-    background: radial-gradient(circle at center, transparent 25%, rgba(254,2,120,0.02) 50%, rgba(254,2,120,0.04) 80%);
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.3), 0 0 15px rgba(254,2,120,0.05);
+    background: radial-gradient(circle at center, transparent 20%, rgba(254,2,120,0.02) 50%, rgba(254,2,120,0.05) 85%);
+    box-shadow: inset 0 0 16px rgba(0,0,0,0.3), 0 0 12px rgba(254,2,120,0.06);
 }
 .reel-outer.spinning { animation-play-state: running; }
 .reel-hub {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 18px; height: 18px;
+    width: 16px; height: 16px;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--accent) 0%, var(--accent-dark) 100%);
-    border: 2px solid var(--accent);
-    box-shadow: 0 0 12px var(--accent-glow), 0 0 4px var(--accent);
+    background: radial-gradient(circle, var(--accent), var(--accent-dark));
+    box-shadow: 0 0 10px var(--accent-glow), 0 0 4px var(--accent);
 }
 .reel-spoke {
     position: absolute;
     top: 50%; left: 50%;
     width: 2px;
-    height: 36px;
+    height: 32px;
     background: linear-gradient(to bottom, var(--reel-spoke), transparent);
     transform-origin: center top;
 }
@@ -261,8 +261,7 @@ html, body {
     to { transform: rotate(360deg); }
 }
 .reel-label {
-    text-align: center;
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 9px;
     font-weight: 800;
     color: var(--text-muted);
@@ -272,33 +271,33 @@ html, body {
 
 /* ── Clip Upload ───────────────────────────────────────────────────────────── */
 .clip-upload-zone {
-    padding: 12px 16px;
+    padding: 12px 14px;
     border-bottom: 1px solid var(--panel-border);
 }
 .clip-upload-dropzone {
-    border: 2px dashed rgba(254,2,120,0.25);
+    border: 2px dashed rgba(254,2,120,0.3);
     border-radius: 10px;
-    padding: 18px 12px;
+    padding: 16px 10px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    background: rgba(254,2,120,0.02);
+    background: rgba(254,2,120,0.03);
 }
 .clip-upload-dropzone:hover,
 .clip-upload-dropzone.dragover {
     border-color: var(--accent);
-    background: rgba(254,2,120,0.06);
+    background: rgba(254,2,120,0.07);
     box-shadow: 0 0 20px rgba(254,2,120,0.08);
 }
 .clip-upload-dropzone i {
-    font-size: 22px;
+    font-size: 20px;
     color: var(--accent);
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 .clip-upload-dropzone p {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--text-label);
     margin: 0;
     line-height: 1.4;
 }
@@ -313,8 +312,8 @@ html, body {
     display: none;
 }
 .clip-upload-progress-bar {
-    height: 4px;
-    background: rgba(255,255,255,0.06);
+    height: 5px;
+    background: rgba(255,255,255,0.08);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -327,12 +326,12 @@ html, body {
 }
 .clip-upload-progress-text {
     font-size: 11px;
-    color: var(--text-muted);
+    color: var(--text-label);
     margin-top: 4px;
     text-align: center;
 }
 
-/* ── Clip Bin (list of uploaded clips) ─────────────────────────────────────── */
+/* ── Clip Bin ──────────────────────────────────────────────────────────────── */
 .clip-bin {
     flex: 1;
     overflow-y: auto;
@@ -340,7 +339,7 @@ html, body {
 }
 .clip-bin::-webkit-scrollbar { width: 4px; }
 .clip-bin::-webkit-scrollbar-track { background: transparent; }
-.clip-bin::-webkit-scrollbar-thumb { background: rgba(254,2,120,0.2); border-radius: 4px; }
+.clip-bin::-webkit-scrollbar-thumb { background: rgba(254,2,120,0.25); border-radius: 4px; }
 
 .clip-bin-item {
     display: flex;
@@ -354,27 +353,19 @@ html, body {
     margin-bottom: 4px;
 }
 .clip-bin-item:hover {
-    background: rgba(254,2,120,0.06);
-    border-color: rgba(254,2,120,0.15);
+    background: rgba(254,2,120,0.07);
+    border-color: rgba(254,2,120,0.18);
 }
-.clip-bin-item.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-}
+.clip-bin-item.dragging { opacity: 0.5; cursor: grabbing; }
 .clip-bin-item-thumb {
-    width: 56px;
-    height: 36px;
+    width: 54px; height: 36px;
     border-radius: 4px;
     background: #1a1a22;
     overflow: hidden;
     flex-shrink: 0;
     position: relative;
 }
-.clip-bin-item-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+.clip-bin-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .clip-bin-item-thumb .duration-badge {
     position: absolute;
     bottom: 2px; right: 2px;
@@ -385,26 +376,22 @@ html, body {
     border-radius: 3px;
     font-weight: 700;
 }
-.clip-bin-item-info {
-    flex: 1;
-    overflow: hidden;
-}
+.clip-bin-item-info { flex: 1; overflow: hidden; }
 .clip-bin-item-name {
     font-size: 12px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .clip-bin-item-meta {
     font-size: 10px;
-    color: var(--text-muted);
+    color: var(--text-label);
     margin-top: 2px;
 }
 .clip-bin-item-remove {
-    width: 24px;
-    height: 24px;
+    width: 24px; height: 24px;
     border-radius: 50%;
     border: none;
     background: transparent;
@@ -422,22 +409,25 @@ html, body {
 .clip-bin-item-remove:hover { background: rgba(239,68,68,0.15); }
 
 .clip-bin-empty {
-    padding: 30px 16px;
+    padding: 28px 16px;
     text-align: center;
 }
 .clip-bin-empty i {
-    font-size: 26px;
-    color: rgba(254,2,120,0.15);
+    font-size: 28px;
+    color: rgba(254,2,120,0.2);
     display: block;
     margin-bottom: 10px;
 }
 .clip-bin-empty p {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--text-label);
     line-height: 1.5;
 }
 
-/* ── Center Area (Preview + Timeline) ──────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   CENTER AREA — This is the KEY fix: explicit flex layout so preview,
+   transport, and timeline each get a defined space and NEVER overlap.
+   ═══════════════════════════════════════════════════════════════════════════ */
 .editor-center {
     flex: 1;
     display: flex;
@@ -448,31 +438,32 @@ html, body {
 
 /* ── Preview Monitor ───────────────────────────────────────────────────────── */
 .preview-area {
+    /* KEY FIX: use a FIXED pixel height so it never overflows into controls */
     flex: 0 0 auto;
-    height: 40%;
-    min-height: 200px;
+    height: 280px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px 24px;
-    background: radial-gradient(ellipse at center, rgba(254,2,120,0.015) 0%, var(--editor-bg) 70%);
+    padding: 12px 20px;
+    background: radial-gradient(ellipse at center, rgba(254,2,120,0.02) 0%, var(--editor-bg) 70%);
     position: relative;
+    overflow: hidden;
 }
 .preview-monitor {
     position: relative;
-    width: 100%;
-    max-width: 580px;
+    height: 100%;
     aspect-ratio: 16/9;
+    max-width: 100%;
     background: #000;
     border-radius: 6px;
     overflow: hidden;
     /* Vintage monitor frame */
+    border: 4px solid #222230;
+    outline: 2px solid #333344;
     box-shadow:
-        0 0 0 4px #1a1a24,
-        0 0 0 6px #2a2a38,
-        0 0 0 7px rgba(254,2,120,0.1),
-        0 4px 30px rgba(0,0,0,0.6),
-        inset 0 0 80px rgba(254,2,120,0.03);
+        0 0 0 1px rgba(254,2,120,0.08),
+        0 6px 30px rgba(0,0,0,0.6),
+        inset 0 0 60px rgba(254,2,120,0.03);
 }
 .preview-monitor video {
     width: 100%;
@@ -489,8 +480,8 @@ html, body {
         0deg,
         transparent,
         transparent 2px,
-        rgba(0,0,0,0.06) 2px,
-        rgba(0,0,0,0.06) 4px
+        rgba(0,0,0,0.05) 2px,
+        rgba(0,0,0,0.05) 4px
     );
     pointer-events: none;
     z-index: 2;
@@ -500,7 +491,7 @@ html, body {
     content: '';
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.45) 100%);
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
     pointer-events: none;
     z-index: 3;
 }
@@ -511,44 +502,49 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: var(--text-muted);
+    color: var(--text-label);
     z-index: 1;
 }
 .preview-placeholder i {
-    font-size: 40px;
-    margin-bottom: 12px;
-    color: rgba(254,2,120,0.12);
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: rgba(254,2,120,0.18);
 }
 .preview-placeholder p {
     font-size: 13px;
+    color: var(--text-label);
 }
 .preview-timecode {
     position: absolute;
-    bottom: 14px;
-    right: 18px;
+    bottom: 10px;
+    right: 14px;
     font-family: 'Courier New', monospace;
     font-size: 13px;
     font-weight: 700;
     color: var(--accent);
     text-shadow: 0 0 10px var(--accent-glow);
     z-index: 5;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.7);
     padding: 3px 10px;
     border-radius: 4px;
     letter-spacing: 1px;
 }
 
-/* ── Transport Controls ────────────────────────────────────────────────────── */
+/* ── Transport Controls — fixed height, never overlapped ───────────────────── */
 .transport-controls {
-    padding: 12px 24px;
-    background: linear-gradient(180deg, #141420 0%, #0f0f18 100%);
-    border-top: 1px solid var(--panel-border);
-    border-bottom: 1px solid var(--panel-border);
+    flex: 0 0 auto;
+    height: 60px;
+    background: linear-gradient(180deg, #18182a 0%, #101020 100%);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    padding: 0 24px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    position: relative;
+    z-index: 10;
 }
 .transport-btn {
     width: 44px;
@@ -556,116 +552,107 @@ html, body {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 16px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: all 0.12s ease;
-    /* Metallic 3D button */
-    background: linear-gradient(180deg, #3e3e50 0%, #252534 50%, #1c1c2a 100%);
-    color: rgba(255,255,255,0.7);
+    position: relative;
+    /* 3D Metallic button */
+    background: linear-gradient(180deg, var(--metal-light) 0%, var(--metal-mid) 40%, var(--metal-dark) 100%);
+    color: rgba(255,255,255,0.85);
     box-shadow:
-        0 3px 6px rgba(0,0,0,0.4),
-        0 1px 0 rgba(255,255,255,0.06) inset,
-        0 -1px 0 rgba(0,0,0,0.3) inset;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        0 3px 8px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        inset 0 -1px 0 rgba(0,0,0,0.3);
 }
 .transport-btn:hover {
-    background: linear-gradient(180deg, #4a4a60 0%, #303044 50%, #242436 100%);
+    background: linear-gradient(180deg, #555570 0%, #3c3c55 40%, #2a2a40 100%);
     color: #fff;
     box-shadow:
-        0 4px 10px rgba(0,0,0,0.5),
-        0 1px 0 rgba(255,255,255,0.08) inset,
-        0 -1px 0 rgba(0,0,0,0.3) inset;
+        0 4px 12px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.12);
 }
 .transport-btn:active {
     transform: translateY(1px);
-    box-shadow:
-        0 1px 3px rgba(0,0,0,0.4),
-        0 1px 0 rgba(255,255,255,0.04) inset;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.transport-btn i {
+    line-height: 1;
 }
 .transport-btn.btn-play {
     width: 56px;
-    height: 46px;
-    font-size: 18px;
-    background: linear-gradient(180deg, #ff3d96 0%, var(--accent) 40%, var(--accent-dark) 100%);
+    height: 48px;
+    font-size: 20px;
+    background: linear-gradient(180deg, #ff4d9a 0%, var(--accent) 40%, var(--accent-dark) 100%);
     color: #fff;
     box-shadow:
-        0 4px 14px var(--accent-glow),
-        0 1px 0 rgba(255,255,255,0.2) inset,
-        0 -1px 0 rgba(0,0,0,0.2) inset;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        0 4px 16px var(--accent-glow),
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        inset 0 -2px 0 rgba(0,0,0,0.15);
 }
 .transport-btn.btn-play:hover {
-    background: linear-gradient(180deg, #ff5aa8 0%, #ff1485 40%, #d10060 100%);
+    background: linear-gradient(180deg, #ff6bb0 0%, #ff1a85 40%, #d10060 100%);
     box-shadow:
-        0 6px 20px var(--accent-glow),
-        0 1px 0 rgba(255,255,255,0.25) inset;
+        0 6px 24px var(--accent-glow),
+        inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .transport-divider {
     width: 1px;
-    height: 28px;
-    background: rgba(255,255,255,0.08);
-    margin: 0 6px;
+    height: 30px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 8px;
 }
 .transport-btn.btn-tool {
     width: 40px;
     height: 36px;
     font-size: 14px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     box-shadow: none;
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.65);
 }
 .transport-btn.btn-tool:hover {
-    background: rgba(254,2,120,0.08);
-    border-color: rgba(254,2,120,0.3);
+    background: rgba(254,2,120,0.1);
+    border-color: rgba(254,2,120,0.35);
     color: var(--accent);
 }
 .transport-btn.btn-tool.active {
-    background: rgba(254,2,120,0.15);
+    background: rgba(254,2,120,0.18);
     border-color: var(--accent);
     color: var(--accent);
-    box-shadow: 0 0 10px rgba(254,2,120,0.15);
+    box-shadow: 0 0 12px rgba(254,2,120,0.15);
 }
 
 /* ── Timeline / Editing Bench ──────────────────────────────────────────────── */
 .timeline-area {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     background: var(--bench-bg);
     position: relative;
-    min-height: 0;
+    min-height: 100px;
 }
 .timeline-ruler {
-    height: 26px;
-    background: rgba(0,0,0,0.35);
+    height: 28px;
+    background: rgba(0,0,0,0.4);
     border-bottom: 1px solid var(--panel-border);
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
 }
-.timeline-ruler-marks {
-    position: absolute;
-    top: 0; left: 0; height: 100%;
-    display: flex;
-    align-items: flex-end;
-}
 .timeline-ruler-mark {
     position: absolute;
     bottom: 0;
     width: 1px;
-    background: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.15);
 }
 .timeline-ruler-mark.major {
     height: 14px;
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.3);
 }
-.timeline-ruler-mark.minor {
-    height: 7px;
-}
+.timeline-ruler-mark.minor { height: 7px; }
 .timeline-ruler-label {
     position: absolute;
     top: 3px;
@@ -685,14 +672,14 @@ html, body {
     z-index: 50;
     pointer-events: none;
     transition: left 0.05s linear;
-    box-shadow: 0 0 6px var(--accent-glow);
+    box-shadow: 0 0 8px var(--accent-glow);
 }
 .timeline-playhead::before {
     content: '';
     position: absolute;
     top: -1px;
-    left: -5px;
-    width: 12px;
+    left: -6px;
+    width: 14px;
     height: 14px;
     background: var(--accent);
     clip-path: polygon(0 0, 100% 0, 50% 100%);
@@ -705,7 +692,7 @@ html, body {
     left: -10px;
     width: 22px;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(254,2,120,0.05), transparent);
+    background: linear-gradient(90deg, transparent, rgba(254,2,120,0.06), transparent);
 }
 
 /* Film Strip Track */
@@ -718,11 +705,11 @@ html, body {
 }
 .timeline-track-container::-webkit-scrollbar { height: 6px; }
 .timeline-track-container::-webkit-scrollbar-track { background: transparent; }
-.timeline-track-container::-webkit-scrollbar-thumb { background: rgba(254,2,120,0.2); border-radius: 3px; }
+.timeline-track-container::-webkit-scrollbar-thumb { background: rgba(254,2,120,0.25); border-radius: 3px; }
 
 .timeline-track {
     min-height: 100%;
-    padding: 16px 24px;
+    padding: 12px 24px;
     display: flex;
     align-items: center;
     gap: 0;
@@ -740,7 +727,7 @@ html, body {
     overflow: hidden;
     flex-shrink: 0;
     transition: box-shadow 0.15s ease;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 .timeline-clip:hover {
     box-shadow: 0 0 0 1px var(--accent), 0 0 14px var(--accent-glow);
@@ -748,12 +735,9 @@ html, body {
 .timeline-clip.selected {
     box-shadow: 0 0 0 2px var(--accent), 0 0 20px var(--accent-glow);
 }
-.timeline-clip.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-}
+.timeline-clip.dragging { opacity: 0.5; cursor: grabbing; }
 
-/* Sprocket Holes (top + bottom of film strip) */
+/* Sprocket Holes */
 .timeline-clip::before,
 .timeline-clip::after {
     content: '';
@@ -763,18 +747,15 @@ html, body {
     background: var(--film-strip-bg);
     background-image: repeating-linear-gradient(
         90deg,
-        transparent 0px,
-        transparent 8px,
-        var(--sprocket-color) 8px,
-        var(--sprocket-color) 14px,
-        transparent 14px,
-        transparent 22px
+        transparent 0px, transparent 8px,
+        var(--sprocket-color) 8px, var(--sprocket-color) 14px,
+        transparent 14px, transparent 22px
     );
 }
 .timeline-clip::before { top: 0; }
 .timeline-clip::after { bottom: 0; }
 
-/* Thumbnail Frames inside Film Strip */
+/* Thumbnail Frames */
 .timeline-clip-frames {
     display: flex;
     height: 100%;
@@ -790,47 +771,40 @@ html, body {
 }
 .timeline-clip-frame:last-child { border-right: none; }
 
-/* Clip Label Overlay */
+/* Clip Label */
 .timeline-clip-label {
     position: absolute;
-    bottom: 10px;
-    left: 4px;
-    right: 4px;
+    bottom: 10px; left: 4px; right: 4px;
     font-size: 10px;
     font-weight: 700;
     color: #fff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     z-index: 3;
     padding: 2px 6px;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.55);
     border-radius: 3px;
 }
 
 /* Trim Handles */
 .timeline-clip-trim-handle {
     position: absolute;
-    top: 0;
-    width: 8px;
-    height: 100%;
+    top: 0; width: 8px; height: 100%;
     cursor: col-resize;
     z-index: 5;
     background: transparent;
     transition: background 0.15s ease;
 }
 .timeline-clip-trim-handle:hover,
-.timeline-clip-trim-handle.active {
-    background: rgba(254,2,120,0.4);
-}
+.timeline-clip-trim-handle.active { background: rgba(254,2,120,0.45); }
 .timeline-clip-trim-handle.left { left: 0; border-radius: 4px 0 0 4px; }
 .timeline-clip-trim-handle.right { right: 0; border-radius: 0 4px 4px 0; }
 
-/* Splice Point (transition marker between clips) */
+/* Splice Points */
 .timeline-splice {
-    width: 18px;
-    height: 80px;
+    width: 18px; height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -839,9 +813,8 @@ html, body {
     position: relative;
 }
 .timeline-splice-line {
-    width: 2px;
-    height: 50px;
-    background: rgba(254,2,120,0.15);
+    width: 2px; height: 50px;
+    background: rgba(254,2,120,0.18);
     border-radius: 1px;
     transition: all 0.15s ease;
 }
@@ -852,43 +825,39 @@ html, body {
 }
 .timeline-splice-icon {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     font-size: 10px;
     color: transparent;
     transition: color 0.15s ease;
 }
-.timeline-splice:hover .timeline-splice-icon {
-    color: var(--accent);
-}
+.timeline-splice:hover .timeline-splice-icon { color: var(--accent); }
 
-/* Empty Timeline State */
+/* Empty Timeline */
 .timeline-empty {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     pointer-events: none;
 }
 .timeline-empty i {
     font-size: 30px;
-    color: rgba(254,2,120,0.12);
+    color: rgba(254,2,120,0.18);
     display: block;
     margin-bottom: 12px;
 }
 .timeline-empty p {
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.6;
+    font-size: 14px;
+    color: var(--text-label);
+    line-height: 1.7;
 }
 .timeline-empty p span {
     color: var(--accent);
     font-weight: 700;
 }
 
-/* ── Right Panel (Properties / Colour Grading) ────────────────────────────── */
+/* ── Right Panel ───────────────────────────────────────────────────────────── */
 .editor-right-panel {
     width: 240px;
     min-width: 240px;
@@ -904,14 +873,14 @@ html, body {
 }
 .editor-panel-tab {
     flex: 1;
-    padding: 10px 6px;
-    font-size: 10px;
+    padding: 11px 6px;
+    font-size: 11px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     text-align: center;
     cursor: pointer;
-    color: var(--text-muted);
+    color: var(--text-label);
     border-bottom: 2px solid transparent;
     transition: all 0.15s ease;
     background: none;
@@ -919,7 +888,7 @@ html, body {
     border-left: none;
     border-right: none;
 }
-.editor-panel-tab:hover { color: var(--text-secondary); }
+.editor-panel-tab:hover { color: var(--text-primary); }
 .editor-panel-tab.active {
     color: var(--accent);
     border-bottom-color: var(--accent);
@@ -935,18 +904,16 @@ html, body {
 .editor-panel-content::-webkit-scrollbar-thumb { background: rgba(254,2,120,0.2); border-radius: 4px; }
 
 /* Properties Panel */
-.prop-section {
-    margin-bottom: 20px;
-}
+.prop-section { margin-bottom: 20px; }
 .prop-section-title {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
     margin-bottom: 12px;
     padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .prop-row {
     display: flex;
@@ -955,31 +922,29 @@ html, body {
     margin-bottom: 10px;
 }
 .prop-label {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-secondary);
 }
 .prop-value {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #fff;
     font-family: 'Courier New', monospace;
 }
 
 /* Colour Grading Sliders */
-.grading-slider-group {
-    margin-bottom: 18px;
-}
+.grading-slider-group { margin-bottom: 18px; }
 .grading-slider-label {
     display: flex;
     justify-content: space-between;
     margin-bottom: 8px;
 }
 .grading-slider-label span {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-secondary);
 }
 .grading-slider-label .grading-slider-value {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--accent);
     font-family: 'Courier New', monospace;
@@ -989,31 +954,25 @@ html, body {
 .grading-slider {
     -webkit-appearance: none;
     width: 100%;
-    height: 4px;
+    height: 5px;
     border-radius: 4px;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.1);
     outline: none;
     cursor: pointer;
 }
 .grading-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 16px; height: 16px;
     border-radius: 50%;
     background: var(--accent);
-    box-shadow: 0 0 8px var(--accent-glow), 0 0 2px var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow), 0 0 3px var(--accent);
     cursor: pointer;
-    transition: transform 0.1s ease;
-}
-.grading-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
 }
 .grading-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 16px; height: 16px;
     border-radius: 50%;
     background: var(--accent);
-    box-shadow: 0 0 8px var(--accent-glow), 0 0 2px var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow), 0 0 3px var(--accent);
     cursor: pointer;
     border: none;
 }
@@ -1026,33 +985,33 @@ html, body {
     margin-top: 10px;
 }
 .transition-option {
-    padding: 8px 4px;
+    padding: 9px 4px;
     border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.06);
-    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
     color: var(--text-secondary);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     text-align: center;
     cursor: pointer;
     transition: all 0.12s ease;
 }
 .transition-option:hover {
-    border-color: rgba(254,2,120,0.3);
-    background: rgba(254,2,120,0.05);
-    color: var(--text-primary);
+    border-color: rgba(254,2,120,0.35);
+    background: rgba(254,2,120,0.06);
+    color: #fff;
 }
 .transition-option.active {
     border-color: var(--accent);
-    background: rgba(254,2,120,0.12);
+    background: rgba(254,2,120,0.14);
     color: var(--accent);
-    box-shadow: 0 0 8px rgba(254,2,120,0.1);
+    box-shadow: 0 0 10px rgba(254,2,120,0.1);
 }
 
 /* ── Audio Track ───────────────────────────────────────────────────────────── */
 .audio-track-area {
-    height: 42px;
-    background: rgba(0,0,0,0.25);
+    height: 44px;
+    background: rgba(0,0,0,0.28);
     border-top: 1px solid var(--panel-border);
     padding: 0 24px;
     display: flex;
@@ -1061,9 +1020,9 @@ html, body {
     flex-shrink: 0;
 }
 .audio-track-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
-    color: var(--text-muted);
+    color: var(--text-label);
     text-transform: uppercase;
     letter-spacing: 1px;
     flex-shrink: 0;
@@ -1073,30 +1032,30 @@ html, body {
 }
 .audio-track-waveform {
     flex: 1;
-    height: 26px;
-    background: rgba(254,2,120,0.03);
+    height: 28px;
+    background: rgba(254,2,120,0.04);
     border-radius: 4px;
-    border: 1px solid rgba(254,2,120,0.08);
+    border: 1px solid rgba(254,2,120,0.1);
     position: relative;
     overflow: hidden;
 }
 .audio-track-add-btn {
-    padding: 5px 12px;
+    padding: 6px 14px;
     border-radius: 5px;
-    border: 1px solid rgba(254,2,120,0.2);
+    border: 1px solid rgba(254,2,120,0.25);
     background: transparent;
     color: var(--accent);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.12s ease;
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
 }
 .audio-track-add-btn:hover {
-    background: rgba(254,2,120,0.1);
+    background: rgba(254,2,120,0.12);
     border-color: var(--accent);
 }
 
@@ -1104,28 +1063,28 @@ html, body {
 .export-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.88);
+    background: rgba(0,0,0,0.9);
     z-index: 1000;
     display: none;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
 }
 .export-overlay.active { display: flex; }
 .export-modal {
-    background: linear-gradient(180deg, #1e1e2c 0%, #16161e 100%);
+    background: linear-gradient(180deg, #1e1e2e 0%, #161620 100%);
     border: 1px solid rgba(254,2,120,0.15);
     border-radius: 20px;
     padding: 40px;
     text-align: center;
     max-width: 420px;
     width: 90%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(254,2,120,0.05);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(254,2,120,0.05);
 }
 .export-modal h3 {
     font-size: 20px;
     margin-bottom: 8px;
-    color: var(--text-primary);
+    color: #fff;
     font-weight: 800;
 }
 .export-modal p {
@@ -1134,30 +1093,23 @@ html, body {
     margin-bottom: 28px;
 }
 .export-progress-ring {
-    width: 120px;
-    height: 120px;
+    width: 120px; height: 120px;
     margin: 0 auto 24px;
     position: relative;
 }
 .export-progress-ring svg {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     transform: rotate(-90deg);
 }
-.export-progress-ring circle {
-    fill: none;
-    stroke-width: 4;
-}
-.export-progress-ring .ring-bg {
-    stroke: rgba(255,255,255,0.06);
-}
+.export-progress-ring circle { fill: none; stroke-width: 4; }
+.export-progress-ring .ring-bg { stroke: rgba(255,255,255,0.08); }
 .export-progress-ring .ring-fill {
     stroke: var(--accent);
     stroke-dasharray: 351.86;
     stroke-dashoffset: 351.86;
     stroke-linecap: round;
     transition: stroke-dashoffset 0.5s ease;
-    filter: drop-shadow(0 0 4px var(--accent-glow));
+    filter: drop-shadow(0 0 6px var(--accent-glow));
 }
 .export-progress-percent {
     position: absolute;
@@ -1170,7 +1122,7 @@ html, body {
 }
 .export-status-text {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--text-label);
     margin-top: 8px;
 }
 .export-download-btn {
@@ -1201,9 +1153,9 @@ html, body {
     top: 16px; right: 16px;
     width: 32px; height: 32px;
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.04);
-    color: var(--text-muted);
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: var(--text-label);
     font-size: 14px;
     cursor: pointer;
     display: flex;
@@ -1212,12 +1164,11 @@ html, body {
     transition: all 0.12s ease;
 }
 .export-close-btn:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.15);
-    color: var(--text-primary);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
 }
 
-/* ── Razor Blade Cursor (for cut tool) ─────────────────────────────────────── */
+/* ── Razor Blade Cursor ────────────────────────────────────────────────────── */
 .cursor-razor .timeline-track { cursor: crosshair; }
 .cursor-razor .timeline-clip { cursor: crosshair !important; }
 
@@ -1244,6 +1195,7 @@ html, body {
     font-size: 22px;
     margin-bottom: 12px;
     font-weight: 800;
+    color: #fff;
 }
 .editor-mobile-warning p {
     font-size: 14px;

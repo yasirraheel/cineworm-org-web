@@ -41,19 +41,19 @@ class FFmpegService
             'fps'      => 0,
         ];
 
-        if (!file_exists($videoPath)) {
+        if (!\file_exists($videoPath)) {
             Log::warning("FFmpegService::getVideoInfo – file not found: {$videoPath}");
             return $defaults;
         }
 
         // Run ffprobe to get stream and format info as JSON
-        $cmd = escapeshellarg(self::FFPROBE_PATH)
+        $cmd = \escapeshellarg(self::FFPROBE_PATH)
              . ' -v quiet -print_format json -show_format -show_streams '
-             . escapeshellarg($videoPath)
+             . \escapeshellarg($videoPath)
              . ' 2>&1';
 
-        $output = shell_exec($cmd);
-        $data   = json_decode($output, true);
+        $output = \shell_exec($cmd);
+        $data   = \json_decode($output, true);
 
         if (!$data) {
             Log::warning("FFmpegService::getVideoInfo – ffprobe returned no data for: {$videoPath}");
@@ -61,7 +61,7 @@ class FFmpegService
         }
 
         // Extract duration from format-level info
-        $duration = floatval($data['format']['duration'] ?? 0);
+        $duration = \floatval($data['format']['duration'] ?? 0);
 
         // Find the first video stream for resolution and fps
         $width  = 0;
@@ -71,23 +71,23 @@ class FFmpegService
         if (!empty($data['streams'])) {
             foreach ($data['streams'] as $stream) {
                 if (($stream['codec_type'] ?? '') === 'video') {
-                    $width  = intval($stream['width'] ?? 0);
-                    $height = intval($stream['height'] ?? 0);
+                    $width  = \intval($stream['width'] ?? 0);
+                    $height = \intval($stream['height'] ?? 0);
 
                     // fps may be in r_frame_rate (e.g. "30000/1001") or avg_frame_rate
                     $fpsRaw = $stream['r_frame_rate'] ?? $stream['avg_frame_rate'] ?? '0/1';
-                    $fpsParts = explode('/', $fpsRaw);
-                    if (count($fpsParts) === 2 && floatval($fpsParts[1]) > 0) {
-                        $fps = round(floatval($fpsParts[0]) / floatval($fpsParts[1]), 2);
+                    $fpsParts = \explode('/', $fpsRaw);
+                    if (\count($fpsParts) === 2 && \floatval($fpsParts[1]) > 0) {
+                        $fps = \round(\floatval($fpsParts[0]) / \floatval($fpsParts[1]), 2);
                     } else {
-                        $fps = floatval($fpsRaw);
+                        $fps = \floatval($fpsRaw);
                     }
                     break; // use first video stream only
                 }
             }
         }
 
-        return compact('duration', 'width', 'height', 'fps');
+        return \compact('duration', 'width', 'height', 'fps');
     }
 
     // =====================================================================
@@ -105,8 +105,8 @@ class FFmpegService
     public function extractThumbnails(string $videoPath, string $outputDir, int $count = 20): array
     {
         // Ensure output directory exists
-        if (!is_dir($outputDir)) {
-            mkdir($outputDir, 0755, true);
+        if (!\is_dir($outputDir)) {
+            \mkdir($outputDir, 0755, true);
         }
 
         // Get the video duration so we can compute even intervals
@@ -123,22 +123,22 @@ class FFmpegService
 
         for ($i = 0; $i < $count; $i++) {
             // Seek to the computed timestamp
-            $timestamp = round($i * $interval, 2);
-            $filename  = sprintf('thumb_%03d.jpg', $i + 1);
+            $timestamp = \round($i * $interval, 2);
+            $filename  = \sprintf('thumb_%03d.jpg', $i + 1);
             $outPath   = $outputDir . '/' . $filename;
 
             // -ss before -i for fast seeking, scale to 160px wide keeping aspect ratio
-            $cmd = escapeshellarg(self::FFMPEG_PATH)
-                 . ' -y -ss ' . escapeshellarg((string) $timestamp)
-                 . ' -i ' . escapeshellarg($videoPath)
+            $cmd = \escapeshellarg(self::FFMPEG_PATH)
+                 . ' -y -ss ' . \escapeshellarg((string) $timestamp)
+                 . ' -i ' . \escapeshellarg($videoPath)
                  . ' -vframes 1 -vf "scale=160:-1"'
                  . ' -q:v 3'
-                 . ' ' . escapeshellarg($outPath)
+                 . ' ' . \escapeshellarg($outPath)
                  . ' 2>&1';
 
-            shell_exec($cmd);
+            \shell_exec($cmd);
 
-            if (file_exists($outPath)) {
+            if (\file_exists($outPath)) {
                 $filenames[] = $filename;
             }
         }
@@ -182,11 +182,11 @@ class FFmpegService
         $logFile   = $exportDir . '/ffmpeg_progress.log';
 
         // Ensure export directory exists
-        if (!is_dir($exportDir)) {
-            mkdir($exportDir, 0755, true);
+        if (!\is_dir($exportDir)) {
+            \mkdir($exportDir, 0755, true);
         }
 
-        $outputFile = $exportDir . '/export_' . time() . '.mp4';
+        $outputFile = $exportDir . '/export_' . \time() . '.mp4';
 
         // ── Sort clips by position ────────────────────────────────────────
         $clips = $timeline['clips'];
@@ -194,9 +194,9 @@ class FFmpegService
 
         // ── Colour grading defaults ───────────────────────────────────────
         $cg = $timeline['colorGrading'] ?? [];
-        $brightness = floatval($cg['brightness'] ?? 0);
-        $contrast   = floatval($cg['contrast']   ?? 1.0);
-        $saturation = floatval($cg['saturation'] ?? 1.0);
+        $brightness = \floatval($cg['brightness'] ?? 0);
+        $contrast   = \floatval($cg['contrast']   ?? 1.0);
+        $saturation = \floatval($cg['saturation'] ?? 1.0);
 
         // Build the eq filter string for colour grading
         $eqFilter = "eq=brightness={$brightness}:contrast={$contrast}:saturation={$saturation}";
@@ -210,16 +210,16 @@ class FFmpegService
         foreach ($clips as $idx => $clip) {
             // Look up the actual clip record for its file path
             $clipRecord = EditingClip::find($clip['clipId'] ?? 0);
-            if (!$clipRecord || !file_exists(public_path($clipRecord->file_path))) {
+            if (!$clipRecord || !\file_exists(public_path($clipRecord->file_path))) {
                 Log::warning("FFmpegService::exportTimeline – clip #{$clip['clipId']} not found, skipping");
                 continue;
             }
 
             $filePath = public_path($clipRecord->file_path);
-            $inputs[] = '-i ' . escapeshellarg($filePath);
+            $inputs[] = '-i ' . \escapeshellarg($filePath);
 
-            $inPoint  = floatval($clip['inPoint']  ?? 0);
-            $outPoint = floatval($clip['outPoint'] ?? $clipRecord->duration);
+            $inPoint  = \floatval($clip['inPoint']  ?? 0);
+            $outPoint = \floatval($clip['outPoint'] ?? $clipRecord->duration);
 
             // Trim and apply colour grading to each clip
             $trimLabel = "v{$idx}";
@@ -242,13 +242,13 @@ class FFmpegService
         $finalAudio = $clipLabels[0]['audio'];
 
         if (count($clipLabels) > 1) {
-            for ($i = 1; $i < count($clipLabels); $i++) {
+            for ($i = 1; $i < \count($clipLabels); $i++) {
                 $prevClip = $clips[$i - 1] ?? [];
                 $transition = $prevClip['transition'] ?? null;
 
                 $xfadeDuration = 0;
                 if ($transition && ($transition['type'] ?? '') === 'crossfade') {
-                    $xfadeDuration = floatval($transition['duration'] ?? 1.0);
+                    $xfadeDuration = \floatval($transition['duration'] ?? 1.0);
                 }
 
                 $outLabel  = "xv{$i}";
@@ -275,9 +275,9 @@ class FFmpegService
         if (!empty($audioTracks)) {
             foreach ($audioTracks as $aIdx => $audioTrack) {
                 $audioFile = $audioTrack['filePath'] ?? '';
-                if ($audioFile && file_exists(public_path($audioFile))) {
-                    $inputs[] = '-i ' . escapeshellarg(public_path($audioFile));
-                    $volume = floatval($audioTrack['volume'] ?? 1.0);
+                if ($audioFile && \file_exists(public_path($audioFile))) {
+                    $inputs[] = '-i ' . \escapeshellarg(public_path($audioFile));
+                    $volume = \floatval($audioTrack['volume'] ?? 1.0);
 
                     $bgLabel  = "bg{$aIdx}";
                     $mixLabel = "mix{$aIdx}";
@@ -294,10 +294,10 @@ class FFmpegService
         }
 
         // ── Assemble the full FFmpeg command ──────────────────────────────
-        $filterComplex = implode('; ', $filterParts);
-        $inputsStr     = implode(' ', $inputs);
+        $filterComplex = \implode('; ', $filterParts);
+        $inputsStr     = \implode(' ', $inputs);
 
-        $cmd = escapeshellarg(self::FFMPEG_PATH)
+        $cmd = \escapeshellarg(self::FFMPEG_PATH)
              . ' -y'
              . ' ' . $inputsStr
              . ' -filter_complex "' . $filterComplex . '"'
@@ -305,19 +305,19 @@ class FFmpegService
              . ' -c:v libx264 -preset medium -crf 23'
              . ' -c:a aac -b:a 192k'
              . ' -movflags +faststart'
-             . ' ' . escapeshellarg($outputFile)
-             . ' -progress ' . escapeshellarg($logFile)
+             . ' ' . \escapeshellarg($outputFile)
+             . ' -progress ' . \escapeshellarg($logFile)
              . ' > /dev/null 2>&1 &';
 
         Log::info("FFmpegService::exportTimeline – launching background export for project #{$project->id}");
         Log::info("FFmpegService::exportTimeline – command: {$cmd}");
 
         // Launch as a background process (non-blocking)
-        exec($cmd);
+        \exec($cmd);
 
         // Store the expected output path on the project
         $project->update([
-            'exported_file' => "user_editor/{$userId}/{$projectId}/exports/" . basename($outputFile),
+            'exported_file' => "user_editor/{$userId}/{$projectId}/exports/" . \basename($outputFile),
         ]);
 
         return $outputFile;
@@ -342,23 +342,23 @@ class FFmpegService
     {
         $result = ['progress' => 0, 'finished' => false];
 
-        if (!file_exists($logFile)) {
+        if (!\file_exists($logFile)) {
             return $result;
         }
 
-        $content = file_get_contents($logFile);
+        $content = \file_get_contents($logFile);
 
         // Check if FFmpeg has signalled completion
-        if (strpos($content, 'progress=end') !== false) {
+        if (\strpos($content, 'progress=end') !== false) {
             $result['progress'] = 100;
             $result['finished'] = true;
             return $result;
         }
 
         // Extract the latest out_time_us value (microseconds of output written so far)
-        preg_match_all('/out_time_us=(\d+)/', $content, $matches);
+        \preg_match_all('/out_time_us=(\d+)/', $content, $matches);
         if (!empty($matches[1])) {
-            $lastTimeUs = intval(end($matches[1]));
+            $lastTimeUs = \intval(\end($matches[1]));
             $result['progress'] = $lastTimeUs; // Controller will compute % from total_duration
         }
 
