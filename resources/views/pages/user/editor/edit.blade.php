@@ -139,7 +139,7 @@
         <!-- Preview Monitor -->
         <div class="preview-area">
             <div class="preview-monitor" id="previewMonitor">
-                <video id="previewVideo" preload="auto"></video>
+                <video id="previewVideo" preload="auto" crossorigin="anonymous"></video>
                 <div class="preview-placeholder" id="previewPlaceholder">
                     <i class="fa fa-film"></i>
                     <p>Add clips to the timeline to preview</p>
@@ -184,6 +184,24 @@
 
         <!-- Timeline Area -->
         <div class="timeline-area" id="timelineArea">
+
+            <!-- Timeline Toolbar (zoom) -->
+            <div class="timeline-toolbar">
+                <div class="timeline-zoom-controls">
+                    <button class="timeline-zoom-btn" onclick="FilmEditor.zoomTimeline(-20)" title="Zoom Out">
+                        <i class="fa fa-search-minus"></i>
+                    </button>
+                    <input type="range" id="timelineZoomSlider" class="timeline-zoom-slider"
+                           min="20" max="300" value="80" step="10"
+                           oninput="FilmEditor.setZoom(parseInt(this.value))"
+                           title="Timeline Zoom">
+                    <button class="timeline-zoom-btn" onclick="FilmEditor.zoomTimeline(20)" title="Zoom In">
+                        <i class="fa fa-search-plus"></i>
+                    </button>
+                    <span class="timeline-zoom-label" id="timelineZoomLabel">80px/s</span>
+                </div>
+            </div>
+
             <!-- Ruler -->
             <div class="timeline-ruler" id="timelineRuler">
                 <div class="timeline-playhead" id="timelinePlayhead"></div>

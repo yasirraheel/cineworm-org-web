@@ -310,6 +310,7 @@ html, body {
 .clip-upload-progress {
     margin-top: 10px;
     display: none;
+    transition: opacity 0.3s ease;
 }
 .clip-upload-progress-bar {
     height: 5px;
@@ -634,6 +635,83 @@ html, body {
     position: relative;
     min-height: 100px;
 }
+
+/* ── Timeline Toolbar (Zoom Controls) ─────────────────────────────────────── */
+.timeline-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 5px 12px;
+    background: rgba(0,0,0,0.25);
+    border-bottom: 1px solid var(--panel-border);
+    flex-shrink: 0;
+    gap: 8px;
+}
+.timeline-zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.timeline-zoom-btn {
+    width: 26px;
+    height: 26px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+.timeline-zoom-btn:hover {
+    background: rgba(254,2,120,0.2);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+.timeline-zoom-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 110px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.12);
+    outline: none;
+    cursor: pointer;
+}
+.timeline-zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px var(--accent-glow);
+    transition: transform 0.1s;
+}
+.timeline-zoom-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+.timeline-zoom-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+.timeline-zoom-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    min-width: 42px;
+    text-align: left;
+    font-family: 'Courier New', monospace;
+}
+
 .timeline-ruler {
     height: 28px;
     background: rgba(0,0,0,0.4);

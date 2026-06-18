@@ -162,7 +162,9 @@ const FilmEditor = (function() {
         const progressFill = document.getElementById('uploadProgressFill');
         const progressText = document.getElementById('uploadProgressText');
 
+        // Show progress bar — use flex so it respects its layout properly
         progressEl.style.display = 'block';
+        progressEl.style.opacity = '1';
         progressFill.style.width = '0%';
         progressText.textContent = `Uploading ${file.name}…`;
 
@@ -174,14 +176,23 @@ const FilmEditor = (function() {
             formData,
             function(percent) {
                 progressFill.style.width = percent + '%';
-                if (percent >= 100) {
-                    progressText.textContent = 'Processing thumbnails…';
-                }
+                progressText.textContent = percent >= 100
+                    ? 'Processing… please wait'
+                    : `Uploading ${file.name}… ${percent}%`;
             },
             function(err, resp) {
-                progressEl.style.display = 'none';
+                // Animate out the progress bar
+                progressFill.style.width = '100%';
+                setTimeout(function() {
+                    progressEl.style.opacity = '0';
+                    setTimeout(function() {
+                        progressEl.style.display = 'none';
+                        progressEl.style.opacity = '1';
+                        progressFill.style.width = '0%';
+                    }, 300);
+                }, 400);
 
-                if (err || !resp.success) {
+                if (err || !resp || !resp.success) {
                     Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 4000,
                         icon: 'error', title: (resp && resp.message) || err || 'Upload failed' });
                     return;
@@ -554,15 +565,22 @@ const FilmEditor = (function() {
     }
 
     function startPlayback() {
-        if (state.totalDuration <= 0) return;
+        if (state.totalDuration <= 0) {
+            Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2500,
+                icon: 'info', title: 'Add clips to the timeline first' });
+            return;
+        }
         state.isPlaying = true;
 
         document.getElementById('playIcon').className = 'fa fa-pause';
         document.getElementById('sourceReel').classList.add('spinning');
         document.getElementById('masterReel').classList.add('spinning');
 
+        // Immediately sync the video element to the correct clip/time
+        // then start the animation loop
+        updateVideoPlayback();
+
         const video = document.getElementById('previewVideo');
-        if (video.src) video.play().catch(()=>{});
 
         let lastTime = performance.now();
         function tick(now) {
@@ -630,18 +648,32 @@ const FilmEditor = (function() {
                 if (!clip) break;
 
                 placeholder.style.display = 'none';
+                video.style.display = 'block';
 
-                // If video source changed, update it
+                // If video source changed, update it and wait for canplay before seeking
                 if (video.dataset.currentClipId != tc.clipId) {
-                    video.src = clip.filepath;
                     video.dataset.currentClipId = tc.clipId;
-                    video.load();
-                }
+                    video.src = clip.filepath;
 
-                // Seek to correct position within the clip
-                const clipTime = (tc.inPoint || 0) + (state.playheadPosition - elapsed);
-                if (Math.abs(video.currentTime - clipTime) > 0.1) {
-                    video.currentTime = clipTime;
+                    const targetTime = (tc.inPoint || 0) + (state.playheadPosition - elapsed);
+                    video.addEventListener('canplay', function onCanPlay() {
+                        video.removeEventListener('canplay', onCanPlay);
+                        video.currentTime = targetTime;
+                        if (state.isPlaying) {
+                            video.play().catch(() => {});
+                        }
+                    }, { once: true });
+                    video.load();
+                } else {
+                    // Seek to correct position within the clip
+                    const clipTime = (tc.inPoint || 0) + (state.playheadPosition - elapsed);
+                    if (Math.abs(video.currentTime - clipTime) > 0.15) {
+                        video.currentTime = clipTime;
+                    }
+                    // Resume play if not already playing and we are in play mode
+                    if (state.isPlaying && video.paused) {
+                        video.play().catch(() => {});
+                    }
                 }
 
                 // Apply grading filters to video
@@ -653,6 +685,7 @@ const FilmEditor = (function() {
 
         // No clip at playhead
         placeholder.style.display = '';
+        video.style.display = 'none';
         video.pause();
         video.removeAttribute('src');
         video.dataset.currentClipId = '';
@@ -1076,6 +1109,25 @@ const FilmEditor = (function() {
         });
     }
 
+    // ── Timeline Zoom ─────────────────────────────────────────────────────
+    function zoomTimeline(delta) {
+        const newZoom = Math.max(20, Math.min(300, state.pixelsPerSecond + delta));
+        setZoom(newZoom);
+    }
+
+    function setZoom(value) {
+        state.pixelsPerSecond = Math.max(20, Math.min(300, value));
+
+        // Sync slider and label
+        const slider = document.getElementById('timelineZoomSlider');
+        const label  = document.getElementById('timelineZoomLabel');
+        if (slider) slider.value = state.pixelsPerSecond;
+        if (label)  label.textContent = state.pixelsPerSecond + 'px/s';
+
+        // Re-render timeline at new zoom level
+        renderTimeline();
+    }
+
     // ── Public API ────────────────────────────────────────────────────────
     return {
         init: init,
@@ -1103,6 +1155,8 @@ const FilmEditor = (function() {
         setTransitionDuration: setTransitionDuration,
         addAudioTrack: addAudioTrack,
         handleAudioSelect: handleAudioSelect,
+        zoomTimeline: zoomTimeline,
+        setZoom: setZoom,
     };
 })();
 
