@@ -46,37 +46,48 @@ class FFmpegService
             return $defaults;
         }
 
-        // Hostinger doesn't have ffprobe, so we use ffmpeg -i to get metadata
-        $cmd = \escapeshellarg(self::FFMPEG_PATH)
-             . ' -i ' . \escapeshellarg($videoPath)
+        // Run ffprobe to get stream and format info as JSON
+        $cmd = \escapeshellarg(self::FFPROBE_PATH)
+             . ' -v quiet -print_format json -show_format -show_streams '
+             . \escapeshellarg($videoPath)
              . ' 2>&1';
 
         $output = $this->runProcCommand($cmd);
+        $data   = \json_decode($output, true);
 
-        // Parse Duration (e.g. Duration: 00:00:05.52)
-        if (\preg_match('/Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/', $output, $matches)) {
-            $hours   = \floatval($matches[1]);
-            $minutes = \floatval($matches[2]);
-            $seconds = \floatval($matches[3]);
-            $defaults['duration'] = ($hours * 3600) + ($minutes * 60) + $seconds;
+        if (!$data) {
+            Log::warning("FFmpegService::getVideoInfo – ffprobe returned no data for: {$videoPath}\nOutput: " . \substr($output, 0, 500));
+            return $defaults;
         }
 
-        // Parse Resolution and FPS from Video stream (e.g. Stream #0:0(und): Video: h264... 1920x1080... 30 fps)
-        if (\preg_match('/Stream #.*?: Video: .*?, (\d+)x(\d+)/', $output, $matches)) {
-            $defaults['width']  = \intval($matches[1]);
-            $defaults['height'] = \intval($matches[2]);
-        }
-        
-        // Match fps separately to be safe
-        if (\preg_match('/, (\d+(?:\.\d+)?) fps/', $output, $fpsMatch)) {
-            $defaults['fps'] = \floatval($fpsMatch[1]);
+        // Extract duration from format-level info
+        $duration = \floatval($data['format']['duration'] ?? 0);
+
+        // Find the first video stream for resolution and fps
+        $width  = 0;
+        $height = 0;
+        $fps    = 0;
+
+        if (!empty($data['streams'])) {
+            foreach ($data['streams'] as $stream) {
+                if (($stream['codec_type'] ?? '') === 'video') {
+                    $width  = \intval($stream['width'] ?? 0);
+                    $height = \intval($stream['height'] ?? 0);
+
+                    // fps may be in r_frame_rate (e.g. "30000/1001") or avg_frame_rate
+                    $fpsRaw = $stream['r_frame_rate'] ?? $stream['avg_frame_rate'] ?? '0/1';
+                    $fpsParts = \explode('/', $fpsRaw);
+                    if (\count($fpsParts) === 2 && \floatval($fpsParts[1]) > 0) {
+                        $fps = \round(\floatval($fpsParts[0]) / \floatval($fpsParts[1]), 2);
+                    } else {
+                        $fps = \floatval($fpsRaw);
+                    }
+                    break; // use first video stream only
+                }
+            }
         }
 
-        if ($defaults['duration'] == 0) {
-            Log::warning("FFmpegService::getVideoInfo – ffmpeg could not parse duration for: {$videoPath}\nOutput: " . \substr($output, 0, 500));
-        }
-
-        return $defaults;
+        return \compact('duration', 'width', 'height', 'fps');
     }
 
     // =====================================================================
