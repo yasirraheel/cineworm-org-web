@@ -3,7 +3,7 @@
 @section("content")
 
 @php
-  $availableFeatures = \App\SubscriptionPlan::AVAILABLE_FEATURES;
+  $availableFeatures = \App\PlanFeature::getActiveFeaturesMap();
   $selectedFeatures = isset($plan_info) ? $plan_info->getDirectFeatureKeys() : [];
   $inheritedFeatures = isset($plan_info) ? $plan_info->getInheritedFeatureKeys() : [];
   $includedPlanIds = isset($plan_info) ? $plan_info->getIncludedPlanIds() : [];

@@ -239,6 +239,10 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::post('subscription_plan/add_edit_plan', 'SubscriptionPlanController@addnew');
         Route::get('subscription_plan/delete/{id}', 'SubscriptionPlanController@delete');
 
+        Route::get('plan_features', 'PlanFeaturesController@index');
+        Route::post('plan_features/save', 'PlanFeaturesController@save');
+        Route::get('plan_features/delete/{id}', 'PlanFeaturesController@delete');
+
         // Admin Job Listings
         Route::get('job_listings', 'JobListingController@index');
         Route::get('job_listings/add', 'JobListingController@create');

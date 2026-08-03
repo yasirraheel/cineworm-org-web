@@ -154,6 +154,13 @@
                                     <span>{{ trans('words.subscription_plan') }}</span>
                                 </a>
                             </li>
+                            <li class="{{ classActivePath('plan_features') }}">
+                                <a href="{{ URL::to('admin/plan_features') }}"
+                                    class="{{ classActivePath('plan_features') }}">
+                                    <i class="fa fa-check-square-o"></i>
+                                    <span>Plan Features</span>
+                                </a>
+                            </li>
                             <li class="{{ classActivePath('transactions') }}">
                                 <a href="{{ URL::to('admin/transactions') }}"
                                     class="{{ classActivePath('transactions') }}">
