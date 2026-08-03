@@ -173,9 +173,14 @@ class UsersController extends MainAdminController
         $user->user_address = $inputs['user_address'];
 
         if (!empty($inputs['exp_date'])) {
-            $user->exp_date = strtotime($inputs['exp_date']);
-        } elseif ($plan_info) {
-            $user->exp_date = strtotime(date('m/d/Y', strtotime('+' . (int) $plan_info->plan_days . ' days')));
+            $parsedDate = strtotime($inputs['exp_date']);
+            $user->exp_date = ($parsedDate !== false && $parsedDate > 0) ? $parsedDate : 0;
+        } elseif ($plan_info && !empty($plan_info->plan_days)) {
+            $user->exp_date = strtotime('+' . (int) $plan_info->plan_days . ' days');
+        } else {
+            if (empty($user->exp_date)) {
+                $user->exp_date = 0;
+            }
         }
 
         $allowedUserTypes = ['Admin', 'Moderator', 'Sub_Admin', 'User'];
