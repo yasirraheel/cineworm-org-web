@@ -79,7 +79,7 @@
         ],
         'film_editing_access' => [
             'title' => 'Film Editing Access',
-            'url' => URL('user/editor'),
+            'url' => URL('reel2reel/'),
             'icon' => 'fa fa-cut',
         ],
         'colour_grading_access' => [
