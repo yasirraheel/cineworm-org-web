@@ -89,6 +89,13 @@
                                                 {{ trans('words.subscription_plan') }}
                                             </a>
                                         </li>
+                                        <li>
+                                            <a href="/reel2reel/"
+                                                class="{{ request()->is('reel2reel*') ? 'active' : '' }}"
+                                                title="Video Editor">
+                                                Video Editor
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
