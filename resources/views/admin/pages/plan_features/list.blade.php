@@ -34,7 +34,6 @@
                                         <th>Icon</th>
                                         <th>Feature Name</th>
                                         <th>Feature Key</th>
-                                        <th>Target URL</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -45,7 +44,6 @@
                                             <td><i class="{{ $feature->icon }}"></i></td>
                                             <td><strong>{{ $feature->feature_name }}</strong></td>
                                             <td><code>{{ $feature->feature_key }}</code></td>
-                                            <td><small class="text-muted">{{ $feature->url ?: 'javascript:void(0);' }}</small></td>
                                             <td>
                                                 @if($feature->status == 1)
                                                     <span class="badge badge-success">Active</span>
@@ -88,13 +86,6 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-4 col-form-label">Target URL / Path</label>
-                        <div class="col-sm-8">
-                            <input type="text" name="url" id="feature_url" class="form-control" placeholder="e.g. reel2reel/ or user/films">
-                            <small class="form-text text-muted">Use relative paths like <code>reel2reel/</code> or full URLs.</small>
-                        </div>
-                    </div>
-                    <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Icon Class</label>
                         <div class="col-sm-8">
                             <input type="text" name="icon" id="feature_icon" class="form-control" placeholder="e.g. fa fa-cut or fa fa-star">
@@ -124,7 +115,6 @@ function resetForm() {
     document.getElementById('featureModalLabel').innerText = 'Add Plan Feature';
     document.getElementById('feature_id').value = '';
     document.getElementById('feature_name').value = '';
-    document.getElementById('feature_url').value = '';
     document.getElementById('feature_icon').value = 'fa fa-check-circle';
     document.getElementById('feature_status').value = '1';
 }
@@ -133,7 +123,6 @@ function editFeature(feature) {
     document.getElementById('featureModalLabel').innerText = 'Edit Plan Feature';
     document.getElementById('feature_id').value = feature.id;
     document.getElementById('feature_name').value = feature.feature_name;
-    document.getElementById('feature_url').value = feature.url || '';
     document.getElementById('feature_icon').value = feature.icon || 'fa fa-check-circle';
     document.getElementById('feature_status').value = feature.status;
     $('#featureModal').modal('show');

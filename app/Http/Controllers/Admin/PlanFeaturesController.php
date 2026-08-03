@@ -33,7 +33,6 @@ class PlanFeaturesController extends Controller
 
         $request->validate([
             'feature_name' => 'required|string|max:255',
-            'url'          => 'nullable|string|max:255',
             'icon'         => 'nullable|string|max:100',
         ]);
 
@@ -57,7 +56,6 @@ class PlanFeaturesController extends Controller
         }
 
         $feature->feature_name = $request->input('feature_name');
-        $feature->url = $request->input('url');
         $feature->icon = $request->input('icon') ?: 'fa fa-check-circle';
         $feature->status = $request->has('status') ? (int) $request->input('status') : 1;
         $feature->save();

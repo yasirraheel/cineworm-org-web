@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 
 class PlanFeature extends Model
 {
@@ -16,6 +17,18 @@ class PlanFeature extends Model
         'sort_order',
         'status',
     ];
+
+    public static function getSystemUrlMap(): array
+    {
+        return [
+            'film_editing_access'    => '/reel2reel/',
+            'extended_media_uploads' => URL::to('user/films/upload'),
+            'priority_promotion'     => URL::to('promotions'),
+            'job_listing'            => URL::to('user/jobs'),
+            'news_ticker'            => URL::to('user/news_tickers'),
+            'live_broadcast'         => URL::to('user/live_broadcasts'),
+        ];
+    }
 
     public static function getActiveFeaturesMap(): array
     {
@@ -36,50 +49,38 @@ class PlanFeature extends Model
     public static function getActiveFeaturesConfig(): array
     {
         $features = self::where('status', 1)->orderBy('sort_order')->orderBy('id')->get();
+        $systemMap = self::getSystemUrlMap();
 
         if ($features->isEmpty()) {
             return [
-                'watch_content' => ['title' => 'Watch Content', 'url' => URL('/'), 'icon' => 'fa fa-play-circle'],
-                'donate_to_projects' => ['title' => 'Donate to Projects', 'url' => getcong('donation_link') ? stripslashes(getcong('donation_link')) : 'javascript:void(0);', 'icon' => 'fa fa-heart'],
-                'play_games' => ['title' => 'Play Games', 'url' => URL('game/remote-control'), 'icon' => 'fa fa-gamepad'],
-                'basic_user_account' => ['title' => 'Basic User Account', 'url' => URL('dashboard'), 'icon' => 'fa fa-user-circle'],
-                'personal_profile_page' => ['title' => 'Personal Profile Page', 'url' => URL('profile'), 'icon' => 'fa fa-id-card'],
-                'film_uploads' => ['title' => 'Film Uploads', 'url' => URL('user/films'), 'icon' => 'fa fa-upload'],
-                'promotion_services' => ['title' => 'Promotion Services', 'url' => URL('promotions'), 'icon' => 'fa fa-bullhorn'],
-                'deal_plus_access' => ['title' => 'Deal Plus Access', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-handshake'],
-                'crowdfunding_link_sharing' => ['title' => 'Crowdfunding Link Sharing', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-link'],
-                'website_link_sharing' => ['title' => 'Website Link Sharing', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-globe'],
-                'photo_gallery' => ['title' => 'Photo Gallery', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-image'],
-                'project_showcase_page' => ['title' => 'Project Showcase Page', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-film'],
-                'film_project_space' => ['title' => 'Film Project Space', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-folder-open'],
-                'film_editing_access' => ['title' => 'Film Editing Access', 'url' => 'user/editor', 'icon' => 'fa fa-cut'],
-                'colour_grading_access' => ['title' => 'Colour Grading Access', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-adjust'],
-                'advanced_film_showcase' => ['title' => 'Advanced Film Showcase', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-star'],
-                'pro_creator_tools' => ['title' => 'Pro Creator Tools', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-wrench'],
-                'extended_media_uploads' => ['title' => 'Extended Media Uploads', 'url' => URL('user/films/upload'), 'icon' => 'fa fa-cloud-upload-alt'],
-                'priority_promotion' => ['title' => 'Priority Promotion', 'url' => URL('promotions'), 'icon' => 'fa fa-rocket'],
-                'job_listing' => ['title' => 'Job Listing', 'url' => URL('user/jobs'), 'icon' => 'fa fa-briefcase'],
-                'news_ticker' => ['title' => 'News Ticker', 'url' => URL('user/news_tickers'), 'icon' => 'fa fa-newspaper'],
-                'live_broadcast' => ['title' => 'Live Broadcast', 'url' => URL('user/live_broadcasts'), 'icon' => 'fa fa-podcast'],
+                'film_editing_access'    => ['title' => 'Film Editing Access', 'url' => '/reel2reel/', 'icon' => 'fa fa-cut'],
+                'extended_media_uploads' => ['title' => 'Extended Media Uploads', 'url' => URL::to('user/films/upload'), 'icon' => 'fa fa-cloud-upload-alt'],
+                'priority_promotion'     => ['title' => 'Priority Promotion', 'url' => URL::to('promotions'), 'icon' => 'fa fa-rocket'],
+                'job_listing'            => ['title' => 'Job Listing', 'url' => URL::to('user/jobs'), 'icon' => 'fa fa-briefcase'],
+                'news_ticker'            => ['title' => 'News Ticker', 'url' => URL::to('user/news_tickers'), 'icon' => 'fa fa-newspaper'],
+                'live_broadcast'         => ['title' => 'Live Broadcast', 'url' => URL::to('user/live_broadcasts'), 'icon' => 'fa fa-podcast'],
             ];
         }
 
         $config = [];
         foreach ($features as $feature) {
-            $rawUrl = trim($feature->url ?? '');
-            if (empty($rawUrl) || $rawUrl === '#' || $rawUrl === 'javascript:void(0);') {
-                $finalUrl = 'javascript:void(0);';
-            } elseif (str_starts_with($rawUrl, 'http://') || str_starts_with($rawUrl, 'https://')) {
-                $finalUrl = $rawUrl;
+            $key = $feature->feature_key;
+            
+            if (isset($systemMap[$key])) {
+                $finalUrl = $systemMap[$key];
             } else {
-                $finalUrl = url(ltrim($rawUrl, '/'));
+                $rawUrl = trim($feature->url ?? '');
+                if (!empty($rawUrl) && $rawUrl !== '#' && $rawUrl !== 'javascript:void(0);') {
+                    $finalUrl = str_starts_with($rawUrl, 'http') ? $rawUrl : URL::to($rawUrl);
+                } else {
+                    $finalUrl = 'javascript:void(0);';
+                }
             }
 
-            $config[$feature->feature_key] = [
+            $config[$key] = [
                 'title' => $feature->feature_name,
-                'url' => $finalUrl,
-                'raw_url' => $feature->url,
-                'icon' => $feature->icon ?: 'fa fa-check-circle',
+                'url'   => $finalUrl,
+                'icon'  => $feature->icon ?: 'fa fa-check-circle',
             ];
         }
 
