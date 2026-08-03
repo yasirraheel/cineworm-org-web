@@ -31,10 +31,16 @@ Route::get('/offline', function() {
 })->name('pwa.offline');
 
 // Reel2Reel Video Editor Route
-Route::get('/reel2reel/{any?}', function () {
-    $path = public_path('reel2reel/index.html');
-    if (file_exists($path)) {
-        return response()->file($path);
+Route::get('/reel2reel/{any?}', function ($any = null) {
+    if ($any) {
+        $file = public_path('reel2reel/' . $any);
+        if (is_file($file)) {
+            return response()->file($file);
+        }
+    }
+    $indexPath = public_path('reel2reel/index.html');
+    if (is_file($indexPath)) {
+        return response()->file($indexPath);
     }
     abort(404);
 })->where('any', '.*');
