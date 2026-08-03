@@ -35,12 +35,24 @@ Route::get('/reel2reel/{any?}', function ($any = null) {
     if ($any) {
         $file = public_path('reel2reel/' . $any);
         if (is_file($file)) {
-            return response()->file($file);
+            $ext = pathinfo($file, PATHINFO_EXTENSION);
+            $mimeTypes = [
+                'css'   => 'text/css',
+                'js'    => 'application/javascript',
+                'wasm'  => 'application/wasm',
+                'json'  => 'application/json',
+                'svg'   => 'image/svg+xml',
+                'png'   => 'image/png',
+                'jpg'   => 'image/jpeg',
+                'woff2' => 'font/woff2',
+            ];
+            $headers = isset($mimeTypes[$ext]) ? ['Content-Type' => $mimeTypes[$ext]] : [];
+            return response()->file($file, $headers);
         }
     }
     $indexPath = public_path('reel2reel/index.html');
     if (is_file($indexPath)) {
-        return response()->file($indexPath);
+        return response()->file($indexPath, ['Content-Type' => 'text/html']);
     }
     abort(404);
 })->where('any', '.*');
