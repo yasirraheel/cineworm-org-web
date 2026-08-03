@@ -16,7 +16,7 @@
               <button class="button-menu-mobile open-left"> <i class="mdi mdi-menu"></i> </button>
             </li>
             <li class="list-inline-item">
-              <h4 class="page-title">{{$page_title}}</h4>
+              <h4 class="page-title">{{ $page_title ?? 'Admin' }}</h4>
             </li>
           </ul>
           <nav class="navbar-custom">

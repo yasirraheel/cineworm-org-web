@@ -20,8 +20,9 @@ class PlanFeaturesController extends Controller
             return redirect('admin/dashboard')->with('error_flash_message', 'Access Denied');
         }
 
+        $page_title = 'Plan Features';
         $features = PlanFeature::orderBy('sort_order')->orderBy('id')->get();
-        return view('admin.pages.plan_features.list', compact('features'));
+        return view('admin.pages.plan_features.list', compact('features', 'page_title'));
     }
 
     public function save(Request $request)
