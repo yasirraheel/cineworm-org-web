@@ -130,18 +130,21 @@
     <a href="#" class="vfx-item-btn-danger text-uppercase data_remove"><i class="fa fa-trash"></i>Account Delete</a>
 
     @if(count($activePlans) > 0)
+    @php $renderedFeatureKeys = []; @endphp
     <div class="dashboard-feature-sidebar">
       @foreach($activePlans as $plan)
         @php
             $directFeatures = $plan->getDirectFeatureKeys();
-            if (empty($directFeatures)) continue;
+            $uniqueFeatures = array_diff($directFeatures, $renderedFeatureKeys);
+            if (empty($uniqueFeatures)) continue;
         @endphp
         <div class="plan-group">
           <h6>{{ $plan->plan_name }}</h6>
           <div class="dashboard-feature-links">
-            @foreach($directFeatures as $featureKey)
+            @foreach($uniqueFeatures as $featureKey)
               @if(isset($featureLinkConfig[$featureKey]))
                   @php 
+                      $renderedFeatureKeys[] = $featureKey;
                       $featureLink = $featureLinkConfig[$featureKey]; 
                       $hasAccess = in_array($featureKey, $planFeatureKeys, true);
                   @endphp
