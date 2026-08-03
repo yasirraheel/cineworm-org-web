@@ -563,9 +563,22 @@ Route::get('user/live_broadcasts', 'UserLiveBroadcastController@index');
 Route::get('user/live_broadcasts/create', 'UserLiveBroadcastController@create');
 Route::post('user/live_broadcasts/create', 'UserLiveBroadcastController@store');
 
-// Zoom OAuth
-Route::get('user/zoom/connect', 'ZoomOAuthController@connect');
-Route::get('user/zoom/callback', 'ZoomOAuthController@callback');
+// Reel2Reel Video Editor Routes
+Route::get('user/editor', function () {
+    $filePath = public_path('reel2reel/index.html');
+    if (file_exists($filePath)) {
+        return response()->file($filePath);
+    }
+    return redirect('reel2reel/');
+});
+
+Route::get('reel2reel', function () {
+    $filePath = public_path('reel2reel/index.html');
+    if (file_exists($filePath)) {
+        return response()->file($filePath);
+    }
+    return redirect('/');
+});
 
 Route::get('membership_plan', 'UserController@membership_plan');
 Route::get('payment_method/{plan_id}', 'UserController@payment_method');

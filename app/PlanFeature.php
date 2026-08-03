@@ -52,7 +52,7 @@ class PlanFeature extends Model
                 'photo_gallery' => ['title' => 'Photo Gallery', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-image'],
                 'project_showcase_page' => ['title' => 'Project Showcase Page', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-film'],
                 'film_project_space' => ['title' => 'Film Project Space', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-folder-open'],
-                'film_editing_access' => ['title' => 'Film Editing Access', 'url' => URL('reel2reel/'), 'icon' => 'fa fa-cut'],
+                'film_editing_access' => ['title' => 'Film Editing Access', 'url' => 'user/editor', 'icon' => 'fa fa-cut'],
                 'colour_grading_access' => ['title' => 'Colour Grading Access', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-adjust'],
                 'advanced_film_showcase' => ['title' => 'Advanced Film Showcase', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-star'],
                 'pro_creator_tools' => ['title' => 'Pro Creator Tools', 'url' => 'javascript:void(0);', 'icon' => 'fa fa-wrench'],

@@ -90,8 +90,8 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="/reel2reel/"
-                                                class="{{ request()->is('reel2reel*') ? 'active' : '' }}"
+                                            <a href="{{ URL::to('user/editor') }}"
+                                                class="{{ request()->is('user/editor*') || request()->is('reel2reel*') ? 'active' : '' }}"
                                                 title="Video Editor">
                                                 Video Editor
                                             </a>
