@@ -70,6 +70,55 @@
     color: #94a3b8 !important;
     font-size: 13px !important;
   }
+  /* Action Buttons Styling */
+  .action-btn-group {
+    display: inline-flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+  }
+  .btn-action-edit {
+    background: rgba(53, 184, 224, 0.15) !important;
+    border: 1px solid rgba(53, 184, 224, 0.35) !important;
+    color: #35b8e0 !important;
+    border-radius: 6px !important;
+    padding: 6px 14px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+  }
+  .btn-action-edit:hover {
+    background: #35b8e0 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(53, 184, 224, 0.3) !important;
+    transform: translateY(-1px) !important;
+  }
+  .btn-action-delete {
+    background: rgba(255, 91, 91, 0.15) !important;
+    border: 1px solid rgba(255, 91, 91, 0.35) !important;
+    color: #ff5b5b !important;
+    border-radius: 6px !important;
+    padding: 6px 14px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+  }
+  .btn-action-delete:hover {
+    background: #ff5b5b !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(255, 91, 91, 0.3) !important;
+    transform: translateY(-1px) !important;
+  }
   /* Modal styling */
   .modal-content {
     background-color: #1a2234 !important;
@@ -146,7 +195,7 @@
                                     <th>Feature Key</th>
                                     <th>Target URL</th>
                                     <th width="100">Status</th>
-                                    <th width="160">Actions</th>
+                                    <th width="180" class="text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -165,13 +214,15 @@
                                                 <span class="badge badge-danger" style="background-color: #ff5b5b !important; padding: 5px 8px;">Inactive</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-info" onclick='editFeature(@json($feature))' style="background-color: #35b8e0; border-color: #35b8e0;">
-                                                <i class="fa fa-edit"></i> Edit
-                                            </button>
-                                            <a href="{{ url('admin/plan_features/delete/'.$feature->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this feature?')" style="background-color: #ff5b5b; border-color: #ff5b5b;">
-                                                <i class="fa fa-trash"></i> Delete
-                                            </a>
+                                        <td class="text-right">
+                                            <div class="action-btn-group">
+                                                <button class="btn-action-edit" onclick='editFeature(@json($feature))'>
+                                                    <i class="fa fa-edit"></i> Edit
+                                                </button>
+                                                <a href="{{ url('admin/plan_features/delete/'.$feature->id) }}" class="btn-action-delete" onclick="return confirm('Are you sure you want to delete this feature?')">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
