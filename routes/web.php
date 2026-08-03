@@ -30,6 +30,15 @@ Route::get('/offline', function() {
     return view('offline', compact('pwa_settings'));
 })->name('pwa.offline');
 
+// Reel2Reel Video Editor Route
+Route::get('/reel2reel/{any?}', function () {
+    $path = public_path('reel2reel/index.html');
+    if (file_exists($path)) {
+        return response()->file($path);
+    }
+    abort(404);
+})->where('any', '.*');
+
 // Temporary route to clear cache - REMOVE after use
 Route::get('/clear-all-cache', function() {
     try {
