@@ -82,11 +82,11 @@
 
 <!-- Modal for Create/Edit List -->
 <div class="modal fade" id="listModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <form action="{{ URL::to('user/whatsapp/lists/save') }}" method="POST">
             @csrf
             <input type="hidden" name="id" id="list_id">
-            <div class="modal-content" style="background:#1a2234;color:#fff;border:1px solid rgba(255,255,255,0.1);">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="listModalTitle" style="color:#25D366;font-weight:700;">Create Contact List</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -101,9 +101,9 @@
                         <textarea name="description" id="list_description" class="form-control" rows="3" placeholder="Optional list notes..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.1);">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success" style="background:#25D366;border-color:#25D366;">Save List</button>
+                    <button type="submit" class="btn btn-success" style="background:#25D366;border-color:#25D366;font-weight:600;">Save List</button>
                 </div>
             </div>
         </form>

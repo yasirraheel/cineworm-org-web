@@ -96,37 +96,41 @@
 
 <!-- Modal for Create/Edit Contact -->
 <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <form action="{{ URL::to('user/whatsapp/lists/'.$list->id.'/contacts/save') }}" method="POST">
             @csrf
             <input type="hidden" name="id" id="contact_id">
-            <div class="modal-content" style="background:#1a2234;color:#fff;border:1px solid rgba(255,255,255,0.1);">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="contactModalTitle" style="color:#25D366;font-weight:700;">Add Contact</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Phone Number * (with Country Code)</label>
-                        <input type="text" name="phone" id="contact_phone" class="form-control" placeholder="e.g. 15551234567 or 447700900077" required>
-                        <small class="text-muted">Include country code without + or spaces.</small>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone Number * (with Country Code)</label>
+                            <input type="text" name="phone" id="contact_phone" class="form-control" placeholder="e.g. 15551234567 or 447700900077" required>
+                            <small class="text-muted d-block mt-1">Include country code without + or spaces.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Contact Name</label>
+                            <input type="text" name="name" id="contact_name" class="form-control" placeholder="e.g. John Doe">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Contact Name</label>
-                        <input type="text" name="name" id="contact_name" class="form-control" placeholder="e.g. John Doe">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Company / Organization</label>
-                        <input type="text" name="company" id="contact_company" class="form-control" placeholder="e.g. Acme Corp">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tags</label>
-                        <input type="text" name="tags" id="contact_tags" class="form-control" placeholder="e.g. VIP, Client">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Company / Organization</label>
+                            <input type="text" name="company" id="contact_company" class="form-control" placeholder="e.g. Acme Corp">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tags</label>
+                            <input type="text" name="tags" id="contact_tags" class="form-control" placeholder="e.g. VIP, Client">
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.1);">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success" style="background:#25D366;border-color:#25D366;">Save Contact</button>
+                    <button type="submit" class="btn btn-success" style="background:#25D366;border-color:#25D366;font-weight:600;">Save Contact</button>
                 </div>
             </div>
         </form>
@@ -135,10 +139,10 @@
 
 <!-- Modal for CSV Import -->
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <form action="{{ URL::to('user/whatsapp/lists/'.$list->id.'/contacts/import') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="modal-content" style="background:#1a2234;color:#fff;border:1px solid rgba(255,255,255,0.1);">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" style="color:#38bdf8;font-weight:700;"><i class="fa fa-upload"></i> Import Contacts from CSV</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -148,16 +152,16 @@
                         <label class="form-label">Select CSV File *</label>
                         <input type="file" name="file" class="form-control" accept=".csv,.txt" required>
                     </div>
-                    <div class="p-3 mb-2 rounded" style="background:rgba(255,255,255,0.05);font-size:13px;">
-                        <strong>CSV Format Requirements:</strong><br>
+                    <div class="p-3 mb-3 rounded" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:13px;">
+                        <strong style="color:#38bdf8;">CSV Format Requirements:</strong><br>
                         - Column headers: <code>phone</code> (required), <code>name</code>, <code>company</code>, <code>tags</code>.<br>
                         - Phone numbers must include country code.
                     </div>
-                    <a href="{{ URL::to('user/whatsapp/lists/sample-file') }}" class="btn btn-sm btn-outline-info"><i class="fa fa-download"></i> Download Sample CSV Template</a>
+                    <a href="{{ URL::to('user/whatsapp/lists/sample-file') }}" class="btn btn-sm btn-outline-info" style="font-weight:600;"><i class="fa fa-download"></i> Download Sample CSV Template</a>
                 </div>
-                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.1);">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-info">Upload & Import</button>
+                    <button type="submit" class="btn btn-info" style="font-weight:600;">Upload & Import</button>
                 </div>
             </div>
         </form>
