@@ -33,6 +33,10 @@
 <link rel="stylesheet" href="{{ URL::asset('site_assets/css/megamenu.css') }}">
 <link rel="stylesheet" href="{{ URL::asset('site_assets/css/ionicons.css') }}">
 <link rel="stylesheet" href="{{ URL::asset('site_assets/css/font-awesome.min.css') }}">
+<!-- Font Icon CDNs for Modern Browser Compatibility -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 
 
 <link rel="stylesheet" href="{{ URL::asset('site_assets/css/color-style/'.getcong('styling').'.css') }}" id="theme">
