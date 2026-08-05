@@ -112,7 +112,6 @@
         </div>
     </div>
 </div>
-@endsection
 
 <script type="text/javascript">
 
