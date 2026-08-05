@@ -60,18 +60,29 @@ function getOrCreateSession(sessionId) {
   return sessions.get(sessionId);
 }
 
+function formatCleanNumber(jidOrId) {
+  if (!jidOrId) return null;
+  const numOnly = String(jidOrId).split('@')[0].split(':')[0].replace(/[^\d]/g, '');
+  return numOnly ? `+${numOnly}` : null;
+}
+
 function serializeStatus(session) {
   return {
     ok: true,
     sessionId: session.id,
     status: session.connectionStatus,
     connected: session.connectionStatus === 'connected',
-    connectedNumber: session.connectedNumber,
+    connectedNumber: formatCleanNumber(session.connectedNumber || session.sock?.user?.id),
     hasQr: Boolean(session.lastQrDataUrl),
     qrDataUrl: session.lastQrDataUrl,
     lastError: session.lastError,
   };
 }
+
+app.get('/qr', requireApiKey, (req, res) => {
+  const session = getOrCreateSession(getSessionId(req));
+  res.json(serializeStatus(session));
+});
 
 function normalizeNumber(value) {
   return String(value || '').replace(/[^\d]/g, '');

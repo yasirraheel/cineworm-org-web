@@ -139,6 +139,40 @@ class UserWhatsappController extends Controller
         return response()->json($status);
     }
 
+    public function sendTestMessage(Request $request)
+    {
+        if ($redirect = $this->ensureWhatsappAccess()) {
+            return response()->json(['ok' => false, 'error' => 'Access Denied'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|string',
+            'message' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['ok' => false, 'error' => $validator->errors()->first()], 422);
+        }
+
+        $phone = preg_replace('/[^\d]/', '', $request->input('phone'));
+        $message = trim($request->input('message'));
+
+        if (empty($phone) || strlen($phone) < 8) {
+            return response()->json(['ok' => false, 'error' => 'Please enter a valid phone number with country code.'], 422);
+        }
+
+        $res = $this->campaignService->requestServer('post', '/send', [
+            'number' => $phone,
+            'message' => $message
+        ], $this->getSessionId());
+
+        if (isset($res['ok']) && $res['ok']) {
+            return response()->json(['ok' => true, 'message' => 'Test message sent successfully to +' . $phone]);
+        }
+
+        return response()->json(['ok' => false, 'error' => $res['error'] ?? 'Failed to send test message. Please ensure your WhatsApp device is connected.'], 400);
+    }
+
     public function lists()
     {
         if ($redirect = $this->ensureWhatsappAccess()) {

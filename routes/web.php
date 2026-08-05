@@ -569,6 +569,7 @@ Route::get('user/whatsapp/status', 'UserWhatsappController@status');
 Route::post('user/whatsapp/connect', 'UserWhatsappController@connect');
 Route::get('user/whatsapp/qr', 'UserWhatsappController@qr');
 Route::post('user/whatsapp/logout', 'UserWhatsappController@logoutSession');
+Route::post('user/whatsapp/send-test', 'UserWhatsappController@sendTestMessage');
 Route::get('user/whatsapp/lists', 'UserWhatsappController@lists');
 Route::post('user/whatsapp/lists/save', 'UserWhatsappController@saveList');
 Route::get('user/whatsapp/lists/{id}/contacts', 'UserWhatsappController@contacts');

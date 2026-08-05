@@ -49,7 +49,7 @@
                         <div class="row align-items-center">
                             <div class="col-md-7">
                                 <h4 style="color:#25D366;font-weight:700;margin-top:0;" id="waStatusTitle">
-                                    <i class="fa fa-whatsapp"></i> WhatsApp Device Connection
+                                    <i class="fa fa-whatsapp fab fa-brands"></i> WhatsApp Device Connection
                                 </h4>
                                 <p style="color:#94a3b8;font-size:14px;margin-bottom:10px;" id="waStatusDesc">
                                     Connect your WhatsApp account to enable bulk messaging and automatic campaign delivery directly from your own WhatsApp number.
@@ -63,6 +63,9 @@
                                 </div>
                             </div>
                             <div class="col-md-5 text-end text-md-end">
+                                <button type="button" id="btnTestWa" class="btn btn-outline-info waves-effect waves-light me-2" onclick="openTestMsgModal()" style="font-weight:600;display:{{ ($status['connected'] ?? false) ? 'inline-block' : 'none' }};">
+                                    <i class="fa fa-paper-plane"></i> Send Test Msg
+                                </button>
                                 <button type="button" id="btnConnectWa" class="btn btn-success waves-effect waves-light me-2" onclick="connectWhatsApp()" style="background-color:#25D366;border-color:#25D366;font-weight:600;">
                                     <i class="fa fa-qrcode"></i> Connect / Scan QR
                                 </button>
@@ -174,8 +177,8 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" style="background-color:#1a2234;color:#ffffff;border:1px solid rgba(255,255,255,0.1);box-shadow:0 15px 40px rgba(0,0,0,0.5);">
             <div class="modal-header">
-                <h5 class="modal-title" id="waQrModalLabel" style="color:#25D366;font-weight:700;"><i class="fa fa-whatsapp"></i> Pair Your WhatsApp Device</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="waQrModalLabel" style="color:#25D366;font-weight:700;"><i class="fa fa-whatsapp fab fa-brands"></i> Pair Your WhatsApp Device</h5>
+                <button type="button" class="btn-close btn-close-white close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body text-center p-4">
                 <div id="waQrLoading" class="my-4">
@@ -199,8 +202,42 @@
                 </div>
             </div>
             <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.1);">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal">Close</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Sending Test WhatsApp Message -->
+<div class="modal fade" id="waTestModal" tabindex="-1" role="dialog" aria-labelledby="waTestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="background-color:#1a2234;color:#ffffff;border:1px solid rgba(255,255,255,0.1);box-shadow:0 15px 40px rgba(0,0,0,0.5);">
+            <div class="modal-header">
+                <h5 class="modal-title" id="waTestModalLabel" style="color:#38bdf8;font-weight:700;"><i class="fa fa-paper-plane"></i> Send Test WhatsApp Message</h5>
+                <button type="button" class="btn-close btn-close-white close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+            <form id="waTestForm" onsubmit="sendTestMessageSubmit(event)">
+                <div class="modal-body p-4 text-start">
+                    <div id="waTestAlert" style="display:none;" class="alert mb-3"></div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="testPhone" style="color:#94a3b8;font-size:13px;font-weight:600;">Recipient WhatsApp Number (With Country Code)</label>
+                        <input type="text" class="form-control" id="testPhone" placeholder="e.g. +14155552671 or 447956675381" required style="background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,0.15);">
+                        <small class="text-muted">Include country code without spaces or dashes.</small>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="testMessage" style="color:#94a3b8;font-size:13px;font-weight:600;">Message Content</label>
+                        <textarea class="form-control" id="testMessage" rows="3" required style="background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,0.15);">Hello! This is a test message sent from CineWorm WhatsApp Web.</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.1);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="btnSubmitTestMsg" class="btn btn-info" style="background:#38bdf8;border-color:#38bdf8;font-weight:600;color:#000;">
+                        <i class="fa fa-paper-plane"></i> Send Test Message
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -232,13 +269,22 @@ function pollQrStatus() {
 
     qrPollTimer = setInterval(function() {
         $.get("{{ URL::to('user/whatsapp/qr') }}", function(res) {
-            if (res.connected) {
+            var isConn = res.connected || res.status === 'connected';
+            var rawNum = res.connectedNumber || res.number || '';
+            var cleanNum = rawNum.toString().replace('@s.whatsapp.net', '').split(':')[0];
+            if (cleanNum && !cleanNum.startsWith('+')) cleanNum = '+' + cleanNum;
+
+            if (isConn) {
                 clearInterval(qrPollTimer);
                 $('#waQrLoading').hide();
                 $('#waQrContainer').hide();
                 $('#waConnectedState').show();
-                $('#waConnectedNumberText').text('Connected Phone: ' + (res.connectedNumber || 'Active'));
-                updatePageStatus(true, res.connectedNumber);
+                $('#waConnectedNumberText').text('Connected Phone: ' + (cleanNum || 'Active'));
+                updatePageStatus(true, cleanNum);
+
+                setTimeout(function() {
+                    $('#waQrModal').modal('hide');
+                }, 1500);
             } else if (res.qrDataUrl) {
                 $('#waQrLoading').hide();
                 $('#waConnectedState').hide();
@@ -260,13 +306,54 @@ function logoutWhatsApp() {
 }
 
 function updatePageStatus(connected, number = '') {
+    var cleanNum = (number || '').toString().replace('@s.whatsapp.net', '').split(':')[0];
+    if (cleanNum && !cleanNum.startsWith('+')) cleanNum = '+' + cleanNum;
+
     if (connected) {
-        $('#waStatusBadge').html('<span class="badge bg-success" style="font-size:14px;padding:8px 14px;"><i class="fa fa-check-circle"></i> Connected (' + (number || 'Active') + ')</span>');
+        $('#waStatusBadge').html('<span class="badge bg-success" style="font-size:14px;padding:8px 14px;"><i class="fa fa-check-circle"></i> Connected (' + (cleanNum || 'Active') + ')</span>');
         $('#btnLogoutWa').show();
+        $('#btnTestWa').show();
     } else {
         $('#waStatusBadge').html('<span class="badge bg-warning text-dark" style="font-size:14px;padding:8px 14px;"><i class="fa fa-exclamation-triangle"></i> Disconnected / Pairing Required</span>');
         $('#btnLogoutWa').hide();
+        $('#btnTestWa').hide();
     }
+}
+
+function openTestMsgModal() {
+    $('#waTestAlert').hide();
+    $('#waTestModal').modal('show');
+}
+
+function sendTestMessageSubmit(e) {
+    e.preventDefault();
+    var phone = $('#testPhone').val().trim();
+    var message = $('#testMessage').val().trim();
+
+    if (!phone || !message) return;
+
+    $('#btnSubmitTestMsg').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Sending...');
+    $('#waTestAlert').hide();
+
+    $.post("{{ URL::to('user/whatsapp/send-test') }}", {
+        _token: "{{ csrf_token() }}",
+        phone: phone,
+        message: message
+    }, function(res) {
+        $('#btnSubmitTestMsg').prop('disabled', false).html('<i class="fa fa-paper-plane"></i> Send Test Message');
+        if (res.ok) {
+            $('#waTestAlert').removeClass('alert-danger').addClass('alert-success').text(res.message).show();
+            setTimeout(function() {
+                $('#waTestModal').modal('hide');
+            }, 2500);
+        } else {
+            $('#waTestAlert').removeClass('alert-success').addClass('alert-danger').text(res.error || 'Failed to send message.').show();
+        }
+    }).fail(function(xhr) {
+        $('#btnSubmitTestMsg').prop('disabled', false).html('<i class="fa fa-paper-plane"></i> Send Test Message');
+        var err = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Server error sending test message.';
+        $('#waTestAlert').removeClass('alert-success').addClass('alert-danger').text(err).show();
+    });
 }
 </script>
 @endsection
