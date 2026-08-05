@@ -39,9 +39,9 @@
                             </h4>
                             <div>
                                 @if(in_array($campaign->status, ['draft', 'paused'], true))
-                                    <form action="{{ URL::to('user/whatsapp/campaigns/'.$campaign->id.'/launch') }}" method="POST" class="d-inline">
+                                    <form action="{{ URL::to('user/whatsapp/campaigns/'.$campaign->id.'/launch') }}" method="POST" class="d-inline launch-form">
                                         @csrf
-                                        <button type="submit" class="btn btn-success me-2" style="background:#25D366;border-color:#25D366;font-weight:600;" onclick="return confirm('Launch this campaign now?')">
+                                        <button type="button" class="btn btn-success me-2 btn-launch" style="background:#25D366;border-color:#25D366;font-weight:600;">
                                             <i class="fa fa-play"></i> Launch Campaign
                                         </button>
                                     </form>
@@ -129,4 +129,30 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn-launch');
+    if (!btn) return;
+    e.preventDefault();
+    var form = btn.closest('.launch-form');
+    Swal.fire({
+      title: 'Launch Campaign?',
+      text: 'This will start sending WhatsApp messages to all contacts in the list.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#25D366',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, Launch!',
+      cancelButtonText: 'Cancel',
+      background: '#1a2234',
+      color: '#fff'
+    }).then(function(result) {
+      if (result.isConfirmed) {
+        form.submit();
+      }
+    });
+  });
+</script>
+
 @endsection
