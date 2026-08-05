@@ -62,16 +62,18 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="col-md-5 text-end text-md-end">
-                                <button type="button" id="btnTestWa" class="btn btn-outline-info waves-effect waves-light me-2" onclick="openTestMsgModal()" style="font-weight:600;display:{{ ($status['connected'] ?? false) ? 'inline-block' : 'none' }};">
-                                    <i class="fa fa-paper-plane"></i> Send Test Msg
-                                </button>
-                                <button type="button" id="btnConnectWa" class="btn btn-success waves-effect waves-light me-2" onclick="connectWhatsApp()" style="background-color:#25D366;border-color:#25D366;font-weight:600;">
-                                    <i class="fa fa-qrcode"></i> Connect / Scan QR
-                                </button>
-                                <button type="button" id="btnLogoutWa" class="btn btn-outline-danger waves-effect waves-light" onclick="logoutWhatsApp()" style="font-weight:600;display:{{ ($status['connected'] ?? false) ? 'inline-block' : 'none' }};">
-                                    <i class="fa fa-power-off"></i> Disconnect
-                                </button>
+                            <div class="col-md-6 col-lg-5 text-end">
+                                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:flex-end; min-height:42px;">
+                                    <button type="button" id="btnTestWa" class="btn btn-outline-info waves-effect waves-light" onclick="openTestMsgModal()" style="font-weight:600;margin:0;display:{{ ($status['connected'] ?? false) ? 'inline-flex' : 'none' }};align-items:center;gap:6px;">
+                                        <i class="fa fa-paper-plane"></i> Send Test Msg
+                                    </button>
+                                    <button type="button" id="btnConnectWa" class="btn btn-success waves-effect waves-light" onclick="connectWhatsApp()" style="background-color:#25D366;border-color:#25D366;font-weight:600;margin:0;display:inline-flex;align-items:center;gap:6px;">
+                                        <i class="fa fa-qrcode"></i> Connect / Scan QR
+                                    </button>
+                                    <button type="button" id="btnLogoutWa" class="btn btn-outline-danger waves-effect waves-light" onclick="logoutWhatsApp()" style="font-weight:600;margin:0;display:{{ ($status['connected'] ?? false) ? 'inline-flex' : 'none' }};align-items:center;gap:6px;">
+                                        <i class="fa fa-power-off"></i> Disconnect
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -311,8 +313,8 @@ function updatePageStatus(connected, number = '') {
 
     if (connected) {
         $('#waStatusBadge').html('<span class="badge bg-success" style="font-size:14px;padding:8px 14px;"><i class="fa fa-check-circle"></i> Connected (' + (cleanNum || 'Active') + ')</span>');
-        $('#btnLogoutWa').show();
-        $('#btnTestWa').show();
+        $('#btnLogoutWa').css('display', 'inline-flex');
+        $('#btnTestWa').css('display', 'inline-flex');
     } else {
         $('#waStatusBadge').html('<span class="badge bg-warning text-dark" style="font-size:14px;padding:8px 14px;"><i class="fa fa-exclamation-triangle"></i> Disconnected / Pairing Required</span>');
         $('#btnLogoutWa').hide();
