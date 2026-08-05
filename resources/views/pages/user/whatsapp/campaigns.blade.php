@@ -114,38 +114,11 @@
 </div>
 
 <script type="text/javascript">
-
-  @if(Session::has('flash_message'))
-  const ToastWA = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 3500,
-    timerProgressBar: false,
-  })
-  ToastWA.fire({
-    icon: 'success',
-    title: '{{ Session::get('flash_message') }}'
-  })
-  @endif
-
-  @if(Session::has('error_flash_message'))
-  const ToastWAErr = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 3500,
-    timerProgressBar: false,
-  })
-  ToastWAErr.fire({
-    icon: 'error',
-    title: '{{ Session::get('error_flash_message') }}'
-  })
-  @endif
-
-  $(document).on('click', '.btn-launch', function(e) {
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn-launch');
+    if (!btn) return;
     e.preventDefault();
-    var form = $(this).closest('.launch-form');
+    var form = btn.closest('.launch-form');
     Swal.fire({
       title: 'Launch Campaign?',
       text: 'This will start sending WhatsApp messages to all contacts in the list.',
@@ -157,13 +130,12 @@
       cancelButtonText: 'Cancel',
       background: '#1a2234',
       color: '#fff'
-    }).then((result) => {
+    }).then(function(result) {
       if (result.isConfirmed) {
         form.submit();
       }
     });
   });
-
 </script>
 
 @endsection
