@@ -90,7 +90,8 @@ class WhatsappCampaignService
             return;
         }
 
-        $status = $this->requestServer('get', '/status');
+        $sessionId = $campaign->user_id ? "user_{$campaign->user_id}" : 'admin';
+        $status = $this->requestServer('get', '/status', [], $sessionId);
         if (!($status['connected'] ?? false)) {
             $campaign->last_error = 'WhatsApp is not connected. Connect WhatsApp Web before running campaigns.';
             $campaign->save();
@@ -124,7 +125,7 @@ class WhatsappCampaignService
                     'message' => $send->message,
                     'validateNumber' => true,
                     'typingPresence' => true,
-                ]);
+                ], $sessionId);
 
                 if (!($response['ok'] ?? false)) {
                     throw new \RuntimeException($response['error'] ?? 'WhatsApp server rejected the message.');
@@ -266,14 +267,15 @@ class WhatsappCampaignService
         $campaign->save();
     }
 
-    protected function requestServer($method, $path, array $payload = [])
+    public function requestServer($method, $path, array $payload = [], string $sessionId = 'admin')
     {
         try {
             $url = rtrim(config('whatsapp.server_url'), '/') . $path;
             $client = Http::timeout(max(15, (int) config('whatsapp.timeout')))
                 ->acceptJson()
                 ->withHeaders([
-                    'x-api-key' => config('whatsapp.api_key'),
+                    'x-api-key'    => config('whatsapp.api_key'),
+                    'x-session-id' => $sessionId,
                 ]);
 
             $response = $method === 'post'

@@ -40,6 +40,7 @@ class SubscriptionPlan extends Model
         'job_listing' => 'Job Listing',
         'news_ticker' => 'News Ticker',
         'live_broadcast' => 'Live Broadcast',
+        'whatsapp_marketing_access' => 'WhatsApp Web & Campaigns',
     ];
 
     public function scopeActive($query)

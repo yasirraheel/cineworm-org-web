@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import fs from 'fs/promises';
+import path from 'path';
 import pino from 'pino';
 import QRCode from 'qrcode';
 import makeWASocket, {
@@ -15,21 +16,10 @@ const logger = pino({ level: process.env.WA_LOG_LEVEL || 'info' });
 const host = process.env.WA_SERVER_HOST || '127.0.0.1';
 const port = Number(process.env.WA_SERVER_PORT || 3025);
 const apiKey = process.env.WA_SERVER_API_KEY || 'change-this-long-random-key';
-const authDir = process.env.WA_AUTH_DIR || 'auth';
+const baseAuthDir = process.env.WA_AUTH_DIR || 'auth';
 const qrIdleTimeoutMs = Number(process.env.WA_QR_IDLE_TIMEOUT_MS || 120000);
 
-let sock = null;
-let lastQr = null;
-let lastQrDataUrl = null;
-let connectionStatus = 'disconnected';
-let connectedNumber = null;
-let lastError = null;
-let starting = false;
-let manualStop = false;
-let reconnectAllowed = false;
-let qrIdleTimer = null;
-let unopenedFailureCount = 0;
-let sessionHadQr = false;
+const sessions = new Map();
 
 app.use(express.json({ limit: '1mb' }));
 
@@ -41,15 +31,45 @@ function requireApiKey(req, res, next) {
   return next();
 }
 
-function serializeStatus() {
+function getSessionId(req) {
+  const raw = req.header('x-session-id') || req.query.sessionId || req.body?.sessionId || 'admin';
+  return String(raw).trim().replace(/[^a-zA-Z0-9_-]/g, '_') || 'admin';
+}
+
+function getOrCreateSession(sessionId) {
+  if (!sessions.has(sessionId)) {
+    const authDir = sessionId === 'admin' ? baseAuthDir : path.join(baseAuthDir, `session_${sessionId}`);
+    sessions.set(sessionId, {
+      id: sessionId,
+      authDir,
+      sock: null,
+      lastQr: null,
+      lastQrDataUrl: null,
+      connectionStatus: 'disconnected',
+      connectedNumber: null,
+      lastError: null,
+      starting: false,
+      manualStop: false,
+      reconnectAllowed: false,
+      qrIdleTimer: null,
+      unopenedFailureCount: 0,
+      sessionHadQr: false,
+    });
+  }
+
+  return sessions.get(sessionId);
+}
+
+function serializeStatus(session) {
   return {
     ok: true,
-    status: connectionStatus,
-    connected: connectionStatus === 'connected',
-    connectedNumber,
-    hasQr: Boolean(lastQrDataUrl),
-    qrDataUrl: lastQrDataUrl,
-    lastError,
+    sessionId: session.id,
+    status: session.connectionStatus,
+    connected: session.connectionStatus === 'connected',
+    connectedNumber: session.connectedNumber,
+    hasQr: Boolean(session.lastQrDataUrl),
+    qrDataUrl: session.lastQrDataUrl,
+    lastError: session.lastError,
   };
 }
 
@@ -67,125 +87,125 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (safeMax - safeMin + 1)) + safeMin;
 }
 
-function clearQrIdleTimer() {
-  if (qrIdleTimer) {
-    clearTimeout(qrIdleTimer);
-    qrIdleTimer = null;
+function clearQrIdleTimer(session) {
+  if (session.qrIdleTimer) {
+    clearTimeout(session.qrIdleTimer);
+    session.qrIdleTimer = null;
   }
 }
 
-function scheduleQrIdleStop() {
-  clearQrIdleTimer();
+function scheduleQrIdleStop(session) {
+  clearQrIdleTimer(session);
 
-  qrIdleTimer = setTimeout(() => {
-    stopSocket('disconnected', 'QR expired because no admin scanned it in time.').catch((error) => {
-      lastError = error.message;
-      logger.error(error, 'Failed to stop idle WhatsApp QR socket');
+  session.qrIdleTimer = setTimeout(() => {
+    stopSocket(session, 'disconnected', 'QR expired because no user scanned it in time.').catch((error) => {
+      session.lastError = error.message;
+      logger.error(error, `Failed to stop idle WhatsApp QR socket for ${session.id}`);
     });
   }, qrIdleTimeoutMs);
 }
 
-async function clearAuthState() {
-  await fs.rm(authDir, { recursive: true, force: true });
-  lastQr = null;
-  lastQrDataUrl = null;
-  connectedNumber = null;
+async function clearAuthState(session) {
+  await fs.rm(session.authDir, { recursive: true, force: true });
+  session.lastQr = null;
+  session.lastQrDataUrl = null;
+  session.connectedNumber = null;
 }
 
-async function stopSocket(status = 'disconnected', message = null) {
-  clearQrIdleTimer();
+async function stopSocket(session, status = 'disconnected', message = null) {
+  clearQrIdleTimer(session);
 
-  const activeSock = sock;
-  manualStop = true;
-  reconnectAllowed = false;
-  sock = null;
-  connectionStatus = status;
-  lastError = message;
-  lastQr = null;
-  lastQrDataUrl = null;
-  connectedNumber = null;
+  const activeSock = session.sock;
+  session.manualStop = true;
+  session.reconnectAllowed = false;
+  session.sock = null;
+  session.connectionStatus = status;
+  session.lastError = message;
+  session.lastQr = null;
+  session.lastQrDataUrl = null;
+  session.connectedNumber = null;
 
   if (activeSock && typeof activeSock.end === 'function') {
     activeSock.end(new Error(message || status));
   }
 }
 
-async function startSocket() {
-  if (starting) {
+async function startSocket(session) {
+  if (session.starting) {
     return;
   }
 
-  if (sock && ['connected', 'connecting', 'qr'].includes(connectionStatus)) {
+  if (session.sock && ['connected', 'connecting', 'qr'].includes(session.connectionStatus)) {
     return;
   }
 
-  starting = true;
-  manualStop = false;
-  reconnectAllowed = false;
-  sessionHadQr = false;
-  connectionStatus = 'connecting';
-  lastError = null;
+  session.starting = true;
+  session.manualStop = false;
+  session.reconnectAllowed = false;
+  session.sessionHadQr = false;
+  session.connectionStatus = 'connecting';
+  session.lastError = null;
 
   try {
-    const { state, saveCreds } = await useMultiFileAuthState(authDir);
+    const { state, saveCreds } = await useMultiFileAuthState(session.authDir);
     const { version } = await fetchLatestBaileysVersion();
 
-    sock = makeWASocket({
+    session.sock = makeWASocket({
       version,
       auth: state,
       logger,
       printQRInTerminal: false,
-      browser: ['Cineworm Admin', 'Chrome', '1.0.0'],
+      browser: [`Cineworm (${session.id})`, 'Chrome', '1.0.0'],
       markOnlineOnConnect: false,
       syncFullHistory: false,
     });
 
-    sock.ev.on('creds.update', saveCreds);
+    session.sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', async (update) => {
+    session.sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
-        sessionHadQr = true;
-        lastQr = qr;
-        lastQrDataUrl = await QRCode.toDataURL(qr, { margin: 1, width: 320 });
-        connectionStatus = 'qr';
-        scheduleQrIdleStop();
+        session.sessionHadQr = true;
+        session.lastQr = qr;
+        session.lastQrDataUrl = await QRCode.toDataURL(qr, { margin: 1, width: 320 });
+        session.connectionStatus = 'qr';
+        scheduleQrIdleStop(session);
       }
 
       if (connection === 'open') {
-        clearQrIdleTimer();
-        connectionStatus = 'connected';
-        reconnectAllowed = true;
-        unopenedFailureCount = 0;
-        connectedNumber = sock?.user?.id || null;
-        lastQr = null;
-        lastQrDataUrl = null;
-        lastError = null;
+        clearQrIdleTimer(session);
+        session.connectionStatus = 'connected';
+        session.reconnectAllowed = true;
+        session.unopenedFailureCount = 0;
+        session.connectedNumber = session.sock?.user?.id || null;
+        session.lastQr = null;
+        session.lastQrDataUrl = null;
+        session.lastError = null;
       }
 
       if (connection === 'close') {
-        clearQrIdleTimer();
+        clearQrIdleTimer(session);
         const statusCode = lastDisconnect?.error?.output?.statusCode;
         const errorMessage = lastDisconnect?.error?.message || null;
         const loggedOut = statusCode === DisconnectReason.loggedOut;
         const restartRequired = statusCode === DisconnectReason.restartRequired;
         const deviceRemoved = loggedOut && /device_removed|conflict/i.test(errorMessage || '');
-        const shouldReconnect = !manualStop && !loggedOut && (reconnectAllowed || sessionHadQr || restartRequired);
+        const shouldReconnect = !session.manualStop && !loggedOut && (session.reconnectAllowed || session.sessionHadQr || restartRequired);
 
-        const failedBeforeOpen = !manualStop && !reconnectAllowed && !loggedOut;
-        const staleFailure = failedBeforeOpen && !sessionHadQr && !restartRequired;
-        unopenedFailureCount = staleFailure ? unopenedFailureCount + 1 : 0;
+        const failedBeforeOpen = !session.manualStop && !session.reconnectAllowed && !loggedOut;
+        const staleFailure = failedBeforeOpen && !session.sessionHadQr && !restartRequired;
+        session.unopenedFailureCount = staleFailure ? session.unopenedFailureCount + 1 : 0;
 
-        if (deviceRemoved || (staleFailure && unopenedFailureCount >= 1)) {
-          await clearAuthState();
+        if (deviceRemoved || (staleFailure && session.unopenedFailureCount >= 1)) {
+          await clearAuthState(session);
         }
 
-        connectionStatus = manualStop ? connectionStatus : (loggedOut || staleFailure ? 'logged_out' : 'disconnected');
-        connectedNumber = null;
-        lastQr = null;
-        lastQrDataUrl = null;
-        lastError = manualStop ? lastError : (
+        session.connectionStatus = session.manualStop ? session.connectionStatus : (loggedOut || staleFailure ? 'logged_out' : 'disconnected');
+        session.connectedNumber = null;
+        session.lastQr = null;
+        session.lastQrDataUrl = null;
+        session.lastError = session.manualStop ? session.lastError : (
           staleFailure
             ? 'Previous WhatsApp session was stale. Auth was cleared; click Connect / QR to generate a new QR code.'
             : (
@@ -194,52 +214,61 @@ async function startSocket() {
                 : (shouldReconnect ? 'WhatsApp pairing completed. Reconnecting session...' : errorMessage)
             )
         );
-        sock = null;
-        manualStop = false;
-        sessionHadQr = false;
+        session.sock = null;
+        session.manualStop = false;
+        session.sessionHadQr = false;
 
         if (shouldReconnect) {
           setTimeout(() => {
-            startSocket().catch((error) => {
-              lastError = error.message;
-              logger.error(error, 'Failed to reconnect WhatsApp socket');
+            startSocket(session).catch((error) => {
+              session.lastError = error.message;
+              logger.error(error, `Failed to reconnect WhatsApp socket for ${session.id}`);
             });
           }, 3000);
         }
       }
     });
   } catch (error) {
-    connectionStatus = 'error';
-    lastError = error.message;
-    logger.error(error, 'Failed to start WhatsApp socket');
+    session.connectionStatus = 'error';
+    session.lastError = error.message;
+    logger.error(error, `Failed to start WhatsApp socket for ${session.id}`);
   } finally {
-    starting = false;
+    session.starting = false;
   }
 }
 
 app.get('/health', (req, res) => {
-  res.json({ ok: true, service: 'cineworm-whatsapp-server' });
+  res.json({
+    ok: true,
+    service: 'cineworm-whatsapp-server',
+    activeSessions: Array.from(sessions.keys()),
+  });
 });
 
 app.get('/status', requireApiKey, (req, res) => {
-  res.json(serializeStatus());
+  const session = getOrCreateSession(getSessionId(req));
+  res.json(serializeStatus(session));
 });
 
 app.post('/connect', requireApiKey, async (req, res) => {
-  await startSocket();
-  res.json(serializeStatus());
+  const session = getOrCreateSession(getSessionId(req));
+  await startSocket(session);
+  res.json(serializeStatus(session));
 });
 
 app.get('/qr', requireApiKey, (req, res) => {
+  const session = getOrCreateSession(getSessionId(req));
   res.json({
     ok: true,
-    status: connectionStatus,
-    qr: lastQr,
-    qrDataUrl: lastQrDataUrl,
+    sessionId: session.id,
+    status: session.connectionStatus,
+    qr: session.lastQr,
+    qrDataUrl: session.lastQrDataUrl,
   });
 });
 
 app.post('/send', requireApiKey, async (req, res) => {
+  const session = getOrCreateSession(getSessionId(req));
   const number = normalizeNumber(req.body.number);
   const message = String(req.body.message || '').trim();
   const validateNumber = req.body.validateNumber !== false;
@@ -253,15 +282,15 @@ app.post('/send', requireApiKey, async (req, res) => {
     return res.status(422).json({ ok: false, error: 'Message is required.' });
   }
 
-  if (!sock || connectionStatus !== 'connected') {
-    return res.status(409).json({ ok: false, error: 'WhatsApp is not connected.' });
+  if (!session.sock || session.connectionStatus !== 'connected') {
+    return res.status(409).json({ ok: false, error: `WhatsApp session (${session.id}) is not connected.` });
   }
 
   const jid = `${number}@s.whatsapp.net`;
 
   try {
-    if (validateNumber && typeof sock.onWhatsApp === 'function') {
-      const matches = await sock.onWhatsApp(jid);
+    if (validateNumber && typeof session.sock.onWhatsApp === 'function') {
+      const matches = await session.sock.onWhatsApp(jid);
       const isRegistered = Array.isArray(matches) && matches.some((item) => item?.exists);
 
       if (!isRegistered) {
@@ -271,47 +300,49 @@ app.post('/send', requireApiKey, async (req, res) => {
 
     if (typingPresence) {
       try {
-        await sock.presenceSubscribe(jid);
-        await sock.sendPresenceUpdate('composing', jid);
+        await session.sock.presenceSubscribe(jid);
+        await session.sock.sendPresenceUpdate('composing', jid);
         await sleep(randomInt(900, 2400));
-        await sock.sendPresenceUpdate('paused', jid);
+        await session.sock.sendPresenceUpdate('paused', jid);
       } catch (presenceError) {
         logger.debug(presenceError, 'Unable to publish typing presence');
       }
     }
 
-    const response = await sock.sendMessage(jid, {
+    const response = await session.sock.sendMessage(jid, {
       text: message,
       linkPreview: false,
     });
 
     return res.json({
       ok: true,
+      sessionId: session.id,
       jid,
       messageId: response?.key?.id || null,
       response,
     });
   } catch (error) {
-    logger.warn(error, 'WhatsApp send failed');
+    logger.warn(error, `WhatsApp send failed for session ${session.id}`);
     return res.status(500).json({ ok: false, error: error.message || 'WhatsApp send failed.', jid });
   }
 });
 
 app.post('/logout', requireApiKey, async (req, res) => {
-  if (sock) {
+  const session = getOrCreateSession(getSessionId(req));
+  if (session.sock) {
     try {
-      await sock.logout();
+      await session.sock.logout();
     } catch (error) {
-      logger.warn(error, 'WhatsApp logout raised an error; clearing local auth state anyway');
+      logger.warn(error, `WhatsApp logout raised an error for session ${session.id}; clearing local auth state anyway`);
     }
   }
 
-  await stopSocket('logged_out', null);
-  await clearAuthState();
+  await stopSocket(session, 'logged_out', null);
+  await clearAuthState(session);
 
-  res.json(serializeStatus());
+  res.json(serializeStatus(session));
 });
 
 app.listen(port, host, () => {
-  logger.info(`WhatsApp server listening at http://${host}:${port}`);
+  logger.info(`WhatsApp multi-session server listening at http://${host}:${port}`);
 });

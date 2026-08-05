@@ -21,12 +21,13 @@ class PlanFeature extends Model
     public static function getSystemUrlMap(): array
     {
         return [
-            'film_editing_access'    => '/reel2reel/',
-            'extended_media_uploads' => URL::to('user/films/upload'),
-            'priority_promotion'     => URL::to('promotions'),
-            'job_listing'            => URL::to('user/jobs'),
-            'news_ticker'            => URL::to('user/news_tickers'),
-            'live_broadcast'         => URL::to('user/live_broadcasts'),
+            'film_editing_access'      => '/reel2reel/',
+            'extended_media_uploads'   => URL::to('user/films/upload'),
+            'priority_promotion'       => URL::to('promotions'),
+            'job_listing'              => URL::to('user/jobs'),
+            'news_ticker'              => URL::to('user/news_tickers'),
+            'live_broadcast'           => URL::to('user/live_broadcasts'),
+            'whatsapp_marketing_access' => URL::to('user/whatsapp'),
         ];
     }
 
@@ -53,12 +54,13 @@ class PlanFeature extends Model
 
         if ($features->isEmpty()) {
             return [
-                'film_editing_access'    => ['title' => 'Film Editing Access', 'url' => '/reel2reel/', 'icon' => 'fa fa-cut'],
-                'extended_media_uploads' => ['title' => 'Extended Media Uploads', 'url' => URL::to('user/films/upload'), 'icon' => 'fa fa-cloud-upload-alt'],
-                'priority_promotion'     => ['title' => 'Priority Promotion', 'url' => URL::to('promotions'), 'icon' => 'fa fa-rocket'],
-                'job_listing'            => ['title' => 'Job Listing', 'url' => URL::to('user/jobs'), 'icon' => 'fa fa-briefcase'],
-                'news_ticker'            => ['title' => 'News Ticker', 'url' => URL::to('user/news_tickers'), 'icon' => 'fa fa-newspaper'],
-                'live_broadcast'         => ['title' => 'Live Broadcast', 'url' => URL::to('user/live_broadcasts'), 'icon' => 'fa fa-podcast'],
+                'film_editing_access'       => ['title' => 'Film Editing Access', 'url' => '/reel2reel/', 'icon' => 'fa fa-cut'],
+                'extended_media_uploads'    => ['title' => 'Extended Media Uploads', 'url' => URL::to('user/films/upload'), 'icon' => 'fa fa-cloud-upload-alt'],
+                'priority_promotion'        => ['title' => 'Priority Promotion', 'url' => URL::to('promotions'), 'icon' => 'fa fa-rocket'],
+                'job_listing'               => ['title' => 'Job Listing', 'url' => URL::to('user/jobs'), 'icon' => 'fa fa-briefcase'],
+                'news_ticker'               => ['title' => 'News Ticker', 'url' => URL::to('user/news_tickers'), 'icon' => 'fa fa-newspaper'],
+                'live_broadcast'            => ['title' => 'Live Broadcast', 'url' => URL::to('user/live_broadcasts'), 'icon' => 'fa fa-podcast'],
+                'whatsapp_marketing_access' => ['title' => 'WhatsApp Web & Campaigns', 'url' => URL::to('user/whatsapp'), 'icon' => 'fa fa-whatsapp'],
             ];
         }
 

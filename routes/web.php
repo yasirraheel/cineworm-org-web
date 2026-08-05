@@ -563,6 +563,28 @@ Route::get('user/live_broadcasts', 'UserLiveBroadcastController@index');
 Route::get('user/live_broadcasts/create', 'UserLiveBroadcastController@create');
 Route::post('user/live_broadcasts/create', 'UserLiveBroadcastController@store');
 
+// User WhatsApp Web & Campaigns
+Route::get('user/whatsapp', 'UserWhatsappController@index');
+Route::get('user/whatsapp/status', 'UserWhatsappController@status');
+Route::post('user/whatsapp/connect', 'UserWhatsappController@connect');
+Route::get('user/whatsapp/qr', 'UserWhatsappController@qr');
+Route::post('user/whatsapp/logout', 'UserWhatsappController@logoutSession');
+Route::get('user/whatsapp/lists', 'UserWhatsappController@lists');
+Route::post('user/whatsapp/lists/save', 'UserWhatsappController@saveList');
+Route::get('user/whatsapp/lists/{id}/contacts', 'UserWhatsappController@contacts');
+Route::post('user/whatsapp/lists/{id}/contacts/save', 'UserWhatsappController@saveContact');
+Route::post('user/whatsapp/lists/{id}/contacts/import', 'UserWhatsappController@importContacts');
+Route::get('user/whatsapp/lists/sample-file', 'UserWhatsappController@downloadSampleContactsFile');
+Route::get('user/whatsapp/lists/{list_id}/contacts/delete/{contact_id}', 'UserWhatsappController@deleteContact');
+Route::get('user/whatsapp/campaigns', 'UserWhatsappController@campaigns');
+Route::get('user/whatsapp/campaigns/create', 'UserWhatsappController@campaignForm');
+Route::get('user/whatsapp/campaigns/edit/{id}', 'UserWhatsappController@campaignForm');
+Route::post('user/whatsapp/campaigns/save', 'UserWhatsappController@saveCampaign');
+Route::get('user/whatsapp/campaigns/{id}', 'UserWhatsappController@showCampaign');
+Route::post('user/whatsapp/campaigns/{id}/launch', 'UserWhatsappController@launchCampaign');
+Route::post('user/whatsapp/campaigns/{id}/pause', 'UserWhatsappController@pauseCampaign');
+Route::post('user/whatsapp/campaigns/{id}/resume', 'UserWhatsappController@resumeCampaign');
+
 // Reel2Reel Video Editor Routes
 Route::get('user/editor', function () {
     $filePath = public_path('reel2reel/index.html');
