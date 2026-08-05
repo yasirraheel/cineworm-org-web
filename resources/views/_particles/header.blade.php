@@ -89,13 +89,6 @@
                                                 {{ trans('words.subscription_plan') }}
                                             </a>
                                         </li>
-                                        <li>
-                                            <a href="{{ URL::to('user/editor') }}"
-                                                class="{{ request()->is('user/editor*') || request()->is('reel2reel*') ? 'active' : '' }}"
-                                                title="Video Editor">
-                                                Video Editor
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
                             </div>
