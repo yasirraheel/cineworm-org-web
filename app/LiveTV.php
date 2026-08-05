@@ -21,11 +21,18 @@ class LiveTV extends Model
 
 		if($livetv_info)
 		{
-			return  $livetv_info->$field_name;
+			$val = $livetv_info->$field_name;
+			if(in_array($field_name, ['channel_thumb']) && empty($val)) {
+				return 'site_assets/images/poster_placeholder.png';
+			}
+			return $val;
 		}
 		else
 		{
-			return  '';
+			if(in_array($field_name, ['channel_thumb'])) {
+				return 'site_assets/images/poster_placeholder.png';
+			}
+			return '';
 		}
 	}
 

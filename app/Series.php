@@ -28,11 +28,18 @@ class Series extends Model
 		
 		if($series_info)
 		{
-			return  $series_info->$field_name;
+			$val = $series_info->$field_name;
+			if(in_array($field_name, ['series_poster', 'series_cover']) && empty($val)) {
+				return 'site_assets/images/poster_placeholder.png';
+			}
+			return $val;
 		}
 		else
 		{
-			return  '';
+			if(in_array($field_name, ['series_poster', 'series_cover'])) {
+				return 'site_assets/images/poster_placeholder.png';
+			}
+			return '';
 		}
 	}
 

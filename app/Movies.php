@@ -27,11 +27,18 @@ class Movies extends Model
 
 		if($movie_info)
 		{
-			return  $movie_info->$field_name;
+			$val = $movie_info->$field_name;
+			if(in_array($field_name, ['video_image', 'video_image_thumb']) && empty($val)) {
+				return 'site_assets/images/poster_placeholder.png';
+			}
+			return $val;
 		}
 		else
 		{
-			return  '';
+			if(in_array($field_name, ['video_image', 'video_image_thumb'])) {
+				return 'site_assets/images/poster_placeholder.png';
+			}
+			return '';
 		}
 
 	}

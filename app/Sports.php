@@ -21,11 +21,18 @@ class Sports extends Model
 		
 		if($sports_info)
 		{
-			return  $sports_info->$field_name;
+			$val = $sports_info->$field_name;
+			if(in_array($field_name, ['video_image']) && empty($val)) {
+				return 'site_assets/images/poster_placeholder.png';
+			}
+			return $val;
 		}
 		else
 		{
-			return  '';
+			if(in_array($field_name, ['video_image'])) {
+				return 'site_assets/images/poster_placeholder.png';
+			}
+			return '';
 		}
 	}
 

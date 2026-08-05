@@ -557,6 +557,28 @@ $(document).ready(function() {
         listView.show();
     });
 });
+
+// Global Image Error Fallback to theme placeholder
+document.addEventListener('DOMContentLoaded', function() {
+    var placeholderUrl = "{{ URL::asset('site_assets/images/poster_placeholder.png') }}";
+    function handleImgError(img) {
+        if (img && !img.dataset.hasFallback) {
+            img.dataset.hasFallback = "true";
+            img.src = placeholderUrl;
+        }
+    }
+    document.querySelectorAll('img').forEach(function(img) {
+        img.addEventListener('error', function() { handleImgError(img); });
+        if (img.complete && (img.naturalWidth === 0 || img.naturalHeight === 0) && img.src) {
+            handleImgError(img);
+        }
+    });
+    window.addEventListener('error', function(e) {
+        if (e.target && e.target.tagName === 'IMG') {
+            handleImgError(e.target);
+        }
+    }, true);
+});
 </script>
 
 @if(getcong('site_footer_code'))
