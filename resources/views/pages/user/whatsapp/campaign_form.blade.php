@@ -66,7 +66,7 @@
                                 <textarea name="message" class="form-control" rows="5" placeholder="Type your WhatsApp message template here..." required>{{ old('message', $campaign->message) }}</textarea>
                                 <div class="p-2 mt-2 rounded" style="background:rgba(255,255,255,0.04);font-size:12px;color:#94a3b8;">
                                     <strong>Available Personalization Placeholders:</strong><br>
-                                    Available tags: <code>@{{name}}</code> &bull; <code>@{{phone}}</code> &bull; <code>@{{company}}</code> &bull; <code>@{{tags}}</code>
+                                    Available tags: <code>&#123;&#123;name&#125;&#125;</code> &bull; <code>&#123;&#123;phone&#125;&#125;</code> &bull; <code>&#123;&#123;company&#125;&#125;</code> &bull; <code>&#123;&#123;tags&#125;&#125;</code>
                                 </div>
                             </div>
 
