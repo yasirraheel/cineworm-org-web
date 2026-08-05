@@ -213,29 +213,31 @@
 <!-- Modal for Sending Test WhatsApp Message -->
 <div class="modal fade" id="waTestModal" tabindex="-1" role="dialog" aria-labelledby="waTestModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content" style="background-color:#1a2234;color:#ffffff;border:1px solid rgba(255,255,255,0.1);box-shadow:0 15px 40px rgba(0,0,0,0.5);">
-            <div class="modal-header">
-                <h5 class="modal-title" id="waTestModalLabel" style="color:#38bdf8;font-weight:700;"><i class="fa fa-paper-plane"></i> Send Test WhatsApp Message</h5>
-                <button type="button" class="btn-close btn-close-white close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">&times;</button>
+        <div class="modal-content" style="background-color:#161b26;color:#ffffff;border:1px solid rgba(255,255,255,0.08);box-shadow:0 10px 30px rgba(0,0,0,0.5);border-radius:10px;">
+            <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.08);padding:15px 20px;">
+                <h5 class="modal-title" id="waTestModalLabel" style="color:#25D366;font-weight:700;margin:0;">
+                    <i class="fa fa-paper-plane"></i> Send Test WhatsApp Message
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="color:#fff;opacity:0.8;font-size:24px;background:none;border:none;">&times;</button>
             </div>
             <form id="waTestForm" onsubmit="sendTestMessageSubmit(event)">
                 <div class="modal-body p-4 text-start">
                     <div id="waTestAlert" style="display:none;" class="alert mb-3"></div>
                     
                     <div class="form-group mb-3">
-                        <label for="testPhone" style="color:#94a3b8;font-size:13px;font-weight:600;">Recipient WhatsApp Number (With Country Code)</label>
-                        <input type="text" class="form-control" id="testPhone" placeholder="e.g. +14155552671 or 447956675381" required style="background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,0.15);">
-                        <small class="text-muted">Include country code without spaces or dashes.</small>
+                        <label for="testPhone" style="color:#cbd5e1;font-size:13px;font-weight:600;margin-bottom:6px;display:block;">Recipient WhatsApp Number (With Country Code)</label>
+                        <input type="text" class="form-control" id="testPhone" placeholder="e.g. 447956675381" required style="background:rgba(255,255,255,0.05);color:#fff;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:10px 12px;">
+                        <small style="color:#94a3b8;font-size:12px;margin-top:4px;display:block;">Include country code without spaces or dashes.</small>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="testMessage" style="color:#94a3b8;font-size:13px;font-weight:600;">Message Content</label>
-                        <textarea class="form-control" id="testMessage" rows="3" required style="background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,0.15);">Hello! This is a test message sent from CineWorm WhatsApp Web.</textarea>
+                        <label for="testMessage" style="color:#cbd5e1;font-size:13px;font-weight:600;margin-bottom:6px;display:block;">Message Content</label>
+                        <textarea class="form-control" id="testMessage" rows="3" required style="background:rgba(255,255,255,0.05);color:#fff;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:10px 12px;">Hello! This is a test message sent from CineWorm WhatsApp Web.</textarea>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.1);">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal">Cancel</button>
-                    <button type="submit" id="btnSubmitTestMsg" class="btn btn-info" style="background:#38bdf8;border-color:#38bdf8;font-weight:600;color:#000;">
+                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.08);padding:15px 20px;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal" style="font-weight:600;">Cancel</button>
+                    <button type="submit" id="btnSubmitTestMsg" class="btn btn-success" style="background-color:#25D366;border-color:#25D366;font-weight:600;color:#ffffff;">
                         <i class="fa fa-paper-plane"></i> Send Test Message
                     </button>
                 </div>
