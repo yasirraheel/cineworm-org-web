@@ -12,6 +12,7 @@ class WhatsappCampaign extends Model
         'user_id',
         'contact_list_id',
         'name',
+        'title',
         'message',
         'status',
         'scheduled_at',

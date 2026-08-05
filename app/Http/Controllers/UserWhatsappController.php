@@ -455,6 +455,7 @@ class UserWhatsappController extends Controller
 
         $campaign->user_id = $userId;
         $campaign->title = trim($request->title);
+        $campaign->name  = trim($request->title); // name column is NOT NULL in DB, keep in sync with title
         $campaign->contact_list_id = $list->id;
         $campaign->message = $request->message;
         $campaign->min_delay_seconds = (int) $request->input('min_delay_seconds', 4);
