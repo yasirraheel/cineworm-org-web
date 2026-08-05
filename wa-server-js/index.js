@@ -166,7 +166,7 @@ async function startSocket(session) {
       auth: state,
       logger,
       printQRInTerminal: false,
-      browser: [`Cineworm (${session.id})`, 'Chrome', '1.0.0'],
+      browser: ['CineWorm', 'Chrome', '1.0.0'],
       markOnlineOnConnect: false,
       syncFullHistory: false,
     });
