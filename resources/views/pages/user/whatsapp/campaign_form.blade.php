@@ -50,7 +50,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label text-light">Target Contact List *</label>
-                                    <select name="contact_list_id" class="form-control" required>
+                                    <select name="contact_list_id" class="form-control" size="1" required>
                                         <option value="">-- Select Contact List --</option>
                                         @foreach($lists as $list)
                                             <option value="{{ $list->id }}" {{ old('contact_list_id', $campaign->contact_list_id) == $list->id ? 'selected' : '' }}>
