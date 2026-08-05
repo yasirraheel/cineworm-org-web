@@ -763,6 +763,17 @@ Route::get('/maintenance_up', function () {
     return '<h1>Site Up</h1>';
 });
 
+// Auto-deploy route
+Route::get('/deploy-auto-pull', function () {
+    if (request('key') !== 'cw_deploy_secret_9988776655') {
+        return response('Unauthorized', 403);
+    }
+    chdir(base_path());
+    $git = shell_exec('git pull origin master 2>&1');
+    $view = shell_exec('php artisan view:clear 2>&1');
+    return response("<pre>=== GIT PULL ===\n{$git}\n=== VIEW CLEAR ===\n{$view}</pre>", 200);
+});
+
 // Game Remote Control Routes
 Route::prefix('game')->group(function () {
     Route::get('/remote-control', [GameRoomController::class, 'showRemoteControl'])->name('game.remote');
