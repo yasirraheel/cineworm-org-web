@@ -28,21 +28,7 @@
                 <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                     @include('pages.user.whatsapp._nav')
 
-                    @if(Session::has('flash_message'))
-                        <div class="alert alert-success">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span></button>
-                            {{ Session::get('flash_message') }}
-                        </div>
-                    @endif
-
-                    @if(Session::has('error_flash_message'))
-                        <div class="alert alert-danger">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span></button>
-                            {{ Session::get('error_flash_message') }}
-                        </div>
-                    @endif
+                    @include('pages.user.whatsapp._flash')
 
                     {{-- ── Device Connection Card ── --}}
                     <div class="card mb-4" style="background:#161b26;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.3);">

@@ -30,15 +30,7 @@
                 <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                     @include('pages.user.whatsapp._nav')
 
-                    @if($errors->any())
-                        <div class="alert alert-danger mb-4">
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                    @include('pages.user.whatsapp._flash')
 
                     <div class="card mb-4" style="background:#161b26;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:25px;">
                         <h4 style="color:#25D366;font-weight:700;margin-top:0;" class="mb-4">
