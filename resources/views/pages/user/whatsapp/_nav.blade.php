@@ -12,6 +12,13 @@
 
 <style>
 /* Modern Dark Modal & High Contrast Input Design System */
+.modal-dialog {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+}
+
 .modal-content {
     background-color: #141a26 !important;
     color: #f8fafc !important;
@@ -40,7 +47,10 @@
 .modal input[type="number"], 
 .modal input[type="file"], 
 .modal textarea, 
-.modal select {
+.modal select,
+.vfx-item-info .form-control,
+.vfx-item-info select.form-control,
+.vfx-item-info textarea.form-control {
     background-color: #0d121c !important;
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
@@ -54,7 +64,8 @@
 .modal .form-control:focus, 
 .modal input:focus, 
 .modal textarea:focus, 
-.modal select:focus {
+.modal select:focus,
+.vfx-item-info .form-control:focus {
     background-color: #121824 !important;
     color: #ffffff !important;
     border-color: #25D366 !important;
@@ -65,12 +76,13 @@
 /* High Contrast Placeholders */
 .modal .form-control::placeholder, 
 .modal input::placeholder, 
-.modal textarea::placeholder {
+.modal textarea::placeholder,
+.vfx-item-info .form-control::placeholder {
     color: #94a3b8 !important;
     opacity: 1 !important;
 }
 
-.modal label, .modal .form-label {
+.modal label, .modal .form-label, .vfx-item-info label {
     color: #e2e8f0 !important;
     font-size: 13px !important;
     font-weight: 600 !important;
