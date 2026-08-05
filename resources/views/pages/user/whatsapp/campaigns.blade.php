@@ -81,9 +81,9 @@
                                             <td>
                                                 <a href="{{ URL::to('user/whatsapp/campaigns/'.$campaign->id) }}" class="btn btn-sm btn-info me-1" title="View Delivery Log"><i class="fa fa-eye"></i></a>
                                                 @if(in_array($campaign->status, ['draft', 'paused'], true))
-                                                    <form action="{{ URL::to('user/whatsapp/campaigns/'.$campaign->id.'/launch') }}" method="POST" class="d-inline">
+                                                    <form action="{{ URL::to('user/whatsapp/campaigns/'.$campaign->id.'/launch') }}" method="POST" class="d-inline launch-form">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-sm btn-success me-1" title="Launch Campaign" onclick="return confirm('Launch this WhatsApp campaign now?')"><i class="fa fa-play"></i></button>
+                                                        <button type="button" class="btn btn-sm btn-success me-1 btn-launch" title="Launch Campaign"><i class="fa fa-play"></i></button>
                                                     </form>
                                                 @elseif($campaign->status == 'running')
                                                     <form action="{{ URL::to('user/whatsapp/campaigns/'.$campaign->id.'/pause') }}" method="POST" class="d-inline">
@@ -112,4 +112,59 @@
         </div>
     </div>
 </div>
+@endsection
+
+<script type="text/javascript">
+
+  @if(Session::has('flash_message'))
+  const ToastWA = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3500,
+    timerProgressBar: false,
+  })
+  ToastWA.fire({
+    icon: 'success',
+    title: '{{ Session::get('flash_message') }}'
+  })
+  @endif
+
+  @if(Session::has('error_flash_message'))
+  const ToastWAErr = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3500,
+    timerProgressBar: false,
+  })
+  ToastWAErr.fire({
+    icon: 'error',
+    title: '{{ Session::get('error_flash_message') }}'
+  })
+  @endif
+
+  $(document).on('click', '.btn-launch', function(e) {
+    e.preventDefault();
+    var form = $(this).closest('.launch-form');
+    Swal.fire({
+      title: 'Launch Campaign?',
+      text: 'This will start sending WhatsApp messages to all contacts in the list.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#25D366',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, Launch!',
+      cancelButtonText: 'Cancel',
+      background: '#1a2234',
+      color: '#fff'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        form.submit();
+      }
+    });
+  });
+
+</script>
+
 @endsection
