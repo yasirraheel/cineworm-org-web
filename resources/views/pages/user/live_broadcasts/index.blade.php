@@ -77,13 +77,13 @@
     .btn-zoom-dark { background: #334155; color: #f8fafc !important; }
     .btn-zoom-dark:hover { background: #475569; color: #f8fafc !important; }
 
-    /* Compact Viewport Height Frame */
+    /* Viewport Height Frame */
     .iframe-wrapper {
         position: relative;
         width: 100%;
-        height: calc(85vh - 200px);
-        min-height: 420px;
-        max-height: 600px;
+        height: calc(88vh - 170px);
+        min-height: 480px;
+        max-height: 680px;
         border-radius: 8px;
         overflow: hidden;
         background: #000;
