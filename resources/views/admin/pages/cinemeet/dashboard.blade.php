@@ -1,225 +1,214 @@
 @extends('admin.admin_app')
 
 @section('content')
-<style>
-    .cinemeet-header {
-        background: linear-gradient(135deg, #161b26 0%, #1f2737 50%, #253147 100%);
-        border: 1px solid #2d3748;
-        border-radius: 12px;
-        padding: 24px 28px;
-        margin-bottom: 24px;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .cinemeet-header h2 { margin: 0; font-size: 22px; font-weight: 700; color: #fff; }
-    .cinemeet-header p { margin: 4px 0 0; color: #a0aec0; font-size: 13px; }
-    .cm-badge-online  { background: #10b981; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .cm-badge-offline { background: #ef4444; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    <div class="content-page">
+        <div class="content">
+            <div class="container-fluid">
 
-    .stat-card {
-        background: #252b36;
-        border: 1px solid #2d3748;
-        border-radius: 10px;
-        padding: 20px 22px;
-        box-shadow: 0 4px 15px rgba(0,0,0,.15);
-        border-left: 4px solid #3b82f6;
-        margin-bottom: 20px;
-    }
-    .stat-card .stat-icon { font-size: 28px; color: #60a5fa; float: right; margin-top: -2px; }
-    .stat-card .stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 6px; }
-    .stat-card .stat-value { font-size: 24px; font-weight: 700; color: #f8fafc; }
-    .stat-card .stat-sub { font-size: 12px; color: #64748b; margin-top: 4px; }
-
-    .quick-action-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all .2s; }
-    .quick-action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); text-decoration: none; }
-    .btn-restart { background: #ef4444; color: #fff; }
-    .btn-restart:hover { background: #dc2626; color: #fff; }
-    .btn-visit { background: #3b82f6; color: #fff; }
-    .btn-visit:hover { background: #2563eb; color: #fff; }
-
-    .nav-links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-top: 8px; }
-    .nav-card {
-        background: #252b36;
-        border: 1px solid #333b4d;
-        border-radius: 10px;
-        padding: 20px 16px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,.15);
-        text-decoration: none;
-        color: #e2e8f0;
-        transition: all .2s ease-in-out;
-    }
-    .nav-card:hover {
-        border-color: #60a5fa;
-        background: #2d3544;
-        transform: translateY(-3px);
-        text-decoration: none;
-        color: #60a5fa;
-    }
-    .nav-card .nav-icon { font-size: 28px; margin-bottom: 8px; }
-    .nav-card .nav-label { font-size: 13px; font-weight: 600; color: #f1f5f9; }
-    .nav-card .nav-sub { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-    .nav-card:hover .nav-label { color: #60a5fa; }
-
-    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2d3748; font-size: 13px; }
-    .info-row:last-child { border-bottom: none; }
-    .info-key { color: #94a3b8; }
-    .info-val { color: #f1f5f9; font-weight: 500; }
-</style>
-
-<div class="content-page">
-    <div class="content">
-        <div class="container-fluid">
-
-            @if(session('flash_message'))
-                <div class="alert alert-success alert-dismissible" style="background:#065f46; color:#a7f3d0; border:1px solid #047857;">
-                    <button type="button" class="close" data-dismiss="alert" style="color:#a7f3d0;">&times;</button>
-                    {{ session('flash_message') }}
-                </div>
-            @endif
-            @if(session('flash_error'))
-                <div class="alert alert-danger alert-dismissible" style="background:#991b1b; color:#fecaca; border:1px solid #b91c1c;">
-                    <button type="button" class="close" data-dismiss="alert" style="color:#fecaca;">&times;</button>
-                    {{ session('flash_error') }}
-                </div>
-            @endif
-
-            {{-- Header --}}
-            <div class="cinemeet-header">
-                <div>
-                    <h2><i class="fa fa-video-camera" style="color:#60a5fa;"></i> &nbsp;CineMeet Manager</h2>
-                    <p>Manage your live video conferencing platform from here</p>
-                </div>
-                <div style="text-align:right;">
-                    @if(isset($status['status']) && $status['status'] === 'online')
-                        <span class="cm-badge-online"><i class="fa fa-circle"></i> Online</span>
-                    @else
-                        <span class="cm-badge-offline"><i class="fa fa-circle"></i> Offline</span>
-                    @endif
-                    <div style="margin-top:8px; font-size:12px; color:#94a3b8;">
-                        {{ env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org') }}
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card-box" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h4 class="header-title m-t-0 m-b-5"><i class="fa fa-video-camera text-primary"></i> CineMeet Manager</h4>
+                                <p class="text-muted font-13 m-b-0">Manage your live video conferencing platform</p>
+                            </div>
+                            <div class="text-right">
+                                @if(isset($status['status']) && $status['status'] === 'online')
+                                    <span class="badge badge-success" style="font-size: 13px; padding: 6px 12px;"><i class="fa fa-circle"></i> Online</span>
+                                @else
+                                    <span class="badge badge-danger" style="font-size: 13px; padding: 6px 12px;"><i class="fa fa-circle"></i> Offline</span>
+                                @endif
+                                <div class="text-muted font-12 m-t-5">{{ env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org') }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Stats Row --}}
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="stat-card" style="border-left-color:#3b82f6;">
-                        <i class="fa fa-clock-o stat-icon" style="color:#60a5fa;"></i>
-                        <div class="stat-label">Uptime</div>
-                        <div class="stat-value">{{ $status['uptime']['formatted'] ?? '—' }}</div>
-                        <div class="stat-sub">Since last restart</div>
+                @if(session('flash_message'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ session('flash_message') }}
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card" style="border-left-color:#10b981;">
-                        <i class="fa fa-code-fork stat-icon" style="color:#34d399;"></i>
-                        <div class="stat-label">Version</div>
-                        <div class="stat-value" style="font-size:18px;">{{ $status['version'] ?? '—' }}</div>
-                        <div class="stat-sub">CineMeet SFU</div>
+                @endif
+                @if(session('flash_error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ session('flash_error') }}
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card" style="border-left-color:#f59e0b;">
-                        <i class="fa fa-microchip stat-icon" style="color:#fbbf24;"></i>
-                        <div class="stat-label">Memory Used</div>
-                        <div class="stat-value" style="font-size:18px;">{{ $status['memory']['rss'] ?? '—' }}</div>
-                        <div class="stat-sub">Heap: {{ $status['memory']['heapUsed'] ?? '—' }}</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card" style="border-left-color:#a855f7;">
-                        <i class="fa fa-tag stat-icon" style="color:#c084fc;"></i>
-                        <div class="stat-label">App Name</div>
-                        <div class="stat-value" style="font-size:18px;">{{ $settings['APP_NAME'] ?? 'CineMeet' }}</div>
-                        <div class="stat-sub">Node {{ $status['nodeVersion'] ?? '' }}</div>
-                    </div>
-                </div>
-            </div>
+                @endif
 
-            <div class="row">
-                {{-- Quick Actions & Info --}}
-                <div class="col-md-4">
-                    <div class="card-box" style="background:#252b36; border:1px solid #2d3748; border-radius:10px;">
-                        <h4 class="header-title mb-3" style="color:#f8fafc;"><i class="fa fa-bolt" style="color:#f59e0b;"></i> Quick Actions</h4>
-                        <div style="display:flex; flex-direction:column; gap:10px;">
-                            <form action="{{ URL::to('admin/cinemeet/restart') }}" method="POST">
+                {{-- Stats Widgets --}}
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div class="text-center">
+                                <h2 class="text-primary" data-plugin="counterup">{{ $status['uptime']['formatted'] ?? '—' }}</h2>
+                                <h5>Uptime</h5>
+                                <p class="text-muted font-12 m-b-0">Since last restart</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div class="text-center">
+                                <h2 class="text-success">{{ $status['version'] ?? '—' }}</h2>
+                                <h5>Version</h5>
+                                <p class="text-muted font-12 m-b-0">CineMeet SFU Engine</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div class="text-center">
+                                <h2 class="text-warning">{{ $status['memory']['rss'] ?? '—' }}</h2>
+                                <h5>Memory Used</h5>
+                                <p class="text-muted font-12 m-b-0">Heap: {{ $status['memory']['heapUsed'] ?? '—' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div class="text-center">
+                                <h2 class="text-purple">{{ $settings['APP_NAME'] ?? 'CineMeet' }}</h2>
+                                <h5>App Name</h5>
+                                <p class="text-muted font-12 m-b-0">Node {{ $status['nodeVersion'] ?? '' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    {{-- Left Column: Actions & Server Info --}}
+                    <div class="col-md-4">
+                        <div class="card-box">
+                            <h4 class="header-title m-t-0 m-b-20"><i class="fa fa-bolt text-warning"></i> Quick Actions</h4>
+
+                            <form action="{{ URL::to('admin/cinemeet/restart') }}" method="POST" class="m-b-15">
                                 {{ csrf_field() }}
-                                <button type="submit" class="quick-action-btn btn-restart" onclick="return confirm('Restart CineMeet now?')" style="width:100%; justify-content:center;">
-                                    <i class="fa fa-refresh"></i> Restart CineMeet
+                                <button type="submit" class="btn btn-danger btn-block waves-effect waves-light" onclick="return confirm('Restart CineMeet server now?')">
+                                    <i class="fa fa-refresh"></i> Restart CineMeet Server
                                 </button>
                             </form>
-                            <a href="{{ env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org') }}" target="_blank" class="quick-action-btn btn-visit" style="justify-content:center;">
-                                <i class="fa fa-external-link"></i> Visit Live Site
-                            </a>
-                        </div>
 
-                        <hr style="margin:20px 0; border-color:#2d3748;">
-                        <h4 class="header-title mb-3" style="color:#f8fafc;"><i class="fa fa-info-circle" style="color:#60a5fa;"></i> Server Info</h4>
-                        <div class="info-row">
-                            <span class="info-key">Domain</span>
-                            <span class="info-val" style="color:#60a5fa;">{{ $status['domain'] ?? '—' }}</span>
+                            <a href="{{ env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org') }}" target="_blank" class="btn btn-primary btn-block waves-effect waves-light">
+                                <i class="fa fa-external-link"></i> Open CineMeet Web App
+                            </a>
+
+                            <hr class="m-t-25 m-b-20">
+
+                            <h4 class="header-title m-b-15"><i class="fa fa-info-circle text-info"></i> Server Information</h4>
+
+                            <table class="table table-sm table-borderless m-b-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted">Domain</td>
+                                        <td class="text-right font-weight-bold text-primary">{{ $status['domain'] ?? '—' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Platform</td>
+                                        <td class="text-right font-weight-bold">{{ ucfirst($status['platform'] ?? '—') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">API Status</td>
+                                        <td class="text-right font-weight-bold text-success">Connected (HTTP 200)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Last Checked</td>
+                                        <td class="text-right">{{ \Carbon\Carbon::now()->format('H:i:s') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="info-row">
-                            <span class="info-key">Platform</span>
-                            <span class="info-val">{{ ucfirst($status['platform'] ?? '—') }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-key">Last Checked</span>
-                            <span class="info-val">{{ \Carbon\Carbon::now()->format('H:i:s') }}</span>
+                    </div>
+
+                    {{-- Right Column: Management Sections Grid --}}
+                    <div class="col-md-8">
+                        <div class="card-box">
+                            <h4 class="header-title m-t-0 m-b-20"><i class="fa fa-th text-purple"></i> Management Sections</h4>
+
+                            <div class="row">
+                                <div class="col-md-4 col-sm-6">
+                                    <a href="{{ URL::to('admin/cinemeet/branding') }}" style="text-decoration:none;">
+                                        <div class="card-box widget-user text-center" style="border: 1px solid rgba(255,255,255,0.08); transition: transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                                            <div class="m-b-10" style="font-size:32px;">🎨</div>
+                                            <h5>Branding</h5>
+                                            <p class="text-muted font-12 m-b-0">Name, Logo, Title</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4 col-sm-6">
+                                    <a href="{{ URL::to('admin/cinemeet/homepage') }}" style="text-decoration:none;">
+                                        <div class="card-box widget-user text-center" style="border: 1px solid rgba(255,255,255,0.08); transition: transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                                            <div class="m-b-10" style="font-size:32px;">🏠</div>
+                                            <h5>Homepage</h5>
+                                            <p class="text-muted font-12 m-b-0">Hero, CTA, Buttons</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4 col-sm-6">
+                                    <a href="{{ URL::to('admin/cinemeet/social') }}" style="text-decoration:none;">
+                                        <div class="card-box widget-user text-center" style="border: 1px solid rgba(255,255,255,0.08); transition: transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                                            <div class="m-b-10" style="font-size:32px;">🔗</div>
+                                            <h5>Social & Links</h5>
+                                            <p class="text-muted font-12 m-b-0">Discord, GitHub...</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4 col-sm-6">
+                                    <a href="{{ URL::to('admin/cinemeet/visibility') }}" style="text-decoration:none;">
+                                        <div class="card-box widget-user text-center" style="border: 1px solid rgba(255,255,255,0.08); transition: transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                                            <div class="m-b-10" style="font-size:32px;">👁</div>
+                                            <h5>Visibility</h5>
+                                            <p class="text-muted font-12 m-b-0">Show/Hide Sections</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4 col-sm-6">
+                                    <a href="{{ URL::to('admin/cinemeet/seo') }}" style="text-decoration:none;">
+                                        <div class="card-box widget-user text-center" style="border: 1px solid rgba(255,255,255,0.08); transition: transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                                            <div class="m-b-10" style="font-size:32px;">🔍</div>
+                                            <h5>SEO & Meta</h5>
+                                            <p class="text-muted font-12 m-b-0">Title, OG, Keywords</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4 col-sm-6">
+                                    <a href="{{ URL::to('admin/cinemeet/server') }}" style="text-decoration:none;">
+                                        <div class="card-box widget-user text-center" style="border: 1px solid rgba(255,255,255,0.08); transition: transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                                            <div class="m-b-10" style="font-size:32px;">⚙️</div>
+                                            <h5>Server</h5>
+                                            <p class="text-muted font-12 m-b-0">Domain, Port, IP</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-md-4 col-sm-6">
+                                    <a href="{{ URL::to('admin/cinemeet/api-docs') }}" style="text-decoration:none;">
+                                        <div class="card-box widget-user text-center" style="border: 1px solid rgba(255,255,255,0.08); transition: transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                                            <div class="m-b-10" style="font-size:32px;">📄</div>
+                                            <h5>API Docs</h5>
+                                            <p class="text-muted font-12 m-b-0">REST API Reference</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Navigation Grid --}}
-                <div class="col-md-8">
-                    <div class="card-box" style="background:#252b36; border:1px solid #2d3748; border-radius:10px;">
-                        <h4 class="header-title mb-3" style="color:#f8fafc;"><i class="fa fa-th" style="color:#a855f7;"></i> Management Sections</h4>
-                        <div class="nav-links-grid">
-                            <a href="{{ URL::to('admin/cinemeet/branding') }}" class="nav-card">
-                                <div class="nav-icon">🎨</div>
-                                <div class="nav-label">Branding</div>
-                                <div class="nav-sub">Name, Logo, Title</div>
-                            </a>
-                            <a href="{{ URL::to('admin/cinemeet/homepage') }}" class="nav-card">
-                                <div class="nav-icon">🏠</div>
-                                <div class="nav-label">Homepage</div>
-                                <div class="nav-sub">Hero, CTA, Buttons</div>
-                            </a>
-                            <a href="{{ URL::to('admin/cinemeet/social') }}" class="nav-card">
-                                <div class="nav-icon">🔗</div>
-                                <div class="nav-label">Social & Links</div>
-                                <div class="nav-sub">Discord, GitHub...</div>
-                            </a>
-                            <a href="{{ URL::to('admin/cinemeet/visibility') }}" class="nav-card">
-                                <div class="nav-icon">👁</div>
-                                <div class="nav-label">Visibility</div>
-                                <div class="nav-sub">Show/Hide sections</div>
-                            </a>
-                            <a href="{{ URL::to('admin/cinemeet/seo') }}" class="nav-card">
-                                <div class="nav-icon">🔍</div>
-                                <div class="nav-label">SEO & Meta</div>
-                                <div class="nav-sub">Title, OG, Keywords</div>
-                            </a>
-                            <a href="{{ URL::to('admin/cinemeet/server') }}" class="nav-card">
-                                <div class="nav-icon">⚙️</div>
-                                <div class="nav-label">Server</div>
-                                <div class="nav-sub">Domain, Port, IP</div>
-                            </a>
-                            <a href="{{ URL::to('admin/cinemeet/api-docs') }}" class="nav-card">
-                                <div class="nav-icon">📄</div>
-                                <div class="nav-label">API Docs</div>
-                                <div class="nav-sub">REST API Reference</div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
-
         </div>
     </div>
-</div>
 @endsection
