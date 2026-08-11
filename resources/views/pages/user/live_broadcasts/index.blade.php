@@ -1,6 +1,6 @@
 @extends('site_app')
 
-@section('head_title', 'Live Broadcast & Meetings | '.getcong('site_name'))
+@section('head_title', 'My Live Broadcasts | '.getcong('site_name'))
 @section('head_url', Request::url())
 
 @section('content')
@@ -27,7 +27,7 @@
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 6px;
-        padding: 10px 16px;
+        padding: 12px 18px;
         margin-bottom: 15px;
     }
 
@@ -50,34 +50,17 @@
         border: none;
         display: block;
     }
-
-    .share-link-input {
-        background: rgba(0, 0, 0, 0.4) !important;
-        color: #fff !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        font-size: 13px;
-        font-family: monospace;
-    }
-
-    .lobby-hero-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 30px 20px;
-        margin-bottom: 25px;
-        text-align: center;
-    }
 </style>
 
 <div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-12">
-                <h2>Live Broadcast & Meetings</h2>
+                <h2>My Live Broadcasts</h2>
                 <nav id="breadcrumbs">
                     <ul>
                         <li><a href="{{ URL::to('/') }}">Home</a></li>
-                        <li>Live Broadcasts</li>
+                        <li>My Live Broadcasts</li>
                     </ul>
                 </nav>
             </div>
@@ -100,6 +83,24 @@
                         {{-- Standard App Flash Messages --}}
                         @include('pages.user.whatsapp._flash')
 
+                        {{-- Header Row --}}
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-md-6">
+                                <h3 style="color:#fff;margin-bottom:5px;"><i class="fa fa-video-camera" style="color:#e50914;margin-right:8px;"></i> Live Broadcasts</h3>
+                                <p style="color:#ccc;font-size:14px;">Manage your live broadcasts and meeting rooms.</p>
+                            </div>
+                            <div class="col-md-6 text-right" style="text-align: right; padding-top: 10px;">
+                                <a href="javascript:void(0);" onclick="openNewMeetingModal();" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; margin-right:5px;">
+                                    <i class="fa fa-plus"></i> Create Broadcast
+                                </a>
+                                @if(!$inCall)
+                                    <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; background-color:#28a745;">
+                                        <i class="fa fa-play"></i> Start Call
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+
                         @if($inCall)
                             {{-- ACTIVE CALL WORKSPACE --}}
                             <div class="cineworm-meeting-box">
@@ -110,27 +111,27 @@
                                         <h4 style="color:#fff; margin:0; font-size:16px; font-weight:700;">
                                             <i class="fa fa-video-camera" style="color:#e50914; margin-right:6px;"></i> {{ $meetingTitle }}
                                         </h4>
-                                        <p style="color:#ccc; margin:2px 0 0; font-size:12px;">Room ID: <code style="color:#fe0278;">{{ $roomId }}</code></p>
+                                        <p style="color:#ccc; margin:2px 0 0; font-size:13px;">Room ID: <code style="color:#fe0278;">{{ $roomId }}</code></p>
                                     </div>
 
                                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                                         {{-- Leave Call --}}
-                                        <a href="{{ URL::to('user/live_broadcasts') }}" class="btn btn-sm btn-danger" onclick="return leaveCallConfirm(this.href);" style="background:#e50914; border:none; padding:6px 14px; font-size:12px; font-weight:600;">
+                                        <a href="{{ URL::to('user/live_broadcasts') }}" class="btn btn-sm btn-danger" onclick="return leaveCallConfirm(this.href);" style="background:#e50914; border:none; padding:6px 14px; font-size:13px; font-weight:600;">
                                             <i class="fa fa-phone"></i> Leave Call
                                         </a>
 
                                         {{-- Copy Link --}}
-                                        <button type="button" class="btn btn-sm btn-success" onclick="copyInviteLink('{{ $shareableJoinUrl }}')" style="background:#28a745; border:none; padding:6px 14px; font-size:12px; font-weight:600;">
+                                        <button type="button" class="btn btn-sm btn-success" onclick="copyInviteLink('{{ $shareableJoinUrl }}')" style="background:#28a745; border:none; padding:6px 14px; font-size:13px; font-weight:600;">
                                             <i class="fa fa-copy"></i> Copy Link
                                         </button>
 
                                         {{-- Share WhatsApp --}}
-                                        <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn btn-sm btn-success" style="background:#25D366; border:none; padding:6px 14px; font-size:12px; font-weight:600; color:#fff !important;">
+                                        <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn btn-sm btn-success" style="background:#25D366; border:none; padding:6px 14px; font-size:13px; font-weight:600; color:#fff !important;">
                                             <i class="fa-brands fa-whatsapp"></i> WhatsApp
                                         </a>
 
                                         {{-- Fullscreen --}}
-                                        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleIframeFullscreen()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:6px 14px; font-size:12px;">
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleIframeFullscreen()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:6px 14px; font-size:13px;">
                                             <i class="fa fa-expand"></i> Fullscreen
                                         </button>
                                     </div>
@@ -138,9 +139,9 @@
 
                                 {{-- Guest Link Bar --}}
                                 <div style="margin-bottom: 15px;">
-                                    <label style="color:#ccc; font-size:12px; font-weight:600; margin-bottom:4px; display:block;">Guest Share Link</label>
+                                    <label style="color:#ccc; font-size:13px; font-weight:600; margin-bottom:5px; display:block;">Guest Share Link</label>
                                     <div style="display: flex; align-items: center; width: 100%; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.4);">
-                                        <input type="text" id="shareUrlInput" value="{{ $shareableJoinUrl }}" readonly style="flex: 1; background: transparent; border: none; color: #fff; padding: 10px 14px; font-size: 13px; font-family: monospace; outline: none;">
+                                        <input type="text" id="shareUrlInput" value="{{ $shareableJoinUrl }}" readonly style="flex: 1; background: transparent; border: none; color: #fff; padding: 10px 14px; font-size: 14px; font-family: monospace; outline: none;">
                                         <button type="button" onclick="copyInviteLink('{{ $shareableJoinUrl }}')" style="background: #e50914; color: #fff; border: none; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
                                             <i class="fa fa-copy"></i> Copy Link
                                         </button>
@@ -158,72 +159,48 @@
                                 </div>
 
                             </div>
-                        @else
-                            {{-- DASHBOARD LOBBY VIEW --}}
-                            <div class="row" style="margin-bottom: 20px;">
-                                <div class="col-md-7">
-                                    <h3 style="color:#fff; margin-bottom:5px;"><i class="fa fa-video-camera" style="color:#e50914; margin-right:8px;"></i> Live Broadcast & Meetings</h3>
-                                    <p style="color:#ccc; font-size:14px;">Host HD video calls, webinars, and screen sharing sessions directly inside CineWorm.</p>
-                                </div>
-                                <div class="col-md-5 text-right" style="text-align: right; padding-top: 10px;">
-                                    <button type="button" onclick="openNewMeetingModal();" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; border:none; cursor:pointer; margin-right:5px;">
-                                        <i class="fa fa-plus"></i> Create Meeting
-                                    </button>
-                                    <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; background-color:#28a745;">
-                                        <i class="fa fa-play"></i> Start Call
-                                    </a>
-                                </div>
-                            </div>
                         @endif
 
                         {{-- HISTORY TABLE --}}
-                        <div class="row" style="margin-top:25px; margin-bottom:10px;">
-                            <div class="col-12">
-                                <h4 style="color:#fff; font-size:16px; font-weight:700; margin-bottom:15px;">
-                                    <i class="fa fa-history" style="color:#e50914; margin-right:8px;"></i> My Created Meetings History
-                                </h4>
+                        <div class="table-responsive" style="margin-top: 15px;">
+                            <table class="table table-bordered" style="color: #fff; border-color: rgba(255,255,255,0.1);">
+                                <thead>
+                                    <tr>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Title</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Room ID</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Created</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($live_broadcasts as $broadcast)
+                                        <tr>
+                                            <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->title }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1); color:#fe0278; font-family:monospace;">{{ $broadcast->zoom_meeting_id }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->created_at ? $broadcast->created_at->format('M d, Y') : '—' }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1);">
+                                                <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-success" style="background:#e50914; border:none; padding:5px 12px; font-size:13px; margin-right:5px; text-decoration:none;">
+                                                    <i class="fa fa-video-camera"></i> Start Call
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:5px 12px; font-size:13px;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
+                                                    <i class="fa fa-copy"></i> Copy Link
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="text-center" style="border-color: rgba(255,255,255,0.1); padding: 30px; color:#ccc;">
+                                                <i class="fa fa-video-camera" style="font-size:32px; display:block; margin-bottom:14px; opacity:0.2;"></i>
+                                                No live broadcasts scheduled yet.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
 
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" style="color: #fff; border-color: rgba(255,255,255,0.1);">
-                                        <thead>
-                                            <tr>
-                                                <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Meeting Title</th>
-                                                <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Room ID</th>
-                                                <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Created Date</th>
-                                                <th style="border-color: rgba(255,255,255,0.1); color:#fff;" class="text-center">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($live_broadcasts as $broadcast)
-                                                <tr>
-                                                    <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->title }}</td>
-                                                    <td style="border-color: rgba(255,255,255,0.1); color:#fe0278; font-family:monospace;">{{ $broadcast->zoom_meeting_id }}</td>
-                                                    <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->created_at ? $broadcast->created_at->format('M d, Y H:i') : '—' }}</td>
-                                                    <td style="border-color: rgba(255,255,255,0.1);" class="text-center">
-                                                        <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-success" style="background:#e50914; border:none; padding:4px 10px; font-size:12px; margin-right:4px;">
-                                                            <i class="fa fa-video-camera"></i> Start Call
-                                                        </a>
-                                                        <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:4px 10px; font-size:12px;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
-                                                            <i class="fa fa-copy"></i> Copy Link
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="4" class="text-center" style="border-color: rgba(255,255,255,0.1); padding: 30px; color:#aaa;">
-                                                        <i class="fa fa-video-camera" style="font-size:32px; display:block; margin-bottom:14px; opacity:0.3;"></i>
-                                                        No live broadcast meetings scheduled yet. Click <strong>"Create Meeting"</strong> above to get started!
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div style="margin-top:15px;">
-                                    @include('_particles.pagination', ['paginator' => $live_broadcasts])
-                                </div>
-                            </div>
+                        <div style="margin-top:20px;">
+                            @include('_particles.pagination', ['paginator' => $live_broadcasts])
                         </div>
 
                     </div>
@@ -239,10 +216,10 @@ function openNewMeetingModal() {
         Swal.fire({
             title: 'Create Instant Live Meeting',
             html: `
-                <div style="text-align:left; font-size:13px; color:#ccc; margin-top:10px;">
+                <div style="text-align:left; font-size:14px; color:#ccc; margin-top:10px;">
                     <label style="font-weight:600; margin-bottom:6px; display:block; color:#fff;">Meeting Topic / Title</label>
-                    <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:13px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Strategy Sync, Film Review...">
-                    <small style="color:#aaa; font-size:11px; margin-top:4px; display:block;">Guests will see this topic when joining your meeting link.</small>
+                    <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Strategy Sync, Film Review...">
+                    <small style="color:#aaa; font-size:12px; margin-top:4px; display:block;">Guests will see this topic when joining your meeting link.</small>
                 </div>
             `,
             showCancelButton: true,
