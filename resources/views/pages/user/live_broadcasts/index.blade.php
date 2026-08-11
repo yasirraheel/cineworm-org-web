@@ -178,7 +178,7 @@
 
                                 <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                                     {{-- Leave Call Button --}}
-                                    <a href="{{ URL::to('user/live_broadcasts') }}" class="btn-zoom-action btn-zoom-danger" onclick="return confirm('Leave this video call?')">
+                                    <a href="{{ URL::to('user/live_broadcasts') }}" class="btn-zoom-action btn-zoom-danger" onclick="return leaveCallConfirm(this.href);">
                                         <i class="fa fa-phone"></i> Leave Call
                                     </a>
 
@@ -351,7 +351,47 @@ function copyInviteLink(url) {
 }
 
 function showCopyToast() {
-    alert('Invite link copied to clipboard!');
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'Invite link copied to clipboard!',
+            showConfirmButton: false,
+            timer: 2500,
+            background: '#141820',
+            color: '#fff'
+        });
+    } else {
+        var toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed; top:20px; right:20px; background:#059669; color:#fff; padding:12px 20px; border-radius:8px; z-index:999999; font-size:14px; font-weight:600; box-shadow:0 10px 25px rgba(0,0,0,0.5);';
+        toast.innerHTML = '<i class="fa fa-check-circle"></i> Invite link copied to clipboard!';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 2500);
+    }
+}
+
+function leaveCallConfirm(url) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Leave Video Call?',
+            text: 'Are you sure you want to exit this meeting?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#334155',
+            confirmButtonText: 'Yes, Leave Meeting',
+            cancelButtonText: 'Stay in Call',
+            background: '#141820',
+            color: '#fff'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+        return false;
+    }
+    return true;
 }
 
 function toggleIframeFullscreen() {
