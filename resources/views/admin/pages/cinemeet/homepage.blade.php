@@ -2,20 +2,21 @@
 
 @section('content')
 <style>
-    .cm-page-header { background: linear-gradient(135deg, #1a1a2e, #0f3460); color:#fff; border-radius:10px; padding:20px 24px; margin-bottom:24px; }
-    .cm-page-header h3 { margin:0; font-size:18px; font-weight:700; }
-    .cm-page-header p { margin:4px 0 0; color:rgba(255,255,255,.6); font-size:12px; }
-    .cm-breadcrumb { font-size:12px; color:rgba(255,255,255,.5); margin-bottom:6px; }
-    .cm-breadcrumb a { color:rgba(255,255,255,.7); text-decoration:none; }
-    .form-section { background:#fff; border-radius:10px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,.06); margin-bottom:20px; }
-    .form-section h5 { font-size:14px; font-weight:700; color:#2c3e50; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid #f0f0f0; }
-    .form-group label { font-size:13px; font-weight:600; color:#555; }
-    .form-control { border-radius:6px; border:1px solid #dde; font-size:13px; }
-    .form-control:focus { border-color:#0f3460; box-shadow:0 0 0 2px rgba(15,52,96,.1); }
-    .btn-save { background:#0f3460; color:#fff; border:none; padding:10px 28px; border-radius:8px; font-size:13px; font-weight:600; }
-    .btn-save:hover { background:#0d2c55; color:#fff; }
-    .hint-text { font-size:11px; color:#aaa; margin-top:4px; }
-    .section-label { display:inline-block; background:#e8f4fd; color:#0f3460; border-radius:4px; padding:2px 8px; font-size:11px; font-weight:600; margin-bottom:6px; }
+    .cm-page-header { background: linear-gradient(135deg, #161b26, #253147); color:#fff; border-radius:10px; border:1px solid #2d3748; padding:20px 24px; margin-bottom:24px; }
+    .cm-page-header h3 { margin:0; font-size:18px; font-weight:700; color:#fff; }
+    .cm-page-header p { margin:4px 0 0; color:#a0aec0; font-size:12px; }
+    .cm-breadcrumb { font-size:12px; color:#64748b; margin-bottom:6px; }
+    .cm-breadcrumb a { color:#94a3b8; text-decoration:none; }
+    .cm-breadcrumb a:hover { color:#60a5fa; }
+    .form-section { background:#252b36; border:1px solid #2d3748; border-radius:10px; padding:24px; box-shadow:0 4px 15px rgba(0,0,0,.15); margin-bottom:20px; }
+    .form-section h5 { font-size:14px; font-weight:700; color:#f8fafc; margin-bottom:18px; padding-bottom:10px; border-bottom:1px solid #333b4d; }
+    .form-group label { font-size:13px; font-weight:600; color:#cbd5e1; }
+    .form-control { background:#1e232d !important; color:#f1f5f9 !important; border:1px solid #333b4d !important; border-radius:6px; font-size:13px; }
+    .form-control:focus { border-color:#3b82f6 !important; box-shadow:0 0 0 2px rgba(59,130,246,.2) !important; }
+    .btn-save { background:#3b82f6; color:#fff; border:none; padding:10px 28px; border-radius:8px; font-size:13px; font-weight:600; }
+    .btn-save:hover { background:#2563eb; color:#fff; }
+    .hint-text { font-size:11px; color:#94a3b8; margin-top:4px; }
+    .section-label { display:inline-block; background:#1e293b; color:#60a5fa; border:1px solid #334155; border-radius:4px; padding:2px 8px; font-size:11px; font-weight:600; margin-bottom:6px; }
 </style>
 
 <div class="content-page">
@@ -23,14 +24,14 @@
         <div class="container-fluid">
 
             @if(session('flash_message'))
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <div class="alert alert-success alert-dismissible" style="background:#065f46; color:#a7f3d0; border:1px solid #047857;">
+                    <button type="button" class="close" data-dismiss="alert" style="color:#a7f3d0;">&times;</button>
                     {{ session('flash_message') }}
                 </div>
             @endif
             @if(session('flash_error'))
-                <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <div class="alert alert-danger alert-dismissible" style="background:#991b1b; color:#fecaca; border:1px solid #b91c1c;">
+                    <button type="button" class="close" data-dismiss="alert" style="color:#fecaca;">&times;</button>
                     {{ session('flash_error') }}
                 </div>
             @endif
@@ -48,7 +49,7 @@
 
                 {{-- Hero Section --}}
                 <div class="form-section">
-                    <h5><i class="fa fa-star"></i> Hero Section</h5>
+                    <h5><i class="fa fa-star" style="color:#fbbf24;"></i> Hero Section</h5>
                     <div class="section-label">Landing page — top hero banner</div>
 
                     <div class="form-group row mt-3">
@@ -72,7 +73,7 @@
 
                 {{-- Room Input Section --}}
                 <div class="form-section">
-                    <h5><i class="fa fa-sign-in"></i> Room Entry Section</h5>
+                    <h5><i class="fa fa-sign-in" style="color:#60a5fa;"></i> Room Entry Section</h5>
                     <div class="section-label">The "Pick a room name" box</div>
 
                     <div class="form-group row mt-3">
@@ -108,7 +109,7 @@
 
                 {{-- Features Section --}}
                 <div class="form-section">
-                    <h5><i class="fa fa-list-alt"></i> Features Section</h5>
+                    <h5><i class="fa fa-list-alt" style="color:#c084fc;"></i> Features Section</h5>
                     <div class="section-label">The features cards below the room input</div>
 
                     <div class="form-group row mt-3">
@@ -130,7 +131,7 @@
                 </div>
 
                 <div class="text-right">
-                    <a href="{{ URL::to('admin/cinemeet') }}" class="btn btn-default mr-2">Cancel</a>
+                    <a href="{{ URL::to('admin/cinemeet') }}" class="btn btn-secondary mr-2">Cancel</a>
                     <button type="submit" class="btn-save">
                         <i class="fa fa-save"></i> Save & Restart CineMeet
                     </button>

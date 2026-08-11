@@ -3,39 +3,70 @@
 @section('content')
 <style>
     .cinemeet-header {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        background: linear-gradient(135deg, #161b26 0%, #1f2737 50%, #253147 100%);
+        border: 1px solid #2d3748;
         border-radius: 12px;
-        padding: 28px 30px;
+        padding: 24px 28px;
         margin-bottom: 24px;
         color: #fff;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
-    .cinemeet-header h2 { margin: 0; font-size: 22px; font-weight: 700; }
-    .cinemeet-header p { margin: 4px 0 0; color: rgba(255,255,255,0.65); font-size: 13px; }
-    .cm-badge-online  { background: #1abc9c; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .cm-badge-offline { background: #e74c3c; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .stat-card { background: #fff; border-radius: 10px; padding: 22px 24px; box-shadow: 0 2px 12px rgba(0,0,0,.06); border-left: 4px solid #0f3460; margin-bottom: 20px; }
-    .stat-card .stat-icon { font-size: 32px; color: #0f3460; float: right; margin-top: -4px; }
-    .stat-card .stat-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .stat-card .stat-value { font-size: 26px; font-weight: 700; color: #2c3e50; }
-    .stat-card .stat-sub { font-size: 12px; color: #aaa; margin-top: 2px; }
-    .quick-action-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all .2s; }
-    .quick-action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.2); text-decoration: none; }
-    .btn-restart { background: #e74c3c; color: #fff; }
-    .btn-restart:hover { background: #c0392b; color: #fff; }
-    .btn-visit { background: #3498db; color: #fff; }
-    .btn-visit:hover { background: #2980b9; color: #fff; }
-    .nav-links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-top: 8px; }
-    .nav-card { background: #fff; border-radius: 10px; padding: 18px 16px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); text-decoration: none; color: #2c3e50; transition: all .2s; border: 2px solid transparent; }
-    .nav-card:hover { border-color: #0f3460; transform: translateY(-2px); text-decoration: none; color: #0f3460; }
+    .cinemeet-header h2 { margin: 0; font-size: 22px; font-weight: 700; color: #fff; }
+    .cinemeet-header p { margin: 4px 0 0; color: #a0aec0; font-size: 13px; }
+    .cm-badge-online  { background: #10b981; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .cm-badge-offline { background: #ef4444; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+    .stat-card {
+        background: #252b36;
+        border: 1px solid #2d3748;
+        border-radius: 10px;
+        padding: 20px 22px;
+        box-shadow: 0 4px 15px rgba(0,0,0,.15);
+        border-left: 4px solid #3b82f6;
+        margin-bottom: 20px;
+    }
+    .stat-card .stat-icon { font-size: 28px; color: #60a5fa; float: right; margin-top: -2px; }
+    .stat-card .stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 6px; }
+    .stat-card .stat-value { font-size: 24px; font-weight: 700; color: #f8fafc; }
+    .stat-card .stat-sub { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+    .quick-action-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all .2s; }
+    .quick-action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); text-decoration: none; }
+    .btn-restart { background: #ef4444; color: #fff; }
+    .btn-restart:hover { background: #dc2626; color: #fff; }
+    .btn-visit { background: #3b82f6; color: #fff; }
+    .btn-visit:hover { background: #2563eb; color: #fff; }
+
+    .nav-links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-top: 8px; }
+    .nav-card {
+        background: #252b36;
+        border: 1px solid #333b4d;
+        border-radius: 10px;
+        padding: 20px 16px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,.15);
+        text-decoration: none;
+        color: #e2e8f0;
+        transition: all .2s ease-in-out;
+    }
+    .nav-card:hover {
+        border-color: #60a5fa;
+        background: #2d3544;
+        transform: translateY(-3px);
+        text-decoration: none;
+        color: #60a5fa;
+    }
     .nav-card .nav-icon { font-size: 28px; margin-bottom: 8px; }
-    .nav-card .nav-label { font-size: 13px; font-weight: 600; }
-    .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    .nav-card .nav-label { font-size: 13px; font-weight: 600; color: #f1f5f9; }
+    .nav-card .nav-sub { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .nav-card:hover .nav-label { color: #60a5fa; }
+
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2d3748; font-size: 13px; }
     .info-row:last-child { border-bottom: none; }
-    .info-key { color: #888; }
-    .info-val { color: #2c3e50; font-weight: 500; }
+    .info-key { color: #94a3b8; }
+    .info-val { color: #f1f5f9; font-weight: 500; }
 </style>
 
 <div class="content-page">
@@ -43,14 +74,14 @@
         <div class="container-fluid">
 
             @if(session('flash_message'))
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <div class="alert alert-success alert-dismissible" style="background:#065f46; color:#a7f3d0; border:1px solid #047857;">
+                    <button type="button" class="close" data-dismiss="alert" style="color:#a7f3d0;">&times;</button>
                     {{ session('flash_message') }}
                 </div>
             @endif
             @if(session('flash_error'))
-                <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <div class="alert alert-danger alert-dismissible" style="background:#991b1b; color:#fecaca; border:1px solid #b91c1c;">
+                    <button type="button" class="close" data-dismiss="alert" style="color:#fecaca;">&times;</button>
                     {{ session('flash_error') }}
                 </div>
             @endif
@@ -58,7 +89,7 @@
             {{-- Header --}}
             <div class="cinemeet-header">
                 <div>
-                    <h2><i class="fa fa-video-camera"></i> &nbsp;CineMeet Manager</h2>
+                    <h2><i class="fa fa-video-camera" style="color:#60a5fa;"></i> &nbsp;CineMeet Manager</h2>
                     <p>Manage your live video conferencing platform from here</p>
                 </div>
                 <div style="text-align:right;">
@@ -67,7 +98,7 @@
                     @else
                         <span class="cm-badge-offline"><i class="fa fa-circle"></i> Offline</span>
                     @endif
-                    <div style="margin-top:8px; font-size:12px; color:rgba(255,255,255,.6);">
+                    <div style="margin-top:8px; font-size:12px; color:#94a3b8;">
                         {{ env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org') }}
                     </div>
                 </div>
@@ -76,32 +107,32 @@
             {{-- Stats Row --}}
             <div class="row">
                 <div class="col-md-3">
-                    <div class="stat-card">
-                        <i class="fa fa-clock-o stat-icon"></i>
+                    <div class="stat-card" style="border-left-color:#3b82f6;">
+                        <i class="fa fa-clock-o stat-icon" style="color:#60a5fa;"></i>
                         <div class="stat-label">Uptime</div>
                         <div class="stat-value">{{ $status['uptime']['formatted'] ?? '—' }}</div>
                         <div class="stat-sub">Since last restart</div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stat-card" style="border-left-color:#27ae60;">
-                        <i class="fa fa-code-fork stat-icon" style="color:#27ae60;"></i>
+                    <div class="stat-card" style="border-left-color:#10b981;">
+                        <i class="fa fa-code-fork stat-icon" style="color:#34d399;"></i>
                         <div class="stat-label">Version</div>
                         <div class="stat-value" style="font-size:18px;">{{ $status['version'] ?? '—' }}</div>
                         <div class="stat-sub">CineMeet SFU</div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stat-card" style="border-left-color:#e67e22;">
-                        <i class="fa fa-microchip stat-icon" style="color:#e67e22;"></i>
+                    <div class="stat-card" style="border-left-color:#f59e0b;">
+                        <i class="fa fa-microchip stat-icon" style="color:#fbbf24;"></i>
                         <div class="stat-label">Memory Used</div>
                         <div class="stat-value" style="font-size:18px;">{{ $status['memory']['rss'] ?? '—' }}</div>
                         <div class="stat-sub">Heap: {{ $status['memory']['heapUsed'] ?? '—' }}</div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="stat-card" style="border-left-color:#9b59b6;">
-                        <i class="fa fa-tag stat-icon" style="color:#9b59b6;"></i>
+                    <div class="stat-card" style="border-left-color:#a855f7;">
+                        <i class="fa fa-tag stat-icon" style="color:#c084fc;"></i>
                         <div class="stat-label">App Name</div>
                         <div class="stat-value" style="font-size:18px;">{{ $settings['APP_NAME'] ?? 'CineMeet' }}</div>
                         <div class="stat-sub">Node {{ $status['nodeVersion'] ?? '' }}</div>
@@ -112,8 +143,8 @@
             <div class="row">
                 {{-- Quick Actions & Info --}}
                 <div class="col-md-4">
-                    <div class="card-box">
-                        <h4 class="header-title mb-3"><i class="fa fa-bolt"></i> Quick Actions</h4>
+                    <div class="card-box" style="background:#252b36; border:1px solid #2d3748; border-radius:10px;">
+                        <h4 class="header-title mb-3" style="color:#f8fafc;"><i class="fa fa-bolt" style="color:#f59e0b;"></i> Quick Actions</h4>
                         <div style="display:flex; flex-direction:column; gap:10px;">
                             <form action="{{ URL::to('admin/cinemeet/restart') }}" method="POST">
                                 {{ csrf_field() }}
@@ -126,11 +157,11 @@
                             </a>
                         </div>
 
-                        <hr style="margin:18px 0;">
-                        <h4 class="header-title mb-3"><i class="fa fa-info-circle"></i> Server Info</h4>
+                        <hr style="margin:20px 0; border-color:#2d3748;">
+                        <h4 class="header-title mb-3" style="color:#f8fafc;"><i class="fa fa-info-circle" style="color:#60a5fa;"></i> Server Info</h4>
                         <div class="info-row">
                             <span class="info-key">Domain</span>
-                            <span class="info-val">{{ $status['domain'] ?? '—' }}</span>
+                            <span class="info-val" style="color:#60a5fa;">{{ $status['domain'] ?? '—' }}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-key">Platform</span>
@@ -145,43 +176,43 @@
 
                 {{-- Navigation Grid --}}
                 <div class="col-md-8">
-                    <div class="card-box">
-                        <h4 class="header-title mb-3"><i class="fa fa-th"></i> Management Sections</h4>
+                    <div class="card-box" style="background:#252b36; border:1px solid #2d3748; border-radius:10px;">
+                        <h4 class="header-title mb-3" style="color:#f8fafc;"><i class="fa fa-th" style="color:#a855f7;"></i> Management Sections</h4>
                         <div class="nav-links-grid">
                             <a href="{{ URL::to('admin/cinemeet/branding') }}" class="nav-card">
                                 <div class="nav-icon">🎨</div>
                                 <div class="nav-label">Branding</div>
-                                <div style="font-size:11px;color:#aaa;margin-top:4px;">Name, Logo, Title</div>
+                                <div class="nav-sub">Name, Logo, Title</div>
                             </a>
                             <a href="{{ URL::to('admin/cinemeet/homepage') }}" class="nav-card">
                                 <div class="nav-icon">🏠</div>
                                 <div class="nav-label">Homepage</div>
-                                <div style="font-size:11px;color:#aaa;margin-top:4px;">Hero, CTA, Buttons</div>
+                                <div class="nav-sub">Hero, CTA, Buttons</div>
                             </a>
                             <a href="{{ URL::to('admin/cinemeet/social') }}" class="nav-card">
                                 <div class="nav-icon">🔗</div>
                                 <div class="nav-label">Social & Links</div>
-                                <div style="font-size:11px;color:#aaa;margin-top:4px;">Discord, GitHub...</div>
+                                <div class="nav-sub">Discord, GitHub...</div>
                             </a>
                             <a href="{{ URL::to('admin/cinemeet/visibility') }}" class="nav-card">
                                 <div class="nav-icon">👁</div>
                                 <div class="nav-label">Visibility</div>
-                                <div style="font-size:11px;color:#aaa;margin-top:4px;">Show/Hide sections</div>
+                                <div class="nav-sub">Show/Hide sections</div>
                             </a>
                             <a href="{{ URL::to('admin/cinemeet/seo') }}" class="nav-card">
                                 <div class="nav-icon">🔍</div>
                                 <div class="nav-label">SEO & Meta</div>
-                                <div style="font-size:11px;color:#aaa;margin-top:4px;">Title, OG, Keywords</div>
+                                <div class="nav-sub">Title, OG, Keywords</div>
                             </a>
                             <a href="{{ URL::to('admin/cinemeet/server') }}" class="nav-card">
                                 <div class="nav-icon">⚙️</div>
                                 <div class="nav-label">Server</div>
-                                <div style="font-size:11px;color:#aaa;margin-top:4px;">Domain, Port, IP</div>
+                                <div class="nav-sub">Domain, Port, IP</div>
                             </a>
                             <a href="{{ URL::to('admin/cinemeet/api-docs') }}" class="nav-card">
                                 <div class="nav-icon">📄</div>
                                 <div class="nav-label">API Docs</div>
-                                <div style="font-size:11px;color:#aaa;margin-top:4px;">REST API Reference</div>
+                                <div class="nav-sub">REST API Reference</div>
                             </a>
                         </div>
                     </div>
