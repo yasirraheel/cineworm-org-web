@@ -68,14 +68,20 @@ class UserLiveBroadcastController extends Controller
             ->first();
 
         $meetingTitle = $currentBroadcast->title ?? ($user->name . "'s Live Meeting");
+        $roomPassword = $currentBroadcast->zoom_meeting_password ?? '';
 
         // Construct embedded CineMeet URL with user's name & auto-join params
         $nameEncoded   = urlencode($user->name ?? 'User-' . rand(1000, 9999));
         $avatarUrl     = $user->user_icon ? asset($user->user_icon) : '';
         $avatarEncoded = urlencode($avatarUrl);
+        $passParam     = !empty($roomPassword) ? ('&roomPassword=' . urlencode($roomPassword)) : '';
 
-        $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}&audio=true&video=true";
-        $shareableJoinUrl = "{$cinemeetBaseUrl}/join?room={$roomId}";
+        $audioParam    = $request->get('audio', '1');
+        $videoParam    = $request->get('video', '1');
+        $screenParam   = $request->get('screen', '1');
+
+        $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}{$passParam}&audio={$audioParam}&video={$videoParam}&screen={$screenParam}";
+        $shareableJoinUrl = "{$cinemeetBaseUrl}/join?room={$roomId}" . (!empty($roomPassword) ? ('&roomPassword=' . urlencode($roomPassword)) : '');
 
         // Paginated history list of broadcasts
         $live_broadcasts = LiveBroadcast::where('user_id', $user->id)
@@ -87,6 +93,7 @@ class UserLiveBroadcastController extends Controller
             'live_broadcasts',
             'roomId',
             'meetingTitle',
+            'roomPassword',
             'cinemeetEmbedUrl',
             'shareableJoinUrl',
             'cinemeetBaseUrl'
@@ -107,7 +114,7 @@ class UserLiveBroadcastController extends Controller
     }
 
     /**
-     * Store new CineMeet Live Broadcast Meeting
+     * Store new CineMeet Live Broadcast Meeting with Custom Settings
      */
     public function store(Request $request)
     {
@@ -118,6 +125,7 @@ class UserLiveBroadcastController extends Controller
 
         $request->validate([
             'title' => 'nullable|string|max:255',
+            'password' => 'nullable|string|max:100',
         ]);
 
         $user = Auth::user();
@@ -126,7 +134,9 @@ class UserLiveBroadcastController extends Controller
         // Generate unique room ID
         $roomId = 'cineworm_' . $user->id . '_' . Str::lower(Str::random(6));
         $title  = $request->title ? trim($request->title) : ($user->name . "'s Live Meeting (" . date('M d, H:i') . ")");
-        $shareUrl = "{$cinemeetBaseUrl}/join?room={$roomId}";
+        $password = $request->password ? trim($request->password) : '';
+
+        $shareUrl = "{$cinemeetBaseUrl}/join?room={$roomId}" . (!empty($password) ? ('&roomPassword=' . urlencode($password)) : '');
 
         $broadcast = new LiveBroadcast();
         $broadcast->user_id               = $user->id;
@@ -134,12 +144,39 @@ class UserLiveBroadcastController extends Controller
         $broadcast->zoom_meeting_id       = $roomId;
         $broadcast->zoom_join_url         = $shareUrl;
         $broadcast->zoom_start_url        = $shareUrl;
-        $broadcast->zoom_meeting_password = '';
+        $broadcast->zoom_meeting_password = $password;
         $broadcast->scheduled_at          = now();
         $broadcast->status                = 1; // Active
         $broadcast->save();
 
-        \Session::flash('flash_message', 'New Live Meeting created successfully!');
+        \Session::flash('flash_message', 'New customized live meeting created successfully!');
         return redirect()->to('user/live_broadcasts?room=' . $roomId);
+    }
+
+    /**
+     * Update room settings
+     */
+    public function updateRoom(Request $request, $id)
+    {
+        if (!$this->hasLiveBroadcastFeature()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $broadcast = LiveBroadcast::where('user_id', Auth::user()->id)->where('id', $id)->first();
+        if (!$broadcast) {
+            return response()->json(['success' => false, 'message' => 'Meeting not found'], 404);
+        }
+
+        if ($request->has('title')) {
+            $broadcast->title = trim($request->title);
+        }
+        if ($request->has('password')) {
+            $broadcast->zoom_meeting_password = trim($request->password);
+        }
+
+        $broadcast->save();
+
+        \Session::flash('flash_message', 'Meeting customization settings saved!');
+        return redirect()->back();
     }
 }

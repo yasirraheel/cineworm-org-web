@@ -87,11 +87,11 @@
                         <div class="row" style="margin-bottom: 20px;">
                             <div class="col-md-6">
                                 <h3 style="color:#fff;margin-bottom:5px;"><i class="fa fa-video-camera" style="color:#e50914;margin-right:8px;"></i> Live Broadcasts</h3>
-                                <p style="color:#ccc;font-size:14px;">Manage your live broadcasts and meeting rooms.</p>
+                                <p style="color:#ccc;font-size:14px;">Manage and customize your live video meeting rooms.</p>
                             </div>
                             <div class="col-md-6 text-right" style="text-align: right; padding-top: 10px;">
                                 <a href="javascript:void(0);" onclick="openNewMeetingModal();" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; margin-right:5px;">
-                                    <i class="fa fa-plus"></i> Create Broadcast
+                                    <i class="fa fa-sliders"></i> Customize & Create
                                 </a>
                                 @if(!$inCall)
                                     <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; background-color:#28a745;">
@@ -111,7 +111,12 @@
                                         <h4 style="color:#fff; margin:0; font-size:16px; font-weight:700;">
                                             <i class="fa fa-video-camera" style="color:#e50914; margin-right:6px;"></i> {{ $meetingTitle }}
                                         </h4>
-                                        <p style="color:#ccc; margin:2px 0 0; font-size:13px;">Room ID: <code style="color:#fe0278;">{{ $roomId }}</code></p>
+                                        <p style="color:#ccc; margin:2px 0 0; font-size:13px;">
+                                            Room ID: <code style="color:#fe0278;">{{ $roomId }}</code>
+                                            @if(!empty($roomPassword))
+                                                <span class="badge badge-warning" style="background:#ffc107; color:#000; margin-left:6px;"><i class="fa fa-lock"></i> Protected</span>
+                                            @endif
+                                        </p>
                                     </div>
 
                                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -168,6 +173,7 @@
                                     <tr>
                                         <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Title</th>
                                         <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Room ID</th>
+                                        <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Security</th>
                                         <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Created</th>
                                         <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Action</th>
                                     </tr>
@@ -177,19 +183,29 @@
                                         <tr>
                                             <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->title }}</td>
                                             <td style="border-color: rgba(255,255,255,0.1); color:#fe0278; font-family:monospace;">{{ $broadcast->zoom_meeting_id }}</td>
+                                            <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">
+                                                @if(!empty($broadcast->zoom_meeting_password))
+                                                    <span class="badge" style="background-color:#ffc107; color:#000; padding:4px 8px;"><i class="fa fa-lock"></i> Protected</span>
+                                                @else
+                                                    <span class="badge" style="background-color:#17a2b8; color:#fff; padding:4px 8px;"><i class="fa fa-unlock"></i> Open</span>
+                                                @endif
+                                            </td>
                                             <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->created_at ? $broadcast->created_at->format('M d, Y') : '—' }}</td>
                                             <td style="border-color: rgba(255,255,255,0.1);">
-                                                <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-success" style="background:#e50914; border:none; padding:5px 12px; font-size:13px; margin-right:5px; text-decoration:none;">
+                                                <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-success" style="background:#e50914; border:none; padding:5px 12px; font-size:13px; margin-right:4px; text-decoration:none;">
                                                     <i class="fa fa-video-camera"></i> Start Call
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:5px 12px; font-size:13px;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
+                                                <button type="button" class="btn btn-sm btn-info" style="background:#17a2b8; border:none; color:#fff; padding:5px 12px; font-size:13px; margin-right:4px;" onclick="openEditMeetingModal('{{ $broadcast->id }}', '{{ addslashes($broadcast->title) }}', '{{ addslashes($broadcast->zoom_meeting_password) }}')">
+                                                    <i class="fa fa-sliders"></i> Customize
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:5px 12px; font-size:13px;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}@if(!empty($broadcast->zoom_meeting_password))&roomPassword={{ urlencode($broadcast->zoom_meeting_password) }}@endif')">
                                                     <i class="fa fa-copy"></i> Copy Link
                                                 </button>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center" style="border-color: rgba(255,255,255,0.1); padding: 30px; color:#ccc;">
+                                            <td colspan="5" class="text-center" style="border-color: rgba(255,255,255,0.1); padding: 30px; color:#ccc;">
                                                 <i class="fa fa-video-camera" style="font-size:32px; display:block; margin-bottom:14px; opacity:0.2;"></i>
                                                 No live broadcasts scheduled yet.
                                             </td>
@@ -214,16 +230,22 @@
 function openNewMeetingModal() {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
-            title: 'Create Instant Live Meeting',
+            title: 'Customize & Create Live Meeting',
             html: `
                 <div style="text-align:left; font-size:14px; color:#ccc; margin-top:10px;">
-                    <label style="font-weight:600; margin-bottom:6px; display:block; color:#fff;">Meeting Topic / Title</label>
-                    <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Strategy Sync, Film Review...">
-                    <small style="color:#aaa; font-size:12px; margin-top:4px; display:block;">Guests will see this topic when joining your meeting link.</small>
+                    <div style="margin-bottom:12px;">
+                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;">Meeting Topic / Title</label>
+                        <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Strategy Sync, Film Review...">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;"><i class="fa fa-lock" style="color:#ffc107;"></i> Room Security Password (Optional)</label>
+                        <input type="text" id="swalMeetingPassword" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" placeholder="Leave empty for open room">
+                        <small style="color:#aaa; font-size:11px; margin-top:2px; display:block;">If set, guests must enter this password to join your call.</small>
+                    </div>
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: 'Start Meeting Now',
+            confirmButtonText: 'Create & Start Meeting',
             confirmButtonColor: '#e50914',
             cancelButtonText: 'Cancel',
             cancelButtonColor: '#333',
@@ -232,11 +254,12 @@ function openNewMeetingModal() {
             focusConfirm: false,
             preConfirm: () => {
                 const title = document.getElementById('swalMeetingTitle').value;
+                const password = document.getElementById('swalMeetingPassword').value;
                 if (!title || !title.trim()) {
                     Swal.showValidationMessage('Please enter a meeting topic');
                     return false;
                 }
-                return title.trim();
+                return { title: title.trim(), password: password.trim() };
             }
         }).then((result) => {
             if (result.isConfirmed && result.value) {
@@ -253,35 +276,82 @@ function openNewMeetingModal() {
                 var titleInput = document.createElement('input');
                 titleInput.type = 'hidden';
                 titleInput.name = 'title';
-                titleInput.value = result.value;
+                titleInput.value = result.value.title;
                 form.appendChild(titleInput);
+
+                var passInput = document.createElement('input');
+                passInput.type = 'hidden';
+                passInput.name = 'password';
+                passInput.value = result.value.password;
+                form.appendChild(passInput);
 
                 document.body.appendChild(form);
                 form.submit();
             }
         });
-    } else {
-        var topic = prompt('Enter Meeting Topic / Title:', "{{ Auth::user()->name }}'s Live Meeting");
-        if (topic) {
-            var form = document.createElement('form');
-            form.method = 'POST';
-            form.action = "{{ URL::to('user/live_broadcasts/create') }}";
-            
-            var csrf = document.createElement('input');
-            csrf.type = 'hidden';
-            csrf.name = '_token';
-            csrf.value = "{{ csrf_token() }}";
-            form.appendChild(csrf);
+    }
+}
 
-            var titleInput = document.createElement('input');
-            titleInput.type = 'hidden';
-            titleInput.name = 'title';
-            titleInput.value = topic;
-            form.appendChild(titleInput);
+function openEditMeetingModal(id, currentTitle, currentPassword) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Customize Meeting Settings',
+            html: `
+                <div style="text-align:left; font-size:14px; color:#ccc; margin-top:10px;">
+                    <div style="margin-bottom:12px;">
+                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;">Meeting Topic / Title</label>
+                        <input type="text" id="swalEditTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" value="${currentTitle}">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;"><i class="fa fa-lock" style="color:#ffc107;"></i> Room Password</label>
+                        <input type="text" id="swalEditPassword" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" value="${currentPassword}" placeholder="Leave empty for open room">
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Save Customizations',
+            confirmButtonColor: '#e50914',
+            cancelButtonText: 'Cancel',
+            cancelButtonColor: '#333',
+            background: '#181d27',
+            color: '#fff',
+            preConfirm: () => {
+                const title = document.getElementById('swalEditTitle').value;
+                const password = document.getElementById('swalEditPassword').value;
+                if (!title || !title.trim()) {
+                    Swal.showValidationMessage('Please enter a meeting topic');
+                    return false;
+                }
+                return { title: title.trim(), password: password.trim() };
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{{ URL::to('user/live_broadcasts/update') }}/" + id;
+                
+                var csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = "{{ csrf_token() }}";
+                form.appendChild(csrf);
 
-            document.body.appendChild(form);
-            form.submit();
-        }
+                var titleInput = document.createElement('input');
+                titleInput.type = 'hidden';
+                titleInput.name = 'title';
+                titleInput.value = result.value.title;
+                form.appendChild(titleInput);
+
+                var passInput = document.createElement('input');
+                passInput.type = 'hidden';
+                passInput.name = 'password';
+                passInput.value = result.value.password;
+                form.appendChild(passInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 }
 

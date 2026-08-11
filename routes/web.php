@@ -583,6 +583,7 @@ Route::post('user/news_tickers/store', 'UserNewsTickerController@store');
 Route::get('user/live_broadcasts', 'UserLiveBroadcastController@index');
 Route::get('user/live_broadcasts/create', 'UserLiveBroadcastController@create');
 Route::post('user/live_broadcasts/create', 'UserLiveBroadcastController@store');
+Route::post('user/live_broadcasts/update/{id}', 'UserLiveBroadcastController@updateRoom');
 
 // User WhatsApp Web & Campaigns
 Route::get('user/whatsapp', 'UserWhatsappController@index');
