@@ -234,7 +234,7 @@
                             <p>Host HD video calls, webinars, and screen sharing sessions directly inside CineWorm. Invite colleagues or subscribers with a 1-click shareable link.</p>
 
                             <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:16px;">
-                                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#newMeetingModal" style="background:#2563eb; border:none; font-weight:600; padding:10px 24px; border-radius:8px;">
+                                <button type="button" class="btn btn-primary btn-lg" onclick="openNewMeetingModal();" style="background:#2563eb; border:none; font-weight:600; padding:10px 24px; border-radius:8px;">
                                     <i class="fa fa-plus-circle"></i> Create New Meeting
                                 </button>
                                 <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="btn btn-success btn-lg" style="background:#059669; border:none; font-weight:600; padding:10px 24px; border-radius:8px;">
@@ -337,6 +337,60 @@
 </div>
 
 <script>
+function openNewMeetingModal() {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Create Instant Live Meeting',
+            html: `
+                <div style="text-align:left; font-size:13px; color:#cbd5e1; margin-top:10px;">
+                    <label style="font-weight:600; margin-bottom:6px; display:block;">Meeting Topic / Title</label>
+                    <input type="text" id="swalMeetingTitle" class="form-control" style="background:#0b0e14; color:#fff; border:1px solid #252e3e; font-size:13px; padding:8px 12px; border-radius:6px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Sync, Film Review...">
+                    <small style="color:#94a3b8; font-size:11px; margin-top:4px; display:block;">Guests will see this topic when joining your meeting link.</small>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Start Meeting Now',
+            confirmButtonColor: '#2563eb',
+            cancelButtonText: 'Cancel',
+            cancelButtonColor: '#334155',
+            background: '#141820',
+            color: '#fff',
+            focusConfirm: false,
+            preConfirm: () => {
+                const title = document.getElementById('swalMeetingTitle').value;
+                if (!title || !title.trim()) {
+                    Swal.showValidationMessage('Please enter a meeting topic');
+                    return false;
+                }
+                return title.trim();
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{{ URL::to('user/live_broadcasts/create') }}";
+                
+                var csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = "{{ csrf_token() }}";
+                form.appendChild(csrf);
+
+                var titleInput = document.createElement('input');
+                titleInput.type = 'hidden';
+                titleInput.name = 'title';
+                titleInput.value = result.value;
+                form.appendChild(titleInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    } else {
+        $('#newMeetingModal').modal('show');
+    }
+}
+
 function copyInviteLink(url) {
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(url).then(showCopyToast);
