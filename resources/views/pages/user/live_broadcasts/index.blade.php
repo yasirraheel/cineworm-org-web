@@ -98,12 +98,43 @@
                     <div class="edit-profile-form">
 
                         @if(session('flash_message'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="background:#065f46; color:#a7f3d0; border:1px solid #047857; margin-bottom:20px;">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:#a7f3d0;">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                {{ session('flash_message') }}
-                            </div>
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    if (typeof Swal !== 'undefined') {
+                                        Swal.fire({
+                                            toast: true,
+                                            position: 'top-end',
+                                            icon: 'success',
+                                            title: "{!! addslashes(session('flash_message')) !!}",
+                                            showConfirmButton: false,
+                                            timer: 4000,
+                                            timerProgressBar: true,
+                                            background: '#181d27',
+                                            color: '#fff'
+                                        });
+                                    }
+                                });
+                            </script>
+                        @endif
+
+                        @if(session('error_flash_message'))
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    if (typeof Swal !== 'undefined') {
+                                        Swal.fire({
+                                            toast: true,
+                                            position: 'top-end',
+                                            icon: 'error',
+                                            title: "{!! addslashes(session('error_flash_message')) !!}",
+                                            showConfirmButton: false,
+                                            timer: 4000,
+                                            timerProgressBar: true,
+                                            background: '#181d27',
+                                            color: '#fff'
+                                        });
+                                    }
+                                });
+                            </script>
                         @endif
 
                         @if($inCall)
@@ -132,7 +163,7 @@
 
                                         {{-- Share WhatsApp --}}
                                         <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn btn-sm btn-success" style="background:#25D366; border:none; padding:6px 14px; font-size:12px; font-weight:600; color:#fff !important;">
-                                            <i class="fa fa-whatsapp"></i> WhatsApp
+                                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
                                         </a>
 
                                         {{-- Fullscreen --}}
