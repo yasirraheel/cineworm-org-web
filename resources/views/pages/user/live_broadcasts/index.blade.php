@@ -232,15 +232,50 @@ function openNewMeetingModal() {
         Swal.fire({
             title: 'Customize & Create Live Meeting',
             html: `
-                <div style="text-align:left; font-size:14px; color:#ccc; margin-top:10px;">
+                <div style="text-align:left; font-size:13px; color:#ccc; margin-top:10px;">
                     <div style="margin-bottom:12px;">
                         <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;">Meeting Topic / Title</label>
-                        <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Strategy Sync, Film Review...">
+                        <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:13px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Strategy Sync, Film Review...">
                     </div>
+
                     <div style="margin-bottom:12px;">
-                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;"><i class="fa fa-lock" style="color:#ffc107;"></i> Room Security Password (Optional)</label>
-                        <input type="text" id="swalMeetingPassword" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" placeholder="Leave empty for open room">
+                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;"><i class="fa fa-lock" style="color:#ffc107;"></i> Room Password (Optional)</label>
+                        <input type="text" id="swalMeetingPassword" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:13px; padding:8px 12px; border-radius:4px; width:100%;" placeholder="Leave empty for open room">
                         <small style="color:#aaa; font-size:11px; margin-top:2px; display:block;">If set, guests must enter this password to join your call.</small>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                        <div>
+                            <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;"><i class="fa fa-microphone text-info"></i> Default Microphone</label>
+                            <select id="swalAudio" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:12px;">
+                                <option value="1" selected>Microphone Active (ON)</option>
+                                <option value="0">Muted on Join (OFF)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;"><i class="fa fa-video-camera text-info"></i> Default Camera</label>
+                            <select id="swalVideo" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:12px;">
+                                <option value="1" selected>Camera Active (ON)</option>
+                                <option value="0">Camera Disabled (OFF)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;"><i class="fa fa-desktop text-success"></i> Allow Screen Share</label>
+                            <select id="swalScreen" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:12px;">
+                                <option value="1" selected>Enabled (Yes)</option>
+                                <option value="0">Disabled (No)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;"><i class="fa fa-comments text-warning"></i> Enable Group Chat</label>
+                            <select id="swalChat" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:12px;">
+                                <option value="1" selected>Enabled (Yes)</option>
+                                <option value="0">Disabled (No)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             `,
@@ -255,11 +290,23 @@ function openNewMeetingModal() {
             preConfirm: () => {
                 const title = document.getElementById('swalMeetingTitle').value;
                 const password = document.getElementById('swalMeetingPassword').value;
+                const audio = document.getElementById('swalAudio').value;
+                const video = document.getElementById('swalVideo').value;
+                const screen = document.getElementById('swalScreen').value;
+                const chat = document.getElementById('swalChat').value;
+
                 if (!title || !title.trim()) {
                     Swal.showValidationMessage('Please enter a meeting topic');
                     return false;
                 }
-                return { title: title.trim(), password: password.trim() };
+                return { 
+                    title: title.trim(), 
+                    password: password.trim(),
+                    audio: audio,
+                    video: video,
+                    screen: screen,
+                    chat: chat
+                };
             }
         }).then((result) => {
             if (result.isConfirmed && result.value) {
@@ -273,17 +320,14 @@ function openNewMeetingModal() {
                 csrf.value = "{{ csrf_token() }}";
                 form.appendChild(csrf);
 
-                var titleInput = document.createElement('input');
-                titleInput.type = 'hidden';
-                titleInput.name = 'title';
-                titleInput.value = result.value.title;
-                form.appendChild(titleInput);
-
-                var passInput = document.createElement('input');
-                passInput.type = 'hidden';
-                passInput.name = 'password';
-                passInput.value = result.value.password;
-                form.appendChild(passInput);
+                var params = ['title', 'password', 'audio', 'video', 'screen', 'chat'];
+                params.forEach(function(key) {
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = result.value[key];
+                    form.appendChild(input);
+                });
 
                 document.body.appendChild(form);
                 form.submit();

@@ -70,17 +70,21 @@ class UserLiveBroadcastController extends Controller
         $meetingTitle = $currentBroadcast->title ?? ($user->name . "'s Live Meeting");
         $roomPassword = $currentBroadcast->zoom_meeting_password ?? '';
 
-        // Construct embedded CineMeet URL with user's name & auto-join params
+        // Construct embedded CineMeet URL with full customization parameters
         $nameEncoded   = urlencode($user->name ?? 'User-' . rand(1000, 9999));
         $avatarUrl     = $user->user_icon ? asset($user->user_icon) : '';
         $avatarEncoded = urlencode($avatarUrl);
-        $passParam     = !empty($roomPassword) ? ('&roomPassword=' . urlencode($roomPassword)) : '';
+        $passParam     = !empty($roomPassword) ? ('&roomPassword=' . urlencode($roomPassword)) : '&roomPassword=0';
 
         $audioParam    = $request->get('audio', '1');
         $videoParam    = $request->get('video', '1');
         $screenParam   = $request->get('screen', '1');
+        $chatParam     = $request->get('chat', '1');
+        $hideParam     = $request->get('hide', '0');
+        $notifyParam   = $request->get('notify', '1');
+        $durationParam = $request->get('duration', 'unlimited');
 
-        $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}{$passParam}&audio={$audioParam}&video={$videoParam}&screen={$screenParam}";
+        $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}{$passParam}&audio={$audioParam}&video={$videoParam}&screen={$screenParam}&chat={$chatParam}&hide={$hideParam}&notify={$notifyParam}&duration={$durationParam}";
         $shareableJoinUrl = "{$cinemeetBaseUrl}/join?room={$roomId}" . (!empty($roomPassword) ? ('&roomPassword=' . urlencode($roomPassword)) : '');
 
         // Paginated history list of broadcasts
@@ -114,7 +118,7 @@ class UserLiveBroadcastController extends Controller
     }
 
     /**
-     * Store new CineMeet Live Broadcast Meeting with Custom Settings
+     * Store new CineMeet Live Broadcast Meeting with Full Customization
      */
     public function store(Request $request)
     {
@@ -136,6 +140,12 @@ class UserLiveBroadcastController extends Controller
         $title  = $request->title ? trim($request->title) : ($user->name . "'s Live Meeting (" . date('M d, H:i') . ")");
         $password = $request->password ? trim($request->password) : '';
 
+        $audio  = $request->get('audio', '1');
+        $video  = $request->get('video', '1');
+        $screen = $request->get('screen', '1');
+        $chat   = $request->get('chat', '1');
+        $notify = $request->get('notify', '1');
+
         $shareUrl = "{$cinemeetBaseUrl}/join?room={$roomId}" . (!empty($password) ? ('&roomPassword=' . urlencode($password)) : '');
 
         $broadcast = new LiveBroadcast();
@@ -150,7 +160,7 @@ class UserLiveBroadcastController extends Controller
         $broadcast->save();
 
         \Session::flash('flash_message', 'New customized live meeting created successfully!');
-        return redirect()->to('user/live_broadcasts?room=' . $roomId);
+        return redirect()->to("user/live_broadcasts?room={$roomId}&audio={$audio}&video={$video}&screen={$screen}&chat={$chat}&notify={$notify}");
     }
 
     /**
