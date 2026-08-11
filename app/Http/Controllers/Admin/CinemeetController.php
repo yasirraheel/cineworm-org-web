@@ -19,9 +19,6 @@ class CinemeetController extends MainAdminController
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
-    /**
-     * Make an authenticated API call to CineMeet
-     */
     private function apiGet(string $endpoint)
     {
         try {
@@ -76,10 +73,10 @@ class CinemeetController extends MainAdminController
             'APP_ICON', 'APP_APPLE_TOUCH_ICON',
         ];
         $updates = array_intersect_key($request->all(), array_flip($keys));
-        $result  = $this->apiPost('settings', ['settings' => $updates, 'restart' => true]);
+        $result  = $this->apiPost('settings', ['settings' => $updates, 'restart' => false]);
 
         if (!empty($result['success'])) {
-            session()->flash('flash_message', 'Branding updated and CineMeet restarted!');
+            session()->flash('flash_message', 'Branding updated dynamically!');
         } else {
             session()->flash('flash_error', 'Error: ' . ($result['error'] ?? 'Unknown error'));
         }
@@ -102,10 +99,10 @@ class CinemeetController extends MainAdminController
             'APP_NEW_ROOM_TITLE', 'APP_NEW_ROOM_DESCRIPTION',
         ];
         $updates = array_intersect_key($request->all(), array_flip($keys));
-        $result  = $this->apiPost('settings', ['settings' => $updates, 'restart' => true]);
+        $result  = $this->apiPost('settings', ['settings' => $updates, 'restart' => false]);
 
         if (!empty($result['success'])) {
-            session()->flash('flash_message', 'Homepage content updated!');
+            session()->flash('flash_message', 'Homepage content updated dynamically!');
         } else {
             session()->flash('flash_error', 'Error: ' . ($result['error'] ?? 'Unknown error'));
         }
@@ -131,7 +128,7 @@ class CinemeetController extends MainAdminController
         $result  = $this->apiPost('settings', ['settings' => $updates, 'restart' => false]);
 
         if (!empty($result['success'])) {
-            session()->flash('flash_message', 'Social links updated!');
+            session()->flash('flash_message', 'Social links updated dynamically!');
         } else {
             session()->flash('flash_error', 'Error: ' . ($result['error'] ?? 'Unknown error'));
         }
@@ -154,16 +151,15 @@ class CinemeetController extends MainAdminController
             'SHOW_POWERED_BY', 'SHOW_ACTIVE_ROOMS',
         ];
 
-        // Checkboxes not in request = false
         $updates = [];
         foreach ($toggleKeys as $key) {
             $updates[$key] = $request->has($key) ? 'true' : 'false';
         }
 
-        $result = $this->apiPost('settings', ['settings' => $updates, 'restart' => true]);
+        $result = $this->apiPost('settings', ['settings' => $updates, 'restart' => false]);
 
         if (!empty($result['success'])) {
-            session()->flash('flash_message', 'Visibility settings updated!');
+            session()->flash('flash_message', 'Visibility settings updated dynamically!');
         } else {
             session()->flash('flash_error', 'Error: ' . ($result['error'] ?? 'Unknown error'));
         }
@@ -188,7 +184,7 @@ class CinemeetController extends MainAdminController
         $result  = $this->apiPost('settings', ['settings' => $updates, 'restart' => false]);
 
         if (!empty($result['success'])) {
-            session()->flash('flash_message', 'SEO settings updated!');
+            session()->flash('flash_message', 'SEO settings updated dynamically!');
         } else {
             session()->flash('flash_error', 'Error: ' . ($result['error'] ?? 'Unknown error'));
         }
@@ -212,7 +208,7 @@ class CinemeetController extends MainAdminController
         $result  = $this->apiPost('settings', ['settings' => $updates, 'restart' => true]);
 
         if (!empty($result['success'])) {
-            session()->flash('flash_message', 'Server settings updated and CineMeet restarted!');
+            session()->flash('flash_message', 'Server settings updated and restart triggered!');
         } else {
             session()->flash('flash_error', 'Error: ' . ($result['error'] ?? 'Unknown error'));
         }
@@ -238,7 +234,7 @@ class CinemeetController extends MainAdminController
     {
         $result = $this->apiPost('restart');
         if (!empty($result['success'])) {
-            session()->flash('flash_message', 'CineMeet restarted successfully!');
+            session()->flash('flash_message', 'CineMeet restart signal sent successfully!');
         } else {
             session()->flash('flash_error', 'Restart failed: ' . ($result['error'] ?? 'Unknown error'));
         }
