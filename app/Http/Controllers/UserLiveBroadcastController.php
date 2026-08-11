@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
+use App\Models\LiveBroadcast;
+use Illuminate\Support\Str;
 
 class UserLiveBroadcastController extends Controller
 {
@@ -13,15 +14,23 @@ class UserLiveBroadcastController extends Controller
         $this->middleware('auth');
     }
 
+    /**
+     * Check if user's subscription plan grants access to live_broadcast feature
+     */
     private function hasLiveBroadcastFeature()
     {
         $user = Auth::user();
+
+        // Admin & Sub-Admin always have access
+        if ($user->usertype === 'Admin' || $user->usertype === 'Sub_Admin') {
+            return true;
+        }
+
         if (!$user->plan_id) {
             return false;
         }
 
         $plan = \App\SubscriptionPlan::find($user->plan_id);
-
         if (!$plan) {
             return false;
         }
@@ -30,17 +39,70 @@ class UserLiveBroadcastController extends Controller
         return in_array('live_broadcast', $features);
     }
 
-    public function index()
+    /**
+     * Live Broadcasts Dashboard & Embedded Zoom-Style Workspace
+     */
+    public function index(Request $request)
     {
         if (!$this->hasLiveBroadcastFeature()) {
-            \Session::flash('error_flash_message', 'Your current plan does not support Live Broadcasts.');
+            \Session::flash('error_flash_message', 'Your current plan does not support Live Broadcasts. Please upgrade your subscription plan.');
             return redirect('dashboard');
         }
 
-        $live_broadcasts = \App\Models\LiveBroadcast::where('user_id', Auth::user()->id)->orderBy('id', 'DESC')->paginate(10);
-        return view('pages.user.live_broadcasts.index', compact('live_broadcasts'));
+        $user = Auth::user();
+        $cinemeetBaseUrl = rtrim(env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org'), '/');
+
+        // Determine target room ID
+        $requestedRoom = $request->get('room');
+        
+        if ($requestedRoom) {
+            $roomId = preg_replace('/[^a-zA-Z0-9_\-]/', '', $requestedRoom);
+        } else {
+            // Find most recent broadcast or generate new room ID
+            $latestBroadcast = LiveBroadcast::where('user_id', $user->id)
+                ->orderBy('id', 'DESC')
+                ->first();
+
+            if ($latestBroadcast && !empty($latestBroadcast->zoom_meeting_id)) {
+                $roomId = $latestBroadcast->zoom_meeting_id;
+            } else {
+                $roomId = 'cineworm_' . $user->id . '_' . Str::lower(Str::random(6));
+            }
+        }
+
+        // Find active broadcast record if exists
+        $currentBroadcast = LiveBroadcast::where('user_id', $user->id)
+            ->where('zoom_meeting_id', $roomId)
+            ->first();
+
+        $meetingTitle = $currentBroadcast->title ?? ($user->name . "'s Live Meeting");
+
+        // Construct embedded CineMeet URL with user's name & auto-join params
+        $nameEncoded  = urlencode($user->name ?? 'User-' . rand(1000, 9999));
+        $avatarUrl    = $user->user_icon ? asset($user->user_icon) : '';
+        $avatarEncoded = urlencode($avatarUrl);
+
+        $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}&audio=true&video=true";
+        $shareableJoinUrl = "{$cinemeetBaseUrl}/join?room={$roomId}";
+
+        // Paginated history list of broadcasts
+        $live_broadcasts = LiveBroadcast::where('user_id', $user->id)
+            ->orderBy('id', 'DESC')
+            ->paginate(10);
+
+        return view('pages.user.live_broadcasts.index', compact(
+            'live_broadcasts',
+            'roomId',
+            'meetingTitle',
+            'cinemeetEmbedUrl',
+            'shareableJoinUrl',
+            'cinemeetBaseUrl'
+        ));
     }
 
+    /**
+     * Show Create Meeting form/modal
+     */
     public function create()
     {
         if (!$this->hasLiveBroadcastFeature()) {
@@ -51,6 +113,9 @@ class UserLiveBroadcastController extends Controller
         return view('pages.user.live_broadcasts.add');
     }
 
+    /**
+     * Store new CineMeet Live Broadcast Meeting
+     */
     public function store(Request $request)
     {
         if (!$this->hasLiveBroadcastFeature()) {
@@ -59,58 +124,29 @@ class UserLiveBroadcastController extends Controller
         }
 
         $request->validate([
-            'title' => 'required',
+            'title' => 'nullable|string|max:255',
         ]);
 
         $user = Auth::user();
-        if (empty($user->zoom_access_token)) {
-            \Session::flash('error_flash_message', 'Please connect your Zoom account first.');
-            return redirect('user/live_broadcasts');
-        }
+        $cinemeetBaseUrl = rtrim(env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org'), '/');
 
-        // Call Zoom API to create a meeting
-        $client = new \GuzzleHttp\Client();
-        try {
-            $response = $client->request('POST', 'https://api.zoom.us/v2/users/me/meetings', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $user->zoom_access_token,
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'topic' => $request->title,
-                    'type' => 1, // Instant meeting
-                    'settings' => [
-                        'host_video' => true,
-                        'participant_video' => false, // Treat as broadcast, guests can turn on later
-                        'mute_upon_entry' => true,
-                        'auto_recording' => 'cloud',
-                    ]
-                ]
-            ]);
+        // Generate unique room ID
+        $roomId = 'cineworm_' . $user->id . '_' . Str::lower(Str::random(6));
+        $title  = $request->title ? trim($request->title) : ($user->name . "'s Live Meeting (" . date('M d, H:i') . ")");
+        $shareUrl = "{$cinemeetBaseUrl}/join?room={$roomId}";
 
-            $body = json_decode($response->getBody(), true);
-            
-            if (!isset($body['id'])) {
-                throw new \Exception('Failed to get meeting ID from Zoom');
-            }
+        $broadcast = new LiveBroadcast();
+        $broadcast->user_id               = $user->id;
+        $broadcast->title                 = $title;
+        $broadcast->zoom_meeting_id       = $roomId;
+        $broadcast->zoom_join_url         = $shareUrl;
+        $broadcast->zoom_start_url        = $shareUrl;
+        $broadcast->zoom_meeting_password = '';
+        $broadcast->scheduled_at          = now();
+        $broadcast->status                = 1; // Active / Approved
+        $broadcast->save();
 
-            $broadcast = new \App\Models\LiveBroadcast();
-            $broadcast->user_id = $user->id;
-            $broadcast->title = $request->title;
-            $broadcast->zoom_meeting_id = $body['id'];
-            $broadcast->zoom_join_url = $body['join_url'];
-            $broadcast->zoom_start_url = $body['start_url'];
-            $broadcast->zoom_meeting_password = $body['password'] ?? null;
-            $broadcast->status = 0; // pending approval
-            $broadcast->save();
-
-            \Session::flash('flash_message', 'Live Broadcast created successfully. It will be visible after admin approval.');
-            return redirect('user/live_broadcasts');
-
-        } catch (\Exception $e) {
-            // Check if token expired, handle refresh token in a real app
-            \Session::flash('error_flash_message', 'Error creating broadcast: ' . $e->getMessage());
-            return redirect()->back();
-        }
+        \Session::flash('flash_message', 'New Live Meeting created successfully!');
+        return redirect()->to('user/live_broadcasts?room=' . $roomId);
     }
 }
