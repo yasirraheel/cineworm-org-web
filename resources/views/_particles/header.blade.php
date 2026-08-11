@@ -89,6 +89,15 @@
                                                 {{ trans('words.subscription_plan') }}
                                             </a>
                                         </li>
+                                        @if (Auth::check())
+                                            <li>
+                                                <a href="{{ URL::to('dashboard') }}"
+                                                    class="{{ request()->is('dashboard') || request()->is('user/*') || request()->is('profile') || request()->is('watchlist') || request()->is('promotions*') ? 'active' : '' }}"
+                                                    title="Dashboard">
+                                                    Dashboard
+                                                </a>
+                                            </li>
+                                        @endif
                                     </ul>
                                 </div>
                             </div>
