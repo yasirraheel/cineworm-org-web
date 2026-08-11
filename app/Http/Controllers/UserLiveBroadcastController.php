@@ -40,7 +40,7 @@ class UserLiveBroadcastController extends Controller
     }
 
     /**
-     * Live Broadcasts Dashboard & Embedded Zoom-Style Workspace
+     * Live Broadcasts Dashboard & Meeting Workspace
      */
     public function index(Request $request)
     {
@@ -52,22 +52,14 @@ class UserLiveBroadcastController extends Controller
         $user = Auth::user();
         $cinemeetBaseUrl = rtrim(env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org'), '/');
 
-        // Determine target room ID
+        // Check if user requested to enter/start a call
+        $inCall = $request->has('room');
         $requestedRoom = $request->get('room');
-        
+
         if ($requestedRoom) {
             $roomId = preg_replace('/[^a-zA-Z0-9_\-]/', '', $requestedRoom);
         } else {
-            // Find most recent broadcast or generate new room ID
-            $latestBroadcast = LiveBroadcast::where('user_id', $user->id)
-                ->orderBy('id', 'DESC')
-                ->first();
-
-            if ($latestBroadcast && !empty($latestBroadcast->zoom_meeting_id)) {
-                $roomId = $latestBroadcast->zoom_meeting_id;
-            } else {
-                $roomId = 'cineworm_' . $user->id . '_' . Str::lower(Str::random(6));
-            }
+            $roomId = 'cineworm_' . $user->id . '_' . Str::lower(Str::random(6));
         }
 
         // Find active broadcast record if exists
@@ -78,8 +70,8 @@ class UserLiveBroadcastController extends Controller
         $meetingTitle = $currentBroadcast->title ?? ($user->name . "'s Live Meeting");
 
         // Construct embedded CineMeet URL with user's name & auto-join params
-        $nameEncoded  = urlencode($user->name ?? 'User-' . rand(1000, 9999));
-        $avatarUrl    = $user->user_icon ? asset($user->user_icon) : '';
+        $nameEncoded   = urlencode($user->name ?? 'User-' . rand(1000, 9999));
+        $avatarUrl     = $user->user_icon ? asset($user->user_icon) : '';
         $avatarEncoded = urlencode($avatarUrl);
 
         $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}&audio=true&video=true";
@@ -91,6 +83,7 @@ class UserLiveBroadcastController extends Controller
             ->paginate(10);
 
         return view('pages.user.live_broadcasts.index', compact(
+            'inCall',
             'live_broadcasts',
             'roomId',
             'meetingTitle',
@@ -101,7 +94,7 @@ class UserLiveBroadcastController extends Controller
     }
 
     /**
-     * Show Create Meeting form/modal
+     * Show Create Meeting form
      */
     public function create()
     {
@@ -143,7 +136,7 @@ class UserLiveBroadcastController extends Controller
         $broadcast->zoom_start_url        = $shareUrl;
         $broadcast->zoom_meeting_password = '';
         $broadcast->scheduled_at          = now();
-        $broadcast->status                = 1; // Active / Approved
+        $broadcast->status                = 1; // Active
         $broadcast->save();
 
         \Session::flash('flash_message', 'New Live Meeting created successfully!');

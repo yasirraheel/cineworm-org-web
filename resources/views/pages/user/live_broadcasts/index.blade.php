@@ -5,7 +5,6 @@
 
 @section('content')
 <style>
-    /* Fix header dropdown z-index overlap */
     header, .header-area, .navbar, .user-dropdown, .dropdown-menu {
         z-index: 99999 !important;
     }
@@ -26,7 +25,7 @@
         background: #141820;
         border: 1px solid #2a3446;
         border-radius: 12px;
-        padding: 14px;
+        padding: 18px;
         box-shadow: 0 8px 25px rgba(0,0,0,0.4);
         margin-bottom: 16px;
         z-index: 1;
@@ -73,6 +72,8 @@
     .btn-zoom-primary:hover { background: #1d4ed8; color: #fff !important; }
     .btn-zoom-success { background: #059669; color: #fff !important; }
     .btn-zoom-success:hover { background: #047857; color: #fff !important; }
+    .btn-zoom-danger { background: #dc2626; color: #fff !important; }
+    .btn-zoom-danger:hover { background: #b91c1c; color: #fff !important; }
     .btn-zoom-dark { background: #334155; color: #f8fafc !important; }
     .btn-zoom-dark:hover { background: #475569; color: #f8fafc !important; }
 
@@ -117,9 +118,29 @@
         padding: 12px 16px;
     }
 
-    /* Toggle Profile Sidebar */
     .sidebar-collapsed { display: none !important; }
     .main-workspace-full { flex: 0 0 100% !important; max-width: 100% !important; }
+
+    .lobby-hero-card {
+        background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 28px 24px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .lobby-hero-card h3 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+    .lobby-hero-card p {
+        color: #94a3b8;
+        font-size: 14px;
+        max-width: 600px;
+        margin: 0 auto 20px auto;
+    }
 </style>
 
 <div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
@@ -154,75 +175,92 @@
                         </div>
                     @endif
 
-                    {{-- Main Workspace Card --}}
-                    <div class="meeting-workspace-card">
-                        
-                        {{-- Zoom-Style Toolbar --}}
-                        <div class="meeting-toolbar">
-                            <div class="meeting-title-box">
-                                <h4><i class="fa fa-video-camera" style="color:#60a5fa; margin-right:4px;"></i> {{ $meetingTitle }}</h4>
-                                <p>Room: <code style="color:#60a5fa;">{{ $roomId }}</code></p>
+                    @if($inCall)
+                        {{-- ACTIVE CALL WORKSPACE VIEW --}}
+                        <div class="meeting-workspace-card">
+                            
+                            {{-- Zoom-Style Toolbar --}}
+                            <div class="meeting-toolbar">
+                                <div class="meeting-title-box">
+                                    <h4><i class="fa fa-video-camera" style="color:#60a5fa; margin-right:4px;"></i> {{ $meetingTitle }}</h4>
+                                    <p>Room: <code style="color:#60a5fa;">{{ $roomId }}</code></p>
+                                </div>
+
+                                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                    {{-- Leave Call Button --}}
+                                    <a href="{{ URL::to('user/live_broadcasts') }}" class="btn-zoom-action btn-zoom-danger" onclick="return confirm('Leave this video call?')">
+                                        <i class="fa fa-phone"></i> Leave Call
+                                    </a>
+
+                                    {{-- Sidebar Toggle Button --}}
+                                    <button type="button" class="btn-zoom-action btn-zoom-dark" onclick="toggleProfileSidebar()" title="Toggle Sidebar">
+                                        <i class="fa fa-columns"></i> <span id="sidebarToggleText">Expand Call</span>
+                                    </button>
+
+                                    {{-- Copy Link Button --}}
+                                    <button type="button" class="btn-zoom-action btn-zoom-success" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
+                                        <i class="fa fa-copy"></i> Copy Link
+                                    </button>
+
+                                    {{-- Share WhatsApp --}}
+                                    <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn-zoom-action btn-zoom-dark" style="background:#25D366; color:#fff !important;">
+                                        <i class="fa fa-whatsapp"></i> WhatsApp
+                                    </a>
+
+                                    {{-- Fullscreen Toggle --}}
+                                    <button type="button" class="btn-zoom-action btn-zoom-dark" onclick="toggleIframeFullscreen()">
+                                        <i class="fa fa-expand"></i> Fullscreen
+                                    </button>
+                                </div>
                             </div>
 
-                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                                {{-- Sidebar Toggle Button --}}
-                                <button type="button" class="btn-zoom-action btn-zoom-dark" onclick="toggleProfileSidebar()" title="Toggle Sidebar">
-                                    <i class="fa fa-columns"></i> <span id="sidebarToggleText">Expand Call</span>
-                                </button>
-
-                                {{-- Copy Link Button --}}
-                                <button type="button" class="btn-zoom-action btn-zoom-success" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
-                                    <i class="fa fa-copy"></i> Copy Link
-                                </button>
-
-                                {{-- Share WhatsApp --}}
-                                <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn-zoom-action btn-zoom-dark" style="background:#25D366; color:#fff !important;">
-                                    <i class="fa fa-whatsapp"></i> WhatsApp
-                                </a>
-
-                                {{-- Instant New Meeting Modal Trigger --}}
-                                <button type="button" class="btn-zoom-action btn-zoom-primary" data-toggle="modal" data-target="#newMeetingModal">
-                                    <i class="fa fa-plus-circle"></i> New Meeting
-                                </button>
-
-                                {{-- Fullscreen Toggle --}}
-                                <button type="button" class="btn-zoom-action btn-zoom-dark" onclick="toggleIframeFullscreen()">
-                                    <i class="fa fa-expand"></i> Fullscreen
-                                </button>
-                            </div>
-                        </div>
-
-                        {{-- Share Link Bar --}}
-                        <div class="row" style="margin-bottom: 8px;">
-                            <div class="col-12">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" style="background:#0b0e14; border-color:#1e2636; color:#94a3b8; font-size:11px; height:32px; padding:0 8px;">Guest Share Link</span>
-                                    </div>
-                                    <input type="text" id="shareUrlInput" class="form-control share-link-input" value="{{ $shareableJoinUrl }}" readonly>
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" style="background:#1e2636; color:#fff; border-color:#1e2636; height:32px; font-size:11px; padding:0 10px;" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
-                                            <i class="fa fa-clone"></i> Copy
-                                        </button>
+                            {{-- Share Link Bar --}}
+                            <div class="row" style="margin-bottom: 8px;">
+                                <div class="col-12">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" style="background:#0b0e14; border-color:#1e2636; color:#94a3b8; font-size:11px; height:32px; padding:0 8px;">Guest Share Link</span>
+                                        </div>
+                                        <input type="text" id="shareUrlInput" class="form-control share-link-input" value="{{ $shareableJoinUrl }}" readonly>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" style="background:#1e2636; color:#fff; border-color:#1e2636; height:32px; font-size:11px; padding:0 10px;" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
+                                                <i class="fa fa-clone"></i> Copy
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {{-- Embedded CineMeet Call Workspace --}}
-                        <div class="iframe-wrapper" id="meetingFrameWrapper">
-                            <iframe id="cinemeetFrame"
-                                class="cinemeet-frame"
-                                src="{{ $cinemeetEmbedUrl }}"
-                                allow="camera; microphone; display-capture; autoplay; clipboard-write; fullscreen"
-                                title="CineMeet Video Meeting">
-                            </iframe>
-                        </div>
+                            {{-- Embedded CineMeet Call Workspace --}}
+                            <div class="iframe-wrapper" id="meetingFrameWrapper">
+                                <iframe id="cinemeetFrame"
+                                    class="cinemeet-frame"
+                                    src="{{ $cinemeetEmbedUrl }}"
+                                    allow="camera; microphone; display-capture; autoplay; clipboard-write; fullscreen"
+                                    title="CineMeet Video Meeting">
+                                </iframe>
+                            </div>
 
-                    </div>
+                        </div>
+                    @else
+                        {{-- DASHBOARD LOBBY VIEW --}}
+                        <div class="lobby-hero-card">
+                            <h3><i class="fa fa-video-camera" style="color:#60a5fa; margin-right:8px;"></i> Live Broadcast & Meetings</h3>
+                            <p>Host HD video calls, webinars, and screen sharing sessions directly inside CineWorm. Invite colleagues or subscribers with a 1-click shareable link.</p>
+
+                            <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:16px;">
+                                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#newMeetingModal" style="background:#2563eb; border:none; font-weight:600; padding:10px 24px; border-radius:8px;">
+                                    <i class="fa fa-plus-circle"></i> Create New Meeting
+                                </button>
+                                <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="btn btn-success btn-lg" style="background:#059669; border:none; font-weight:600; padding:10px 24px; border-radius:8px;">
+                                    <i class="fa fa-play-circle"></i> Start Quick Meeting
+                                </a>
+                            </div>
+                        </div>
+                    @endif
 
                     {{-- Meeting History Table --}}
-                    <div class="meeting-workspace-card" style="margin-top:16px;">
+                    <div class="meeting-workspace-card">
                         <h4 style="color:#fff; font-size:15px; font-weight:700; margin-bottom:12px;">
                             <i class="fa fa-history" style="color:#c084fc; margin-right:6px;"></i> My Created Meetings History
                         </h4>
@@ -250,11 +288,11 @@
                                                 {{ $broadcast->created_at ? $broadcast->created_at->format('M d, Y H:i') : '—' }}
                                             </td>
                                             <td style="border-color: rgba(255,255,255,0.08);" class="text-center">
-                                                <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-primary waves-effect" style="font-size:11px; padding:2px 8px;">
-                                                    <i class="fa fa-sign-in"></i> Open
+                                                <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-primary waves-effect" style="font-size:11px; padding:3px 10px; background:#2563eb;">
+                                                    <i class="fa fa-video-camera"></i> Start Meeting
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-dark waves-effect" style="font-size:11px; padding:2px 8px; background:#334155; color:#fff;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
-                                                    <i class="fa fa-copy"></i> Link
+                                                <button type="button" class="btn btn-sm btn-dark waves-effect" style="font-size:11px; padding:3px 10px; background:#334155; color:#fff;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
+                                                    <i class="fa fa-copy"></i> Copy Link
                                                 </button>
                                             </td>
                                         </tr>
@@ -262,7 +300,7 @@
                                         <tr>
                                             <td colspan="4" class="text-center" style="border-color: rgba(255,255,255,0.08); padding: 20px; color:#64748b;">
                                                 <i class="fa fa-video-camera" style="font-size:24px; display:block; margin-bottom:8px; opacity:0.3;"></i>
-                                                No meeting rooms created yet. Click <strong>"New Meeting"</strong> above to start your first live call!
+                                                No meeting rooms created yet. Click <strong>"Create New Meeting"</strong> above to start your first live call!
                                             </td>
                                         </tr>
                                     @endforelse
@@ -319,8 +357,10 @@ function copyInviteLink(url) {
         navigator.clipboard.writeText(url).then(showCopyToast);
     } else {
         var input = document.getElementById('shareUrlInput');
-        input.select();
-        document.execCommand('copy');
+        if (input) {
+            input.select();
+            document.execCommand('copy');
+        }
         showCopyToast();
     }
 }
@@ -331,15 +371,17 @@ function showCopyToast() {
 
 function toggleIframeFullscreen() {
     var wrapper = document.getElementById('meetingFrameWrapper');
-    if (!document.fullscreenElement) {
-        if (wrapper.requestFullscreen) {
-            wrapper.requestFullscreen();
-        } else if (wrapper.webkitRequestFullscreen) {
-            wrapper.webkitRequestFullscreen();
-        }
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
+    if (wrapper) {
+        if (!document.fullscreenElement) {
+            if (wrapper.requestFullscreen) {
+                wrapper.requestFullscreen();
+            } else if (wrapper.webkitRequestFullscreen) {
+                wrapper.webkitRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
         }
     }
 }
@@ -349,14 +391,16 @@ function toggleProfileSidebar() {
     var mainCol = document.getElementById('mainWorkspaceCol');
     var btnText = document.getElementById('sidebarToggleText');
     
-    if (sidebar.classList.contains('sidebar-collapsed')) {
-        sidebar.classList.remove('sidebar-collapsed');
-        mainCol.classList.remove('main-workspace-full');
-        btnText.textContent = 'Expand Call';
-    } else {
-        sidebar.classList.add('sidebar-collapsed');
-        mainCol.classList.add('main-workspace-full');
-        btnText.textContent = 'Show Profile';
+    if (sidebar && mainCol) {
+        if (sidebar.classList.contains('sidebar-collapsed')) {
+            sidebar.classList.remove('sidebar-collapsed');
+            mainCol.classList.remove('main-workspace-full');
+            if (btnText) btnText.textContent = 'Expand Call';
+        } else {
+            sidebar.classList.add('sidebar-collapsed');
+            mainCol.classList.add('main-workspace-full');
+            if (btnText) btnText.textContent = 'Show Profile';
+        }
     }
 }
 </script>
