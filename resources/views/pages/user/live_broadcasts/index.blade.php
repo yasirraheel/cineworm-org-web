@@ -97,45 +97,8 @@
                 <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                     <div class="edit-profile-form">
 
-                        @if(session('flash_message'))
-                            <script>
-                                document.addEventListener("DOMContentLoaded", function() {
-                                    if (typeof Swal !== 'undefined') {
-                                        Swal.fire({
-                                            toast: true,
-                                            position: 'top-end',
-                                            icon: 'success',
-                                            title: "{!! addslashes(session('flash_message')) !!}",
-                                            showConfirmButton: false,
-                                            timer: 4000,
-                                            timerProgressBar: true,
-                                            background: '#181d27',
-                                            color: '#fff'
-                                        });
-                                    }
-                                });
-                            </script>
-                        @endif
-
-                        @if(session('error_flash_message'))
-                            <script>
-                                document.addEventListener("DOMContentLoaded", function() {
-                                    if (typeof Swal !== 'undefined') {
-                                        Swal.fire({
-                                            toast: true,
-                                            position: 'top-end',
-                                            icon: 'error',
-                                            title: "{!! addslashes(session('error_flash_message')) !!}",
-                                            showConfirmButton: false,
-                                            timer: 4000,
-                                            timerProgressBar: true,
-                                            background: '#181d27',
-                                            color: '#fff'
-                                        });
-                                    }
-                                });
-                            </script>
-                        @endif
+                        {{-- Standard App Flash Messages --}}
+                        @include('pages.user.whatsapp._flash')
 
                         @if($inCall)
                             {{-- ACTIVE CALL WORKSPACE --}}
@@ -174,14 +137,12 @@
                                 </div>
 
                                 {{-- Guest Link Bar --}}
-                                <div class="input-group" style="margin-bottom: 12px;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" style="background:rgba(0,0,0,0.5); border-color:rgba(255,255,255,0.1); color:#ccc; font-size:12px;">Guest Share Link</span>
-                                    </div>
-                                    <input type="text" id="shareUrlInput" class="form-control share-link-input" value="{{ $shareableJoinUrl }}" readonly>
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" style="background:rgba(255,255,255,0.1); color:#fff; border-color:rgba(255,255,255,0.1); font-size:12px;" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
-                                            <i class="fa fa-clone"></i> Copy
+                                <div style="margin-bottom: 15px;">
+                                    <label style="color:#ccc; font-size:12px; font-weight:600; margin-bottom:4px; display:block;">Guest Share Link</label>
+                                    <div style="display: flex; align-items: center; width: 100%; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.4);">
+                                        <input type="text" id="shareUrlInput" value="{{ $shareableJoinUrl }}" readonly style="flex: 1; background: transparent; border: none; color: #fff; padding: 10px 14px; font-size: 13px; font-family: monospace; outline: none;">
+                                        <button type="button" onclick="copyInviteLink('{{ $shareableJoinUrl }}')" style="background: #e50914; color: #fff; border: none; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                                            <i class="fa fa-copy"></i> Copy Link
                                         </button>
                                     </div>
                                 </div>
@@ -363,21 +324,15 @@ function copyInviteLink(url) {
 function showCopyToast() {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
-            toast: true,
-            position: 'top-end',
             icon: 'success',
-            title: 'Invite link copied to clipboard!',
+            title: 'Invite Link Copied!',
+            text: 'The meeting link has been copied to your clipboard.',
+            timer: 2200,
             showConfirmButton: false,
-            timer: 2500,
+            confirmButtonColor: '#e50914',
             background: '#181d27',
             color: '#fff'
         });
-    } else {
-        var toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed; top:20px; right:20px; background:#e50914; color:#fff; padding:12px 20px; border-radius:4px; z-index:999999; font-size:14px; font-weight:600; box-shadow:0 10px 25px rgba(0,0,0,0.5);';
-        toast.innerHTML = '<i class="fa fa-check-circle"></i> Invite link copied to clipboard!';
-        document.body.appendChild(toast);
-        setTimeout(function() { toast.remove(); }, 2500);
     }
 }
 
