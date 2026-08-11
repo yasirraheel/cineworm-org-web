@@ -5,80 +5,45 @@
 
 @section('content')
 <style>
-    /* Fix header dropdown z-index overlap */
+    /* Ensure site header dropdown float over iframe */
     header, .header-area, .navbar, .user-dropdown, .dropdown-menu {
         z-index: 99999 !important;
     }
 
-    .meeting-workspace-card {
-        background: #141820;
-        border: 1px solid #2a3446;
-        border-radius: 12px;
-        padding: 18px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-        margin-bottom: 16px;
-        z-index: 1;
-        position: relative;
+    .cineworm-meeting-box {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
     }
-    .meeting-toolbar {
+
+    .cineworm-toolbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: 8px;
-        background: #0b0e14;
-        border: 1px solid #1e2636;
-        border-radius: 8px;
-        padding: 8px 14px;
-        margin-bottom: 10px;
-    }
-    .meeting-title-box h4 {
-        margin: 0;
-        font-size: 15px;
-        font-weight: 700;
-        color: #fff;
-    }
-    .meeting-title-box p {
-        margin: 1px 0 0;
-        font-size: 11px;
-        color: #94a3b8;
-    }
-    .btn-zoom-action {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 6px 12px;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none !important;
-        white-space: nowrap;
+        padding: 10px 16px;
+        margin-bottom: 15px;
     }
-    .btn-zoom-primary { background: #2563eb; color: #fff !important; }
-    .btn-zoom-primary:hover { background: #1d4ed8; color: #fff !important; }
-    .btn-zoom-success { background: #059669; color: #fff !important; }
-    .btn-zoom-success:hover { background: #047857; color: #fff !important; }
-    .btn-zoom-danger { background: #dc2626; color: #fff !important; }
-    .btn-zoom-danger:hover { background: #b91c1c; color: #fff !important; }
-    .btn-zoom-dark { background: #334155; color: #f8fafc !important; }
-    .btn-zoom-dark:hover { background: #475569; color: #f8fafc !important; }
 
-    /* Viewport Height Frame */
     .iframe-wrapper {
         position: relative;
         width: 100%;
-        height: calc(88vh - 170px);
+        height: calc(85vh - 180px);
         min-height: 480px;
         max-height: 680px;
-        border-radius: 8px;
+        border-radius: 6px;
         overflow: hidden;
         background: #000;
-        border: 1px solid #2a3446;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         z-index: 1;
     }
+
     iframe.cinemeet-frame {
         width: 100%;
         height: 100%;
@@ -87,45 +52,20 @@
     }
 
     .share-link-input {
-        background: #0b0e14 !important;
-        color: #60a5fa !important;
-        border: 1px solid #1e2636 !important;
-        font-size: 12px;
+        background: rgba(0, 0, 0, 0.4) !important;
+        color: #fff !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        font-size: 13px;
         font-family: monospace;
-        height: 32px;
-    }
-
-    /* Modal Styling */
-    .modal-content-dark {
-        background: #141820;
-        color: #fff;
-        border: 1px solid #2a3446;
-        border-radius: 12px;
-    }
-    .modal-header-dark {
-        border-bottom: 1px solid #2a3446;
-        padding: 12px 16px;
     }
 
     .lobby-hero-card {
-        background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
-        border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 28px 24px;
-        margin-bottom: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 30px 20px;
+        margin-bottom: 25px;
         text-align: center;
-    }
-    .lobby-hero-card h3 {
-        font-size: 22px;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 8px;
-    }
-    .lobby-hero-card p {
-        color: #94a3b8;
-        font-size: 14px;
-        max-width: 600px;
-        margin: 0 auto 20px auto;
     }
 </style>
 
@@ -150,188 +90,153 @@
         <div class="profile-section">
             <div class="row">
                 
-                {{-- Standard User Sidebar (Includes its own col-lg-3 col-md-4) --}}
+                {{-- Standard User Sidebar --}}
                 @include('pages.user._sidebar')
                 
                 {{-- Main Content Workspace Column --}}
                 <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
+                    <div class="edit-profile-form">
 
-                    @if(session('flash_message'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="background:#065f46; color:#a7f3d0; border:1px solid #047857; padding:8px 14px; font-size:13px;">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:#a7f3d0;">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            {{ session('flash_message') }}
-                        </div>
-                    @endif
-
-                    @if($inCall)
-                        {{-- ACTIVE CALL WORKSPACE VIEW --}}
-                        <div class="meeting-workspace-card">
-                            
-                            {{-- Zoom-Style Toolbar --}}
-                            <div class="meeting-toolbar">
-                                <div class="meeting-title-box">
-                                    <h4><i class="fa fa-video-camera" style="color:#60a5fa; margin-right:4px;"></i> {{ $meetingTitle }}</h4>
-                                    <p>Room: <code style="color:#60a5fa;">{{ $roomId }}</code></p>
-                                </div>
-
-                                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                                    {{-- Leave Call Button --}}
-                                    <a href="{{ URL::to('user/live_broadcasts') }}" class="btn-zoom-action btn-zoom-danger" onclick="return leaveCallConfirm(this.href);">
-                                        <i class="fa fa-phone"></i> Leave Call
-                                    </a>
-
-                                    {{-- Copy Link Button --}}
-                                    <button type="button" class="btn-zoom-action btn-zoom-success" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
-                                        <i class="fa fa-copy"></i> Copy Link
-                                    </button>
-
-                                    {{-- Share WhatsApp --}}
-                                    <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn-zoom-action btn-zoom-dark" style="background:#25D366; color:#fff !important;">
-                                        <i class="fa fa-whatsapp"></i> WhatsApp
-                                    </a>
-
-                                    {{-- Fullscreen Toggle --}}
-                                    <button type="button" class="btn-zoom-action btn-zoom-dark" onclick="toggleIframeFullscreen()">
-                                        <i class="fa fa-expand"></i> Fullscreen
-                                    </button>
-                                </div>
+                        @if(session('flash_message'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="background:#065f46; color:#a7f3d0; border:1px solid #047857; margin-bottom:20px;">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:#a7f3d0;">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                {{ session('flash_message') }}
                             </div>
+                        @endif
 
-                            {{-- Share Link Bar --}}
-                            <div class="row" style="margin-bottom: 8px;">
-                                <div class="col-12">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text" style="background:#0b0e14; border-color:#1e2636; color:#94a3b8; font-size:11px; height:32px; padding:0 8px;">Guest Share Link</span>
-                                        </div>
-                                        <input type="text" id="shareUrlInput" class="form-control share-link-input" value="{{ $shareableJoinUrl }}" readonly>
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="button" style="background:#1e2636; color:#fff; border-color:#1e2636; height:32px; font-size:11px; padding:0 10px;" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
-                                                <i class="fa fa-clone"></i> Copy
-                                            </button>
-                                        </div>
+                        @if($inCall)
+                            {{-- ACTIVE CALL WORKSPACE --}}
+                            <div class="cineworm-meeting-box">
+                                
+                                {{-- Toolbar --}}
+                                <div class="cineworm-toolbar">
+                                    <div>
+                                        <h4 style="color:#fff; margin:0; font-size:16px; font-weight:700;">
+                                            <i class="fa fa-video-camera" style="color:#e50914; margin-right:6px;"></i> {{ $meetingTitle }}
+                                        </h4>
+                                        <p style="color:#ccc; margin:2px 0 0; font-size:12px;">Room ID: <code style="color:#fe0278;">{{ $roomId }}</code></p>
+                                    </div>
+
+                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                        {{-- Leave Call --}}
+                                        <a href="{{ URL::to('user/live_broadcasts') }}" class="btn btn-sm btn-danger" onclick="return leaveCallConfirm(this.href);" style="background:#e50914; border:none; padding:6px 14px; font-size:12px; font-weight:600;">
+                                            <i class="fa fa-phone"></i> Leave Call
+                                        </a>
+
+                                        {{-- Copy Link --}}
+                                        <button type="button" class="btn btn-sm btn-success" onclick="copyInviteLink('{{ $shareableJoinUrl }}')" style="background:#28a745; border:none; padding:6px 14px; font-size:12px; font-weight:600;">
+                                            <i class="fa fa-copy"></i> Copy Link
+                                        </button>
+
+                                        {{-- Share WhatsApp --}}
+                                        <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn btn-sm btn-success" style="background:#25D366; border:none; padding:6px 14px; font-size:12px; font-weight:600; color:#fff !important;">
+                                            <i class="fa fa-whatsapp"></i> WhatsApp
+                                        </a>
+
+                                        {{-- Fullscreen --}}
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleIframeFullscreen()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:6px 14px; font-size:12px;">
+                                            <i class="fa fa-expand"></i> Fullscreen
+                                        </button>
                                     </div>
                                 </div>
+
+                                {{-- Guest Link Bar --}}
+                                <div class="input-group" style="margin-bottom: 12px;">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" style="background:rgba(0,0,0,0.5); border-color:rgba(255,255,255,0.1); color:#ccc; font-size:12px;">Guest Share Link</span>
+                                    </div>
+                                    <input type="text" id="shareUrlInput" class="form-control share-link-input" value="{{ $shareableJoinUrl }}" readonly>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" style="background:rgba(255,255,255,0.1); color:#fff; border-color:rgba(255,255,255,0.1); font-size:12px;" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
+                                            <i class="fa fa-clone"></i> Copy
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {{-- Embedded Call View --}}
+                                <div class="iframe-wrapper" id="meetingFrameWrapper">
+                                    <iframe id="cinemeetFrame"
+                                        class="cinemeet-frame"
+                                        src="{{ $cinemeetEmbedUrl }}"
+                                        allow="camera; microphone; display-capture; autoplay; clipboard-write; fullscreen"
+                                        title="CineMeet Video Meeting">
+                                    </iframe>
+                                </div>
+
                             </div>
-
-                            {{-- Embedded CineMeet Call Workspace --}}
-                            <div class="iframe-wrapper" id="meetingFrameWrapper">
-                                <iframe id="cinemeetFrame"
-                                    class="cinemeet-frame"
-                                    src="{{ $cinemeetEmbedUrl }}"
-                                    allow="camera; microphone; display-capture; autoplay; clipboard-write; fullscreen"
-                                    title="CineMeet Video Meeting">
-                                </iframe>
+                        @else
+                            {{-- DASHBOARD LOBBY VIEW --}}
+                            <div class="row" style="margin-bottom: 20px;">
+                                <div class="col-md-7">
+                                    <h3 style="color:#fff; margin-bottom:5px;"><i class="fa fa-video-camera" style="color:#e50914; margin-right:8px;"></i> Live Broadcast & Meetings</h3>
+                                    <p style="color:#ccc; font-size:14px;">Host HD video calls, webinars, and screen sharing sessions directly inside CineWorm.</p>
+                                </div>
+                                <div class="col-md-5 text-right" style="text-align: right; padding-top: 10px;">
+                                    <button type="button" onclick="openNewMeetingModal();" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; border:none; cursor:pointer; margin-right:5px;">
+                                        <i class="fa fa-plus"></i> Create Meeting
+                                    </button>
+                                    <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; background-color:#28a745;">
+                                        <i class="fa fa-play"></i> Start Call
+                                    </a>
+                                </div>
                             </div>
+                        @endif
 
-                        </div>
-                    @else
-                        {{-- DASHBOARD LOBBY VIEW --}}
-                        <div class="lobby-hero-card">
-                            <h3><i class="fa fa-video-camera" style="color:#60a5fa; margin-right:8px;"></i> Live Broadcast & Meetings</h3>
-                            <p>Host HD video calls, webinars, and screen sharing sessions directly inside CineWorm. Invite colleagues or subscribers with a 1-click shareable link.</p>
+                        {{-- HISTORY TABLE --}}
+                        <div class="row" style="margin-top:25px; margin-bottom:10px;">
+                            <div class="col-12">
+                                <h4 style="color:#fff; font-size:16px; font-weight:700; margin-bottom:15px;">
+                                    <i class="fa fa-history" style="color:#e50914; margin-right:8px;"></i> My Created Meetings History
+                                </h4>
 
-                            <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:16px;">
-                                <button type="button" class="btn btn-primary btn-lg" onclick="openNewMeetingModal();" style="background:#2563eb; border:none; font-weight:600; padding:10px 24px; border-radius:8px;">
-                                    <i class="fa fa-plus-circle"></i> Create New Meeting
-                                </button>
-                                <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="btn btn-success btn-lg" style="background:#059669; border:none; font-weight:600; padding:10px 24px; border-radius:8px;">
-                                    <i class="fa fa-play-circle"></i> Start Quick Meeting
-                                </a>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" style="color: #fff; border-color: rgba(255,255,255,0.1);">
+                                        <thead>
+                                            <tr>
+                                                <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Meeting Title</th>
+                                                <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Room ID</th>
+                                                <th style="border-color: rgba(255,255,255,0.1); color:#fff;">Created Date</th>
+                                                <th style="border-color: rgba(255,255,255,0.1); color:#fff;" class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($live_broadcasts as $broadcast)
+                                                <tr>
+                                                    <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->title }}</td>
+                                                    <td style="border-color: rgba(255,255,255,0.1); color:#fe0278; font-family:monospace;">{{ $broadcast->zoom_meeting_id }}</td>
+                                                    <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->created_at ? $broadcast->created_at->format('M d, Y H:i') : '—' }}</td>
+                                                    <td style="border-color: rgba(255,255,255,0.1);" class="text-center">
+                                                        <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-success" style="background:#e50914; border:none; padding:4px 10px; font-size:12px; margin-right:4px;">
+                                                            <i class="fa fa-video-camera"></i> Start Call
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:4px 10px; font-size:12px;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
+                                                            <i class="fa fa-copy"></i> Copy Link
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="4" class="text-center" style="border-color: rgba(255,255,255,0.1); padding: 30px; color:#aaa;">
+                                                        <i class="fa fa-video-camera" style="font-size:32px; display:block; margin-bottom:14px; opacity:0.3;"></i>
+                                                        No live broadcast meetings scheduled yet. Click <strong>"Create Meeting"</strong> above to get started!
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style="margin-top:15px;">
+                                    @include('_particles.pagination', ['paginator' => $live_broadcasts])
+                                </div>
                             </div>
                         </div>
-                    @endif
 
-                    {{-- Meeting History Table --}}
-                    <div class="meeting-workspace-card">
-                        <h4 style="color:#fff; font-size:15px; font-weight:700; margin-bottom:12px;">
-                            <i class="fa fa-history" style="color:#c084fc; margin-right:6px;"></i> My Created Meetings History
-                        </h4>
-
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm" style="color: #fff; border-color: rgba(255,255,255,0.08); font-size:12px;">
-                                <thead>
-                                    <tr style="background:#0b0e14;">
-                                        <th style="border-color: rgba(255,255,255,0.08); color:#94a3b8;">Meeting Title</th>
-                                        <th style="border-color: rgba(255,255,255,0.08); color:#94a3b8;">Room ID</th>
-                                        <th style="border-color: rgba(255,255,255,0.08); color:#94a3b8;">Created Date</th>
-                                        <th style="border-color: rgba(255,255,255,0.08); color:#94a3b8;" class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($live_broadcasts as $broadcast)
-                                        <tr>
-                                            <td style="border-color: rgba(255,255,255,0.08); color:#f1f5f9; font-weight:600;">
-                                                {{ $broadcast->title }}
-                                            </td>
-                                            <td style="border-color: rgba(255,255,255,0.08); color:#60a5fa; font-family:monospace;">
-                                                {{ $broadcast->zoom_meeting_id }}
-                                            </td>
-                                            <td style="border-color: rgba(255,255,255,0.08); color:#94a3b8;">
-                                                {{ $broadcast->created_at ? $broadcast->created_at->format('M d, Y H:i') : '—' }}
-                                            </td>
-                                            <td style="border-color: rgba(255,255,255,0.08);" class="text-center">
-                                                <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-primary waves-effect" style="font-size:11px; padding:3px 10px; background:#2563eb;">
-                                                    <i class="fa fa-video-camera"></i> Start Meeting
-                                                </a>
-                                                <button type="button" class="btn btn-sm btn-dark waves-effect" style="font-size:11px; padding:3px 10px; background:#334155; color:#fff;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
-                                                    <i class="fa fa-copy"></i> Copy Link
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center" style="border-color: rgba(255,255,255,0.08); padding: 20px; color:#64748b;">
-                                                <i class="fa fa-video-camera" style="font-size:24px; display:block; margin-bottom:8px; opacity:0.3;"></i>
-                                                No meeting rooms created yet. Click <strong>"Create New Meeting"</strong> above to start your first live call!
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div style="margin-top:10px;">
-                            @include('_particles.pagination', ['paginator' => $live_broadcasts])
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- New Meeting Modal --}}
-<div class="modal fade" id="newMeetingModal" tabindex="-1" role="dialog" aria-labelledby="newMeetingModalLabel" aria-hidden="true" style="z-index:999999 !important;">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content modal-content-dark">
-            <div class="modal-header modal-header-dark">
-                <h5 class="modal-title" id="newMeetingModalLabel" style="color:#fff; font-weight:700; font-size:15px;">
-                    <i class="fa fa-video-camera text-primary"></i> Create Instant Live Meeting
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:#fff;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="{{ URL::to('user/live_broadcasts/create') }}" method="POST">
-                {{ csrf_field() }}
-                <div class="modal-body" style="padding:16px;">
-                    <div class="form-group">
-                        <label style="color:#cbd5e1; font-weight:600; font-size:12px;">Meeting Topic / Title</label>
-                        <input type="text" name="title" class="form-control" placeholder="e.g. Weekly Strategy Sync, Film Review..." style="background:#0b0e14; color:#fff; border:1px solid #1e2636; font-size:13px;" value="{{ Auth::user()->name }}'s Live Meeting">
-                        <small style="color:#94a3b8; font-size:11px;">Guests will see this topic when joining your meeting link.</small>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-top:1px solid #2a3446; padding:10px 16px;">
-                    <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm btn-primary" style="background:#2563eb; border:none; font-weight:600;">
-                        <i class="fa fa-play-circle"></i> Start Meeting Now
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -342,18 +247,18 @@ function openNewMeetingModal() {
         Swal.fire({
             title: 'Create Instant Live Meeting',
             html: `
-                <div style="text-align:left; font-size:13px; color:#cbd5e1; margin-top:10px;">
-                    <label style="font-weight:600; margin-bottom:6px; display:block;">Meeting Topic / Title</label>
-                    <input type="text" id="swalMeetingTitle" class="form-control" style="background:#0b0e14; color:#fff; border:1px solid #252e3e; font-size:13px; padding:8px 12px; border-radius:6px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Sync, Film Review...">
-                    <small style="color:#94a3b8; font-size:11px; margin-top:4px; display:block;">Guests will see this topic when joining your meeting link.</small>
+                <div style="text-align:left; font-size:13px; color:#ccc; margin-top:10px;">
+                    <label style="font-weight:600; margin-bottom:6px; display:block; color:#fff;">Meeting Topic / Title</label>
+                    <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:13px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Strategy Sync, Film Review...">
+                    <small style="color:#aaa; font-size:11px; margin-top:4px; display:block;">Guests will see this topic when joining your meeting link.</small>
                 </div>
             `,
             showCancelButton: true,
             confirmButtonText: 'Start Meeting Now',
-            confirmButtonColor: '#2563eb',
+            confirmButtonColor: '#e50914',
             cancelButtonText: 'Cancel',
-            cancelButtonColor: '#334155',
-            background: '#141820',
+            cancelButtonColor: '#333',
+            background: '#181d27',
             color: '#fff',
             focusConfirm: false,
             preConfirm: () => {
@@ -387,7 +292,27 @@ function openNewMeetingModal() {
             }
         });
     } else {
-        $('#newMeetingModal').modal('show');
+        var topic = prompt('Enter Meeting Topic / Title:', "{{ Auth::user()->name }}'s Live Meeting");
+        if (topic) {
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ URL::to('user/live_broadcasts/create') }}";
+            
+            var csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = "{{ csrf_token() }}";
+            form.appendChild(csrf);
+
+            var titleInput = document.createElement('input');
+            titleInput.type = 'hidden';
+            titleInput.name = 'title';
+            titleInput.value = topic;
+            form.appendChild(titleInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 }
 
@@ -413,12 +338,12 @@ function showCopyToast() {
             title: 'Invite link copied to clipboard!',
             showConfirmButton: false,
             timer: 2500,
-            background: '#141820',
+            background: '#181d27',
             color: '#fff'
         });
     } else {
         var toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed; top:20px; right:20px; background:#059669; color:#fff; padding:12px 20px; border-radius:8px; z-index:999999; font-size:14px; font-weight:600; box-shadow:0 10px 25px rgba(0,0,0,0.5);';
+        toast.style.cssText = 'position:fixed; top:20px; right:20px; background:#e50914; color:#fff; padding:12px 20px; border-radius:4px; z-index:999999; font-size:14px; font-weight:600; box-shadow:0 10px 25px rgba(0,0,0,0.5);';
         toast.innerHTML = '<i class="fa fa-check-circle"></i> Invite link copied to clipboard!';
         document.body.appendChild(toast);
         setTimeout(function() { toast.remove(); }, 2500);
@@ -432,11 +357,11 @@ function leaveCallConfirm(url) {
             text: 'Are you sure you want to exit this meeting?',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#dc2626',
-            cancelButtonColor: '#334155',
+            confirmButtonColor: '#e50914',
+            cancelButtonColor: '#333',
             confirmButtonText: 'Yes, Leave Meeting',
             cancelButtonText: 'Stay in Call',
-            background: '#141820',
+            background: '#181d27',
             color: '#fff'
         }).then(function(result) {
             if (result.isConfirmed) {
