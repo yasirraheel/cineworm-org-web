@@ -89,6 +89,57 @@
                </ul>
             </li>
 
+            {{-- CineMeet Manager --}}
+            <li class="has_sub {{ request()->is('admin/cinemeet*') ? 'subdrop' : '' }}">
+                <a href="javascript:void(0);" class="waves-effect {{ request()->is('admin/cinemeet*') ? 'active' : '' }}">
+                    <i class="fa fa-video-camera" style="color:#3498db;"></i>
+                    <span style="font-weight:600;">CineMeet</span>
+                    <span class="menu-arrow"></span>
+                </a>
+                <ul class="list-unstyled">
+                    <li class="{{ request()->is('admin/cinemeet') && !request()->is('admin/cinemeet/*') ? 'active' : '' }}">
+                        <a href="{{ URL::to('admin/cinemeet') }}">
+                            <i class="fa fa-dashboard"></i><span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/cinemeet/branding') ? 'active' : '' }}">
+                        <a href="{{ URL::to('admin/cinemeet/branding') }}">
+                            <i class="fa fa-paint-brush"></i><span>Branding</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/cinemeet/homepage') ? 'active' : '' }}">
+                        <a href="{{ URL::to('admin/cinemeet/homepage') }}">
+                            <i class="fa fa-home"></i><span>Homepage Content</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/cinemeet/social') ? 'active' : '' }}">
+                        <a href="{{ URL::to('admin/cinemeet/social') }}">
+                            <i class="fa fa-share-alt"></i><span>Social & Links</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/cinemeet/visibility') ? 'active' : '' }}">
+                        <a href="{{ URL::to('admin/cinemeet/visibility') }}">
+                            <i class="fa fa-eye"></i><span>Visibility</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/cinemeet/seo') ? 'active' : '' }}">
+                        <a href="{{ URL::to('admin/cinemeet/seo') }}">
+                            <i class="fa fa-search"></i><span>SEO & Meta</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/cinemeet/server') ? 'active' : '' }}">
+                        <a href="{{ URL::to('admin/cinemeet/server') }}">
+                            <i class="fa fa-server"></i><span>Server Settings</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/cinemeet/api-docs') ? 'active' : '' }}">
+                        <a href="{{ URL::to('admin/cinemeet/api-docs') }}">
+                            <i class="fa fa-file-code-o"></i><span>API Docs</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
 
 
                     <li class="has_sub">

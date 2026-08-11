@@ -112,6 +112,27 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
 
         Route::get('settings', 'SettingsController@settings');
 
+        // ── CineMeet Manager ──────────────────────────────────────────────────
+        Route::prefix('cinemeet')->name('admin.cinemeet.')->group(function () {
+            Route::get('/',           'CinemeetController@dashboard')      ->name('dashboard');
+            Route::get('/branding',   'CinemeetController@branding')       ->name('branding');
+            Route::post('/branding',  'CinemeetController@updateBranding');
+            Route::get('/homepage',   'CinemeetController@homepage')       ->name('homepage');
+            Route::post('/homepage',  'CinemeetController@updateHomepage');
+            Route::get('/social',     'CinemeetController@social')         ->name('social');
+            Route::post('/social',    'CinemeetController@updateSocial');
+            Route::get('/visibility', 'CinemeetController@visibility')     ->name('visibility');
+            Route::post('/visibility','CinemeetController@updateVisibility');
+            Route::get('/seo',        'CinemeetController@seo')            ->name('seo');
+            Route::post('/seo',       'CinemeetController@updateSeo');
+            Route::get('/server',     'CinemeetController@serverSettings') ->name('server');
+            Route::post('/server',    'CinemeetController@updateServerSettings');
+            Route::get('/api-docs',   'CinemeetController@apiDocs')        ->name('api-docs');
+            Route::post('/restart',   'CinemeetController@restart')        ->name('restart');
+            Route::get('/status',     'CinemeetController@getStatus')      ->name('status');
+        });
+        // ─────────────────────────────────────────────────────────────────────
+
         Route::get('whatsapp', 'WhatsappController@index');
         Route::get('whatsapp/lists', 'WhatsappController@lists');
         Route::post('whatsapp/lists/save', 'WhatsappController@saveList');
