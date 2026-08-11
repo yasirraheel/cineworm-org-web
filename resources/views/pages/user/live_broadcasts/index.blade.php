@@ -5,49 +5,69 @@
 
 @section('content')
 <style>
+    /* Fix header dropdown z-index overlap */
+    header, .header-area, .navbar, .user-dropdown, .dropdown-menu {
+        z-index: 99999 !important;
+    }
+    
+    .breadcrumb-section {
+        padding: 15px 0 !important;
+        margin-bottom: 15px !important;
+    }
+    .breadcrumb-section h2 {
+        font-size: 20px !important;
+        margin-bottom: 0 !important;
+    }
+    .breadcrumb-section #breadcrumbs {
+        display: none !important;
+    }
+
     .meeting-workspace-card {
-        background: #181d27;
-        border: 1px solid #2d3748;
-        border-radius: 14px;
-        padding: 20px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        margin-bottom: 24px;
+        background: #141820;
+        border: 1px solid #2a3446;
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        margin-bottom: 16px;
+        z-index: 1;
+        position: relative;
     }
     .meeting-toolbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: 12px;
-        background: #0f131a;
-        border: 1px solid #252e3e;
-        border-radius: 10px;
-        padding: 14px 20px;
-        margin-bottom: 16px;
+        gap: 8px;
+        background: #0b0e14;
+        border: 1px solid #1e2636;
+        border-radius: 8px;
+        padding: 8px 14px;
+        margin-bottom: 10px;
     }
     .meeting-title-box h4 {
         margin: 0;
-        font-size: 17px;
+        font-size: 15px;
         font-weight: 700;
         color: #fff;
     }
     .meeting-title-box p {
-        margin: 2px 0 0;
-        font-size: 12px;
+        margin: 1px 0 0;
+        font-size: 11px;
         color: #94a3b8;
     }
     .btn-zoom-action {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 9px 16px;
-        border-radius: 8px;
-        font-size: 13px;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
         font-weight: 600;
         border: none;
         cursor: pointer;
         transition: all 0.2s;
         text-decoration: none !important;
+        white-space: nowrap;
     }
     .btn-zoom-primary { background: #2563eb; color: #fff !important; }
     .btn-zoom-primary:hover { background: #1d4ed8; color: #fff !important; }
@@ -56,15 +76,18 @@
     .btn-zoom-dark { background: #334155; color: #f8fafc !important; }
     .btn-zoom-dark:hover { background: #475569; color: #f8fafc !important; }
 
+    /* Compact Viewport Height Frame */
     .iframe-wrapper {
         position: relative;
         width: 100%;
-        height: 75vh;
-        min-height: 520px;
-        border-radius: 10px;
+        height: calc(85vh - 200px);
+        min-height: 420px;
+        max-height: 600px;
+        border-radius: 8px;
         overflow: hidden;
         background: #000;
-        border: 1px solid #2d3748;
+        border: 1px solid #2a3446;
+        z-index: 1;
     }
     iframe.cinemeet-frame {
         width: 100%;
@@ -74,23 +97,29 @@
     }
 
     .share-link-input {
-        background: #0f131a !important;
+        background: #0b0e14 !important;
         color: #60a5fa !important;
-        border: 1px solid #252e3e !important;
-        font-size: 13px;
+        border: 1px solid #1e2636 !important;
+        font-size: 12px;
         font-family: monospace;
+        height: 32px;
     }
 
     /* Modal Styling */
     .modal-content-dark {
-        background: #181d27;
+        background: #141820;
         color: #fff;
-        border: 1px solid #2d3748;
+        border: 1px solid #2a3446;
         border-radius: 12px;
     }
     .modal-header-dark {
-        border-bottom: 1px solid #2d3748;
+        border-bottom: 1px solid #2a3446;
+        padding: 12px 16px;
     }
+
+    /* Toggle Profile Sidebar */
+    .sidebar-collapsed { display: none !important; }
+    .main-workspace-full { flex: 0 0 100% !important; max-width: 100% !important; }
 </style>
 
 <div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
@@ -98,27 +127,26 @@
         <div class="row">
             <div class="col-xl-12">
                 <h2>Live Broadcast & Meetings</h2>
-                <nav id="breadcrumbs">
-                    <ul>
-                        <li><a href="{{ URL::to('/') }}">Home</a></li>
-                        <li>Live Broadcasts</li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </div>
 </div>
 
-<div class="edit-profile-area vfx-item-ptb vfx-item-info">
+<div class="edit-profile-area" style="padding: 10px 0 30px 0;">
     <div class="container-fluid">
         <div class="profile-section">
             <div class="row">
-                @include('pages.user._sidebar')
                 
-                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
+                {{-- Collapsible Sidebar --}}
+                <div class="col-lg-3 col-md-4 col-sm-12" id="profileSidebarCol">
+                    @include('pages.user._sidebar')
+                </div>
+                
+                {{-- Main Workspace Column --}}
+                <div class="col-lg-9 col-md-8 col-sm-12" id="mainWorkspaceCol">
 
                     @if(session('flash_message'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="background:#065f46; color:#a7f3d0; border:1px solid #047857;">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="background:#065f46; color:#a7f3d0; border:1px solid #047857; padding:8px 14px; font-size:13px;">
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:#a7f3d0;">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -132,14 +160,19 @@
                         {{-- Zoom-Style Toolbar --}}
                         <div class="meeting-toolbar">
                             <div class="meeting-title-box">
-                                <h4><i class="fa fa-video-camera" style="color:#60a5fa; margin-right:6px;"></i> {{ $meetingTitle }}</h4>
-                                <p>Room ID: <code>{{ $roomId }}</code></p>
+                                <h4><i class="fa fa-video-camera" style="color:#60a5fa; margin-right:4px;"></i> {{ $meetingTitle }}</h4>
+                                <p>Room: <code style="color:#60a5fa;">{{ $roomId }}</code></p>
                             </div>
 
-                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                {{-- Sidebar Toggle Button --}}
+                                <button type="button" class="btn-zoom-action btn-zoom-dark" onclick="toggleProfileSidebar()" title="Toggle Sidebar">
+                                    <i class="fa fa-columns"></i> <span id="sidebarToggleText">Expand Call</span>
+                                </button>
+
                                 {{-- Copy Link Button --}}
                                 <button type="button" class="btn-zoom-action btn-zoom-success" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
-                                    <i class="fa fa-copy"></i> Copy Invite Link
+                                    <i class="fa fa-copy"></i> Copy Link
                                 </button>
 
                                 {{-- Share WhatsApp --}}
@@ -160,15 +193,15 @@
                         </div>
 
                         {{-- Share Link Bar --}}
-                        <div class="row m-b-15" style="margin-bottom: 16px;">
+                        <div class="row" style="margin-bottom: 8px;">
                             <div class="col-12">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" style="background:#0f131a; border-color:#252e3e; color:#94a3b8; font-size:12px;">Guest Share Link</span>
+                                        <span class="input-group-text" style="background:#0b0e14; border-color:#1e2636; color:#94a3b8; font-size:11px; height:32px; padding:0 8px;">Guest Share Link</span>
                                     </div>
                                     <input type="text" id="shareUrlInput" class="form-control share-link-input" value="{{ $shareableJoinUrl }}" readonly>
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" style="background:#252e3e; color:#fff; border-color:#252e3e;" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
+                                        <button class="btn btn-outline-secondary" type="button" style="background:#1e2636; color:#fff; border-color:#1e2636; height:32px; font-size:11px; padding:0 10px;" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
                                             <i class="fa fa-clone"></i> Copy
                                         </button>
                                     </div>
@@ -189,15 +222,15 @@
                     </div>
 
                     {{-- Meeting History Table --}}
-                    <div class="meeting-workspace-card" style="margin-top:24px;">
-                        <h4 style="color:#fff; font-size:16px; font-weight:700; margin-bottom:16px;">
+                    <div class="meeting-workspace-card" style="margin-top:16px;">
+                        <h4 style="color:#fff; font-size:15px; font-weight:700; margin-bottom:12px;">
                             <i class="fa fa-history" style="color:#c084fc; margin-right:6px;"></i> My Created Meetings History
                         </h4>
 
                         <div class="table-responsive">
-                            <table class="table table-bordered" style="color: #fff; border-color: rgba(255,255,255,0.08);">
+                            <table class="table table-bordered table-sm" style="color: #fff; border-color: rgba(255,255,255,0.08); font-size:12px;">
                                 <thead>
-                                    <tr style="background:#0f131a;">
+                                    <tr style="background:#0b0e14;">
                                         <th style="border-color: rgba(255,255,255,0.08); color:#94a3b8;">Meeting Title</th>
                                         <th style="border-color: rgba(255,255,255,0.08); color:#94a3b8;">Room ID</th>
                                         <th style="border-color: rgba(255,255,255,0.08); color:#94a3b8;">Created Date</th>
@@ -213,22 +246,22 @@
                                             <td style="border-color: rgba(255,255,255,0.08); color:#60a5fa; font-family:monospace;">
                                                 {{ $broadcast->zoom_meeting_id }}
                                             </td>
-                                            <td style="border-color: rgba(255,255,255,0.08); color:#94a3b8; font-size:12px;">
+                                            <td style="border-color: rgba(255,255,255,0.08); color:#94a3b8;">
                                                 {{ $broadcast->created_at ? $broadcast->created_at->format('M d, Y H:i') : '—' }}
                                             </td>
                                             <td style="border-color: rgba(255,255,255,0.08);" class="text-center">
-                                                <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-primary waves-effect" style="font-size:11px; padding:4px 10px;">
-                                                    <i class="fa fa-sign-in"></i> Open Call
+                                                <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-primary waves-effect" style="font-size:11px; padding:2px 8px;">
+                                                    <i class="fa fa-sign-in"></i> Open
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-dark waves-effect" style="font-size:11px; padding:4px 10px; background:#334155; color:#fff;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
+                                                <button type="button" class="btn btn-sm btn-dark waves-effect" style="font-size:11px; padding:2px 8px; background:#334155; color:#fff;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}')">
                                                     <i class="fa fa-copy"></i> Link
                                                 </button>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center" style="border-color: rgba(255,255,255,0.08); padding: 30px; color:#64748b;">
-                                                <i class="fa fa-video-camera" style="font-size:28px; display:block; margin-bottom:10px; opacity:0.3;"></i>
+                                            <td colspan="4" class="text-center" style="border-color: rgba(255,255,255,0.08); padding: 20px; color:#64748b;">
+                                                <i class="fa fa-video-camera" style="font-size:24px; display:block; margin-bottom:8px; opacity:0.3;"></i>
                                                 No meeting rooms created yet. Click <strong>"New Meeting"</strong> above to start your first live call!
                                             </td>
                                         </tr>
@@ -237,7 +270,7 @@
                             </table>
                         </div>
 
-                        <div style="margin-top:16px;">
+                        <div style="margin-top:10px;">
                             @include('_particles.pagination', ['paginator' => $live_broadcasts])
                         </div>
                     </div>
@@ -249,11 +282,11 @@
 </div>
 
 {{-- New Meeting Modal --}}
-<div class="modal fade" id="newMeetingModal" tabindex="-1" role="dialog" aria-labelledby="newMeetingModalLabel" aria-hidden="true">
+<div class="modal fade" id="newMeetingModal" tabindex="-1" role="dialog" aria-labelledby="newMeetingModalLabel" aria-hidden="true" style="z-index:999999 !important;">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content modal-content-dark">
             <div class="modal-header modal-header-dark">
-                <h5 class="modal-title" id="newMeetingModalLabel" style="color:#fff; font-weight:700;">
+                <h5 class="modal-title" id="newMeetingModalLabel" style="color:#fff; font-weight:700; font-size:15px;">
                     <i class="fa fa-video-camera text-primary"></i> Create Instant Live Meeting
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:#fff;">
@@ -262,16 +295,16 @@
             </div>
             <form action="{{ URL::to('user/live_broadcasts/create') }}" method="POST">
                 {{ csrf_field() }}
-                <div class="modal-body">
+                <div class="modal-body" style="padding:16px;">
                     <div class="form-group">
-                        <label style="color:#cbd5e1; font-weight:600; font-size:13px;">Meeting Topic / Title</label>
-                        <input type="text" name="title" class="form-control" placeholder="e.g. Weekly Strategy Sync, Film Review..." style="background:#0f131a; color:#fff; border:1px solid #252e3e;" value="{{ Auth::user()->name }}'s Live Meeting">
+                        <label style="color:#cbd5e1; font-weight:600; font-size:12px;">Meeting Topic / Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Weekly Strategy Sync, Film Review..." style="background:#0b0e14; color:#fff; border:1px solid #1e2636; font-size:13px;" value="{{ Auth::user()->name }}'s Live Meeting">
                         <small style="color:#94a3b8; font-size:11px;">Guests will see this topic when joining your meeting link.</small>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-top:1px solid #2d3748;">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" style="background:#2563eb; border:none; font-weight:600;">
+                <div class="modal-footer" style="border-top:1px solid #2a3446; padding:10px 16px;">
+                    <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary" style="background:#2563eb; border:none; font-weight:600;">
                         <i class="fa fa-play-circle"></i> Start Meeting Now
                     </button>
                 </div>
@@ -308,6 +341,22 @@ function toggleIframeFullscreen() {
         if (document.exitFullscreen) {
             document.exitFullscreen();
         }
+    }
+}
+
+function toggleProfileSidebar() {
+    var sidebar = document.getElementById('profileSidebarCol');
+    var mainCol = document.getElementById('mainWorkspaceCol');
+    var btnText = document.getElementById('sidebarToggleText');
+    
+    if (sidebar.classList.contains('sidebar-collapsed')) {
+        sidebar.classList.remove('sidebar-collapsed');
+        mainCol.classList.remove('main-workspace-full');
+        btnText.textContent = 'Expand Call';
+    } else {
+        sidebar.classList.add('sidebar-collapsed');
+        mainCol.classList.add('main-workspace-full');
+        btnText.textContent = 'Show Profile';
     }
 }
 </script>
