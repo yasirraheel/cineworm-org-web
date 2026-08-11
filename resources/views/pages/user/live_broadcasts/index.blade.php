@@ -5,20 +5,9 @@
 
 @section('content')
 <style>
+    /* Fix header dropdown z-index overlap */
     header, .header-area, .navbar, .user-dropdown, .dropdown-menu {
         z-index: 99999 !important;
-    }
-    
-    .breadcrumb-section {
-        padding: 15px 0 !important;
-        margin-bottom: 15px !important;
-    }
-    .breadcrumb-section h2 {
-        font-size: 20px !important;
-        margin-bottom: 0 !important;
-    }
-    .breadcrumb-section #breadcrumbs {
-        display: none !important;
     }
 
     .meeting-workspace-card {
@@ -118,9 +107,6 @@
         padding: 12px 16px;
     }
 
-    .sidebar-collapsed { display: none !important; }
-    .main-workspace-full { flex: 0 0 100% !important; max-width: 100% !important; }
-
     .lobby-hero-card {
         background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
         border: 1px solid #334155;
@@ -148,23 +134,27 @@
         <div class="row">
             <div class="col-xl-12">
                 <h2>Live Broadcast & Meetings</h2>
+                <nav id="breadcrumbs">
+                    <ul>
+                        <li><a href="{{ URL::to('/') }}">Home</a></li>
+                        <li>Live Broadcasts</li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
 </div>
 
-<div class="edit-profile-area" style="padding: 10px 0 30px 0;">
+<div class="edit-profile-area vfx-item-ptb vfx-item-info">
     <div class="container-fluid">
         <div class="profile-section">
             <div class="row">
                 
-                {{-- Collapsible Sidebar --}}
-                <div class="col-lg-3 col-md-4 col-sm-12" id="profileSidebarCol">
-                    @include('pages.user._sidebar')
-                </div>
+                {{-- Standard User Sidebar (Includes its own col-lg-3 col-md-4) --}}
+                @include('pages.user._sidebar')
                 
-                {{-- Main Workspace Column --}}
-                <div class="col-lg-9 col-md-8 col-sm-12" id="mainWorkspaceCol">
+                {{-- Main Content Workspace Column --}}
+                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
 
                     @if(session('flash_message'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert" style="background:#065f46; color:#a7f3d0; border:1px solid #047857; padding:8px 14px; font-size:13px;">
@@ -191,11 +181,6 @@
                                     <a href="{{ URL::to('user/live_broadcasts') }}" class="btn-zoom-action btn-zoom-danger" onclick="return confirm('Leave this video call?')">
                                         <i class="fa fa-phone"></i> Leave Call
                                     </a>
-
-                                    {{-- Sidebar Toggle Button --}}
-                                    <button type="button" class="btn-zoom-action btn-zoom-dark" onclick="toggleProfileSidebar()" title="Toggle Sidebar">
-                                        <i class="fa fa-columns"></i> <span id="sidebarToggleText">Expand Call</span>
-                                    </button>
 
                                     {{-- Copy Link Button --}}
                                     <button type="button" class="btn-zoom-action btn-zoom-success" onclick="copyInviteLink('{{ $shareableJoinUrl }}')">
@@ -382,24 +367,6 @@ function toggleIframeFullscreen() {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
-        }
-    }
-}
-
-function toggleProfileSidebar() {
-    var sidebar = document.getElementById('profileSidebarCol');
-    var mainCol = document.getElementById('mainWorkspaceCol');
-    var btnText = document.getElementById('sidebarToggleText');
-    
-    if (sidebar && mainCol) {
-        if (sidebar.classList.contains('sidebar-collapsed')) {
-            sidebar.classList.remove('sidebar-collapsed');
-            mainCol.classList.remove('main-workspace-full');
-            if (btnText) btnText.textContent = 'Expand Call';
-        } else {
-            sidebar.classList.add('sidebar-collapsed');
-            mainCol.classList.add('main-workspace-full');
-            if (btnText) btnText.textContent = 'Show Profile';
         }
     }
 }
