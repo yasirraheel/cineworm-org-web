@@ -50,6 +50,159 @@
         border: none;
         display: block;
     }
+
+    /* Guided Tour Modal Styles matching native app theme */
+    .tour-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .tour-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .tour-card {
+        background: #141821;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 480px;
+        padding: 28px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+        position: relative;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+    }
+
+    .tour-overlay.active .tour-card {
+        transform: translateY(0);
+    }
+
+    .tour-close-btn {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        background: transparent;
+        border: none;
+        color: #888;
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .tour-close-btn:hover {
+        color: #fff;
+    }
+
+    .tour-icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        background: rgba(229, 9, 20, 0.15);
+        border: 1px solid rgba(229, 9, 20, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        color: #e50914;
+        font-size: 24px;
+    }
+
+    .tour-title {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .tour-description {
+        color: #ccc;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 22px;
+        min-height: 60px;
+    }
+
+    .tour-dots {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .tour-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .tour-dot.active {
+        background: #e50914;
+        width: 22px;
+        border-radius: 10px;
+    }
+
+    .tour-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tour-btn-secondary {
+        background: transparent;
+        border: none;
+        color: #aaa;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 8px 14px;
+        border-radius: 4px;
+        transition: color 0.2s ease;
+    }
+
+    .tour-btn-secondary:hover {
+        color: #fff;
+    }
+
+    .tour-btn-primary {
+        background: #e50914;
+        color: #fff;
+        border: none;
+        padding: 9px 22px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s ease;
+    }
+
+    .tour-btn-primary:hover {
+        background: #b80710;
+        color: #fff;
+    }
 </style>
 
 <div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
@@ -90,6 +243,9 @@
                                 <p style="color:#ccc;font-size:14px;">Manage and customize your live video meeting rooms.</p>
                             </div>
                             <div class="col-md-6 text-right" style="text-align: right; padding-top: 10px;">
+                                <button type="button" onclick="startLiveTour(true);" class="vfx-item-btn-danger text-uppercase" style="background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; margin-right:5px;">
+                                    <i class="fa fa-question-circle"></i> Quick Tour
+                                </button>
                                 <a href="javascript:void(0);" onclick="openNewMeetingModal();" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; margin-right:5px;">
                                     <i class="fa fa-sliders"></i> Customize & Create
                                 </a>
@@ -198,7 +354,7 @@
                                                 <button type="button" class="btn btn-sm btn-info" style="background:#17a2b8; border:none; color:#fff; padding:5px 12px; font-size:13px; margin-right:4px;" onclick="openEditMeetingModal('{{ $broadcast->id }}', '{{ addslashes($broadcast->title) }}', '{{ addslashes($broadcast->zoom_meeting_password) }}')">
                                                     <i class="fa fa-sliders"></i> Customize
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:5px 12px; font-size:13px;" onclick="copyInviteLink('{{ $cinemeetBaseUrl }}/join?room={{ $broadcast->zoom_meeting_id }}@if(!empty($broadcast->zoom_meeting_password))&roomPassword={{ urlencode($broadcast->zoom_meeting_password) }}@endif')">
+                                                <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:5px 12px; font-size:13px;" onclick="copyInviteLink('{{ url('meeting/join/' . $broadcast->zoom_meeting_id) }}@if(!empty($broadcast->zoom_meeting_password))?roomPassword={{ urlencode($broadcast->zoom_meeting_password) }}@endif')">
                                                     <i class="fa fa-copy"></i> Copy Link
                                                 </button>
                                             </td>
@@ -226,7 +382,155 @@
     </div>
 </div>
 
+{{-- Interactive Tour Modal Overlay Component --}}
+<div id="liveTourOverlay" class="tour-overlay">
+    <div class="tour-card">
+        <button type="button" class="tour-close-btn" onclick="closeLiveTour()">&times;</button>
+
+        <div id="tourIconBox" class="tour-icon-box">
+            <i id="tourIcon" class="fa fa-video-camera"></i>
+        </div>
+
+        <h3 id="tourTitle" class="tour-title">Welcome to Live Broadcasts</h3>
+        <p id="tourDescription" class="tour-description">
+            Host HD video meetings, webinars, screen sharing, and interactive breakout rooms directly inside your CineWorm workspace.
+        </p>
+
+        <div id="tourDots" class="tour-dots">
+            <span class="tour-dot active" onclick="goToTourStep(0)"></span>
+            <span class="tour-dot" onclick="goToTourStep(1)"></span>
+            <span class="tour-dot" onclick="goToTourStep(2)"></span>
+            <span class="tour-dot" onclick="goToTourStep(3)"></span>
+            <span class="tour-dot" onclick="goToTourStep(4)"></span>
+        </div>
+
+        <div class="tour-footer">
+            <button type="button" id="tourPrevBtn" class="tour-btn-secondary" onclick="prevTourStep()">
+                <i class="fa fa-chevron-left"></i> Back
+            </button>
+            <button type="button" class="tour-btn-secondary" onclick="closeLiveTour()">Skip Tour</button>
+            <button type="button" id="tourNextBtn" class="tour-btn-primary" onclick="nextTourStep()">
+                Next <i class="fa fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+// Guided Onboarding Tour Steps Configuration
+var tourSteps = [
+    {
+        icon: 'fa-video-camera',
+        title: 'Welcome to Live Broadcasts',
+        desc: 'Host HD video meetings, webinars, screen sharing, and interactive breakout rooms directly inside your CineWorm workspace.'
+    },
+    {
+        icon: 'fa-sliders',
+        title: 'Customize & Create Meetings',
+        desc: 'Click "Customize & Create" to set custom topics, room security passwords, default microphone/camera states, screen sharing, and group chat rules.'
+    },
+    {
+        icon: 'fa-share-alt',
+        title: 'Share Native Meeting Links',
+        desc: 'Share native cineworm.org/meeting/join/... links via 1-click Copy Link or WhatsApp. Guests are protected by subscription & account authentication.'
+    },
+    {
+        icon: 'fa-desktop',
+        title: 'In-Call Controls & Fullscreen',
+        desc: 'Enjoy full audio/video controls, screen sharing, interactive whiteboard, group chat, and 1-click fullscreen view directly inside your call window.'
+    },
+    {
+        icon: 'fa-play-circle',
+        title: 'Ready to Broadcast!',
+        desc: 'You are all set! Click "Start Call" or "Customize & Create" to launch your live meeting right away.'
+    }
+];
+
+var currentTourStep = 0;
+
+function startLiveTour(forceShow) {
+    if (!forceShow && localStorage.getItem('cineworm_live_tour_seen') === 'true') {
+        return;
+    }
+    currentTourStep = 0;
+    renderTourStep();
+    var overlay = document.getElementById('liveTourOverlay');
+    if (overlay) {
+        overlay.classList.add('active');
+    }
+}
+
+function renderTourStep() {
+    var step = tourSteps[currentTourStep];
+    document.getElementById('tourIcon').className = 'fa ' + step.icon;
+    document.getElementById('tourTitle').innerText = step.title;
+    document.getElementById('tourDescription').innerText = step.desc;
+
+    // Update dots
+    var dots = document.querySelectorAll('.tour-dot');
+    dots.forEach(function(dot, idx) {
+        if (idx === currentTourStep) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+
+    // Update Prev button
+    var prevBtn = document.getElementById('tourPrevBtn');
+    if (currentTourStep === 0) {
+        prevBtn.style.opacity = '0.4';
+        prevBtn.style.pointerEvents = 'none';
+    } else {
+        prevBtn.style.opacity = '1';
+        prevBtn.style.pointerEvents = 'auto';
+    }
+
+    // Update Next button label
+    var nextBtn = document.getElementById('tourNextBtn');
+    if (currentTourStep === tourSteps.length - 1) {
+        nextBtn.innerHTML = 'Get Started <i class="fa fa-check"></i>';
+    } else {
+        nextBtn.innerHTML = 'Next <i class="fa fa-chevron-right"></i>';
+    }
+}
+
+function nextTourStep() {
+    if (currentTourStep < tourSteps.length - 1) {
+        currentTourStep++;
+        renderTourStep();
+    } else {
+        closeLiveTour();
+    }
+}
+
+function prevTourStep() {
+    if (currentTourStep > 0) {
+        currentTourStep--;
+        renderTourStep();
+    }
+}
+
+function goToTourStep(index) {
+    currentTourStep = index;
+    renderTourStep();
+}
+
+function closeLiveTour() {
+    var overlay = document.getElementById('liveTourOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+    localStorage.setItem('cineworm_live_tour_seen', 'true');
+}
+
+// Auto-launch tour for first-time visitors
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        startLiveTour(false);
+    }, 600);
+});
+
 function openNewMeetingModal() {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
