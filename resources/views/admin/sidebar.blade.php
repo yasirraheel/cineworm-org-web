@@ -229,7 +229,7 @@
                                 <a href="{{ URL::to('admin/payment_gateway') }}"
                                     class="{{ classActivePath('payment_gateway') }}">
                                     <i class="fa fa-money"></i>
-                                    <span>{{ trans('words.payment_gateway') }}</span>
+                                    <span>Payment Gateways</span>
                                 </a>
                             </li>
                         </ul>
