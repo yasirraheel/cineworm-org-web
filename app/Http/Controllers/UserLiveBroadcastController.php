@@ -85,7 +85,7 @@ class UserLiveBroadcastController extends Controller
         $durationParam = $request->get('duration', 'unlimited');
 
         $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}{$passParam}&audio={$audioParam}&video={$videoParam}&screen={$screenParam}&chat={$chatParam}&hide={$hideParam}&notify={$notifyParam}&duration={$durationParam}";
-        $shareableJoinUrl = "{$cinemeetBaseUrl}/join?room={$roomId}" . (!empty($roomPassword) ? ('&roomPassword=' . urlencode($roomPassword)) : '');
+        $shareableJoinUrl = url("meeting/join/{$roomId}") . (!empty($roomPassword) ? ('?roomPassword=' . urlencode($roomPassword)) : '');
 
         // Paginated history list of broadcasts
         $live_broadcasts = LiveBroadcast::where('user_id', $user->id)
@@ -146,7 +146,7 @@ class UserLiveBroadcastController extends Controller
         $chat   = $request->get('chat', '1');
         $notify = $request->get('notify', '1');
 
-        $shareUrl = "{$cinemeetBaseUrl}/join?room={$roomId}" . (!empty($password) ? ('&roomPassword=' . urlencode($password)) : '');
+        $shareUrl = url("meeting/join/{$roomId}") . (!empty($password) ? ('?roomPassword=' . urlencode($password)) : '');
 
         $broadcast = new LiveBroadcast();
         $broadcast->user_id               = $user->id;
