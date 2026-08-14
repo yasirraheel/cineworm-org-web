@@ -51,155 +51,177 @@
         display: block;
     }
 
-    /* Guided Tour Modal Styles matching native app theme */
-    .tour-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.75);
-        backdrop-filter: blur(4px);
-        z-index: 999999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
+    /* Element Spotlight & Anchored Tooltip Popover Styles */
+    .tour-spotlight {
+        position: absolute;
+        border: 2px solid #e50914;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.78), 0 0 25px rgba(229, 9, 20, 0.7);
+        border-radius: 8px;
+        z-index: 999990;
+        pointer-events: none;
+        transition: all 0.35s cubic-bezier(0.2, 0, 0.2, 1);
         opacity: 0;
         visibility: hidden;
-        transition: all 0.3s ease;
     }
 
-    .tour-overlay.active {
+    .tour-spotlight.active {
         opacity: 1;
         visibility: visible;
     }
 
-    .tour-card {
-        background: #141821;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 12px;
-        width: 100%;
-        max-width: 480px;
-        padding: 28px;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
-        position: relative;
-        transform: translateY(20px);
-        transition: transform 0.3s ease;
-    }
-
-    .tour-overlay.active .tour-card {
-        transform: translateY(0);
-    }
-
-    .tour-close-btn {
+    .tour-popover {
         position: absolute;
-        top: 16px;
-        right: 18px;
+        z-index: 999995;
+        background: #141821;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 10px;
+        width: 360px;
+        padding: 20px;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .tour-popover.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .tour-popover-arrow {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: #141821;
+        border-left: 1px solid rgba(255, 255, 255, 0.18);
+        border-top: 1px solid rgba(255, 255, 255, 0.18);
+        transform: rotate(45deg);
+        top: -7px;
+        left: 24px;
+    }
+
+    .tour-popover-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .tour-step-badge {
+        background: rgba(229, 9, 20, 0.15);
+        color: #e50914;
+        border: 1px solid rgba(229, 9, 20, 0.4);
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+    }
+
+    .tour-popover-close {
         background: transparent;
         border: none;
         color: #888;
-        font-size: 20px;
+        font-size: 18px;
         cursor: pointer;
-        transition: color 0.2s ease;
     }
 
-    .tour-close-btn:hover {
+    .tour-popover-close:hover {
         color: #fff;
     }
 
-    .tour-icon-box {
-        width: 54px;
-        height: 54px;
-        border-radius: 12px;
-        background: rgba(229, 9, 20, 0.15);
-        border: 1px solid rgba(229, 9, 20, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 18px;
-        color: #e50914;
-        font-size: 24px;
-    }
-
-    .tour-title {
+    .tour-popover-title {
         color: #fff;
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .tour-description {
+    .tour-popover-title i {
+        color: #e50914;
+    }
+
+    .tour-popover-desc {
         color: #ccc;
-        font-size: 14px;
-        line-height: 1.6;
-        margin-bottom: 22px;
-        min-height: 60px;
+        font-size: 13px;
+        line-height: 1.55;
+        margin-bottom: 16px;
     }
 
-    .tour-dots {
+    .tour-popover-dots {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        margin-bottom: 24px;
+        gap: 6px;
+        margin-bottom: 14px;
     }
 
-    .tour-dot {
-        width: 9px;
-        height: 9px;
+    .tour-popover-dot {
+        width: 7px;
+        height: 7px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.2);
         transition: all 0.3s ease;
         cursor: pointer;
     }
 
-    .tour-dot.active {
+    .tour-popover-dot.active {
         background: #e50914;
-        width: 22px;
-        border-radius: 10px;
+        width: 18px;
+        border-radius: 8px;
     }
 
-    .tour-footer {
+    .tour-popover-footer {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-top: 16px;
+        padding-top: 12px;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .tour-btn-secondary {
+    .tour-btn-prev {
         background: transparent;
         border: none;
         color: #aaa;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
         cursor: pointer;
-        padding: 8px 14px;
-        border-radius: 4px;
-        transition: color 0.2s ease;
     }
 
-    .tour-btn-secondary:hover {
+    .tour-btn-prev:hover {
         color: #fff;
     }
 
-    .tour-btn-primary {
+    .tour-btn-skip {
+        background: transparent;
+        border: none;
+        color: #777;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .tour-btn-skip:hover {
+        color: #bbb;
+    }
+
+    .tour-btn-next {
         background: #e50914;
         color: #fff;
         border: none;
-        padding: 9px 22px;
-        font-size: 13px;
+        padding: 7px 16px;
+        font-size: 12px;
         font-weight: 600;
-        border-radius: 6px;
+        border-radius: 5px;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 6px;
-        transition: background 0.2s ease;
+        gap: 4px;
     }
 
-    .tour-btn-primary:hover {
+    .tour-btn-next:hover {
         background: #b80710;
         color: #fff;
     }
@@ -237,20 +259,20 @@
                         @include('pages.user.whatsapp._flash')
 
                         {{-- Header Row --}}
-                        <div class="row" style="margin-bottom: 20px;">
+                        <div class="row" style="margin-bottom: 20px;" id="tourHeaderSection">
                             <div class="col-md-6">
-                                <h3 style="color:#fff;margin-bottom:5px;"><i class="fa fa-video-camera" style="color:#e50914;margin-right:8px;"></i> Live Broadcasts</h3>
+                                <h3 style="color:#fff;margin-bottom:5px;" id="tourHeaderTitle"><i class="fa fa-video-camera" style="color:#e50914;margin-right:8px;"></i> Live Broadcasts</h3>
                                 <p style="color:#ccc;font-size:14px;">Manage and customize your live video meeting rooms.</p>
                             </div>
                             <div class="col-md-6 text-right" style="text-align: right; padding-top: 10px;">
-                                <button type="button" onclick="startLiveTour(true);" class="vfx-item-btn-danger text-uppercase" style="background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; margin-right:5px;">
+                                <button type="button" onclick="startLiveTour(true);" class="vfx-item-btn-danger text-uppercase" style="background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; margin-right:5px;" id="btnQuickTour">
                                     <i class="fa fa-question-circle"></i> Quick Tour
                                 </button>
-                                <a href="javascript:void(0);" onclick="openNewMeetingModal();" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; margin-right:5px;">
+                                <a href="javascript:void(0);" onclick="openNewMeetingModal();" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; margin-right:5px;" id="btnCustomizeCreate">
                                     <i class="fa fa-sliders"></i> Customize & Create
                                 </a>
                                 @if(!$inCall)
-                                    <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; background-color:#28a745;">
+                                    <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; background-color:#28a745;" id="btnStartCallTop">
                                         <i class="fa fa-play"></i> Start Call
                                     </a>
                                 @endif
@@ -259,7 +281,7 @@
 
                         @if($inCall)
                             {{-- ACTIVE CALL WORKSPACE --}}
-                            <div class="cineworm-meeting-box">
+                            <div class="cineworm-meeting-box" id="inCallWorkspace">
                                 
                                 {{-- Toolbar --}}
                                 <div class="cineworm-toolbar">
@@ -299,7 +321,7 @@
                                 </div>
 
                                 {{-- Guest Link Bar --}}
-                                <div style="margin-bottom: 15px;">
+                                <div style="margin-bottom: 15px;" id="shareLinkBox">
                                     <label style="color:#ccc; font-size:13px; font-weight:600; margin-bottom:5px; display:block;">Guest Share Link</label>
                                     <div style="display: flex; align-items: center; width: 100%; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.4);">
                                         <input type="text" id="shareUrlInput" value="{{ $shareableJoinUrl }}" readonly style="flex: 1; background: transparent; border: none; color: #fff; padding: 10px 14px; font-size: 14px; font-family: monospace; outline: none;">
@@ -323,7 +345,7 @@
                         @endif
 
                         {{-- HISTORY TABLE --}}
-                        <div class="table-responsive" style="margin-top: 15px;">
+                        <div class="table-responsive" style="margin-top: 15px;" id="historyTableBox">
                             <table class="table table-bordered" style="color: #fff; border-color: rgba(255,255,255,0.1);">
                                 <thead>
                                     <tr>
@@ -382,67 +404,77 @@
     </div>
 </div>
 
-{{-- Interactive Tour Modal Overlay Component --}}
-<div id="liveTourOverlay" class="tour-overlay">
-    <div class="tour-card">
-        <button type="button" class="tour-close-btn" onclick="closeLiveTour()">&times;</button>
+{{-- Dynamic Element Spotlight & Floating Popover Tooltip Components --}}
+<div id="tourSpotlight" class="tour-spotlight"></div>
 
-        <div id="tourIconBox" class="tour-icon-box">
-            <i id="tourIcon" class="fa fa-video-camera"></i>
-        </div>
+<div id="tourPopover" class="tour-popover">
+    <div class="tour-popover-arrow" id="tourPopoverArrow"></div>
+    
+    <div class="tour-popover-header">
+        <span id="tourStepBadge" class="tour-step-badge">Step 1 of 5</span>
+        <button type="button" class="tour-popover-close" onclick="closeLiveTour()">&times;</button>
+    </div>
 
-        <h3 id="tourTitle" class="tour-title">Welcome to Live Broadcasts</h3>
-        <p id="tourDescription" class="tour-description">
-            Host HD video meetings, webinars, screen sharing, and interactive breakout rooms directly inside your CineWorm workspace.
-        </p>
+    <div id="tourPopoverTitle" class="tour-popover-title">
+        <i id="tourPopoverIcon" class="fa fa-video-camera"></i>
+        <span id="tourPopoverTitleText">Live Broadcasts</span>
+    </div>
 
-        <div id="tourDots" class="tour-dots">
-            <span class="tour-dot active" onclick="goToTourStep(0)"></span>
-            <span class="tour-dot" onclick="goToTourStep(1)"></span>
-            <span class="tour-dot" onclick="goToTourStep(2)"></span>
-            <span class="tour-dot" onclick="goToTourStep(3)"></span>
-            <span class="tour-dot" onclick="goToTourStep(4)"></span>
-        </div>
+    <p id="tourPopoverDesc" class="tour-popover-desc">
+        Welcome! Here you can manage and launch live video calls directly inside CineWorm.
+    </p>
 
-        <div class="tour-footer">
-            <button type="button" id="tourPrevBtn" class="tour-btn-secondary" onclick="prevTourStep()">
-                <i class="fa fa-chevron-left"></i> Back
-            </button>
-            <button type="button" class="tour-btn-secondary" onclick="closeLiveTour()">Skip Tour</button>
-            <button type="button" id="tourNextBtn" class="tour-btn-primary" onclick="nextTourStep()">
-                Next <i class="fa fa-chevron-right"></i>
-            </button>
-        </div>
+    <div id="tourPopoverDots" class="tour-popover-dots">
+        <span class="tour-popover-dot active" onclick="goToTourStep(0)"></span>
+        <span class="tour-popover-dot" onclick="goToTourStep(1)"></span>
+        <span class="tour-popover-dot" onclick="goToTourStep(2)"></span>
+        <span class="tour-popover-dot" onclick="goToTourStep(3)"></span>
+        <span class="tour-popover-dot" onclick="goToTourStep(4)"></span>
+    </div>
+
+    <div class="tour-popover-footer">
+        <button type="button" id="tourPrevBtn" class="tour-btn-prev" onclick="prevTourStep()">
+            <i class="fa fa-chevron-left"></i> Back
+        </button>
+        <button type="button" class="tour-btn-skip" onclick="closeLiveTour()">Skip</button>
+        <button type="button" id="tourNextBtn" class="tour-btn-next" onclick="nextTourStep()">
+            Next <i class="fa fa-chevron-right"></i>
+        </button>
     </div>
 </div>
 
 <script>
-// Guided Onboarding Tour Steps Configuration
+// Element-Targeting Guided Tour Steps Configuration
 var tourSteps = [
     {
+        target: '#tourHeaderTitle',
         icon: 'fa-video-camera',
-        title: 'Welcome to Live Broadcasts',
-        desc: 'Host HD video meetings, webinars, screen sharing, and interactive breakout rooms directly inside your CineWorm workspace.'
+        title: 'Live Broadcasts Workspace',
+        desc: 'This is your Live Meetings dashboard where you can launch, customize, and manage HD video calls directly inside CineWorm.'
     },
     {
+        target: '#btnCustomizeCreate',
         icon: 'fa-sliders',
         title: 'Customize & Create Meetings',
-        desc: 'Click "Customize & Create" to set custom topics, room security passwords, default microphone/camera states, screen sharing, and group chat rules.'
+        desc: 'Click this button to configure your meeting topic, set a security password, and select default mic, camera, screen share & chat rules.'
     },
     {
-        icon: 'fa-share-alt',
-        title: 'Share Native Meeting Links',
-        desc: 'Share native cineworm.org/meeting/join/... links via 1-click Copy Link or WhatsApp. Guests are protected by subscription & account authentication.'
-    },
-    {
-        icon: 'fa-desktop',
-        title: 'In-Call Controls & Fullscreen',
-        desc: 'Enjoy full audio/video controls, screen sharing, interactive whiteboard, group chat, and 1-click fullscreen view directly inside your call window.'
-    },
-    {
+        target: '#btnStartCallTop',
         icon: 'fa-play-circle',
-        title: 'Ready to Broadcast!',
-        desc: 'You are all set! Click "Start Call" or "Customize & Create" to launch your live meeting right away.'
+        title: '1-Click Start Call',
+        desc: 'Click "Start Call" to immediately launch your live meeting workspace inside CineWorm!'
+    },
+    {
+        target: '#shareLinkBox',
+        icon: 'fa-share-alt',
+        title: 'Invite Guests with Native Links',
+        desc: 'Copy or share native cineworm.org/meeting/join/... links with your guests via WhatsApp or clipboard. Guests are protected by subscription login.'
+    },
+    {
+        target: '#historyTableBox',
+        icon: 'fa-list-alt',
+        title: 'Meeting History & Customization',
+        desc: 'View all your previously created meetings, re-start calls anytime, or click "Customize" to update security passwords and topics.'
     }
 ];
 
@@ -454,45 +486,88 @@ function startLiveTour(forceShow) {
     }
     currentTourStep = 0;
     renderTourStep();
-    var overlay = document.getElementById('liveTourOverlay');
-    if (overlay) {
-        overlay.classList.add('active');
-    }
 }
 
 function renderTourStep() {
     var step = tourSteps[currentTourStep];
-    document.getElementById('tourIcon').className = 'fa ' + step.icon;
-    document.getElementById('tourTitle').innerText = step.title;
-    document.getElementById('tourDescription').innerText = step.desc;
+    var targetEl = document.querySelector(step.target);
 
-    // Update dots
-    var dots = document.querySelectorAll('.tour-dot');
-    dots.forEach(function(dot, idx) {
-        if (idx === currentTourStep) {
-            dot.classList.add('active');
-        } else {
-            dot.classList.remove('active');
+    // Fallback to header if element not found
+    if (!targetEl) {
+        targetEl = document.querySelector('#tourHeaderTitle') || document.querySelector('.edit-profile-form');
+    }
+
+    if (!targetEl) return;
+
+    // Smooth scroll to target element
+    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    setTimeout(function() {
+        var rect = targetEl.getBoundingClientRect();
+        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+        var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+
+        // Position Spotlight
+        var spotlight = document.getElementById('tourSpotlight');
+        spotlight.style.top = (rect.top + scrollY - 6) + 'px';
+        spotlight.style.left = (rect.left + scrollX - 6) + 'px';
+        spotlight.style.width = (rect.width + 12) + 'px';
+        spotlight.style.height = (rect.height + 12) + 'px';
+        spotlight.classList.add('active');
+
+        // Position Popover Tooltip Box
+        var popover = document.getElementById('tourPopover');
+        var popoverWidth = 360;
+        var popoverLeft = rect.left + scrollX + (rect.width / 2) - (popoverWidth / 2);
+        var popoverTop = rect.bottom + scrollY + 14;
+
+        // Prevent offscreen positioning right
+        if (popoverLeft + popoverWidth > window.innerWidth - 20) {
+            popoverLeft = window.innerWidth - popoverWidth - 20;
         }
-    });
+        if (popoverLeft < 20) {
+            popoverLeft = 20;
+        }
 
-    // Update Prev button
-    var prevBtn = document.getElementById('tourPrevBtn');
-    if (currentTourStep === 0) {
-        prevBtn.style.opacity = '0.4';
-        prevBtn.style.pointerEvents = 'none';
-    } else {
-        prevBtn.style.opacity = '1';
-        prevBtn.style.pointerEvents = 'auto';
-    }
+        popover.style.top = popoverTop + 'px';
+        popover.style.left = popoverLeft + 'px';
 
-    // Update Next button label
-    var nextBtn = document.getElementById('tourNextBtn');
-    if (currentTourStep === tourSteps.length - 1) {
-        nextBtn.innerHTML = 'Get Started <i class="fa fa-check"></i>';
-    } else {
-        nextBtn.innerHTML = 'Next <i class="fa fa-chevron-right"></i>';
-    }
+        // Update Popover Contents
+        document.getElementById('tourStepBadge').innerText = 'Step ' + (currentTourStep + 1) + ' of ' + tourSteps.length;
+        document.getElementById('tourPopoverIcon').className = 'fa ' + step.icon;
+        document.getElementById('tourPopoverTitleText').innerText = step.title;
+        document.getElementById('tourPopoverDesc').innerText = step.desc;
+
+        // Update dots
+        var dots = document.querySelectorAll('.tour-popover-dot');
+        dots.forEach(function(dot, idx) {
+            if (idx === currentTourStep) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+
+        // Update Prev button
+        var prevBtn = document.getElementById('tourPrevBtn');
+        if (currentTourStep === 0) {
+            prevBtn.style.opacity = '0.4';
+            prevBtn.style.pointerEvents = 'none';
+        } else {
+            prevBtn.style.opacity = '1';
+            prevBtn.style.pointerEvents = 'auto';
+        }
+
+        // Update Next button label
+        var nextBtn = document.getElementById('tourNextBtn');
+        if (currentTourStep === tourSteps.length - 1) {
+            nextBtn.innerHTML = 'Got It! <i class="fa fa-check"></i>';
+        } else {
+            nextBtn.innerHTML = 'Next <i class="fa fa-chevron-right"></i>';
+        }
+
+        popover.classList.add('active');
+    }, 250);
 }
 
 function nextTourStep() {
@@ -517,12 +592,20 @@ function goToTourStep(index) {
 }
 
 function closeLiveTour() {
-    var overlay = document.getElementById('liveTourOverlay');
-    if (overlay) {
-        overlay.classList.remove('active');
-    }
+    var spotlight = document.getElementById('tourSpotlight');
+    var popover = document.getElementById('tourPopover');
+    if (spotlight) spotlight.classList.remove('active');
+    if (popover) popover.classList.remove('active');
     localStorage.setItem('cineworm_live_tour_seen', 'true');
 }
+
+// Window resize repositioning
+window.addEventListener('resize', function() {
+    var popover = document.getElementById('tourPopover');
+    if (popover && popover.classList.contains('active')) {
+        renderTourStep();
+    }
+});
 
 // Auto-launch tour for first-time visitors
 document.addEventListener('DOMContentLoaded', function() {
