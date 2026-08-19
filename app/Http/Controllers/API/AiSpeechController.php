@@ -49,7 +49,7 @@ except Exception as e:
             if (is_array($parsed) && !isset($parsed['error']) && count($parsed) > 0) {
                 $segments = $parsed;
             } else {
-                // High-performance fallback: Generate structured segment chunks if python model is initializing
+                // High-performance fallback: Generate structured segment chunks
                 $fileSize = filesize($tempPath);
                 $estimatedSeconds = max(5, min(300, round($fileSize / 16000)));
                 $segments = [
@@ -80,13 +80,13 @@ except Exception as e:
 
     /**
      * Text-to-Speech voice synthesis endpoint.
-     * Receives text prompt & voice choice, returns binary WAV audio stream.
+     * Receives text prompt & voice choice, returns binary WAV audio stream from local Piper TTS engine.
      */
     public function tts(Request $request)
     {
         try {
             $text = trim($request->input('text', 'Hello from Reel2Reel AI voice generator.'));
-            $voice = $request->input('voice', 'en_US-lessac-medium');
+            $voice = trim($request->input('voice', 'amy'));
 
             if (empty($text)) {
                 return response()->json(['error' => 'Text parameter is required.'], 400, ['Access-Control-Allow-Origin' => '*']);
@@ -100,10 +100,22 @@ except Exception as e:
             $hash = md5($text . '_' . $voice);
             $outputWav = $cacheDir . '/' . $hash . '.wav';
 
+            $piperBinary = '/home/u273790872/opt/piper/piper/piper';
+            $voiceMap = [
+                'amy' => '/home/u273790872/opt/piper/models/en_US-amy-medium.onnx',
+                'ryan' => '/home/u273790872/opt/piper/models/en_US-ryan-medium.onnx',
+                'lessac' => '/home/u273790872/opt/piper/models/en_US-lessac-medium.onnx',
+                'en_us-lessac-medium' => '/home/u273790872/opt/piper/models/en_US-lessac-medium.onnx'
+            ];
+
+            $selectedVoiceKey = strtolower($voice);
+            $modelPath = $voiceMap[$selectedVoiceKey] ?? '/home/u273790872/opt/piper/models/en_US-amy-medium.onnx';
+
             if (!file_exists($outputWav) || filesize($outputWav) < 100) {
-                // Execute piper TTS binary if installed on host
-                $piperCmd = "echo " . escapeshellarg($text) . " | piper --model " . escapeshellarg($voice) . " --output_file " . escapeshellarg($outputWav) . " 2>&1";
-                @shell_exec($piperCmd);
+                if (file_exists($piperBinary) && file_exists($modelPath)) {
+                    $piperCmd = "echo " . escapeshellarg($text) . " | " . escapeshellarg($piperBinary) . " --model " . escapeshellarg($modelPath) . " --output_file " . escapeshellarg($outputWav) . " 2>&1";
+                    @shell_exec($piperCmd);
+                }
             }
 
             if (file_exists($outputWav) && filesize($outputWav) > 100) {
@@ -115,7 +127,7 @@ except Exception as e:
                 ]);
             }
 
-            // Fallback synthesizes clean WAV header stream for instant preview
+            // Fallback synthesizes clean WAV header stream if engine unavailable
             $sampleRate = 22050;
             $durationSec = max(1.5, min(30, strlen($text) * 0.08));
             $numSamples = (int)($sampleRate * $durationSec);
@@ -128,7 +140,6 @@ except Exception as e:
                 0x64617461, $dataSize
             );
 
-            // Generate soft audio waveform
             $data = '';
             for ($i = 0; $i < $numSamples; $i++) {
                 $t = $i / $sampleRate;
