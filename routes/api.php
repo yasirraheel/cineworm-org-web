@@ -155,4 +155,22 @@ Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
 // Route::post('/otp_send', [OtpController::class, 'sendSmsRequest']);
  Route::post('/otp_send', [OtpController::class, 'sendSmsRequest']);
 
+    // Public Open-Source AI Speech-to-Text & TTS Routes for Reel2Reel
+    Route::options('ai/transcribe', function() {
+        return response('', 200, [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'POST, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, X-Requested-With, Authorization'
+        ]);
+    });
+    Route::options('ai/tts', function() {
+        return response('', 200, [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'POST, GET, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, X-Requested-With, Authorization'
+        ]);
+    });
+    Route::post('ai/transcribe', 'AiSpeechController@transcribe');
+    Route::match(['get', 'post'], 'ai/tts', 'AiSpeechController@tts');
+
 });
