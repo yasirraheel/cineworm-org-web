@@ -10,7 +10,7 @@ class AiSpeechController extends Controller
 {
     /**
      * Speech-to-Text / Auto-Caption transcription endpoint.
-     * Receives audio file upload and returns timestamped JSON segments.
+     * Receives audio file upload and returns timestamped JSON segments from Faster-Whisper AI engine.
      */
     public function transcribe(Request $request)
     {
@@ -26,49 +26,59 @@ class AiSpeechController extends Controller
             }
 
             $tempPath = $audioFile->getRealPath();
-            $segments = [];
+            $pythonBin = '/home/u273790872/opt/venv_whisper/bin/python3';
 
-            // Execute faster-whisper or python whisper CLI on host if available
-            $pythonCmd = "python3 -c \"
-import sys, json
+            if (!file_exists($pythonBin)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Whisper AI virtual environment not initialized.'
+                ], 500, ['Access-Control-Allow-Origin' => '*']);
+            }
+
+            $scriptId = uniqid();
+            $pythonScript = storage_path('app/transcribe_' . $scriptId . '.py');
+            $escapedPath = addslashes($tempPath);
+            $langCode = strtolower(substr($language, 0, 2));
+
+            $scriptContent = "import os, sys, json
+os.environ['OPENBLAS_NUM_THREADS'] = '2'
+os.environ['OMP_NUM_THREADS'] = '2'
+os.environ['MKL_NUM_THREADS'] = '2'
 try:
     from faster_whisper import WhisperModel
-    model = WhisperModel('tiny', device='cpu', compute_type='int8')
-    segments_raw, info = model.transcribe('{$tempPath}', language='{$language}')
-    res = []
-    for s in segments_raw:
-        res.append({'start': round(s.start, 2), 'end': round(s.end, 2), 'text': s.text.strip()})
+    model = WhisperModel('tiny', device='cpu', compute_type='int8', cpu_threads=2)
+    segments_raw, info = model.transcribe('{$escapedPath}', language='{$langCode}')
+    res = [{'start': round(s.start, 2), 'end': round(s.end, 2), 'text': s.text.strip()} for s in segments_raw]
     print(json.dumps(res))
 except Exception as e:
     print(json.dumps({'error': str(e)}))
-\" 2>&1";
+";
 
-            $output = @shell_exec($pythonCmd);
+            @file_put_contents($pythonScript, $scriptContent);
+
+            $output = @shell_exec("{$pythonBin} " . escapeshellarg($pythonScript) . " 2>&1");
+            @unlink($pythonScript);
+
             $parsed = @json_decode($output, true);
 
             if (is_array($parsed) && !isset($parsed['error']) && count($parsed) > 0) {
-                $segments = $parsed;
-            } else {
-                // High-performance fallback: Generate structured segment chunks
-                $fileSize = filesize($tempPath);
-                $estimatedSeconds = max(5, min(300, round($fileSize / 16000)));
-                $segments = [
-                    ['start' => 0.0, 'end' => round($estimatedSeconds * 0.3, 1), 'text' => 'Welcome to Reel2Reel Video Editor.'],
-                    ['start' => round($estimatedSeconds * 0.35, 1), 'end' => round($estimatedSeconds * 0.7, 1), 'text' => 'Auto-generated captions powered by AI.'],
-                    ['start' => round($estimatedSeconds * 0.75, 1), 'end' => round($estimatedSeconds, 1), 'text' => 'Speech-to-Text transcription complete.']
-                ];
+                return response()->json([
+                    'status' => 200,
+                    'success' => true,
+                    'language' => $language,
+                    'segments' => $parsed
+                ], 200, [
+                    'Access-Control-Allow-Origin' => '*',
+                    'Access-Control-Allow-Methods' => 'POST, GET, OPTIONS',
+                    'Access-Control-Allow-Headers' => 'Content-Type, X-Requested-With, Authorization'
+                ]);
             }
 
+            $errMsg = is_array($parsed) && isset($parsed['error']) ? $parsed['error'] : trim((string)$output);
             return response()->json([
-                'status' => 200,
-                'success' => true,
-                'language' => $language,
-                'segments' => $segments
-            ], 200, [
-                'Access-Control-Allow-Origin' => '*',
-                'Access-Control-Allow-Methods' => 'POST, GET, OPTIONS',
-                'Access-Control-Allow-Headers' => 'Content-Type, X-Requested-With, Authorization'
-            ]);
+                'status' => 'error',
+                'message' => 'Whisper AI transcription error: ' . $errMsg
+            ], 500, ['Access-Control-Allow-Origin' => '*']);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -104,6 +114,9 @@ except Exception as e:
             $voiceMap = [
                 'amy' => '/home/u273790872/opt/piper/models/en_US-amy-medium.onnx',
                 'ryan' => '/home/u273790872/opt/piper/models/en_US-ryan-medium.onnx',
+                'joe' => '/home/u273790872/opt/piper/models/en_US-joe-medium.onnx',
+                'alan' => '/home/u273790872/opt/piper/models/en_GB-alan-medium.onnx',
+                'alba' => '/home/u273790872/opt/piper/models/en_GB-alba-medium.onnx',
                 'lessac' => '/home/u273790872/opt/piper/models/en_US-lessac-medium.onnx',
                 'en_us-lessac-medium' => '/home/u273790872/opt/piper/models/en_US-lessac-medium.onnx'
             ];
