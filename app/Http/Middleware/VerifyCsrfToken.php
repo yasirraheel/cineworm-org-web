@@ -20,5 +20,7 @@ class VerifyCsrfToken extends Middleware
          '/app_payu_failed',
          '/cashfree/success',
          '/coingate/callback',
+         '/user/editor/api/*',
+         'user/editor/api/*',
     ];
 }

@@ -565,6 +565,13 @@ Route::get('user/editor/{id}/download', 'VideoEditorController@downloadExport');
 Route::delete('user/editor/{id}/delete', 'VideoEditorController@destroy');
 Route::post('user/editor/{id}/delete', 'VideoEditorController@destroy');
 
+// Reel2Reel Cloud Sync & Recovery API Endpoints
+Route::get('user/editor/api/current', 'VideoEditorController@apiCurrentProject');
+Route::post('user/editor/api/sync', 'VideoEditorController@apiSyncProject');
+Route::get('user/editor/api/projects', 'VideoEditorController@apiListProjects');
+Route::get('user/editor/api/load/{id}', 'VideoEditorController@apiLoadProject');
+Route::post('user/editor/api/delete/{id}', 'VideoEditorController@apiDeleteProject');
+
 // User Job Listings
 Route::get('user/jobs', 'UserJobController@index');
 Route::get('user/jobs/create', 'UserJobController@create');

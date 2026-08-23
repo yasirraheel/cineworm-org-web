@@ -537,4 +537,194 @@ class VideoEditorController extends Controller
 
         return redirect('user/editor');
     }
+
+    // =====================================================================
+    //  REST API Endpoints for Reel2Reel Cloud Sync & Recovery
+    // =====================================================================
+
+    /**
+     * Get the latest active project for the authenticated user.
+     */
+    public function apiCurrentProject()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+        }
+
+        $project = EditingProject::where('user_id', $user->id)
+                    ->orderBy('updated_at', 'DESC')
+                    ->first();
+
+        if (!$project) {
+            return response()->json([
+                'success' => true,
+                'hasProject' => false,
+                'project' => null,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'hasProject' => true,
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+                'timeline_data' => $project->timeline_data,
+                'total_duration' => $project->total_duration,
+                'updated_at' => $project->updated_at ? $project->updated_at->timestamp * 1000 : null,
+            ],
+        ]);
+    }
+
+    /**
+     * Auto-save / sync project JSON from Reel2Reel to server.
+     */
+    public function apiSyncProject(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+        }
+
+        $title = $request->input('title', 'Untitled Project');
+        $projectData = $request->input('project_data') ?? $request->input('timeline_data');
+        $clientProjectId = $request->input('client_project_id');
+        $serverId = $request->input('server_id');
+        $duration = (float) $request->input('duration', 0);
+
+        if (!$projectData) {
+            return response()->json(['success' => false, 'message' => 'Project data JSON is required.'], 422);
+        }
+
+        // If string was sent, decode it
+        if (is_string($projectData)) {
+            $decoded = json_decode($projectData, true);
+            if ($decoded) {
+                $projectData = $decoded;
+            }
+        }
+
+        // Find existing project by serverId, or by user's latest project
+        $project = null;
+        if ($serverId) {
+            $project = EditingProject::where('id', $serverId)->where('user_id', $user->id)->first();
+        }
+
+        if (!$project && $clientProjectId) {
+            // Search if we already have this clientProjectId in timeline_data
+            $project = EditingProject::where('user_id', $user->id)
+                        ->where('timeline_data->id', $clientProjectId)
+                        ->first();
+        }
+
+        if (!$project) {
+            // Check if user has an existing project with same title, or create new
+            $project = EditingProject::where('user_id', $user->id)
+                        ->orderBy('updated_at', 'DESC')
+                        ->first();
+        }
+
+        if ($project) {
+            $project->title = $title ?: $project->title;
+            $project->timeline_data = $projectData;
+            $project->total_duration = $duration ?: ($project->total_duration ?? 0);
+            $project->save();
+        } else {
+            $project = EditingProject::create([
+                'user_id' => $user->id,
+                'title' => $title ?: 'My Reel Project',
+                'timeline_data' => $projectData,
+                'status' => 'draft',
+                'total_duration' => $duration,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Project synced to server successfully.',
+            'server_id' => $project->id,
+            'updated_at' => $project->updated_at ? $project->updated_at->timestamp * 1000 : time() * 1000,
+        ]);
+    }
+
+    /**
+     * List all cloud saved projects for the authenticated user.
+     */
+    public function apiListProjects()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+        }
+
+        $projects = EditingProject::where('user_id', $user->id)
+                    ->orderBy('updated_at', 'DESC')
+                    ->get(['id', 'title', 'total_duration', 'status', 'created_at', 'updated_at']);
+
+        return response()->json([
+            'success' => true,
+            'projects' => $projects->map(function ($p) {
+                return [
+                    'id' => $p->id,
+                    'title' => $p->title,
+                    'duration' => $p->total_duration,
+                    'status' => $p->status,
+                    'updated_at' => $p->updated_at ? $p->updated_at->timestamp * 1000 : null,
+                ];
+            }),
+        ]);
+    }
+
+    /**
+     * Load a specific project JSON by server ID.
+     */
+    public function apiLoadProject($id)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+        }
+
+        $project = EditingProject::where('id', $id)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+        if (!$project) {
+            return response()->json(['success' => false, 'message' => 'Project not found.'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+                'timeline_data' => $project->timeline_data,
+                'total_duration' => $project->total_duration,
+                'updated_at' => $project->updated_at ? $project->updated_at->timestamp * 1000 : null,
+            ],
+        ]);
+    }
+
+    /**
+     * Delete a project from the server.
+     */
+    public function apiDeleteProject($id)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+        }
+
+        $project = EditingProject::where('id', $id)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+        if ($project) {
+            $project->delete();
+        }
+
+        return response()->json(['success' => true, 'message' => 'Project deleted from cloud.']);
+    }
 }
+
