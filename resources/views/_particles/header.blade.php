@@ -162,8 +162,8 @@
                                                 </li>
                                                 @if(in_array('promotion_services', $promotionUserFeatures, true))
                                                     <li><a href="{{ URL::to('promotions') }}"
-                                                            title="Promotion Services"><i
-                                                                class="fa fa-bullhorn"></i>Promotion Services</a>
+                                                            title="Promotion"><i
+                                                                class="fa fa-bullhorn"></i>Promotion</a>
                                                     </li>
                                                 @endif
                                                 <li><a href="{{ URL::to('membership_plan') }}"
@@ -266,6 +266,23 @@
         .main-menu .vfx-item-nav > li > a {
             white-space: nowrap;
         }
+    }
+
+    .user-menu .content-user {
+        min-width: 180px !important;
+    }
+
+    .user-menu .content-user li a {
+        white-space: nowrap !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+    }
+
+    .user-menu .content-user li a i {
+        margin-right: 0 !important;
+        min-width: 16px !important;
+        text-align: center !important;
     }
 </style>
 
