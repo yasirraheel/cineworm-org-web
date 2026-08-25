@@ -196,13 +196,6 @@ class IndexController extends Controller
 
         $job_listings = \App\JobListing::where('status', 1)->orderBy('id', 'desc')->take(10)->get();
 
-        $active_broadcasts = \App\Models\LiveBroadcast::with('user')
-            ->where('status', 1)
-            ->where('created_at', '>=', \Carbon\Carbon::now()->subHours(2))
-            ->orderBy('id', 'desc')
-            ->take(5)
-            ->get();
-
         $mixed_feed = [];
         
         foreach($news_tickers as $news) {
@@ -235,14 +228,6 @@ class IndexController extends Controller
                 'type' => 'job',
                 'job' => $job,
                 'created_at' => \Carbon\Carbon::parse($job->created_at)
-            ];
-        }
-
-        foreach($active_broadcasts as $broadcast) {
-            $mixed_feed[] = [
-                'type' => 'live_broadcast',
-                'broadcast' => $broadcast,
-                'created_at' => \Carbon\Carbon::parse($broadcast->created_at)
             ];
         }
 

@@ -788,25 +788,6 @@
                                                         {!! nl2br(e($job->description)) !!}
                                                     </div>
                                                 </div>
-                                            @elseif($item['type'] == 'live_broadcast')
-                                                @php $broadcast = $item['broadcast']; @endphp
-                                                <div class="news-item" style="background: rgba(45, 140, 255, 0.05); padding: 10px; border-radius: 5px; border-left: 3px solid #2D8CFF; margin-bottom: 20px;">
-                                                    <div class="news-headline" style="color: #fff;">
-                                                        <span class="breaking-badge" style="background: #2D8CFF; padding: 3px 8px; font-weight: bold;">LIVE NOW</span>
-                                                        {{ $broadcast->title }}
-                                                    </div>
-                                                    <div class="news-details" style="color: #bbb;">
-                                                        Hosted by {{ optional($broadcast->user)->name ?? 'User' }}
-                                                    </div>
-                                                    <span class="news-time">
-                                                        <i class="fa fa-clock-o"></i> {{ $item['created_at']->diffForHumans() }}
-                                                    </span>
-                                                    @if($broadcast->zoom_join_url)
-                                                        <a href="{{ $broadcast->zoom_join_url }}" target="_blank" style="display: block; font-size: 12px; color: #2D8CFF; margin-top: 5px; font-weight: bold; background: rgba(45, 140, 255, 0.1); padding: 8px 10px; border-radius: 4px; text-align: center; text-decoration: none;">
-                                                            <i class="fa fa-video-camera"></i> Join Live Broadcast
-                                                        </a>
-                                                    @endif
-                                                </div>
                                             @endif
                                         @endforeach
                                     @endif
