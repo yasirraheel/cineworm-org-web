@@ -14,8 +14,25 @@
 	<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 	<link rel="icon" type="image/png" href="icons/icon-512.png">
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20260906_7">
 
+<script>
+// Immediate cache and service worker purging
+if (typeof caches !== 'undefined') {
+    caches.keys().then(function(names) {
+        for (var i = 0; i < names.length; i++) {
+            caches.delete(names[i]);
+        }
+    }).catch(function(){});
+}
+if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+        for (var i = 0; i < regs.length; i++) {
+            regs[i].unregister();
+        }
+    }).catch(function(){});
+}
+</script>
 
 </head>
 <body>
@@ -33,19 +50,7 @@ if (location.protocol.substr(0, 4) === "file")
 			<p class="notSupportedMessage">JavaScript appears to be disabled. Please enable it to view this content.</p>
 		</div>
 	</noscript>
-	<script src="scripts/supportcheck.js"></script>
-	<script src="scripts/offlineclient.js" type="module"></script>
-	<script src="scripts/main.js" type="module"></script>
-	<script>
-		if (typeof navigator !== "undefined" && navigator.serviceWorker) {
-			navigator.serviceWorker.getRegistrations().then(function(regs) {
-				for (var i = 0; i < regs.length; i++) {
-					if (regs[i].scope.indexOf("Watermelon") !== -1 || regs[i].scope.indexOf("games") !== -1) {
-						regs[i].unregister();
-					}
-				}
-			}).catch(function(){});
-		}
-	</script>
+	<script src="scripts/supportcheck.js?v=20260906_7"></script>
+	<script src="scripts/main.js?v=20260906_7" type="module"></script>
 </body>
 </html>

@@ -168,8 +168,16 @@ class GameRoomController extends Controller
             if ($guestToken) {
                 $existing = WatermelonScore::where('guest_token', $guestToken)->first();
                 if ($existing) {
+                    $rawName = trim($request->input('player_name', ''));
+                    $updateData = [];
                     if ($score > $existing->score) {
-                        $existing->update(['score' => $score]);
+                        $updateData['score'] = $score;
+                    }
+                    if ($rawName !== '' && $rawName !== 'Guest') {
+                        $updateData['player_name'] = $rawName;
+                    }
+                    if (!empty($updateData)) {
+                        $existing->update($updateData);
                     }
                     $record = $existing->fresh();
                 } else {

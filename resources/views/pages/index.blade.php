@@ -2266,123 +2266,41 @@
                 };
             }
 
-            // ─── Leaderboard Popover Toggle ──────────────────────
-            function openLeaderboard() {
-                if (!lbOverlay) return;
-                lbOverlay.style.display = 'flex';
-                wmLoadLeaderboard();
-            }
-
-            function closeLeaderboard() {
-                if (!lbOverlay) return;
-                lbOverlay.style.display = 'none';
-            }
-
-            if (lbToggle) {
-                lbToggle.onclick = function(e) {
-                    e.stopPropagation();
-                    if (lbOverlay.style.display === 'none' || !lbOverlay.style.display) {
-                        openLeaderboard();
-                    } else {
-                        closeLeaderboard();
-                    }
-                };
-            }
-
-            if (lbCloseBtn) {
-                lbCloseBtn.onclick = function(e) {
-                    e.stopPropagation();
-                    closeLeaderboard();
-                };
-            }
-
-            // Click outside card to dismiss
-            if (lbOverlay) {
-                lbOverlay.onclick = function(e) {
-                    if (e.target === lbOverlay) {
-                        closeLeaderboard();
-                    }
-                };
-            }
-
-            // ─── Load Rankings ───────────────────────────────────
-            window.wmLoadLeaderboard = function() {
-                var list = document.getElementById('wm-lb-list');
-                var myScoreText = document.getElementById('wm-my-score-text');
-                var myRankText  = document.getElementById('wm-my-rank-text');
-
-                var url = WM_LB_URL + '?guest_token=' + encodeURIComponent(WM_GUEST_TOKEN);
-                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                    .then(function(r){ return r.json(); })
-                    .then(function(data) {
-                        if (!data.success) return;
-
-                        if (data.my_entry) {
-                            if (myScoreText) myScoreText.textContent = Number(data.my_entry.score).toLocaleString();
-                            if (myRankText)  myRankText.textContent  = '#' + data.my_entry.rank;
-                        }
-
-                        renderLeaderboardRows(data.top, data.my_entry);
-                    })
-                    .catch(function(e){
-                        if (list) list.innerHTML = '<div class="wm-lb-empty">Unable to load leaderboard.</div>';
-                    });
-            };
-
-            function renderLeaderboardRows(rows, myEntry) {
-                var list = document.getElementById('wm-lb-list');
-                if (!list) return;
-
-                if (!rows || rows.length === 0) {
-                    list.innerHTML = '<div class="wm-lb-empty">No scores yet. Play to be the first!</div>';
-                    return;
-                }
-
-                var html = '';
-                rows.forEach(function(row) {
-                    var rankClass = '';
-                    var medalIcon = '#' + row.rank;
-                    if (row.rank === 1) { rankClass = 'gold';   medalIcon = '🥇'; }
-                    else if (row.rank === 2) { rankClass = 'silver'; medalIcon = '🥈'; }
-                    else if (row.rank === 3) { rankClass = 'bronze'; medalIcon = '🥉'; }
-
-                    var isMe = false;
-                    if (WM_IS_AUTH && row.user_id) {
-                        isMe = myEntry && myEntry.rank === row.rank && myEntry.score === row.score;
-                    } else if (!WM_IS_AUTH && row.guest_token === WM_GUEST_TOKEN) {
-                        isMe = true;
-                    }
-
-                    html += '<div class="wm-lb-row' + (isMe ? ' me' : '') + '">' +
-                        '<span class="wm-lb-col-rank ' + rankClass + '">' + medalIcon + '</span>' +
-                        '<span class="wm-lb-col-name">' + escHtml(row.player_name) + (isMe ? '<span class="you-tag">YOU</span>' : '') + '</span>' +
-                        '<span class="wm-lb-col-score">' + Number(row.score).toLocaleString() + '</span>' +
-                    '</div>';
-                });
-                list.innerHTML = html;
-            }
-
-            // ─── Score Tracking & Submission ────────────────────
+            // ─── Score Tracking & State ──────────────────────────
             var wmHighestScore   = 0;
             var wmSubmittedScore = 0;
             var wmPollInterval   = null;
 
             function wmGetLiveScoreFromIframe() {
                 var best = 0;
+                // 1. Shared localStorage (same origin cineworm.org)
                 try {
-                    // 1. Check shared same-origin localStorage
                     var local = parseInt(localStorage.getItem('wm_realtime_score') || '0', 10);
-                    if (!isNaN(local) && local > best) {
-                        best = local;
-                    }
+                    if (!isNaN(local) && local > best) best = local;
                 } catch(e) {}
 
+                // 2. Direct iframe window inspection
                 try {
-                    // 2. Check iframe window global
                     if (iframe && iframe.contentWindow) {
                         var win = iframe.contentWindow;
+                        if (typeof win.__get_wm_score === 'function') {
+                            var s = win.__get_wm_score();
+                            if (s > best) best = s;
+                        }
                         if (typeof win.__wm_live_score === 'number' && win.__wm_live_score > best) {
                             best = win.__wm_live_score;
+                        }
+                        // 3. Direct runtime inspection
+                        var rt = win.c3_runtime || (win.c3_runtimeInterface && win.c3_runtimeInterface._localRuntime);
+                        if (rt && rt.GetEventSheetManager) {
+                            var vars = rt.GetEventSheetManager().GetAllGlobalVariables();
+                            for (var i = 0; i < vars.length; i++) {
+                                var n = (vars[i].GetName() || '').toLowerCase();
+                                if (n === 'score' || n === 'tot_score' || n === 'best_score') {
+                                    var v = parseFloat(vars[i].GetValue());
+                                    if (!isNaN(v) && v > best) best = v;
+                                }
+                            }
                         }
                     }
                 } catch(e) {}
@@ -2390,10 +2308,16 @@
                 return best;
             }
 
-            function wmSubmitScore(score, isClosing) {
+            function wmSubmitScore(score, isClosing, callback) {
                 score = parseInt(score, 10);
-                if (isNaN(score) || score <= 0) return;
-                if (score <= wmSubmittedScore && !isClosing) return;
+                if (isNaN(score) || score <= 0) {
+                    if (typeof callback === 'function') callback();
+                    return;
+                }
+                if (score <= wmSubmittedScore && !isClosing) {
+                    if (typeof callback === 'function') callback();
+                    return;
+                }
 
                 wmSubmittedScore = Math.max(wmSubmittedScore, score);
                 wmHighestScore   = Math.max(wmHighestScore, score);
@@ -2409,8 +2333,6 @@
                     formData.append('player_name', WM_PLAYER_NAME);
                 }
 
-                console.log('[Watermelon Leaderboard] Submitting score:', score, 'isAuth:', WM_IS_AUTH);
-
                 try {
                     fetch(WM_SCORE_URL, {
                         method: 'POST',
@@ -2423,30 +2345,41 @@
                     })
                     .then(function(r){ return r.json(); })
                     .then(function(data) {
-                        console.log('[Watermelon Leaderboard] Submit response:', data);
                         if (data && data.success) {
                             var myRankText = document.getElementById('wm-my-rank-text');
                             if (myRankText && data.rank) myRankText.textContent = '#' + data.rank;
                         }
+                        if (typeof callback === 'function') callback(data);
                     })
-                    .catch(function(e){ console.warn('[Watermelon Leaderboard] Score submit error', e); });
-                } catch(e) {}
-            }
-
-            function wmSyncLiveScore(isClosing) {
-                var iframeScore = wmGetLiveScoreFromIframe();
-                var best = Math.max(wmHighestScore, iframeScore);
-                if (best > wmSubmittedScore) {
-                    wmSubmitScore(best, isClosing);
+                    .catch(function(e){
+                        if (typeof callback === 'function') callback();
+                    });
+                } catch(e) {
+                    if (typeof callback === 'function') callback();
                 }
             }
 
             // ─── Leaderboard Popover Toggle ──────────────────────
             function openLeaderboard() {
                 if (!lbOverlay) return;
-                wmSyncLiveScore(false);
                 lbOverlay.style.display = 'flex';
-                wmLoadLeaderboard();
+
+                // Sync current in-game score first
+                var live = wmGetLiveScoreFromIframe();
+                var best = Math.max(wmHighestScore, live);
+                if (best > 0) {
+                    wmHighestScore = best;
+                    var myScoreText = document.getElementById('wm-my-score-text');
+                    if (myScoreText) myScoreText.textContent = Number(best).toLocaleString();
+                }
+
+                if (best > wmSubmittedScore) {
+                    wmSubmitScore(best, true, function() {
+                        wmLoadLeaderboard();
+                    });
+                } else {
+                    wmLoadLeaderboard();
+                }
             }
 
             function closeLeaderboard() {
@@ -2472,7 +2405,6 @@
                 };
             }
 
-            // Click outside card to dismiss
             if (lbOverlay) {
                 lbOverlay.onclick = function(e) {
                     if (e.target === lbOverlay) {
@@ -2487,16 +2419,15 @@
                 var myScoreText = document.getElementById('wm-my-score-text');
                 var myRankText  = document.getElementById('wm-my-rank-text');
 
-                // If we already have a live score higher than display, show it
                 if (wmHighestScore > 0 && myScoreText) {
                     myScoreText.textContent = Number(wmHighestScore).toLocaleString();
                 }
 
-                var url = WM_LB_URL + '?guest_token=' + encodeURIComponent(WM_GUEST_TOKEN);
+                var url = WM_LB_URL + '?guest_token=' + encodeURIComponent(WM_GUEST_TOKEN) + '&t=' + Date.now();
                 fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(function(r){ return r.json(); })
                     .then(function(data) {
-                        if (!data.success) return;
+                        if (!data || !data.success) return;
 
                         if (data.my_entry) {
                             var displayScore = Math.max(Number(data.my_entry.score), wmHighestScore);
@@ -2548,27 +2479,13 @@
                 return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
             }
 
-            // ─── Realtime Game Score Listener ────────────────────
+            // ─── Realtime Game Score Listener & Poller ───────────
             function wmPollIframeScore() {
                 try {
                     var live = wmGetLiveScoreFromIframe();
                     if (live > wmHighestScore) {
                         wmHighestScore = live;
                         wmSubmitScore(live, false);
-                    }
-                    var iframeWin = iframe.contentWindow;
-                    if (!iframeWin) return;
-                    var lf = iframeWin.localforage || (iframeWin.localforage = null);
-                    if (lf) {
-                        lf.getItem('BestScore', function(err, val) {
-                            if (!err && val !== null && val !== undefined) {
-                                var s = parseInt(val, 10);
-                                if (!isNaN(s) && s > wmHighestScore) {
-                                    wmHighestScore = s;
-                                    wmSubmitScore(s, false);
-                                }
-                            }
-                        });
                     }
                 } catch(e) {}
             }
@@ -2604,26 +2521,28 @@
                     wmSubmittedScore = 0;
 
                     // Load fresh game without browser caching old scripts
-                    iframe.src = watermelonBaseUrl + "?t=" + Date.now();
+                    iframe.src = watermelonBaseUrl + "?v=20260906_7&t=" + Date.now();
 
-                    // Ensure leaderboard overlay is CLOSED on startup so game has 100% full view
+                    // Ensure leaderboard overlay is CLOSED on startup
                     closeLeaderboard();
 
                     clearInterval(wmPollInterval);
-                    wmPollInterval = setInterval(wmPollIframeScore, 700);
+                    wmPollInterval = setInterval(wmPollIframeScore, 500);
                 };
             }
 
             // ─── Close Modal (Go Back) ───────────────────────────
             if (closeBtn) {
                 closeBtn.onclick = function() {
-                    // Sync current in-game score BEFORE killing the iframe
-                    wmSyncLiveScore(true);
+                    var live = wmGetLiveScoreFromIframe();
+                    var best = Math.max(wmHighestScore, live);
+                    if (best > wmSubmittedScore) {
+                        wmSubmitScore(best, true);
+                    }
 
                     clearInterval(wmPollInterval);
                     wmPollInterval = null;
 
-                    // Tiny delay so keepalive fetch fires before DOM unload
                     setTimeout(function() {
                         modal.style.display = "none";
                         document.body.style.overflow = '';
