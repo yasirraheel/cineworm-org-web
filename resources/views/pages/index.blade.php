@@ -1787,206 +1787,449 @@
             }
         }
 
-        /* ── Leaderboard Panel ───────────────────────────── */
-        #wm-leaderboard-panel {
+        /* ── Modern Watermelon Leaderboard Popover ───────────────────────────── */
+        .wm-header-lb-btn {
+            background: linear-gradient(135deg, rgba(254, 136, 5, 0.25) 0%, rgba(254, 136, 5, 0.08) 100%);
+            border: 1px solid rgba(254, 136, 5, 0.6);
+            color: #fe8805;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .wm-header-lb-btn:hover {
+            background: #fe8805;
+            color: #000;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(254, 136, 5, 0.45);
+        }
+        .wm-header-lb-btn i {
+            font-size: 13px;
+        }
+
+        .wm-lb-overlay {
             position: absolute;
-            top: 0; right: 0;
-            width: 220px;
-            height: 100%;
-            background: rgba(0,0,0,0.88);
-            backdrop-filter: blur(6px);
-            border-left: 1px solid rgba(254,136,5,0.4);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99;
+            padding: 12px;
+            animation: wmOverlayFadeIn 0.22s ease-out;
+        }
+
+        @keyframes wmOverlayFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .wm-lb-card {
+            background: #141518;
+            background: linear-gradient(180deg, #1c1d22 0%, #111215 100%);
+            border: 1px solid rgba(254, 136, 5, 0.45);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 430px;
+            max-height: 92%;
             display: flex;
             flex-direction: column;
-            z-index: 10;
-            transform: translateX(100%);
-            transition: transform .3s ease;
-            font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(254, 136, 5, 0.15);
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            animation: wmCardPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        #wm-leaderboard-panel.open { transform: translateX(0); }
 
-        #wm-lb-toggle {
-            position: absolute;
-            top: 8px; right: 8px;
-            background: rgba(254,136,5,0.15);
-            border: 1px solid #fe8805;
-            color: #fe8805;
-            border-radius: 6px;
-            padding: 4px 8px;
-            font-size: 11px;
+        @keyframes wmCardPop {
+            from { transform: scale(0.92) translateY(8px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .wm-lb-card-header {
+            padding: 12px 16px;
+            background: rgba(254, 136, 5, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .wm-lb-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wm-lb-title-wrap h4 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.3px;
+        }
+
+        .wm-lb-card-close {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bbb;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
             cursor: pointer;
-            z-index: 20;
-            transition: background .2s;
+            line-height: 1;
+            transition: all 0.15s ease;
         }
-        #wm-lb-toggle:hover { background: rgba(254,136,5,0.3); }
+        .wm-lb-card-close:hover {
+            background: rgba(254, 136, 5, 0.3);
+            color: #fff;
+            border-color: #fe8805;
+        }
 
-        .wm-lb-header {
-            padding: 10px 12px 6px;
-            background: rgba(254,136,5,0.12);
-            border-bottom: 1px solid rgba(254,136,5,0.3);
-            color: #fe8805;
+        /* Player Profile Card in Leaderboard */
+        .wm-lb-player-box {
+            margin: 10px 14px 6px 14px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(254, 136, 5, 0.25);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .wm-lb-player-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .wm-lb-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fe8805 0%, #22c55e 100%);
+            color: #fff;
             font-weight: 700;
             font-size: 13px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .wm-lb-player-meta {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .wm-lb-player-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
             gap: 6px;
         }
-        .wm-lb-header i { font-size: 14px; }
 
-        .wm-lb-my-score {
-            padding: 6px 12px;
-            background: rgba(254,136,5,0.08);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            font-size: 11px;
-            color: #ccc;
+        .wm-guest-edit-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
         }
-        .wm-lb-my-score strong { color: #fe8805; }
+
+        .wm-guest-edit-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(254, 136, 5, 0.4);
+            color: #fff;
+            border-radius: 6px;
+            font-size: 12px;
+            padding: 2px 8px;
+            width: 130px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .wm-guest-edit-input:focus {
+            border-color: #fe8805;
+        }
+
+        .wm-guest-save-btn {
+            background: #fe8805;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .wm-guest-save-btn:hover {
+            background: #ffa133;
+        }
+
+        .wm-lb-player-score-tag {
+            font-size: 11px;
+            color: #999;
+        }
+        .wm-lb-player-score-tag strong {
+            color: #fe8805;
+            font-weight: 700;
+        }
+
+        .wm-lb-rank-badge {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .wm-lb-rank-badge .tag {
+            display: block;
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #777;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .wm-lb-rank-badge .val {
+            font-size: 16px;
+            font-weight: 800;
+            color: #fe8805;
+            line-height: 1.1;
+        }
+
+        /* Leaderboard table list */
+        .wm-lb-table-head {
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #777;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
         .wm-lb-list {
             flex: 1;
             overflow-y: auto;
-            padding: 4px 0;
+            max-height: 280px;
+            padding: 4px 8px;
         }
-        .wm-lb-list::-webkit-scrollbar { width: 4px; }
-        .wm-lb-list::-webkit-scrollbar-thumb { background: #fe8805; border-radius: 4px; }
+        .wm-lb-list::-webkit-scrollbar { width: 5px; }
+        .wm-lb-list::-webkit-scrollbar-thumb { background: rgba(254, 136, 5, 0.4); border-radius: 4px; }
 
         .wm-lb-row {
             display: flex;
             align-items: center;
-            padding: 6px 12px;
-            gap: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            transition: background .15s;
-        }
-        .wm-lb-row:hover { background: rgba(255,255,255,0.04); }
-        .wm-lb-row.me { background: rgba(254,136,5,0.12); }
-
-        .wm-lb-rank {
-            min-width: 22px;
-            font-size: 11px;
-            font-weight: 700;
-            color: #888;
-        }
-        .wm-lb-rank.gold { color: #ffd700; }
-        .wm-lb-rank.silver { color: #c0c0c0; }
-        .wm-lb-rank.bronze { color: #cd7f32; }
-
-        .wm-lb-name {
-            flex: 1;
-            font-size: 11px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            font-size: 12px;
             color: #ddd;
+            transition: background 0.15s;
+        }
+        .wm-lb-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .wm-lb-row.me {
+            background: rgba(254, 136, 5, 0.14);
+            border: 1px solid rgba(254, 136, 5, 0.35);
+        }
+
+        .wm-lb-col-rank {
+            width: 34px;
+            font-weight: 800;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .wm-lb-col-rank.gold { color: #ffd700; font-size: 14px; }
+        .wm-lb-col-rank.silver { color: #d1d5db; font-size: 14px; }
+        .wm-lb-col-rank.bronze { color: #d97706; font-size: 14px; }
+
+        .wm-lb-col-name {
+            flex: 1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-weight: 500;
+            padding-right: 8px;
         }
-        .wm-lb-score-val {
-            font-size: 11px;
+        .wm-lb-col-name .you-tag {
+            font-size: 10px;
+            background: #fe8805;
+            color: #000;
+            padding: 1px 5px;
+            border-radius: 4px;
             font-weight: 700;
-            color: #fe8805;
+            margin-left: 6px;
         }
 
-        .wm-lb-empty {
-            padding: 16px 12px;
+        .wm-lb-col-score {
+            width: 70px;
+            text-align: right;
+            font-weight: 800;
+            color: #22c55e;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .wm-lb-empty, .wm-lb-loading {
+            padding: 24px 16px;
             text-align: center;
-            font-size: 11px;
+            color: #777;
+            font-size: 12px;
+        }
+
+        .wm-lb-card-footer {
+            padding: 8px 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .wm-lb-tip-text {
+            font-size: 10px;
             color: #666;
         }
 
-        .wm-lb-refresh {
-            padding: 6px 12px;
-            border-top: 1px solid rgba(255,255,255,0.07);
-            text-align: center;
-        }
-        .wm-lb-refresh button {
-            background: none;
-            border: 1px solid rgba(254,136,5,0.4);
+        .wm-lb-refresh-btn {
+            background: transparent;
+            border: 1px solid rgba(254, 136, 5, 0.35);
             color: #fe8805;
-            border-radius: 4px;
-            font-size: 10px;
+            border-radius: 6px;
+            font-size: 11px;
             padding: 3px 10px;
             cursor: pointer;
-            width: 100%;
+            transition: all 0.15s;
         }
-        .wm-lb-refresh button:hover { background: rgba(254,136,5,0.2); }
-
-        /* Guest name prompt */
-        #wm-guest-bar {
-            padding: 6px 12px;
-            background: rgba(0,0,0,0.5);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex;
-            gap: 4px;
-        }
-        #wm-guest-name-input {
-            flex: 1;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(254,136,5,0.4);
-            color: #fff;
-            border-radius: 4px;
-            padding: 3px 6px;
-            font-size: 11px;
-        }
-        #wm-guest-name-input::placeholder { color: #666; }
-        #wm-guest-save-btn {
-            background: #fe8805;
-            border: none;
-            color: #000;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 3px 7px;
-            cursor: pointer;
+        .wm-lb-refresh-btn:hover {
+            background: rgba(254, 136, 5, 0.2);
         }
     </style>
+
 
 
     <!-- Game Modal -->
     <div id="watermelon-game-modal" class="game-modal" style="display: none;">
         <div class="game-modal-header" id="game-modal-header">
-            <span class="game-modal-title" id="game-modal-title">Game</span>
-            <button class="game-modal-close" id="close-game-modal">&times;</button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px;">🍉</span>
+                <span class="game-modal-title" id="game-modal-title">Watermelon Game</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button id="wm-lb-toggle" class="wm-header-lb-btn" type="button" title="View Global Leaderboard">
+                    <i class="fas fa-trophy" style="color: #ffd700;"></i>
+                    <span>Leaderboard</span>
+                </button>
+                <button class="game-modal-close" id="close-game-modal" title="Close Game">&times;</button>
+            </div>
         </div>
-        <div class="game-modal-body" style="position:relative;">
-            <!-- Leaderboard Toggle Button -->
-            <button id="wm-lb-toggle" title="Toggle Leaderboard">🏆 Leaderboard</button>
+        <div class="game-modal-body" style="position: relative; overflow: hidden;">
+            <!-- Game iframe (full size) -->
+            <iframe id="game-iframe" src="" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
 
-            <!-- Game iframe -->
-            <iframe id="game-iframe" src="" style="width:100%;height:100%;border:none;"></iframe>
+            <!-- Leaderboard Centered Overlay Modal (hidden by default) -->
+            <div id="wm-leaderboard-overlay" class="wm-lb-overlay" style="display: none;">
+                <div class="wm-lb-card">
+                    <!-- Header -->
+                    <div class="wm-lb-card-header">
+                        <div class="wm-lb-title-wrap">
+                            <span style="font-size: 18px;">🏆</span>
+                            <div>
+                                <h4>Global Leaderboard</h4>
+                            </div>
+                        </div>
+                        <button id="wm-lb-close-btn" class="wm-lb-card-close" type="button" title="Close">&times;</button>
+                    </div>
 
-            <!-- Leaderboard Side Panel -->
-            <div id="wm-leaderboard-panel">
-                <div class="wm-lb-header">
-                    <i class="fas fa-trophy"></i> Global Leaderboard
+                    <!-- User/Guest Card -->
+                    <div class="wm-lb-player-box">
+                        <div class="wm-lb-player-left">
+                            <div class="wm-lb-avatar">
+                                @auth
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                                @else
+                                    <i class="fas fa-user-astronaut"></i>
+                                @endauth
+                            </div>
+                            <div class="wm-lb-player-meta">
+                                @auth
+                                    <div class="wm-lb-player-name">{{ Auth::user()->name }}</div>
+                                @else
+                                    <div class="wm-guest-edit-wrap">
+                                        <input id="wm-guest-name-input" class="wm-guest-edit-input" type="text" maxlength="20" placeholder="Guest Name">
+                                        <button id="wm-guest-save-btn" class="wm-guest-save-btn" type="button">Save</button>
+                                    </div>
+                                @endauth
+                                <div class="wm-lb-player-score-tag">
+                                    Your High Score: <strong id="wm-my-score-text">0</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wm-lb-rank-badge">
+                            <span class="tag">Rank</span>
+                            <span class="val" id="wm-my-rank-text">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Table Header -->
+                    <div class="wm-lb-table-head">
+                        <span class="wm-lb-col-rank">#</span>
+                        <span class="wm-lb-col-name">PLAYER</span>
+                        <span class="wm-lb-col-score">SCORE</span>
+                    </div>
+
+                    <!-- Rankings List -->
+                    <div class="wm-lb-list" id="wm-lb-list">
+                        <div class="wm-lb-loading"><i class="fas fa-spinner fa-spin"></i> Loading rankings...</div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="wm-lb-card-footer">
+                        <span class="wm-lb-tip-text"><i class="fas fa-medal text-warning"></i> Merge watermelons to reach top!</span>
+                        <button class="wm-lb-refresh-btn" type="button" onclick="wmLoadLeaderboard()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
                 </div>
-
-                {{-- Guest name bar (hidden for logged-in users) --}}
-                @guest
-                <div id="wm-guest-bar">
-                    <input id="wm-guest-name-input" type="text" maxlength="20" placeholder="Your name…">
-                    <button id="wm-guest-save-btn">Save</button>
-                </div>
-                @endguest
-
-                <div class="wm-lb-my-score" id="wm-my-score-bar" style="display:none;"></div>
-                <div class="wm-lb-list" id="wm-lb-list"><div class="wm-lb-empty">Loading…</div></div>
-                <div class="wm-lb-refresh"><button onclick="wmLoadLeaderboard()">↻ Refresh</button></div>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var modal    = document.getElementById('watermelon-game-modal');
-            var btn      = document.getElementById('open-game-modal');
-            var closeBtn = document.getElementById('close-game-modal');
-            var iframe   = document.getElementById('game-iframe');
+            var modal     = document.getElementById('watermelon-game-modal');
+            var btn       = document.getElementById('open-game-modal');
+            var closeBtn  = document.getElementById('close-game-modal');
+            var iframe    = document.getElementById('game-iframe');
             var modalTitle = document.getElementById('game-modal-title');
-            var lbPanel  = document.getElementById('wm-leaderboard-panel');
-            var lbToggle = document.getElementById('wm-lb-toggle');
+            var lbOverlay = document.getElementById('wm-leaderboard-overlay');
+            var lbToggle  = document.getElementById('wm-lb-toggle');
+            var lbCloseBtn = document.getElementById('wm-lb-close-btn');
 
             var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}";
 
-            // ─── Leaderboard state ───────────────────────────────────────
+            // ─── State ──────────────────────────────────────────
             var WM_SCORE_URL      = "{{ route('game.watermelon.score') }}";
             var WM_LB_URL         = "{{ route('game.watermelon.leaderboard') }}";
             var WM_CSRF           = "{{ csrf_token() }}";
@@ -1995,94 +2238,135 @@
             var WM_PLAYER_NAME    = "{{ Auth::user()->name }}";
             @else
             var WM_IS_AUTH        = false;
-            // Generate / restore guest token from localStorage
             var WM_PLAYER_NAME    = localStorage.getItem('wm_guest_name') || 'Guest';
             @endauth
 
-            // Guest token — persisted per-browser-session
             var WM_GUEST_TOKEN = localStorage.getItem('wm_guest_token');
             if (!WM_GUEST_TOKEN) {
                 WM_GUEST_TOKEN = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('wm_guest_token', WM_GUEST_TOKEN);
             }
 
-            // ─── Guest name UI ──────────────────────────────────────────
-            var guestNameInput = document.getElementById('wm-guest-name-input');
-            var guestSaveBtn   = document.getElementById('wm-guest-save-btn');
-            if (guestNameInput) {
-                guestNameInput.value = WM_PLAYER_NAME !== 'Guest' ? WM_PLAYER_NAME : '';
+            // Guest name input setup
+            var guestInput = document.getElementById('wm-guest-name-input');
+            var guestSave  = document.getElementById('wm-guest-save-btn');
+            if (guestInput) {
+                guestInput.value = WM_PLAYER_NAME;
             }
-            if (guestSaveBtn) {
-                guestSaveBtn.onclick = function() {
-                    var name = (guestNameInput.value || '').trim();
-                    if (!name) return;
-                    WM_PLAYER_NAME = name.substring(0, 20);
+            if (guestSave) {
+                guestSave.onclick = function(e) {
+                    e.stopPropagation();
+                    var val = (guestInput.value || '').trim();
+                    if (!val) return;
+                    WM_PLAYER_NAME = val.substring(0, 20);
                     localStorage.setItem('wm_guest_name', WM_PLAYER_NAME);
-                    guestSaveBtn.textContent = '✓';
-                    setTimeout(function(){ guestSaveBtn.textContent = 'Save'; }, 1200);
+                    guestSave.textContent = '✓ Saved';
+                    setTimeout(function(){ guestSave.textContent = 'Save'; }, 1200);
+                    wmLoadLeaderboard();
                 };
             }
 
-            // ─── Load leaderboard ────────────────────────────────────────
+            // ─── Leaderboard Popover Toggle ──────────────────────
+            function openLeaderboard() {
+                if (!lbOverlay) return;
+                lbOverlay.style.display = 'flex';
+                wmLoadLeaderboard();
+            }
+
+            function closeLeaderboard() {
+                if (!lbOverlay) return;
+                lbOverlay.style.display = 'none';
+            }
+
+            if (lbToggle) {
+                lbToggle.onclick = function(e) {
+                    e.stopPropagation();
+                    if (lbOverlay.style.display === 'none' || !lbOverlay.style.display) {
+                        openLeaderboard();
+                    } else {
+                        closeLeaderboard();
+                    }
+                };
+            }
+
+            if (lbCloseBtn) {
+                lbCloseBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    closeLeaderboard();
+                };
+            }
+
+            // Click outside card to dismiss
+            if (lbOverlay) {
+                lbOverlay.onclick = function(e) {
+                    if (e.target === lbOverlay) {
+                        closeLeaderboard();
+                    }
+                };
+            }
+
+            // ─── Load Rankings ───────────────────────────────────
             window.wmLoadLeaderboard = function() {
+                var list = document.getElementById('wm-lb-list');
+                var myScoreText = document.getElementById('wm-my-score-text');
+                var myRankText  = document.getElementById('wm-my-rank-text');
+
                 var url = WM_LB_URL + '?guest_token=' + encodeURIComponent(WM_GUEST_TOKEN);
                 fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(function(r){ return r.json(); })
                     .then(function(data) {
                         if (!data.success) return;
-                        renderLeaderboard(data.top, data.my_entry);
+
+                        if (data.my_entry) {
+                            if (myScoreText) myScoreText.textContent = Number(data.my_entry.score).toLocaleString();
+                            if (myRankText)  myRankText.textContent  = '#' + data.my_entry.rank;
+                        }
+
+                        renderLeaderboardRows(data.top, data.my_entry);
                     })
-                    .catch(function(e){ console.warn('Leaderboard fetch failed', e); });
+                    .catch(function(e){
+                        if (list) list.innerHTML = '<div class="wm-lb-empty">Unable to load leaderboard.</div>';
+                    });
             };
 
-            function renderLeaderboard(rows, myEntry) {
+            function renderLeaderboardRows(rows, myEntry) {
                 var list = document.getElementById('wm-lb-list');
-                var myBar = document.getElementById('wm-my-score-bar');
                 if (!list) return;
 
-                // My score bar
-                if (myEntry) {
-                    myBar.style.display = '';
-                    myBar.innerHTML = 'Your best: <strong>#' + myEntry.rank + '</strong> &mdash; <strong>' + myEntry.score + ' pts</strong>';
-                } else {
-                    myBar.style.display = 'none';
-                }
-
                 if (!rows || rows.length === 0) {
-                    list.innerHTML = '<div class="wm-lb-empty">No scores yet.<br>Be the first!</div>';
+                    list.innerHTML = '<div class="wm-lb-empty">No scores yet. Play to be the first!</div>';
                     return;
                 }
 
                 var html = '';
                 rows.forEach(function(row) {
                     var rankClass = '';
-                    var medal = '#' + row.rank;
-                    if (row.rank === 1) { rankClass = 'gold';   medal = '🥇'; }
-                    if (row.rank === 2) { rankClass = 'silver'; medal = '🥈'; }
-                    if (row.rank === 3) { rankClass = 'bronze'; medal = '🥉'; }
+                    var medalIcon = '#' + row.rank;
+                    if (row.rank === 1) { rankClass = 'gold';   medalIcon = '🥇'; }
+                    else if (row.rank === 2) { rankClass = 'silver'; medalIcon = '🥈'; }
+                    else if (row.rank === 3) { rankClass = 'bronze'; medalIcon = '🥉'; }
 
                     var isMe = false;
                     if (WM_IS_AUTH && row.user_id) {
-                        // Can't compare user_id on client for security; rely on myEntry rank
                         isMe = myEntry && myEntry.rank === row.rank && myEntry.score === row.score;
                     } else if (!WM_IS_AUTH && row.guest_token === WM_GUEST_TOKEN) {
                         isMe = true;
                     }
 
                     html += '<div class="wm-lb-row' + (isMe ? ' me' : '') + '">' +
-                        '<span class="wm-lb-rank ' + rankClass + '">' + medal + '</span>' +
-                        '<span class="wm-lb-name">' + escHtml(row.player_name) + (isMe ? ' (you)' : '') + '</span>' +
-                        '<span class="wm-lb-score-val">' + Number(row.score).toLocaleString() + '</span>' +
+                        '<span class="wm-lb-col-rank ' + rankClass + '">' + medalIcon + '</span>' +
+                        '<span class="wm-lb-col-name">' + escHtml(row.player_name) + (isMe ? '<span class="you-tag">YOU</span>' : '') + '</span>' +
+                        '<span class="wm-lb-col-score">' + Number(row.score).toLocaleString() + '</span>' +
                     '</div>';
                 });
                 list.innerHTML = html;
             }
 
             function escHtml(s) {
-                return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+                return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
             }
 
-            // ─── Submit score to server ──────────────────────────────────
+            // ─── Score Submission ────────────────────────────────
             function wmSubmitScore(score) {
                 var formData = new FormData();
                 formData.append('_token',      WM_CSRF);
@@ -2099,17 +2383,16 @@
                 .then(function(r){ return r.json(); })
                 .then(function(data) {
                     if (data.success) {
-                        // Refresh leaderboard after a new score comes in
-                        wmLoadLeaderboard();
+                        var myScoreText = document.getElementById('wm-my-score-text');
+                        var myRankText  = document.getElementById('wm-my-rank-text');
+                        if (myScoreText) myScoreText.textContent = Number(data.score).toLocaleString();
+                        if (myRankText && data.rank) myRankText.textContent = '#' + data.rank;
                     }
                 })
-                .catch(function(e){ console.warn('Score submit failed', e); });
+                .catch(function(e){ console.warn('Score submit error', e); });
             }
 
-            // ─── Intercept the game's BestScore from localStorage ────────
-            // Construct stores BestScore in IndexedDB via localforage.
-            // We intercept postMessage from the iframe as a hook, AND also
-            // poll the iframe's localforage every 5 s during gameplay.
+            // ─── Realtime Game Score Listener ────────────────────
             var wmLastKnownScore = 0;
             var wmPollInterval   = null;
 
@@ -2117,8 +2400,6 @@
                 try {
                     var iframeWin = iframe.contentWindow;
                     if (!iframeWin) return;
-                    // Attempt to read Construct LocalStorage BestScore key
-                    // (same-origin check: Watermelon is served from same domain)
                     var lf = iframeWin.localforage || (iframeWin.localforage = null);
                     if (lf) {
                         lf.getItem('BestScore', function(err, val) {
@@ -2131,14 +2412,12 @@
                             }
                         });
                     }
-                } catch(e) { /* cross-origin guard */ }
+                } catch(e) {}
             }
 
-            // Also listen for postMessage scores (in case the game sends them)
             window.addEventListener('message', function(event) {
                 if (!event.data) return;
                 var d = event.data;
-                // Construct "BestScore" storage event or custom event
                 if (typeof d === 'object' && (d.type === 'wm_score' || d.score !== undefined)) {
                     var s = parseInt(d.score || d.BestScore || 0, 10);
                     if (!isNaN(s) && s > 0) {
@@ -2150,18 +2429,7 @@
                 }
             });
 
-            // ─── Leaderboard toggle ──────────────────────────────────────
-            if (lbToggle && lbPanel) {
-                lbToggle.onclick = function() {
-                    var isOpen = lbPanel.classList.toggle('open');
-                    lbToggle.textContent = isOpen ? '✕ Close' : '🏆 Leaderboard';
-                    if (isOpen) {
-                        wmLoadLeaderboard();
-                    }
-                };
-            }
-
-            // ─── Open Watermelon Modal ───────────────────────────────────
+            // ─── Open Watermelon Modal ───────────────────────────
             if (btn) {
                 btn.onclick = function() {
                     if (modalTitle) modalTitle.innerText = "Watermelon Game";
@@ -2169,19 +2437,16 @@
                     document.body.style.overflow = 'hidden';
                     iframe.src = watermelonUrl;
                     wmLastKnownScore = 0;
-                    // Start polling iframe for score
+
+                    // Ensure leaderboard overlay is CLOSED on startup so game has 100% full view
+                    closeLeaderboard();
+
                     clearInterval(wmPollInterval);
                     wmPollInterval = setInterval(wmPollIframeScore, 5000);
-                    // Open leaderboard panel by default
-                    if (lbPanel && !lbPanel.classList.contains('open')) {
-                        lbPanel.classList.add('open');
-                        if (lbToggle) lbToggle.textContent = '✕ Close';
-                        wmLoadLeaderboard();
-                    }
                 };
             }
 
-            // ─── Close Modal ─────────────────────────────────────────────
+            // ─── Close Modal ─────────────────────────────────────
             if (closeBtn) {
                 closeBtn.onclick = function() {
                     modal.style.display = "none";
@@ -2189,14 +2454,11 @@
                     iframe.src = "";
                     clearInterval(wmPollInterval);
                     wmPollInterval = null;
-                    // Submit final score on close
-                    wmPollIframeScore();
-                    if (lbPanel) lbPanel.classList.remove('open');
-                    if (lbToggle) lbToggle.textContent = '🏆 Leaderboard';
+                    closeLeaderboard();
                 };
             }
 
-            // ─── Draggable Logic ─────────────────────────────────────────
+            // ─── Draggable Modal Logic ───────────────────────────
             dragElement(modal);
 
             function dragElement(elmnt) {
@@ -2208,6 +2470,9 @@
                 }
 
                 function dragMouseDown(e) {
+                    // Do not drag when clicking buttons inside header
+                    if (e.target.closest('button')) return;
+
                     e = e || window.event;
                     var clientX, clientY;
                     if (e.type === 'touchstart') {
@@ -2258,5 +2523,6 @@
             }
         });
     </script>
+
 
 @endsection
