@@ -2362,12 +2362,34 @@
                 list.innerHTML = html;
             }
 
-            function escHtml(s) {
-                return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            // ─── Score Tracking & Submission ────────────────────
+            var wmHighestScore   = 0;
+            var wmSubmittedScore = 0;
+            var wmPollInterval   = null;
+
+            function wmGetLiveScoreFromIframe() {
+                try {
+                    if (iframe && iframe.contentWindow) {
+                        var win = iframe.contentWindow;
+                        if (typeof win.__wm_live_score === 'number' && win.__wm_live_score > 0) {
+                            return win.__wm_live_score;
+                        }
+                    }
+                } catch(e) {}
+                return 0;
             }
 
-            // ─── Score Submission ────────────────────────────────
-            function wmSubmitScore(score) {
+            function wmSubmitScore(score, isClosing) {
+                score = parseInt(score, 10);
+                if (isNaN(score) || score <= 0) return;
+                if (score <= wmSubmittedScore && !isClosing) return;
+
+                wmSubmittedScore = Math.max(wmSubmittedScore, score);
+                wmHighestScore   = Math.max(wmHighestScore, score);
+
+                var myScoreText = document.getElementById('wm-my-score-text');
+                if (myScoreText) myScoreText.textContent = Number(wmHighestScore).toLocaleString();
+
                 var formData = new FormData();
                 formData.append('_token',      WM_CSRF);
                 formData.append('score',       score);
@@ -2375,29 +2397,148 @@
                 if (!WM_IS_AUTH) {
                     formData.append('player_name', WM_PLAYER_NAME);
                 }
-                fetch(WM_SCORE_URL, {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(function(r){ return r.json(); })
-                .then(function(data) {
-                    if (data.success) {
-                        var myScoreText = document.getElementById('wm-my-score-text');
-                        var myRankText  = document.getElementById('wm-my-rank-text');
-                        if (myScoreText) myScoreText.textContent = Number(data.score).toLocaleString();
-                        if (myRankText && data.rank) myRankText.textContent = '#' + data.rank;
+
+                try {
+                    fetch(WM_SCORE_URL, {
+                        method: 'POST',
+                        body: formData,
+                        keepalive: true,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(function(r){ return r.json(); })
+                    .then(function(data) {
+                        if (data && data.success) {
+                            var myRankText = document.getElementById('wm-my-rank-text');
+                            if (myRankText && data.rank) myRankText.textContent = '#' + data.rank;
+                        }
+                    })
+                    .catch(function(e){ console.warn('Score submit error', e); });
+                } catch(e) {}
+            }
+
+            function wmSyncLiveScore(isClosing) {
+                var iframeScore = wmGetLiveScoreFromIframe();
+                var best = Math.max(wmHighestScore, iframeScore);
+                if (best > wmSubmittedScore) {
+                    wmSubmitScore(best, isClosing);
+                }
+            }
+
+            // ─── Leaderboard Popover Toggle ──────────────────────
+            function openLeaderboard() {
+                if (!lbOverlay) return;
+                wmSyncLiveScore(false);
+                lbOverlay.style.display = 'flex';
+                wmLoadLeaderboard();
+            }
+
+            function closeLeaderboard() {
+                if (!lbOverlay) return;
+                lbOverlay.style.display = 'none';
+            }
+
+            if (lbToggle) {
+                lbToggle.onclick = function(e) {
+                    e.stopPropagation();
+                    if (lbOverlay.style.display === 'none' || !lbOverlay.style.display) {
+                        openLeaderboard();
+                    } else {
+                        closeLeaderboard();
                     }
-                })
-                .catch(function(e){ console.warn('Score submit error', e); });
+                };
+            }
+
+            if (lbCloseBtn) {
+                lbCloseBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    closeLeaderboard();
+                };
+            }
+
+            // Click outside card to dismiss
+            if (lbOverlay) {
+                lbOverlay.onclick = function(e) {
+                    if (e.target === lbOverlay) {
+                        closeLeaderboard();
+                    }
+                };
+            }
+
+            // ─── Load Rankings ───────────────────────────────────
+            window.wmLoadLeaderboard = function() {
+                var list = document.getElementById('wm-lb-list');
+                var myScoreText = document.getElementById('wm-my-score-text');
+                var myRankText  = document.getElementById('wm-my-rank-text');
+
+                // If we already have a live score higher than display, show it
+                if (wmHighestScore > 0 && myScoreText) {
+                    myScoreText.textContent = Number(wmHighestScore).toLocaleString();
+                }
+
+                var url = WM_LB_URL + '?guest_token=' + encodeURIComponent(WM_GUEST_TOKEN);
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(r){ return r.json(); })
+                    .then(function(data) {
+                        if (!data.success) return;
+
+                        if (data.my_entry) {
+                            var displayScore = Math.max(Number(data.my_entry.score), wmHighestScore);
+                            if (myScoreText) myScoreText.textContent = Number(displayScore).toLocaleString();
+                            if (myRankText)  myRankText.textContent  = '#' + data.my_entry.rank;
+                        }
+
+                        renderLeaderboardRows(data.top, data.my_entry);
+                    })
+                    .catch(function(e){
+                        if (list) list.innerHTML = '<div class="wm-lb-empty">Unable to load leaderboard.</div>';
+                    });
+            };
+
+            function renderLeaderboardRows(rows, myEntry) {
+                var list = document.getElementById('wm-lb-list');
+                if (!list) return;
+
+                if (!rows || rows.length === 0) {
+                    list.innerHTML = '<div class="wm-lb-empty">No scores yet. Play to be the first!</div>';
+                    return;
+                }
+
+                var html = '';
+                rows.forEach(function(row) {
+                    var rankClass = '';
+                    var medalIcon = '#' + row.rank;
+                    if (row.rank === 1) { rankClass = 'gold';   medalIcon = '🥇'; }
+                    else if (row.rank === 2) { rankClass = 'silver'; medalIcon = '🥈'; }
+                    else if (row.rank === 3) { rankClass = 'bronze'; medalIcon = '🥉'; }
+
+                    var isMe = false;
+                    if (WM_IS_AUTH && row.user_id) {
+                        isMe = myEntry && myEntry.rank === row.rank && myEntry.score === row.score;
+                    } else if (!WM_IS_AUTH && row.guest_token === WM_GUEST_TOKEN) {
+                        isMe = true;
+                    }
+
+                    html += '<div class="wm-lb-row' + (isMe ? ' me' : '') + '">' +
+                        '<span class="wm-lb-col-rank ' + rankClass + '">' + medalIcon + '</span>' +
+                        '<span class="wm-lb-col-name">' + escHtml(row.player_name) + (isMe ? '<span class="you-tag">YOU</span>' : '') + '</span>' +
+                        '<span class="wm-lb-col-score">' + Number(row.score).toLocaleString() + '</span>' +
+                    '</div>';
+                });
+                list.innerHTML = html;
+            }
+
+            function escHtml(s) {
+                return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
             }
 
             // ─── Realtime Game Score Listener ────────────────────
-            var wmLastKnownScore = 0;
-            var wmPollInterval   = null;
-
             function wmPollIframeScore() {
                 try {
+                    var live = wmGetLiveScoreFromIframe();
+                    if (live > wmHighestScore) {
+                        wmHighestScore = live;
+                        wmSubmitScore(live, false);
+                    }
                     var iframeWin = iframe.contentWindow;
                     if (!iframeWin) return;
                     var lf = iframeWin.localforage || (iframeWin.localforage = null);
@@ -2405,9 +2546,9 @@
                         lf.getItem('BestScore', function(err, val) {
                             if (!err && val !== null && val !== undefined) {
                                 var s = parseInt(val, 10);
-                                if (!isNaN(s) && s > wmLastKnownScore) {
-                                    wmLastKnownScore = s;
-                                    wmSubmitScore(s);
+                                if (!isNaN(s) && s > wmHighestScore) {
+                                    wmHighestScore = s;
+                                    wmSubmitScore(s, false);
                                 }
                             }
                         });
@@ -2421,9 +2562,9 @@
                 if (typeof d === 'object' && (d.type === 'wm_score' || d.score !== undefined)) {
                     var s = parseInt(d.score || d.BestScore || 0, 10);
                     if (!isNaN(s) && s > 0) {
-                        if (s > wmLastKnownScore) {
-                            wmLastKnownScore = s;
-                            wmSubmitScore(s);
+                        if (s > wmHighestScore) {
+                            wmHighestScore = s;
+                            wmSubmitScore(s, false);
                         }
                     }
                 }
@@ -2436,25 +2577,33 @@
                     modal.style.display = "flex";
                     document.body.style.overflow = 'hidden';
                     iframe.src = watermelonUrl;
-                    wmLastKnownScore = 0;
+                    wmHighestScore = 0;
+                    wmSubmittedScore = 0;
 
                     // Ensure leaderboard overlay is CLOSED on startup so game has 100% full view
                     closeLeaderboard();
 
                     clearInterval(wmPollInterval);
-                    wmPollInterval = setInterval(wmPollIframeScore, 5000);
+                    wmPollInterval = setInterval(wmPollIframeScore, 1000);
                 };
             }
 
-            // ─── Close Modal ─────────────────────────────────────
+            // ─── Close Modal (Go Back) ───────────────────────────
             if (closeBtn) {
                 closeBtn.onclick = function() {
-                    modal.style.display = "none";
-                    document.body.style.overflow = '';
-                    iframe.src = "";
+                    // Sync current in-game score BEFORE killing the iframe
+                    wmSyncLiveScore(true);
+
                     clearInterval(wmPollInterval);
                     wmPollInterval = null;
-                    closeLeaderboard();
+
+                    // Tiny delay so keepalive fetch fires before DOM unload
+                    setTimeout(function() {
+                        modal.style.display = "none";
+                        document.body.style.overflow = '';
+                        iframe.src = "";
+                        closeLeaderboard();
+                    }, 150);
                 };
             }
 
