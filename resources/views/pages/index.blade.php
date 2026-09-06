@@ -2227,7 +2227,7 @@
             var lbToggle  = document.getElementById('wm-lb-toggle');
             var lbCloseBtn = document.getElementById('wm-lb-close-btn');
 
-            var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}";
+            var watermelonBaseUrl = "{{ URL::asset('games/Watermelon/index.html') }}";
 
             // ─── State ──────────────────────────────────────────
             var WM_SCORE_URL      = "{{ route('game.watermelon.score') }}";
@@ -2368,15 +2368,26 @@
             var wmPollInterval   = null;
 
             function wmGetLiveScoreFromIframe() {
+                var best = 0;
                 try {
+                    // 1. Check shared same-origin localStorage
+                    var local = parseInt(localStorage.getItem('wm_realtime_score') || '0', 10);
+                    if (!isNaN(local) && local > best) {
+                        best = local;
+                    }
+                } catch(e) {}
+
+                try {
+                    // 2. Check iframe window global
                     if (iframe && iframe.contentWindow) {
                         var win = iframe.contentWindow;
-                        if (typeof win.__wm_live_score === 'number' && win.__wm_live_score > 0) {
-                            return win.__wm_live_score;
+                        if (typeof win.__wm_live_score === 'number' && win.__wm_live_score > best) {
+                            best = win.__wm_live_score;
                         }
                     }
                 } catch(e) {}
-                return 0;
+
+                return best;
             }
 
             function wmSubmitScore(score, isClosing) {
@@ -2398,21 +2409,27 @@
                     formData.append('player_name', WM_PLAYER_NAME);
                 }
 
+                console.log('[Watermelon Leaderboard] Submitting score:', score, 'isAuth:', WM_IS_AUTH);
+
                 try {
                     fetch(WM_SCORE_URL, {
                         method: 'POST',
                         body: formData,
                         keepalive: true,
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': WM_CSRF
+                        }
                     })
                     .then(function(r){ return r.json(); })
                     .then(function(data) {
+                        console.log('[Watermelon Leaderboard] Submit response:', data);
                         if (data && data.success) {
                             var myRankText = document.getElementById('wm-my-rank-text');
                             if (myRankText && data.rank) myRankText.textContent = '#' + data.rank;
                         }
                     })
-                    .catch(function(e){ console.warn('Score submit error', e); });
+                    .catch(function(e){ console.warn('[Watermelon Leaderboard] Score submit error', e); });
                 } catch(e) {}
             }
 
@@ -2559,9 +2576,13 @@
             window.addEventListener('message', function(event) {
                 if (!event.data) return;
                 var d = event.data;
-                if (typeof d === 'object' && (d.type === 'wm_score' || d.score !== undefined)) {
+                if (typeof d === 'string') {
+                    try { d = JSON.parse(d); } catch(e){}
+                }
+                if (typeof d === 'object' && (d.type === 'wm_score' || d.type === 'wm_worker_score' || d.score !== undefined)) {
                     var s = parseInt(d.score || d.BestScore || 0, 10);
                     if (!isNaN(s) && s > 0) {
+                        try { localStorage.setItem('wm_realtime_score', String(s)); } catch(e){}
                         if (s > wmHighestScore) {
                             wmHighestScore = s;
                             wmSubmitScore(s, false);
@@ -2576,15 +2597,20 @@
                     if (modalTitle) modalTitle.innerText = "Watermelon Game";
                     modal.style.display = "flex";
                     document.body.style.overflow = 'hidden';
-                    iframe.src = watermelonUrl;
+
+                    // Reset session scores & localStorage cache
+                    try { localStorage.removeItem('wm_realtime_score'); } catch(e){}
                     wmHighestScore = 0;
                     wmSubmittedScore = 0;
+
+                    // Load fresh game without browser caching old scripts
+                    iframe.src = watermelonBaseUrl + "?t=" + Date.now();
 
                     // Ensure leaderboard overlay is CLOSED on startup so game has 100% full view
                     closeLeaderboard();
 
                     clearInterval(wmPollInterval);
-                    wmPollInterval = setInterval(wmPollIframeScore, 1000);
+                    wmPollInterval = setInterval(wmPollIframeScore, 700);
                 };
             }
 
