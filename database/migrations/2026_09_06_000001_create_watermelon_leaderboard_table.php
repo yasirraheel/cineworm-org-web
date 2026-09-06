@@ -18,7 +18,7 @@ class CreateWatermelonLeaderboardTable extends Migration
 
             $table->index('score');
             $table->index('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // No FK to avoid engine mismatch on shared hosting
         });
     }
 
