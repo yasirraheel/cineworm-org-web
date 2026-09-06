@@ -811,4 +811,8 @@ Route::prefix('game')->group(function () {
     Route::post('/verify-room', [GameRoomController::class, 'verifyRoomCode'])->name('game.verify');
     Route::post('/control', [GameRoomController::class, 'sendControl'])->name('game.control');
     Route::get('/controls', [GameRoomController::class, 'getControls'])->name('game.controls');
+
+    // Watermelon Leaderboard
+    Route::post('/watermelon/score', [GameRoomController::class, 'submitScore'])->name('game.watermelon.score');
+    Route::get('/watermelon/leaderboard', [GameRoomController::class, 'getLeaderboard'])->name('game.watermelon.leaderboard');
 });

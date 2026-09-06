@@ -1786,7 +1786,159 @@
                 padding: 5px;
             }
         }
+
+        /* ── Leaderboard Panel ───────────────────────────── */
+        #wm-leaderboard-panel {
+            position: absolute;
+            top: 0; right: 0;
+            width: 220px;
+            height: 100%;
+            background: rgba(0,0,0,0.88);
+            backdrop-filter: blur(6px);
+            border-left: 1px solid rgba(254,136,5,0.4);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            transform: translateX(100%);
+            transition: transform .3s ease;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        #wm-leaderboard-panel.open { transform: translateX(0); }
+
+        #wm-lb-toggle {
+            position: absolute;
+            top: 8px; right: 8px;
+            background: rgba(254,136,5,0.15);
+            border: 1px solid #fe8805;
+            color: #fe8805;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            z-index: 20;
+            transition: background .2s;
+        }
+        #wm-lb-toggle:hover { background: rgba(254,136,5,0.3); }
+
+        .wm-lb-header {
+            padding: 10px 12px 6px;
+            background: rgba(254,136,5,0.12);
+            border-bottom: 1px solid rgba(254,136,5,0.3);
+            color: #fe8805;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .wm-lb-header i { font-size: 14px; }
+
+        .wm-lb-my-score {
+            padding: 6px 12px;
+            background: rgba(254,136,5,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 11px;
+            color: #ccc;
+        }
+        .wm-lb-my-score strong { color: #fe8805; }
+
+        .wm-lb-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+        .wm-lb-list::-webkit-scrollbar { width: 4px; }
+        .wm-lb-list::-webkit-scrollbar-thumb { background: #fe8805; border-radius: 4px; }
+
+        .wm-lb-row {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background .15s;
+        }
+        .wm-lb-row:hover { background: rgba(255,255,255,0.04); }
+        .wm-lb-row.me { background: rgba(254,136,5,0.12); }
+
+        .wm-lb-rank {
+            min-width: 22px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+        }
+        .wm-lb-rank.gold { color: #ffd700; }
+        .wm-lb-rank.silver { color: #c0c0c0; }
+        .wm-lb-rank.bronze { color: #cd7f32; }
+
+        .wm-lb-name {
+            flex: 1;
+            font-size: 11px;
+            color: #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .wm-lb-score-val {
+            font-size: 11px;
+            font-weight: 700;
+            color: #fe8805;
+        }
+
+        .wm-lb-empty {
+            padding: 16px 12px;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .wm-lb-refresh {
+            padding: 6px 12px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            text-align: center;
+        }
+        .wm-lb-refresh button {
+            background: none;
+            border: 1px solid rgba(254,136,5,0.4);
+            color: #fe8805;
+            border-radius: 4px;
+            font-size: 10px;
+            padding: 3px 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .wm-lb-refresh button:hover { background: rgba(254,136,5,0.2); }
+
+        /* Guest name prompt */
+        #wm-guest-bar {
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            gap: 4px;
+        }
+        #wm-guest-name-input {
+            flex: 1;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(254,136,5,0.4);
+            color: #fff;
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 11px;
+        }
+        #wm-guest-name-input::placeholder { color: #666; }
+        #wm-guest-save-btn {
+            background: #fe8805;
+            border: none;
+            color: #000;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 7px;
+            cursor: pointer;
+        }
     </style>
+
 
     <!-- Game Modal -->
     <div id="watermelon-game-modal" class="game-modal" style="display: none;">
@@ -1794,58 +1946,269 @@
             <span class="game-modal-title" id="game-modal-title">Game</span>
             <button class="game-modal-close" id="close-game-modal">&times;</button>
         </div>
-        <div class="game-modal-body">
-            <iframe id="game-iframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+        <div class="game-modal-body" style="position:relative;">
+            <!-- Leaderboard Toggle Button -->
+            <button id="wm-lb-toggle" title="Toggle Leaderboard">🏆 Leaderboard</button>
+
+            <!-- Game iframe -->
+            <iframe id="game-iframe" src="" style="width:100%;height:100%;border:none;"></iframe>
+
+            <!-- Leaderboard Side Panel -->
+            <div id="wm-leaderboard-panel">
+                <div class="wm-lb-header">
+                    <i class="fas fa-trophy"></i> Global Leaderboard
+                </div>
+
+                {{-- Guest name bar (hidden for logged-in users) --}}
+                @guest
+                <div id="wm-guest-bar">
+                    <input id="wm-guest-name-input" type="text" maxlength="20" placeholder="Your name…">
+                    <button id="wm-guest-save-btn">Save</button>
+                </div>
+                @endguest
+
+                <div class="wm-lb-my-score" id="wm-my-score-bar" style="display:none;"></div>
+                <div class="wm-lb-list" id="wm-lb-list"><div class="wm-lb-empty">Loading…</div></div>
+                <div class="wm-lb-refresh"><button onclick="wmLoadLeaderboard()">↻ Refresh</button></div>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var modal = document.getElementById('watermelon-game-modal');
-            var btn = document.getElementById('open-game-modal');
-            var pacmanBtn = document.getElementById('open-pacman-modal');
+            var modal    = document.getElementById('watermelon-game-modal');
+            var btn      = document.getElementById('open-game-modal');
             var closeBtn = document.getElementById('close-game-modal');
-            var iframe = document.getElementById('game-iframe');
+            var iframe   = document.getElementById('game-iframe');
             var modalTitle = document.getElementById('game-modal-title');
+            var lbPanel  = document.getElementById('wm-leaderboard-panel');
+            var lbToggle = document.getElementById('wm-lb-toggle');
 
             var watermelonUrl = "{{ URL::asset('games/Watermelon/index.html') }}";
 
-            // Open Watermelon Modal
-            if(btn){
-                btn.onclick = function() {
-                    if(modalTitle) modalTitle.innerText = "Watermelon Game";
-                    modal.style.display = "flex";
-                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
-                    // Always reload to ensure fresh logs
-                    iframe.src = watermelonUrl;
-                }
+            // ─── Leaderboard state ───────────────────────────────────────
+            var WM_SCORE_URL      = "{{ route('game.watermelon.score') }}";
+            var WM_LB_URL         = "{{ route('game.watermelon.leaderboard') }}";
+            var WM_CSRF           = "{{ csrf_token() }}";
+            @auth
+            var WM_IS_AUTH        = true;
+            var WM_PLAYER_NAME    = "{{ Auth::user()->name }}";
+            @else
+            var WM_IS_AUTH        = false;
+            // Generate / restore guest token from localStorage
+            var WM_PLAYER_NAME    = localStorage.getItem('wm_guest_name') || 'Guest';
+            @endauth
+
+            // Guest token — persisted per-browser-session
+            var WM_GUEST_TOKEN = localStorage.getItem('wm_guest_token');
+            if (!WM_GUEST_TOKEN) {
+                WM_GUEST_TOKEN = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('wm_guest_token', WM_GUEST_TOKEN);
             }
 
-            // Close Modal
-            if(closeBtn){
+            // ─── Guest name UI ──────────────────────────────────────────
+            var guestNameInput = document.getElementById('wm-guest-name-input');
+            var guestSaveBtn   = document.getElementById('wm-guest-save-btn');
+            if (guestNameInput) {
+                guestNameInput.value = WM_PLAYER_NAME !== 'Guest' ? WM_PLAYER_NAME : '';
+            }
+            if (guestSaveBtn) {
+                guestSaveBtn.onclick = function() {
+                    var name = (guestNameInput.value || '').trim();
+                    if (!name) return;
+                    WM_PLAYER_NAME = name.substring(0, 20);
+                    localStorage.setItem('wm_guest_name', WM_PLAYER_NAME);
+                    guestSaveBtn.textContent = '✓';
+                    setTimeout(function(){ guestSaveBtn.textContent = 'Save'; }, 1200);
+                };
+            }
+
+            // ─── Load leaderboard ────────────────────────────────────────
+            window.wmLoadLeaderboard = function() {
+                var url = WM_LB_URL + '?guest_token=' + encodeURIComponent(WM_GUEST_TOKEN);
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(r){ return r.json(); })
+                    .then(function(data) {
+                        if (!data.success) return;
+                        renderLeaderboard(data.top, data.my_entry);
+                    })
+                    .catch(function(e){ console.warn('Leaderboard fetch failed', e); });
+            };
+
+            function renderLeaderboard(rows, myEntry) {
+                var list = document.getElementById('wm-lb-list');
+                var myBar = document.getElementById('wm-my-score-bar');
+                if (!list) return;
+
+                // My score bar
+                if (myEntry) {
+                    myBar.style.display = '';
+                    myBar.innerHTML = 'Your best: <strong>#' + myEntry.rank + '</strong> &mdash; <strong>' + myEntry.score + ' pts</strong>';
+                } else {
+                    myBar.style.display = 'none';
+                }
+
+                if (!rows || rows.length === 0) {
+                    list.innerHTML = '<div class="wm-lb-empty">No scores yet.<br>Be the first!</div>';
+                    return;
+                }
+
+                var html = '';
+                rows.forEach(function(row) {
+                    var rankClass = '';
+                    var medal = '#' + row.rank;
+                    if (row.rank === 1) { rankClass = 'gold';   medal = '🥇'; }
+                    if (row.rank === 2) { rankClass = 'silver'; medal = '🥈'; }
+                    if (row.rank === 3) { rankClass = 'bronze'; medal = '🥉'; }
+
+                    var isMe = false;
+                    if (WM_IS_AUTH && row.user_id) {
+                        // Can't compare user_id on client for security; rely on myEntry rank
+                        isMe = myEntry && myEntry.rank === row.rank && myEntry.score === row.score;
+                    } else if (!WM_IS_AUTH && row.guest_token === WM_GUEST_TOKEN) {
+                        isMe = true;
+                    }
+
+                    html += '<div class="wm-lb-row' + (isMe ? ' me' : '') + '">' +
+                        '<span class="wm-lb-rank ' + rankClass + '">' + medal + '</span>' +
+                        '<span class="wm-lb-name">' + escHtml(row.player_name) + (isMe ? ' (you)' : '') + '</span>' +
+                        '<span class="wm-lb-score-val">' + Number(row.score).toLocaleString() + '</span>' +
+                    '</div>';
+                });
+                list.innerHTML = html;
+            }
+
+            function escHtml(s) {
+                return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            }
+
+            // ─── Submit score to server ──────────────────────────────────
+            function wmSubmitScore(score) {
+                var formData = new FormData();
+                formData.append('_token',      WM_CSRF);
+                formData.append('score',       score);
+                formData.append('guest_token', WM_GUEST_TOKEN);
+                if (!WM_IS_AUTH) {
+                    formData.append('player_name', WM_PLAYER_NAME);
+                }
+                fetch(WM_SCORE_URL, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(r){ return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        // Refresh leaderboard after a new score comes in
+                        wmLoadLeaderboard();
+                    }
+                })
+                .catch(function(e){ console.warn('Score submit failed', e); });
+            }
+
+            // ─── Intercept the game's BestScore from localStorage ────────
+            // Construct stores BestScore in IndexedDB via localforage.
+            // We intercept postMessage from the iframe as a hook, AND also
+            // poll the iframe's localforage every 5 s during gameplay.
+            var wmLastKnownScore = 0;
+            var wmPollInterval   = null;
+
+            function wmPollIframeScore() {
+                try {
+                    var iframeWin = iframe.contentWindow;
+                    if (!iframeWin) return;
+                    // Attempt to read Construct LocalStorage BestScore key
+                    // (same-origin check: Watermelon is served from same domain)
+                    var lf = iframeWin.localforage || (iframeWin.localforage = null);
+                    if (lf) {
+                        lf.getItem('BestScore', function(err, val) {
+                            if (!err && val !== null && val !== undefined) {
+                                var s = parseInt(val, 10);
+                                if (!isNaN(s) && s > wmLastKnownScore) {
+                                    wmLastKnownScore = s;
+                                    wmSubmitScore(s);
+                                }
+                            }
+                        });
+                    }
+                } catch(e) { /* cross-origin guard */ }
+            }
+
+            // Also listen for postMessage scores (in case the game sends them)
+            window.addEventListener('message', function(event) {
+                if (!event.data) return;
+                var d = event.data;
+                // Construct "BestScore" storage event or custom event
+                if (typeof d === 'object' && (d.type === 'wm_score' || d.score !== undefined)) {
+                    var s = parseInt(d.score || d.BestScore || 0, 10);
+                    if (!isNaN(s) && s > 0) {
+                        if (s > wmLastKnownScore) {
+                            wmLastKnownScore = s;
+                            wmSubmitScore(s);
+                        }
+                    }
+                }
+            });
+
+            // ─── Leaderboard toggle ──────────────────────────────────────
+            if (lbToggle && lbPanel) {
+                lbToggle.onclick = function() {
+                    var isOpen = lbPanel.classList.toggle('open');
+                    lbToggle.textContent = isOpen ? '✕ Close' : '🏆 Leaderboard';
+                    if (isOpen) {
+                        wmLoadLeaderboard();
+                    }
+                };
+            }
+
+            // ─── Open Watermelon Modal ───────────────────────────────────
+            if (btn) {
+                btn.onclick = function() {
+                    if (modalTitle) modalTitle.innerText = "Watermelon Game";
+                    modal.style.display = "flex";
+                    document.body.style.overflow = 'hidden';
+                    iframe.src = watermelonUrl;
+                    wmLastKnownScore = 0;
+                    // Start polling iframe for score
+                    clearInterval(wmPollInterval);
+                    wmPollInterval = setInterval(wmPollIframeScore, 5000);
+                    // Open leaderboard panel by default
+                    if (lbPanel && !lbPanel.classList.contains('open')) {
+                        lbPanel.classList.add('open');
+                        if (lbToggle) lbToggle.textContent = '✕ Close';
+                        wmLoadLeaderboard();
+                    }
+                };
+            }
+
+            // ─── Close Modal ─────────────────────────────────────────────
+            if (closeBtn) {
                 closeBtn.onclick = function() {
                     modal.style.display = "none";
-                    document.body.style.overflow = ''; // Restore background scrolling
-                    iframe.src = ""; // Stop game execution
-                }
+                    document.body.style.overflow = '';
+                    iframe.src = "";
+                    clearInterval(wmPollInterval);
+                    wmPollInterval = null;
+                    // Submit final score on close
+                    wmPollIframeScore();
+                    if (lbPanel) lbPanel.classList.remove('open');
+                    if (lbToggle) lbToggle.textContent = '🏆 Leaderboard';
+                };
             }
 
-            // Draggable Logic
+            // ─── Draggable Logic ─────────────────────────────────────────
             dragElement(modal);
 
             function dragElement(elmnt) {
                 var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
                 var header = document.getElementById("game-modal-header");
                 if (header) {
-                    // Mouse events
                     header.onmousedown = dragMouseDown;
-                    // Touch events
                     header.addEventListener('touchstart', dragMouseDown, {passive: false});
                 }
 
                 function dragMouseDown(e) {
                     e = e || window.event;
-
                     var clientX, clientY;
                     if (e.type === 'touchstart') {
                          clientX = e.touches[0].clientX;
@@ -1855,11 +2218,8 @@
                         clientX = e.clientX;
                         clientY = e.clientY;
                     }
-
-                    // get the mouse cursor position at startup:
                     pos3 = clientX;
                     pos4 = clientY;
-
                     if (e.type === 'touchstart') {
                         document.addEventListener('touchend', closeDragElement);
                         document.addEventListener('touchmove', elementDrag, {passive: false});
@@ -1871,8 +2231,7 @@
 
                 function elementDrag(e) {
                     e = e || window.event;
-                    if (e.preventDefault) e.preventDefault(); // Prevent scrolling on mobile
-
+                    if (e.preventDefault) e.preventDefault();
                     var clientX, clientY;
                     if (e.type === 'touchmove') {
                          clientX = e.touches[0].clientX;
@@ -1881,21 +2240,16 @@
                         clientX = e.clientX;
                         clientY = e.clientY;
                     }
-
-                    // calculate the new cursor position:
                     pos1 = pos3 - clientX;
                     pos2 = pos4 - clientY;
                     pos3 = clientX;
                     pos4 = clientY;
-                    // set the element's new position:
-                    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                    elmnt.style.top  = (elmnt.offsetTop  - pos2) + "px";
                     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-                    // Remove transform centering once dragged
                     elmnt.style.transform = "none";
                 }
 
                 function closeDragElement() {
-                    // stop moving when mouse button is released:
                     document.onmouseup = null;
                     document.onmousemove = null;
                     document.removeEventListener('touchend', closeDragElement);
@@ -1904,4 +2258,5 @@
             }
         });
     </script>
+
 @endsection
