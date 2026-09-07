@@ -22,5 +22,7 @@ class VerifyCsrfToken extends Middleware
          '/coingate/callback',
          '/user/editor/api/*',
          'user/editor/api/*',
+         '/livechat/*',
+         'livechat/*',
     ];
 }
