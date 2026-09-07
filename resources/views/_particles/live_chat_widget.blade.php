@@ -25,7 +25,7 @@
                 </div>
                 <div class="cw-header-info">
                     <div class="cw-header-title">{{ getcong('site_name') ?: 'Cineworm' }} Support</div>
-                    <div class="cw-header-subtitle"><span class="cw-pulse"></span> Online &bull; Ready to help</div>
+                    <div class="cw-header-subtitle" id="cw-header-status"><span class="cw-pulse"></span> Online &bull; Ready to help</div>
                 </div>
             </div>
             <div class="cw-header-actions">
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        {{-- Guest Name Strip (Visible only for guests to optionally customize their name) --}}
+        {{-- Guest Name Strip --}}
         @guest
         <div id="cw-guest-identity-bar">
             <span>Chatting as: <strong id="cw-guest-display-name">Guest</strong></span>
@@ -68,10 +68,14 @@
                 <div class="cw-welcome-text">Our team is here to help with any questions about movies, series, or your account.</div>
             </div>
             <div id="cw-messages-stream"></div>
+            {{-- Typing Indicator --}}
             <div id="cw-typing-indicator" style="display: none;">
-                <span class="cw-typing-dot"></span>
-                <span class="cw-typing-dot"></span>
-                <span class="cw-typing-dot"></span>
+                <div class="cw-typing-bubble">
+                    <span class="cw-typing-dot"></span>
+                    <span class="cw-typing-dot"></span>
+                    <span class="cw-typing-dot"></span>
+                </div>
+                <span class="cw-typing-text">Support is typing...</span>
             </div>
         </div>
 
@@ -393,19 +397,46 @@
     border-bottom-right-radius: 4px;
 }
 
-.cw-msg-time {
-    font-size: 9px;
-    color: rgba(255, 255, 255, 0.55);
+/* Meta time and read receipt ticks */
+.cw-msg-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
     margin-top: 4px;
-    text-align: right;
+    font-size: 10px;
 }
-.cw-msg-incoming .cw-msg-time {
+.cw-msg-incoming .cw-msg-meta {
+    justify-content: flex-start;
     color: #64748b;
+}
+.cw-msg-outgoing .cw-msg-meta {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Read receipt ticks */
+.cw-tick {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: -2px;
+    margin-left: 2px;
+    color: rgba(255, 255, 255, 0.6);
+    user-select: none;
+}
+.cw-tick.cw-tick-read {
+    color: #38bdf8 !important; /* Double Blue Checkmark */
 }
 
 /* Typing Indicator */
 #cw-typing-indicator {
     align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: cw-fadein 0.2s ease;
+    margin-top: 2px;
+}
+.cw-typing-bubble {
     background: #1e293b;
     padding: 8px 12px;
     border-radius: 14px;
@@ -413,12 +444,18 @@
     display: flex;
     gap: 4px;
     align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.cw-typing-text {
+    font-size: 11px;
+    color: #94a3b8;
+    font-style: italic;
 }
 .cw-typing-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #94a3b8;
+    background: #38bdf8;
     animation: cw-typing 1.2s infinite ease-in-out;
 }
 .cw-typing-dot:nth-child(2) { animation-delay: 0.2s; }
@@ -525,7 +562,9 @@
     var CW_CHAT = {
         isOpen: false,
         lastId: 0,
+        lastReadUserMsgId: 0,
         pollTimer: null,
+        typingPingTimer: null,
         soundEnabled: localStorage.getItem('cw_chat_sound') !== 'off',
         guestToken: localStorage.getItem('cw_chat_guest_token') || '',
         guestName: localStorage.getItem('cw_chat_guest_name') || '',
@@ -560,13 +599,13 @@
     var minimizeBtn = document.getElementById('cw-minimize-btn');
     var guestDisplayName = document.getElementById('cw-guest-display-name');
     var editGuestNameBtn = document.getElementById('cw-edit-guest-name');
+    var typingIndicator = document.getElementById('cw-typing-indicator');
 
     if (guestDisplayName) {
         guestDisplayName.textContent = CW_CHAT.guestName;
     }
 
     // ── SOUND SYNTHESIS (WEB AUDIO API) ──────────────────────────────
-    // Generates a pleasant two-tone melodic chime (D5 -> A5)
     function playIncomingTone() {
         if (!CW_CHAT.soundEnabled) return;
         try {
@@ -610,7 +649,6 @@
         }
     }
 
-    // Update Sound Button UI
     function updateSoundUI() {
         if (CW_CHAT.soundEnabled) {
             soundOnIcon.style.display = 'block';
@@ -629,9 +667,7 @@
         CW_CHAT.soundEnabled = !CW_CHAT.soundEnabled;
         localStorage.setItem('cw_chat_sound', CW_CHAT.soundEnabled ? 'on' : 'off');
         updateSoundUI();
-        if (CW_CHAT.soundEnabled) {
-            playIncomingTone();
-        }
+        if (CW_CHAT.soundEnabled) playIncomingTone();
     });
 
     // ── OPEN / CLOSE / TOGGLE ────────────────────────────────────────
@@ -691,13 +727,39 @@
         }
     });
 
-    // ── MESSAGE RENDERING ────────────────────────────────────────────
+    // ── REAL-TIME TYPING PING FROM USER ──────────────────────────────
+    chatInput.addEventListener('input', function() {
+        if (!CW_CHAT.typingPingTimer) {
+            sendTypingPing();
+            CW_CHAT.typingPingTimer = setTimeout(function() {
+                CW_CHAT.typingPingTimer = null;
+            }, 2500);
+        }
+    });
+
+    function sendTypingPing() {
+        var csrfToken = document.querySelector('meta[name="csrf-token"]') ?
+                        document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
+
+        fetch('/livechat/typing', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ guest_token: CW_CHAT.guestToken })
+        }).catch(function() {});
+    }
+
+    // ── MESSAGE RENDERING & READ RECEIPT TICKS ────────────────────────
     function appendMessage(msg, isInitial) {
-        // Prevent duplicate rendering
         if (document.getElementById('cw-msg-' + msg.id)) return;
 
         var row = document.createElement('div');
         row.id = 'cw-msg-' + msg.id;
+        row.dataset.id = msg.id;
         var isOutgoing = (msg.sender !== 'admin');
         row.className = 'cw-msg-row ' + (isOutgoing ? 'cw-msg-outgoing' : 'cw-msg-incoming');
 
@@ -709,11 +771,30 @@
         bubble.className = 'cw-msg-bubble';
         bubble.innerHTML = msg.message.replace(/\n/g, '<br>');
 
-        var time = document.createElement('div');
-        time.className = 'cw-msg-time';
-        time.textContent = msg.time || '';
+        var meta = document.createElement('div');
+        meta.className = 'cw-msg-meta';
 
-        bubble.appendChild(time);
+        var timeSpan = document.createElement('span');
+        timeSpan.textContent = msg.time || '';
+        meta.appendChild(timeSpan);
+
+        // Read receipt tick for outgoing user messages
+        if (isOutgoing) {
+            var tickSpan = document.createElement('span');
+            tickSpan.className = 'cw-tick';
+            var isRead = msg.is_read || (CW_CHAT.lastReadUserMsgId && msg.id <= CW_CHAT.lastReadUserMsgId);
+            if (isRead) {
+                tickSpan.classList.add('cw-tick-read');
+                tickSpan.innerHTML = '&#10003;&#10003;'; // Double blue tick
+                tickSpan.title = 'Read by Support';
+            } else {
+                tickSpan.innerHTML = '&#10003;'; // Single tick
+                tickSpan.title = 'Delivered';
+            }
+            meta.appendChild(tickSpan);
+        }
+
+        bubble.appendChild(meta);
         row.appendChild(senderName);
         row.appendChild(bubble);
         messagesStream.appendChild(row);
@@ -722,10 +803,28 @@
             CW_CHAT.lastId = msg.id;
         }
 
-        // Play chime tone if incoming message from admin and not the initial bulk load
         if (!isInitial && !isOutgoing) {
             playIncomingTone();
         }
+    }
+
+    // Update existing message ticks when admin reads messages
+    function updateReadReceipts(lastReadId) {
+        if (!lastReadId) return;
+        CW_CHAT.lastReadUserMsgId = Math.max(CW_CHAT.lastReadUserMsgId, lastReadId);
+
+        var outgoingRows = messagesStream.querySelectorAll('.cw-msg-outgoing');
+        outgoingRows.forEach(function(row) {
+            var msgId = parseInt(row.dataset.id, 10);
+            if (msgId <= CW_CHAT.lastReadUserMsgId) {
+                var tick = row.querySelector('.cw-tick');
+                if (tick && !tick.classList.contains('cw-tick-read')) {
+                    tick.classList.add('cw-tick-read');
+                    tick.innerHTML = '&#10003;&#10003;'; // Double blue tick
+                    tick.title = 'Read by Support';
+                }
+            }
+        });
     }
 
     function scrollToBottom() {
@@ -743,26 +842,39 @@
         })
         .then(function(res) { return res.json(); })
         .then(function(data) {
-            if (data.success && data.messages && data.messages.length > 0) {
-                var wasAtBottom = (messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 60);
-                var isInitial = (CW_CHAT.lastId === 0);
-
-                data.messages.forEach(function(msg) {
-                    appendMessage(msg, isInitial);
-                });
-
-                if (wasAtBottom || isInitial || CW_CHAT.isOpen) {
-                    scrollToBottom();
+            if (data.success) {
+                if (data.last_read_user_msg_id) {
+                    updateReadReceipts(data.last_read_user_msg_id);
                 }
-            }
 
-            // Update unread badge when chat is closed
-            if (!CW_CHAT.isOpen && typeof data.unread_count === 'number') {
-                if (data.unread_count > 0) {
-                    unreadBadge.textContent = data.unread_count > 9 ? '9+' : data.unread_count;
-                    unreadBadge.style.display = 'flex';
+                // Handle Admin Typing Indicator
+                if (data.is_admin_typing) {
+                    typingIndicator.style.display = 'flex';
                 } else {
-                    unreadBadge.style.display = 'none';
+                    typingIndicator.style.display = 'none';
+                }
+
+                if (data.messages && data.messages.length > 0) {
+                    var wasAtBottom = (messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 60);
+                    var isInitial = (CW_CHAT.lastId === 0);
+
+                    data.messages.forEach(function(msg) {
+                        appendMessage(msg, isInitial);
+                    });
+
+                    if (wasAtBottom || isInitial || CW_CHAT.isOpen) {
+                        scrollToBottom();
+                    }
+                }
+
+                // Update unread badge when chat is closed
+                if (!CW_CHAT.isOpen && typeof data.unread_count === 'number') {
+                    if (data.unread_count > 0) {
+                        unreadBadge.textContent = data.unread_count > 9 ? '9+' : data.unread_count;
+                        unreadBadge.style.display = 'flex';
+                    } else {
+                        unreadBadge.style.display = 'none';
+                    }
                 }
             }
         })
@@ -780,7 +892,6 @@
         chatInput.value = '';
         chatInput.style.height = 'auto';
 
-        // CSRF Token
         var csrfToken = document.querySelector('meta[name="csrf-token"]') ?
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
 
@@ -818,8 +929,7 @@
         if (CW_CHAT.pollTimer) {
             clearInterval(CW_CHAT.pollTimer);
         }
-        // Poll every 2.5s when open, every 8s when closed
-        var interval = CW_CHAT.isOpen ? 2500 : 8000;
+        var interval = CW_CHAT.isOpen ? 2500 : 7000;
         CW_CHAT.pollTimer = setInterval(function() {
             fetchMessages(CW_CHAT.isOpen);
         }, interval);

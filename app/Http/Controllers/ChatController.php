@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class ChatController extends Controller
@@ -100,15 +101,46 @@ class ChatController extends Controller
         } else {
             $unreadQuery->where('guest_token', $guestToken);
         }
-        $unreadCount = $unreadQuery->count();
+        // Highest user message ID that admin has read (for double ticks ✓✓)
+        $lastReadQuery = Message::where('is_read', true)->where('sender', '!=', 'admin');
+        if ($user) {
+            $lastReadQuery->where('user_id', $user->id);
+        } else {
+            $lastReadQuery->where('guest_token', $guestToken);
+        }
+        $lastReadUserMsgId = (int) $lastReadQuery->max('id');
+
+        // Check if Admin is currently typing
+        $adminTypingKey = 'cw_admin_typing_' . ($user ? ('user_' . $user->id) : ('guest_' . $guestToken));
+        $isAdminTyping = (bool) Cache::has($adminTypingKey);
 
         return response()->json([
             'success' => true,
             'messages' => $messages,
             'unread_count' => $unreadCount,
+            'last_read_user_msg_id' => $lastReadUserMsgId,
+            'is_admin_typing' => $isAdminTyping,
             'is_auth' => (bool) $user,
             'user_name' => $user ? $user->name : null,
         ]);
+    }
+
+    /**
+     * Record visitor / user typing activity
+     */
+    public function widgetTyping(Request $request)
+    {
+        $user = Auth::user();
+        $guestToken = $request->input('guest_token');
+
+        if (!$user && empty($guestToken)) {
+            return response()->json(['success' => false]);
+        }
+
+        $key = 'cw_typing_' . ($user ? ('user_' . $user->id) : ('guest_' . $guestToken));
+        Cache::put($key, now()->timestamp, 4);
+
+        return response()->json(['success' => true]);
     }
 
     /**
@@ -238,6 +270,8 @@ class ChatController extends Controller
             $userEmail = $u ? $u->email : 'Registered User';
             $avatar = ($u && !empty($u->user_image)) ? asset('upload/' . $u->user_image) : null;
 
+            $isTyping = (bool) Cache::has('cw_typing_user_' . $ut->user_id);
+
             $allThreads[] = [
                 'id' => $ut->user_id,
                 'key' => 'user_' . $ut->user_id,
@@ -251,6 +285,7 @@ class ChatController extends Controller
                 'last_time' => $lastMsg->created_at ? $lastMsg->created_at->diffForHumans(null, true) : '',
                 'timestamp' => $lastMsg->created_at ? $lastMsg->created_at->timestamp : 0,
                 'unread_count' => (int) $ut->unread_count,
+                'is_typing' => $isTyping,
             ];
         }
 
@@ -259,6 +294,7 @@ class ChatController extends Controller
             if (!$lastMsg) continue;
 
             $guestName = $lastMsg->guest_name ?: ('Guest #' . substr($gt->guest_token, -4));
+            $isTyping = (bool) Cache::has('cw_typing_guest_' . $gt->guest_token);
 
             $allThreads[] = [
                 'id' => $gt->guest_token,
@@ -273,6 +309,7 @@ class ChatController extends Controller
                 'last_time' => $lastMsg->created_at ? $lastMsg->created_at->diffForHumans(null, true) : '',
                 'timestamp' => $lastMsg->created_at ? $lastMsg->created_at->timestamp : 0,
                 'unread_count' => (int) $gt->unread_count,
+                'is_typing' => $isTyping,
             ];
         }
 
@@ -366,11 +403,46 @@ class ChatController extends Controller
                 ];
             });
 
+        // Highest admin message ID that the user has read (for double ticks ✓✓)
+        $lastReadAdminQuery = Message::where('is_read', true)->where('sender', 'admin');
+        if ($type === 'user') {
+            $lastReadAdminQuery->where('user_id', $targetId);
+        } else {
+            $lastReadAdminQuery->where('guest_token', $targetId);
+        }
+        $lastReadAdminMsgId = (int) $lastReadAdminQuery->max('id');
+
+        $isUserTyping = (bool) Cache::has('cw_typing_' . $type . '_' . $targetId);
+
         return response()->json([
             'success' => true,
             'messages' => $messages,
             'customer' => $customer,
+            'last_read_admin_msg_id' => $lastReadAdminMsgId,
+            'is_user_typing' => $isUserTyping,
         ]);
+    }
+
+    /**
+     * Record admin typing activity for current active thread
+     */
+    public function adminTyping(Request $request)
+    {
+        if (!Auth::check() || Auth::user()->usertype !== 'Admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $type = $request->input('type');
+        $targetId = $request->input('target_id');
+
+        if (!$type || !$targetId) {
+            return response()->json(['error' => 'Invalid parameters'], 422);
+        }
+
+        $key = 'cw_admin_typing_' . $type . '_' . $targetId;
+        Cache::put($key, now()->timestamp, 4);
+
+        return response()->json(['success' => true]);
     }
 
     /**

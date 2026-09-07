@@ -724,6 +724,7 @@ Route::get('watchlist/remove', 'UserController@watchlist_remove');
 Route::get('/livechat/messages', [ChatController::class, 'fetchWidgetMessages'])->name('livechat.messages');
 Route::post('/livechat/send', [ChatController::class, 'sendWidgetMessage'])->name('livechat.send');
 Route::get('/livechat/unread', [ChatController::class, 'getWidgetUnread'])->name('livechat.unread');
+Route::post('/livechat/typing', [ChatController::class, 'widgetTyping'])->name('livechat.typing');
 
 Route::middleware('auth')->group(function () {
     Route::get('/messages', [ChatController::class, 'index'])->name('chat.index');
@@ -731,6 +732,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/livechat/conversations', [ChatController::class, 'getAdminConversations'])->name('admin.livechat.conversations');
     Route::get('/admin/livechat/thread', [ChatController::class, 'getAdminThread'])->name('admin.livechat.thread');
     Route::post('/admin/livechat/reply', [ChatController::class, 'sendAdminReply'])->name('admin.livechat.reply');
+    Route::post('/admin/livechat/typing', [ChatController::class, 'adminTyping'])->name('admin.livechat.typing');
     Route::post('/admin/livechat/delete_thread', [ChatController::class, 'deleteAdminThread'])->name('admin.livechat.delete_thread');
     Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
     Route::get('/chat/messages/{userId}', [ChatController::class, 'fetchMessages'])->name('chat.fetchMessages');
