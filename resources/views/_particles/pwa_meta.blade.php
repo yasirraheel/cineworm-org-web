@@ -54,10 +54,18 @@
     let installButton;
 
     window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent the mini-infobar from appearing on mobile
+        // Prevent the native mini-infobar from appearing on mobile browsers
         e.preventDefault();
 
-        // Stash the event so it can be triggered later
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent)
+            || (window.matchMedia && window.matchMedia('(max-width: 991px)').matches)
+            || ('ontouchstart' in window && window.innerWidth <= 1024);
+
+        if (isMobile) {
+            return;
+        }
+
+        // Stash the event so it can be triggered on desktop if needed
         deferredPrompt = e;
 
         // Show custom install button/banner if exists
@@ -174,6 +182,13 @@
         margin-top: 10px;
         cursor: pointer;
         font-weight: bold;
+    }
+
+    @media (max-width: 991px) {
+        .ios-install-prompt {
+            display: none !important;
+            visibility: hidden !important;
+        }
     }
 </style>
 

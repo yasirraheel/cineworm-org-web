@@ -193,58 +193,15 @@
     background: rgba(255,255,255,0.1);
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .pwa-banner-inner {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .pwa-banner-text {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .pwa-banner-icon {
-        font-size: 28px;
-    }
-
-    .pwa-banner-message h4 {
-        font-size: 15px;
-    }
-
-    .pwa-banner-message p {
-        font-size: 12px;
-    }
-
-    .pwa-banner-buttons {
-        width: 100%;
-        flex-direction: column;
-    }
-
-    .pwa-btn-install,
-    .pwa-btn-later {
-        width: 100%;
-        padding: 12px 20px;
-        font-size: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .pwa-banner-content {
-        padding: 12px 15px;
-    }
-
-    .pwa-banner-icon {
-        font-size: 24px;
-    }
-
-    .pwa-banner-message h4 {
-        font-size: 14px;
-    }
-
-    .pwa-banner-message p {
-        font-size: 11px;
+/* Never show PWA install banner or iOS guide modal on mobile screens */
+@media (max-width: 991px) {
+    #pwa-install-banner,
+    #pwa-ios-guide-modal {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
     }
 }
 </style>
@@ -364,6 +321,11 @@
 </div>
 
 <script>
+    // Detect mobile devices (smartphones, tablets, touch devices)
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent)
+        || (window.matchMedia && window.matchMedia('(max-width: 991px)').matches)
+        || ('ontouchstart' in window && window.innerWidth <= 1024);
+
     // Detect iOS devices
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isAppInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
@@ -374,57 +336,72 @@
     const shouldShowBanner = !dismissedTime || (Date.now() - parseInt(dismissedTime)) > sevenDays;
 
     function dismissPwaBanner() {
-        document.getElementById('pwa-install-banner').style.display = 'none';
+        var banner = document.getElementById('pwa-install-banner');
+        if (banner) banner.style.display = 'none';
         localStorage.setItem('pwa-banner-dismissed', Date.now());
     }
 
     // iOS specific handling
     if (isIOS) {
-        // Don't show banner if already installed (standalone mode)
-        if (!isAppInStandaloneMode && shouldShowBanner) {
-            // Show iOS-specific banner
-            document.getElementById('pwa-install-banner').style.display = 'block';
-            document.getElementById('pwa-banner-desc').textContent = 'Install on your home screen for a better experience!';
+        // Strictly NEVER show install banner or guide modal on mobile
+        if (isMobileDevice) {
+            var banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.style.display = 'none';
+        } else if (!isAppInStandaloneMode && shouldShowBanner) {
+            var banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.style.display = 'block';
+            var desc = document.getElementById('pwa-banner-desc');
+            if (desc) desc.textContent = 'Install on your home screen for a better experience!';
 
-            // Hide standard install button, show guide button
-            document.getElementById('pwa-install-button').style.display = 'none';
-            document.getElementById('pwa-guide-button').style.display = 'inline-block';
-
-            // Add click handler for guide button
-            document.getElementById('pwa-guide-button').addEventListener('click', function() {
-                document.getElementById('pwa-ios-guide-modal').style.display = 'block';
-            });
+            var installBtn = document.getElementById('pwa-install-button');
+            if (installBtn) installBtn.style.display = 'none';
+            var guideBtn = document.getElementById('pwa-guide-button');
+            if (guideBtn) {
+                guideBtn.style.display = 'inline-block';
+                guideBtn.addEventListener('click', function() {
+                    var modal = document.getElementById('pwa-ios-guide-modal');
+                    if (modal) modal.style.display = 'block';
+                });
+            }
         }
     } else {
         // Android/Desktop - Standard install prompt
         let deferredPrompt;
 
         window.addEventListener('beforeinstallprompt', (e) => {
+            // ALWAYS prevent native mini-infobar on mobile browsers
             e.preventDefault();
             deferredPrompt = e;
 
-            if (shouldShowBanner) {
-                document.getElementById('pwa-install-banner').style.display = 'block';
+            // Strictly NEVER show install banner on mobile
+            if (!isMobileDevice && shouldShowBanner) {
+                var banner = document.getElementById('pwa-install-banner');
+                if (banner) banner.style.display = 'block';
             }
         });
 
-        document.getElementById('pwa-install-button').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+        var installBtn = document.getElementById('pwa-install-button');
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
 
-                if (outcome === 'accepted') {
-                    document.getElementById('pwa-install-banner').style.display = 'none';
-                    localStorage.removeItem('pwa-banner-dismissed');
+                    if (outcome === 'accepted') {
+                        var banner = document.getElementById('pwa-install-banner');
+                        if (banner) banner.style.display = 'none';
+                        localStorage.removeItem('pwa-banner-dismissed');
+                    }
+
+                    deferredPrompt = null;
                 }
-
-                deferredPrompt = null;
-            }
-        });
+            });
+        }
 
         // Hide banner after installation
         window.addEventListener('appinstalled', () => {
-            document.getElementById('pwa-install-banner').style.display = 'none';
+            var banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.style.display = 'none';
             localStorage.removeItem('pwa-banner-dismissed');
         });
     }
