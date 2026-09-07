@@ -101,6 +101,8 @@ class ChatController extends Controller
         } else {
             $unreadQuery->where('guest_token', $guestToken);
         }
+        $unreadCount = $unreadQuery->count();
+
         // Highest user message ID that admin has read (for double ticks ✓✓)
         $lastReadQuery = Message::where('is_read', true)->where('sender', '!=', 'admin');
         if ($user) {
