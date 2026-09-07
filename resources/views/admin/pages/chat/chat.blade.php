@@ -1,24 +1,24 @@
 @extends('admin.admin_app')
 
 @section('content')
-<div class="content-page">
-    <div class="content">
+<div class="content-page cw-chat-page">
+    <div class="content cw-chat-content">
         <div class="container-fluid">
-            {{-- Page Header matching Cineworm admin style --}}
+            {{-- Compact Page Header matching Cineworm admin style --}}
             <div class="row">
                 <div class="col-12">
-                    <div class="page-title-box d-flex align-items-center justify-content-between">
-                        <h4 class="page-title mb-0">Live Chat &amp; Support Inbox</h4>
+                    <div class="page-title-box cw-compact-title d-flex align-items-center justify-content-between">
+                        <h4 class="page-title m-0">Live Chat &amp; Support</h4>
                         <div class="page-title-right">
-                            <span class="badge badge-success px-3 py-2" id="adm-status-indicator" style="font-size: 12px;">
-                                <i class="fa fa-circle text-white mr-1"></i> Live Real-Time Polling
+                            <span class="badge badge-success px-2 py-1" id="adm-status-indicator" style="font-size: 11px;">
+                                <i class="fa fa-circle text-white mr-1"></i> Live Polling Active
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Main Dark Card Box --}}
+            {{-- Main Dark Card Box (Fitted to Viewport) --}}
             <div class="row">
                 <div class="col-12">
                     <div class="card-box p-0 cw-dark-chat-card">
@@ -28,10 +28,10 @@
                             <div class="cw-sidebar">
                                 <div class="cw-sidebar-header">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <h5 class="m-0 text-white font-weight-bold">
+                                        <h6 class="m-0 text-white font-weight-bold">
                                             Conversations
                                             <span class="badge badge-danger ml-1" id="adm-total-unread-badge" style="display:none;">0</span>
-                                        </h5>
+                                        </h6>
                                         {{-- Sound Tone Toggle --}}
                                         <button type="button" id="adm-sound-toggle" class="btn btn-xs cw-btn-sound" title="Toggle Sound Tone">
                                             <span id="adm-sound-icon"><i class="fa fa-volume-up"></i> Sound ON</span>
@@ -39,7 +39,7 @@
                                     </div>
                                     {{-- Search Box --}}
                                     <div class="cw-search-wrap">
-                                        <input type="text" id="adm-thread-search" class="form-control form-control-sm cw-dark-input" placeholder="Search by name, email or message...">
+                                        <input type="text" id="adm-thread-search" class="form-control form-control-sm cw-dark-input" placeholder="Search chats...">
                                     </div>
                                     {{-- Filter Pills --}}
                                     <div class="cw-filter-pills mt-2">
@@ -65,8 +65,8 @@
                                 {{-- Placeholder when no thread is selected --}}
                                 <div class="cw-empty-state" id="adm-empty-state">
                                     <div class="cw-empty-icon"><i class="fa fa-comments-o"></i></div>
-                                    <h4 class="text-white">Select a conversation</h4>
-                                    <p class="text-muted">Choose a visitor or registered user from the left inbox to view messages and reply in real time.</p>
+                                    <h5 class="text-white mb-1">Select a conversation</h5>
+                                    <p class="text-muted font-12 mb-0">Choose a visitor or registered user from the left inbox to view messages and reply in real time.</p>
                                 </div>
 
                                 {{-- Active Chat View --}}
@@ -74,20 +74,20 @@
                                     {{-- Thread Header --}}
                                     <div class="cw-thread-header">
                                         <div class="d-flex align-items-center">
-                                            <div class="cw-thread-avatar mr-3" id="adm-header-avatar">U</div>
+                                            <div class="cw-thread-avatar mr-2" id="adm-header-avatar">U</div>
                                             <div>
                                                 <div class="d-flex align-items-center">
-                                                    <h5 class="m-0 text-white font-weight-bold" id="adm-header-name">Customer Name</h5>
-                                                    <span id="adm-user-typing-badge" class="badge badge-success ml-2 font-11" style="display: none;">
+                                                    <h6 class="m-0 text-white font-weight-bold" id="adm-header-name">Customer Name</h6>
+                                                    <span id="adm-user-typing-badge" class="badge badge-success ml-2 font-10" style="display: none;">
                                                         <i class="fa fa-pencil"></i> typing...
                                                     </span>
                                                 </div>
-                                                <div class="font-12 text-muted" id="adm-header-subinfo">User &bull; user@example.com</div>
+                                                <div class="font-11 text-muted" id="adm-header-subinfo">User &bull; user@example.com</div>
                                             </div>
                                         </div>
                                         <div>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" id="adm-delete-thread-btn" title="Delete Conversation History">
-                                                <i class="fa fa-trash"></i> Delete Chat
+                                            <button type="button" class="btn btn-xs btn-outline-danger" id="adm-delete-thread-btn" title="Delete Conversation History">
+                                                <i class="fa fa-trash"></i> Delete
                                             </button>
                                         </div>
                                     </div>
@@ -110,15 +110,15 @@
                                     <div class="cw-reply-bar">
                                         <form id="adm-reply-form">
                                             <div class="input-group">
-                                                <textarea id="adm-reply-input" class="form-control cw-dark-input" placeholder="Write your reply... (Press Enter to send, Shift+Enter for new line)" rows="2"></textarea>
+                                                <textarea id="adm-reply-input" class="form-control cw-dark-input" placeholder="Write your reply... (Press Enter to send, Shift+Enter for new line)" rows="1"></textarea>
                                                 <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-primary px-4 font-weight-bold cw-send-btn" id="adm-send-btn">
+                                                    <button type="submit" class="btn btn-primary px-3 font-weight-bold cw-send-btn" id="adm-send-btn">
                                                         <i class="fa fa-paper-plane mr-1"></i> Send
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center mt-2 font-11 text-muted">
-                                                <span><i class="fa fa-info-circle text-primary"></i> Replies include read receipts (ticks) and trigger audio chimes on customer side.</span>
+                                            <div class="d-flex justify-content-between align-items-center mt-1 font-10 text-muted">
+                                                <span><i class="fa fa-info-circle text-primary"></i> Replies include double ticks (✓✓) &amp; sound alerts.</span>
                                                 <span><kbd style="background:#333; color:#fff;">Enter</kbd> to send</span>
                                             </div>
                                         </form>
@@ -132,38 +132,38 @@
                                 <div class="cw-customer-header">
                                     <h6 class="m-0 text-white font-weight-bold">Visitor Details</h6>
                                 </div>
-                                <div class="cw-customer-body p-3">
-                                    <div class="text-center mb-3">
+                                <div class="cw-customer-body">
+                                    <div class="text-center mb-2">
                                         <div class="cw-customer-big-avatar mx-auto mb-2" id="adm-cust-big-avatar">U</div>
-                                        <h6 class="font-weight-bold text-white mb-1" id="adm-cust-name">User Name</h6>
-                                        <span class="badge badge-primary font-11" id="adm-cust-badge">Registered User</span>
+                                        <h6 class="font-weight-bold text-white mb-1 font-13 text-truncate" id="adm-cust-name">User Name</h6>
+                                        <span class="badge badge-primary font-10" id="adm-cust-badge">Registered User</span>
                                     </div>
 
-                                    <div class="cw-divider my-3"></div>
+                                    <div class="cw-divider my-2"></div>
 
-                                    <div class="detail-row mb-3">
-                                        <label class="font-11 text-muted text-uppercase d-block mb-1">Email</label>
-                                        <span class="font-13 text-light font-weight-500" id="adm-cust-email">N/A</span>
+                                    <div class="detail-row mb-2">
+                                        <label class="font-10 text-muted text-uppercase d-block mb-0">Email</label>
+                                        <span class="font-12 text-light font-weight-500 text-truncate d-block" id="adm-cust-email">N/A</span>
                                     </div>
 
-                                    <div class="detail-row mb-3" id="adm-cust-phone-row">
-                                        <label class="font-11 text-muted text-uppercase d-block mb-1">Phone</label>
-                                        <span class="font-13 text-light font-weight-500" id="adm-cust-phone">N/A</span>
+                                    <div class="detail-row mb-2" id="adm-cust-phone-row">
+                                        <label class="font-10 text-muted text-uppercase d-block mb-0">Phone</label>
+                                        <span class="font-12 text-light font-weight-500 text-truncate d-block" id="adm-cust-phone">N/A</span>
                                     </div>
 
-                                    <div class="detail-row mb-3" id="adm-cust-ip-row">
-                                        <label class="font-11 text-muted text-uppercase d-block mb-1">IP Address</label>
-                                        <span class="font-13 text-light font-weight-500" id="adm-cust-ip">N/A</span>
+                                    <div class="detail-row mb-2" id="adm-cust-ip-row">
+                                        <label class="font-10 text-muted text-uppercase d-block mb-0">IP Address</label>
+                                        <span class="font-12 text-light font-weight-500" id="adm-cust-ip">N/A</span>
                                     </div>
 
-                                    <div class="detail-row mb-3">
-                                        <label class="font-11 text-muted text-uppercase d-block mb-1">Joined / First Seen</label>
-                                        <span class="font-13 text-light font-weight-500" id="adm-cust-joined">N/A</span>
+                                    <div class="detail-row mb-2">
+                                        <label class="font-10 text-muted text-uppercase d-block mb-0">Joined / First Seen</label>
+                                        <span class="font-12 text-light font-weight-500" id="adm-cust-joined">N/A</span>
                                     </div>
 
-                                    <div class="detail-row mb-3" id="adm-cust-plan-row">
-                                        <label class="font-11 text-muted text-uppercase d-block mb-1">Subscription Plan</label>
-                                        <span class="font-13 text-light font-weight-500" id="adm-cust-plan">Free</span>
+                                    <div class="detail-row mb-2" id="adm-cust-plan-row">
+                                        <label class="font-10 text-muted text-uppercase d-block mb-0">Subscription Plan</label>
+                                        <span class="font-12 text-light font-weight-500" id="adm-cust-plan">Free</span>
                                     </div>
                                 </div>
                             </div>
@@ -175,35 +175,58 @@
 
         </div>
     </div>
-    @include('admin.copyright')
 </div>
 
 <style>
-/* ─── CINEWORM ADMIN DARK THEME STYLES FOR LIVE CHAT ───────────────── */
+/* ─── CINEWORM ADMIN DARK THEME STYLES - COMPACT VIEWPORT FIT ──────── */
+.cw-chat-page {
+    min-height: auto !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+.cw-chat-content {
+    margin-top: 65px !important;
+    margin-bottom: 0 !important;
+    padding: 0 15px 5px 15px !important;
+}
+.cw-compact-title {
+    padding: 6px 0 !important;
+    margin-bottom: 8px !important;
+}
+.cw-compact-title .page-title {
+    line-height: 28px !important;
+    font-size: 16px !important;
+    margin: 0 !important;
+}
+
 .cw-dark-chat-card {
     background-color: #1c1c1e !important;
     border: 1px solid #2a2a2d !important;
     border-radius: 6px !important;
     overflow: hidden;
-    margin-bottom: 30px;
+    margin-bottom: 0px !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .cw-chat-wrapper {
     display: flex;
-    height: 720px;
+    height: calc(100vh - 160px);
+    min-height: 420px;
+    max-height: 580px;
     background: #1c1c1e;
 }
 
 /* Left Sidebar */
 .cw-sidebar {
-    width: 320px;
+    width: 270px;
     border-right: 1px solid #2a2a2d;
     display: flex;
     flex-direction: column;
     background: #151517;
+    flex-shrink: 0;
 }
 .cw-sidebar-header {
-    padding: 14px 16px;
+    padding: 10px 12px;
     background: #1c1c1e;
     border-bottom: 1px solid #2a2a2d;
 }
@@ -212,8 +235,8 @@
     color: #98a6ad;
     border: 1px solid #38383e;
     border-radius: 4px;
-    padding: 3px 8px;
-    font-size: 11px;
+    padding: 2px 7px;
+    font-size: 10px;
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -227,6 +250,7 @@
     border: 1px solid #38383e !important;
     color: #f9f9f9 !important;
     border-radius: 4px;
+    font-size: 12px !important;
 }
 .cw-dark-input:focus {
     border-color: #ff4d00 !important;
@@ -235,16 +259,16 @@
 
 .cw-filter-pills {
     display: flex;
-    gap: 4px;
+    gap: 3px;
 }
 .cw-pill-btn {
     border: 1px solid #323238;
     background: #222226;
     color: #98a6ad;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.15s;
 }
@@ -263,17 +287,17 @@
     overflow-y: auto;
 }
 .cw-sidebar-thread-list::-webkit-scrollbar {
-    width: 5px;
+    width: 4px;
 }
 .cw-sidebar-thread-list::-webkit-scrollbar-thumb {
     background: #333338;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .cw-thread-item {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
+    padding: 9px 12px;
     border-bottom: 1px solid #222226;
     cursor: pointer;
     transition: background 0.15s;
@@ -284,21 +308,21 @@
 }
 .cw-thread-item.active {
     background: #27272e;
-    border-left: 4px solid #ff4d00;
+    border-left: 3px solid #ff4d00;
 }
 .cw-item-avatar {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: #333338;
     color: #ffffff;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-right: 12px;
+    margin-right: 10px;
 }
 .cw-item-avatar.guest {
     background: linear-gradient(135deg, #475569 0%, #334155 100%);
@@ -311,7 +335,7 @@
     min-width: 0;
 }
 .cw-item-title {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     color: #f9f9f9;
     margin-bottom: 2px;
@@ -320,12 +344,12 @@
     justify-content: space-between;
 }
 .cw-item-time {
-    font-size: 10px;
+    font-size: 9px;
     color: #98a6ad;
     font-weight: normal;
 }
 .cw-item-snippet {
-    font-size: 12px;
+    font-size: 11px;
     color: #98a6ad;
     white-space: nowrap;
     overflow: hidden;
@@ -334,11 +358,11 @@
 .cw-unread-pill {
     background: #ff4d00;
     color: #ffffff;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    padding: 1px 6px;
-    border-radius: 10px;
-    margin-left: 6px;
+    padding: 1px 5px;
+    border-radius: 8px;
+    margin-left: 4px;
 }
 
 /* Center Chat Area */
@@ -347,6 +371,7 @@
     display: flex;
     flex-direction: column;
     background: #18181b;
+    min-width: 0;
 }
 .cw-empty-state {
     flex: 1;
@@ -354,13 +379,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px;
+    padding: 30px;
     text-align: center;
     background: #141416;
 }
 .cw-empty-icon {
-    font-size: 52px;
-    margin-bottom: 15px;
+    font-size: 42px;
+    margin-bottom: 10px;
     color: #383840;
 }
 
@@ -370,7 +395,7 @@
     height: 100%;
 }
 .cw-thread-header {
-    padding: 14px 20px;
+    padding: 8px 14px;
     background: #1c1c1e;
     border-bottom: 1px solid #2a2a2d;
     display: flex;
@@ -378,13 +403,13 @@
     justify-content: space-between;
 }
 .cw-thread-avatar {
-    width: 42px;
-    height: 42px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background: #ff4d00;
     color: #ffffff;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -393,29 +418,29 @@
 /* Message Stream */
 .cw-messages-body {
     flex: 1;
-    padding: 20px;
+    padding: 12px 16px;
     overflow-y: auto;
     background: #141416;
     display: flex;
     flex-direction: column;
 }
 .cw-messages-body::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 .cw-messages-body::-webkit-scrollbar-thumb {
     background: #2a2a30;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 #adm-messages-stream {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .cw-msg-bubble-row {
     display: flex;
     flex-direction: column;
-    max-width: 75%;
+    max-width: 80%;
 }
 .cw-msg-bubble-row.incoming {
     align-self: flex-start;
@@ -424,9 +449,9 @@
     align-self: flex-end;
 }
 .cw-msg-bubble-sender {
-    font-size: 11px;
+    font-size: 10px;
     color: #98a6ad;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     font-weight: 600;
 }
 .cw-msg-bubble-row.outgoing .cw-msg-bubble-sender {
@@ -434,29 +459,29 @@
     color: #ff7300;
 }
 .cw-msg-bubble-box {
-    padding: 10px 15px;
-    border-radius: 14px;
-    font-size: 13px;
-    line-height: 1.5;
+    padding: 7px 12px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    line-height: 1.4;
     word-break: break-word;
 }
 .cw-msg-bubble-row.incoming .cw-msg-bubble-box {
     background: #25252a;
     color: #f2f2f2;
     border: 1px solid #33333a;
-    border-bottom-left-radius: 3px;
+    border-bottom-left-radius: 2px;
 }
 .cw-msg-bubble-row.outgoing .cw-msg-bubble-box {
     background: linear-gradient(135deg, #ff4d00 0%, #d83b01 100%);
     color: #ffffff;
-    border-bottom-right-radius: 3px;
+    border-bottom-right-radius: 2px;
 }
 .cw-msg-bubble-meta {
     display: flex;
     align-items: center;
     gap: 4px;
-    margin-top: 4px;
-    font-size: 10px;
+    margin-top: 3px;
+    font-size: 9px;
 }
 .cw-msg-bubble-row.incoming .cw-msg-bubble-meta {
     justify-content: flex-start;
@@ -469,7 +494,7 @@
 
 /* Read receipt ticks in Admin */
 .cw-adm-tick {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     letter-spacing: -2px;
     margin-left: 2px;
@@ -487,16 +512,16 @@
 }
 .cw-typing-bubble {
     background: #25252a;
-    padding: 6px 10px;
-    border-radius: 12px;
+    padding: 5px 9px;
+    border-radius: 10px;
     display: inline-flex;
     gap: 3px;
     align-items: center;
     border: 1px solid #33333a;
 }
 .cw-typing-dot {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
     background: #81c868;
     animation: cw-typing 1.2s infinite ease-in-out;
@@ -510,20 +535,24 @@
 
 /* Reply Bar */
 .cw-reply-bar {
-    padding: 14px 20px;
+    padding: 8px 14px;
     background: #1c1c1e;
     border-top: 1px solid #2a2a2d;
 }
 #adm-reply-input {
     resize: none;
     border-radius: 4px 0 0 4px !important;
-    height: auto !important;
-    min-height: 52px;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 7px 12px !important;
+    font-size: 12.5px;
 }
 .cw-send-btn {
     border-radius: 0 4px 4px 0 !important;
     background: #ff4d00 !important;
     border-color: #ff4d00 !important;
+    padding: 0 16px !important;
+    font-size: 12px !important;
 }
 .cw-send-btn:hover {
     background: #e03e00 !important;
@@ -532,24 +561,29 @@
 
 /* Right Customer Sidebar */
 .cw-customer-sidebar {
-    width: 260px;
+    width: 220px;
     border-left: 1px solid #2a2a2d;
     background: #18181b;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
 }
 .cw-customer-header {
-    padding: 14px 16px;
+    padding: 10px 12px;
     background: #1c1c1e;
     border-bottom: 1px solid #2a2a2d;
 }
+.cw-customer-body {
+    padding: 10px 12px !important;
+    overflow-y: auto;
+}
 .cw-customer-big-avatar {
-    width: 60px;
-    height: 60px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: #ff4d00;
     color: #ffffff;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -690,7 +724,7 @@
                     cachedThreads = data.threads || [];
                     renderThreadList();
 
-                    // If no thread is currently selected, auto-select the first one
+                    // Auto-select first thread if none active
                     if (!currentThread && cachedThreads.length > 0) {
                         var first = cachedThreads[0];
                         selectThread(first.key, first.type, first.id);
@@ -723,7 +757,7 @@
             });
 
             if (filtered.length === 0) {
-                container.html('<div class="text-center text-muted p-4 font-13">No conversations found</div>');
+                container.html('<div class="text-center text-muted p-4 font-12">No conversations found</div>');
                 return;
             }
 
