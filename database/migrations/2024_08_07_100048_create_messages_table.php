@@ -7,15 +7,17 @@ class CreateMessagesTable extends Migration
 {
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('admin_id')->nullable();
-            $table->text('message');
-            $table->timestamps();
+        if (!Schema::hasTable('messages')) {
+            Schema::create('messages', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedBigInteger('admin_id')->nullable();
+                $table->text('message');
+                $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            });
+        }
     }
 
     public function down()

@@ -14,8 +14,12 @@ class AddDefaultImagesToSettingsTable extends Migration
     public function up()
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->string('site_movie_thumb_default')->nullable()->after('site_copyright');
-            $table->string('site_movie_poster_default')->nullable()->after('site_movie_thumb_default');
+            if (!Schema::hasColumn('settings', 'site_movie_thumb_default')) {
+                $table->string('site_movie_thumb_default')->nullable()->after('site_copyright');
+            }
+            if (!Schema::hasColumn('settings', 'site_movie_poster_default')) {
+                $table->string('site_movie_poster_default')->nullable()->after('site_movie_thumb_default');
+            }
         });
     }
 
