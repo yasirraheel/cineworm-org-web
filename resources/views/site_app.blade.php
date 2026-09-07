@@ -585,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function() {
     {!!stripslashes(getcong('site_footer_code'))!!}
 @endif
 
-
+@include('_particles.live_chat_widget')
 
 </body>
 </html>

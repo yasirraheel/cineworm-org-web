@@ -457,5 +457,7 @@ $(document).ready(function() {
 });
 </script>
 
+@include('_particles.live_chat_widget')
+
 </body>
 </html>
