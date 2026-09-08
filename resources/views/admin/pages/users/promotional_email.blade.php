@@ -78,9 +78,67 @@
                     <label class="col-sm-3 col-form-label">Target Audience *</label>
                     <div class="col-sm-8">
                       <select name="audience" id="audience" class="form-control">
-                        <option value="all">All Registered Users ({{ $total_users }} users)</option>
+                        <option value="all" @if($selectedUsers->isEmpty()) selected @endif>All Registered Users ({{ $total_users }} users)</option>
                         <option value="active_only">Active Users Only ({{ $active_users }} users)</option>
+                        <option value="specific_users" @if($selectedUsers->isNotEmpty()) selected @endif>Specific User(s) (<span id="specific_count">{{ $selectedUsers->count() }}</span> selected)</option>
                       </select>
+                    </div>
+                  </div>
+
+                  <!-- Specific Users Search and Selection Section -->
+                  <div class="form-group row" id="specific_users_section" style="@if($selectedUsers->isEmpty()) display: none; @endif">
+                    <label class="col-sm-3 col-form-label">Search & Select Users *</label>
+                    <div class="col-sm-8">
+                      
+                      <!-- User Search Autocomplete Input -->
+                      <div class="position-relative m-b-15">
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text bg-dark border-secondary text-muted" style="border-color: #384561 !important;"><i class="fa fa-search"></i></span>
+                          </div>
+                          <input type="text" id="user_search_input" class="form-control" placeholder="Search user by name, email, or phone (e.g. John or user@example.com)..." autocomplete="off">
+                          <div class="input-group-append" id="search_spinner" style="display: none;">
+                            <span class="input-group-text bg-dark border-secondary" style="border-color: #384561 !important;"><i class="fa fa-spinner fa-spin text-primary"></i></span>
+                          </div>
+                        </div>
+
+                        <!-- Search Results Dropdown -->
+                        <div id="user_search_dropdown" class="list-group position-absolute w-100 shadow-lg" style="display: none; z-index: 1050; max-height: 280px; overflow-y: auto; background: #1c273c; border: 1px solid #323f5d; border-radius: 6px; top: 42px;"></div>
+                      </div>
+
+                      <!-- Selected Users Container -->
+                      <div id="selected_users_container" class="p-3" style="background: rgba(255,255,255,0.03); border: 1px dashed #3a4763; border-radius: 6px; min-height: 70px;">
+                        
+                        <div id="no_users_selected_notice" style="@if($selectedUsers->isNotEmpty()) display: none; @endif text-align: center; color: #8a96a8; padding: 12px 0;">
+                          <i class="fa fa-user-plus fa-2x m-b-5" style="opacity: 0.5;"></i><br>
+                          No specific users selected yet. Search above by name or email to add recipients.
+                        </div>
+
+                        <!-- Pre-loaded or Dynamically Added Users Chips -->
+                        <div id="users_chips_wrapper" class="d-flex flex-wrap">
+                          @foreach($selectedUsers as $u)
+                            <div class="user-chip-item d-flex align-items-center m-1 p-2" style="background: #1e283d; border: 1px solid #334366; border-radius: 6px; color: #e2e8f0; font-size: 13px;" id="user_chip_{{ $u['id'] }}">
+                              <div class="avatar-mini mr-2" style="width: 32px; height: 32px; border-radius: 50%; background: #3bafda; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;">
+                                {{ strtoupper(substr($u['name'], 0, 2)) }}
+                              </div>
+                              <div class="user-meta mr-3">
+                                <div class="font-weight-bold text-white">{{ $u['name'] }} <span class="badge badge-info ml-1" style="font-size: 10px;">{{ $u['plan_name'] }}</span></div>
+                                <div class="text-muted" style="font-size: 11px;"><i class="fa fa-envelope mr-1"></i>{{ $u['email'] }} @if(!empty($u['phone'])) &bull; {{ $u['phone'] }} @endif</div>
+                              </div>
+                              <button type="button" class="btn btn-xs btn-outline-danger btn-remove-chip ml-auto" data-id="{{ $u['id'] }}" title="Remove recipient" style="border: none; background: transparent; color: #ff5b5b; font-size: 16px; line-height: 1; padding: 2px 6px;">
+                                <i class="fa fa-times-circle"></i>
+                              </button>
+                              <input type="hidden" name="user_ids[]" value="{{ $u['id'] }}" class="user-id-input" id="input_user_id_{{ $u['id'] }}">
+                            </div>
+                          @endforeach
+                        </div>
+
+                      </div>
+
+                      <small class="form-text text-muted mt-2">
+                        <i class="fa fa-info-circle text-primary"></i> You can search and add any number of users. To remove a user, click the red (×) icon.
+                      </small>
+
                     </div>
                   </div>
 
@@ -100,8 +158,8 @@
 
                   <div class="form-group">
                     <div class="offset-sm-3 col-sm-9 pl-1">
-                      <button type="button" id="btnQueueBroadcast" class="btn btn-primary waves-effect waves-light" @if($total_users == 0) disabled @endif>
-                        <i class="fa fa-send"></i> Queue & Send to Users
+                      <button type="button" id="btnQueueBroadcast" class="btn btn-primary waves-effect waves-light" @if($total_users == 0 && $selectedUsers->isEmpty()) disabled @endif>
+                        <i class="fa fa-send"></i> <span id="btn_submit_text">@if($selectedUsers->isNotEmpty()) Send Email to Selected User(s) @else Queue & Send to Users @endif</span>
                       </button>
                     </div>
                   </div>
@@ -139,6 +197,8 @@
                           <td>
                             @if($camp->audience === 'active_only')
                               <span class="badge badge-info">Active Users Only</span>
+                            @elseif($camp->audience === 'specific_users')
+                              <span class="badge badge-warning">Specific Users ({{ $camp->total_recipients }})</span>
                             @else
                               <span class="badge badge-secondary">All Users</span>
                             @endif
@@ -159,8 +219,8 @@
                         </tr>
                       @empty
                         <tr>
-                          <td colspan="8" class="text-center py-4 text-muted">
-                            No promotional campaigns queued yet.
+                          <td colspan="8" class="text-center text-muted p-4">
+                            No promotional campaigns queued or sent yet.
                           </td>
                         </tr>
                       @endforelse
@@ -192,6 +252,146 @@
           toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor"
         });
       }
+
+      // Audience Selection Toggle
+      function updateAudienceUI() {
+        var aud = $('#audience').val();
+        if (aud === 'specific_users') {
+          $('#specific_users_section').fadeIn(200);
+          $('#btn_submit_text').text('Send Email to Selected User(s)');
+        } else {
+          $('#specific_users_section').fadeOut(200);
+          $('#btn_submit_text').text('Queue & Send to Users');
+        }
+      }
+
+      $('#audience').on('change', function() {
+        updateAudienceUI();
+        if ($(this).val() === 'specific_users') {
+          $('#user_search_input').focus();
+        }
+      });
+
+      // User Search Autocomplete with Debounce
+      var searchTimeout = null;
+      $('#user_search_input').on('keyup', function() {
+        var term = $(this).val().trim();
+        clearTimeout(searchTimeout);
+
+        if (term.length < 1) {
+          $('#user_search_dropdown').hide().empty();
+          $('#search_spinner').hide();
+          return;
+        }
+
+        $('#search_spinner').show();
+        searchTimeout = setTimeout(function() {
+          $.ajax({
+            url: "{{ url('admin/users/promotional-email/search-users') }}",
+            type: 'GET',
+            data: { q: term },
+            dataType: 'json',
+            success: function(res) {
+              $('#search_spinner').hide();
+              var dropdown = $('#user_search_dropdown');
+              dropdown.empty();
+
+              if (!res.results || res.results.length === 0) {
+                dropdown.html('<div class="p-3 text-muted text-center"><i class="fa fa-info-circle mr-1"></i> No matching users found</div>').show();
+                return;
+              }
+
+              res.results.forEach(function(u) {
+                var isAlreadyAdded = ($('#input_user_id_' + u.id).length > 0);
+                var initials = (u.name || 'U').substring(0, 2).toUpperCase();
+                var statusBadge = u.status === 1
+                  ? '<span class="badge badge-success ml-2" style="font-size:10px;">Active</span>'
+                  : '<span class="badge badge-danger ml-2" style="font-size:10px;">Inactive</span>';
+
+                var itemHtml = `
+                  <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex align-items-center search-result-item" data-user='${JSON.stringify(u)}' style="background: #1c273c; border-color: #2b3954; color: #fff; padding: 10px 14px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #3bafda; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; margin-right: 12px; flex-shrink: 0;">
+                      ${initials}
+                    </div>
+                    <div style="flex-grow: 1; min-width: 0;">
+                      <div class="font-weight-bold text-truncate">${u.name} ${statusBadge} <span class="badge badge-info ml-1" style="font-size:10px;">${u.plan_name}</span></div>
+                      <div class="text-muted text-truncate" style="font-size: 12px;"><i class="fa fa-envelope mr-1"></i>${u.email} ${u.phone ? '&bull; ' + u.phone : ''}</div>
+                    </div>
+                    <div style="margin-left: 10px;">
+                      ${isAlreadyAdded ? '<span class="badge badge-secondary">Added</span>' : '<button type="button" class="btn btn-xs btn-primary"><i class="fa fa-plus"></i> Add</button>'}
+                    </div>
+                  </a>
+                `;
+                dropdown.append(itemHtml);
+              });
+              dropdown.show();
+            },
+            error: function() {
+              $('#search_spinner').hide();
+            }
+          });
+        }, 250);
+      });
+
+      // Add user from search results
+      $(document).on('click', '.search-result-item', function() {
+        var user = $(this).data('user');
+        if (!user) return;
+
+        if ($('#input_user_id_' + user.id).length > 0) {
+          // Already added
+          $('#user_search_dropdown').hide();
+          $('#user_search_input').val('');
+          return;
+        }
+
+        var initials = (user.name || 'U').substring(0, 2).toUpperCase();
+        var chipHtml = `
+          <div class="user-chip-item d-flex align-items-center m-1 p-2" style="background: #1e283d; border: 1px solid #334366; border-radius: 6px; color: #e2e8f0; font-size: 13px;" id="user_chip_${user.id}">
+            <div class="avatar-mini mr-2" style="width: 32px; height: 32px; border-radius: 50%; background: #3bafda; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;">
+              ${initials}
+            </div>
+            <div class="user-meta mr-3">
+              <div class="font-weight-bold text-white">${user.name} <span class="badge badge-info ml-1" style="font-size: 10px;">${user.plan_name}</span></div>
+              <div class="text-muted" style="font-size: 11px;"><i class="fa fa-envelope mr-1"></i>${user.email} ${user.phone ? '&bull; ' + user.phone : ''}</div>
+            </div>
+            <button type="button" class="btn btn-xs btn-outline-danger btn-remove-chip ml-auto" data-id="${user.id}" title="Remove recipient" style="border: none; background: transparent; color: #ff5b5b; font-size: 16px; line-height: 1; padding: 2px 6px;">
+              <i class="fa fa-times-circle"></i>
+            </button>
+            <input type="hidden" name="user_ids[]" value="${user.id}" class="user-id-input" id="input_user_id_${user.id}">
+          </div>
+        `;
+
+        $('#users_chips_wrapper').append(chipHtml);
+        $('#no_users_selected_notice').hide();
+        $('#user_search_dropdown').hide().empty();
+        $('#user_search_input').val('');
+        updateSelectedUsersBadgeCount();
+      });
+
+      // Remove user chip
+      $(document).on('click', '.btn-remove-chip', function() {
+        var id = $(this).data('id');
+        $('#user_chip_' + id).remove();
+        updateSelectedUsersBadgeCount();
+      });
+
+      function updateSelectedUsersBadgeCount() {
+        var count = $('.user-id-input').length;
+        $('#specific_count').text(count);
+        if (count === 0) {
+          $('#no_users_selected_notice').show();
+        } else {
+          $('#no_users_selected_notice').hide();
+        }
+      }
+
+      // Close search dropdown on click outside
+      $(document).on('click', function(e) {
+        if (!$(e.target).closest('#user_search_input, #user_search_dropdown').length) {
+          $('#user_search_dropdown').hide();
+        }
+      });
 
       // Send Test Email AJAX
       $('#test_email_sent_btn').click(function() {
@@ -262,34 +462,75 @@
 
       // Queue & Send Confirmation
       $('#btnQueueBroadcast').click(function() {
-        var subject = $('#subject').val();
+        var subject = $('#subject').val().trim();
         var content = (typeof tinymce !== 'undefined' && tinymce.get('elm1'))
-          ? tinymce.get('elm1').getContent()
-          : $('#elm1').val();
+          ? tinymce.get('elm1').getContent().trim()
+          : $('#elm1').val().trim();
 
-        if (!subject || !content) {
-          alert('Please provide both a subject and message body.');
+        if (!subject) {
+          Swal.fire({ icon: 'warning', title: 'Subject Required', text: 'Please enter a subject line for the email.', background: "#1a2234", color: "#fff" });
+          $('#subject').focus();
           return;
         }
 
-        var audienceText = $('#audience option:selected').text();
+        if (!content) {
+          Swal.fire({ icon: 'warning', title: 'Content Required', text: 'Please compose message content for the email.', background: "#1a2234", color: "#fff" });
+          return;
+        }
 
-        Swal.fire({
-          title: 'Queue Promotional Email Campaign?',
-          text: "This will queue emails for " + audienceText + ". Emails will be sent in batches automatically by your server cron.",
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, Queue Campaign Now!',
-          cancelButtonText: "{{ trans('words.btn_cancel') }}",
-          background: "#1a2234",
-          color: "#fff"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            $('#promoEmailForm').submit();
+        var aud = $('#audience').val();
+
+        if (aud === 'specific_users') {
+          var userCount = $('.user-id-input').length;
+          if (userCount === 0) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'No Recipients Selected',
+              text: 'Please search and select at least one recipient user.',
+              background: "#1a2234",
+              color: "#fff"
+            });
+            $('#user_search_input').focus();
+            return;
           }
-        });
+
+          Swal.fire({
+            title: 'Send Email to ' + userCount + ' Selected User(s)?',
+            text: "The email will be dispatched to the selected user(s) immediately.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10c469',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Send Email Now!',
+            cancelButtonText: "{{ trans('words.btn_cancel') }}",
+            background: "#1a2234",
+            color: "#fff"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              $('#promoEmailForm').submit();
+            }
+          });
+
+        } else {
+          var audienceText = $('#audience option:selected').text();
+
+          Swal.fire({
+            title: 'Queue Promotional Email Campaign?',
+            text: "This will queue emails for " + audienceText + ". Emails will be sent in batches automatically by your server cron.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Queue Campaign Now!',
+            cancelButtonText: "{{ trans('words.btn_cancel') }}",
+            background: "#1a2234",
+            color: "#fff"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              $('#promoEmailForm').submit();
+            }
+          });
+        }
       });
     });
   </script>

@@ -475,7 +475,7 @@ class UsersController extends MainAdminController
 
 
 
-    public function promotionalEmailView()
+    public function promotionalEmailView(Request $request)
     {
         if (Auth::User()->usertype != "Admin") {
             \Session::flash('flash_message', trans('words.access_denied'));
@@ -501,7 +501,99 @@ class UsersController extends MainAdminController
 
         $campaigns = UserPromotionalCampaign::orderBy('id', 'desc')->paginate(10);
 
-        return view('admin.pages.users.promotional_email', compact('page_title', 'total_users', 'active_users', 'campaigns'));
+        // Pre-selected user(s) from request (e.g. ?user_id=123 or ?user_ids=1,2,3)
+        $selectedUsers = collect();
+        $userId = $request->input('user_id');
+        $userIds = $request->input('user_ids');
+
+        $idsToFetch = [];
+        if (!empty($userId)) {
+            $idsToFetch[] = (int) $userId;
+        }
+        if (!empty($userIds)) {
+            $exploded = is_array($userIds) ? $userIds : explode(',', $userIds);
+            foreach ($exploded as $eid) {
+                $eid = (int) trim($eid);
+                if ($eid > 0) {
+                    $idsToFetch[] = $eid;
+                }
+            }
+        }
+
+        $idsToFetch = array_values(array_unique($idsToFetch));
+
+        if (!empty($idsToFetch)) {
+            $selectedUsers = User::whereIn('id', $idsToFetch)->get()->map(function ($u) {
+                $planName = 'No Plan';
+                if ($u->plan_id) {
+                    $plan = \App\SubscriptionPlan::find($u->plan_id);
+                    if ($plan) {
+                        $planName = $plan->plan_name . ((float)$plan->plan_price > 0 ? ' ($' . $plan->plan_price . ')' : ' (Free)');
+                    }
+                }
+                return [
+                    'id' => $u->id,
+                    'name' => $u->name ?: 'User #' . $u->id,
+                    'email' => $u->email,
+                    'phone' => $u->phone ?: '',
+                    'status' => (int) $u->status,
+                    'plan_name' => $planName,
+                    'created_at' => $u->created_at ? $u->created_at->format('M d, Y') : 'N/A',
+                    'avatar' => !empty($u->user_image) ? asset('upload/' . $u->user_image) : null,
+                ];
+            });
+        }
+
+        return view('admin.pages.users.promotional_email', compact('page_title', 'total_users', 'active_users', 'campaigns', 'selectedUsers'));
+    }
+
+    public function searchUsersForEmail(Request $request)
+    {
+        if (Auth::User()->usertype != "Admin") {
+            return response()->json(['results' => []], 403);
+        }
+
+        $term = trim($request->input('q', ''));
+        if (strlen($term) < 1) {
+            return response()->json(['results' => []]);
+        }
+
+        $users = User::whereNotNull('email')->where('email', '!=', '')
+            ->where(function ($q) use ($term) {
+                $q->where('name', 'LIKE', "%{$term}%")
+                  ->orWhere('email', 'LIKE', "%{$term}%")
+                  ->orWhere('phone', 'LIKE', "%{$term}%");
+            })
+            ->where(function ($q) {
+                $q->where('usertype', 'User')
+                  ->orWhereNull('usertype')
+                  ->orWhere('usertype', '');
+            })
+            ->limit(20)
+            ->get();
+
+        $results = $users->map(function ($u) {
+            $planName = 'No Plan';
+            if ($u->plan_id) {
+                $plan = \App\SubscriptionPlan::find($u->plan_id);
+                if ($plan) {
+                    $planName = $plan->plan_name . ((float)$plan->plan_price > 0 ? ' ($' . $plan->plan_price . ')' : ' (Free)');
+                }
+            }
+
+            return [
+                'id' => $u->id,
+                'name' => $u->name ?: 'User #' . $u->id,
+                'email' => $u->email,
+                'phone' => $u->phone ?: '',
+                'status' => (int) $u->status,
+                'plan_name' => $planName,
+                'created_at' => $u->created_at ? $u->created_at->format('M d, Y') : 'N/A',
+                'avatar' => !empty($u->user_image) ? asset('upload/' . $u->user_image) : null,
+            ];
+        });
+
+        return response()->json(['results' => $results]);
     }
 
     public function sendPromotionalEmail(Request $request)
@@ -514,22 +606,40 @@ class UsersController extends MainAdminController
         $request->validate([
             'subject' => 'required|string|max:255',
             'content' => 'required|string',
-            'audience' => 'required|string|in:all,active_only',
+            'audience' => 'required|string|in:all,active_only,specific_users',
+            'user_ids' => 'nullable|array',
+            'user_ids.*' => 'integer',
         ]);
 
         $subject = trim($request->input('subject'));
         $content = $request->input('content');
         $audience = $request->input('audience');
+        $specificUserIds = (array) $request->input('user_ids', []);
+
+        if ($audience === 'specific_users' && empty($specificUserIds)) {
+            \Session::flash('flash_message', 'Please select or search at least one recipient user.');
+            return redirect()->back()->withInput();
+        }
 
         $campaign = (new UserPromotionalEmailService())->queueCampaign(
             $subject,
             $subject,
             $content,
             $audience,
-            Auth::id()
+            Auth::id(),
+            $specificUserIds
         );
 
-        \Session::flash('flash_message', "Promotional campaign queued successfully! {$campaign->total_recipients} user email(s) have been added to the queue and will be delivered in rate-limited batches via the server cron.");
+        if ($campaign->total_recipients === 0) {
+            \Session::flash('flash_message', 'No valid user emails found for the selected recipient criteria.');
+            return redirect('admin/users/promotional-email');
+        }
+
+        if ($audience === 'specific_users') {
+            \Session::flash('flash_message', "Promotional email successfully dispatched/queued to {$campaign->total_recipients} selected user(s)!");
+        } else {
+            \Session::flash('flash_message', "Promotional campaign queued successfully! {$campaign->total_recipients} user email(s) have been added to the queue and will be delivered in rate-limited batches via the server cron.");
+        }
 
         return redirect('admin/users/promotional-email');
     }

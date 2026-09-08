@@ -251,6 +251,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('users/history/{id}', 'UsersController@user_history');
         Route::get('users/export', 'UsersController@user_export');
         Route::get('users/promotional-email', 'UsersController@promotionalEmailView');
+        Route::get('users/promotional-email/search-users', 'UsersController@searchUsersForEmail');
         Route::post('users/promotional-email/send', 'UsersController@sendPromotionalEmail');
         Route::post('users/promotional-email/test', 'UsersController@testPromotionalEmail');
 

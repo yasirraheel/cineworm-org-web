@@ -26,6 +26,9 @@
                     {!! Form::close() !!}
                   </div>             
                 <div class="col-md-6 text-md-right">
+                  <button type="button" id="btn_send_selected_email" class="btn btn-warning btn-md waves-effect waves-light m-b-20 mt-2 m-r-5" style="display: none;" data-toggle="tooltip" title="Send promotional email to selected users">
+                    <i class="fa fa-envelope"></i> Send Email to Selected (<span id="selected_users_count">0</span>)
+                  </button>
                   <a href="{{URL::to('admin/users/promotional-email')}}" class="btn btn-primary btn-md waves-effect waves-light m-b-20 mt-2 m-r-5" data-toggle="tooltip" title="Send Promotional Email to Users"><i class="fa fa-envelope-o"></i> Send Promo Email</a>
                   <a href="{{URL::to('admin/users/add_user')}}" class="btn btn-success btn-md waves-effect waves-light m-b-20 mt-2 m-r-5" data-toggle="tooltip" title="{{trans('words.add_user')}}"><i class="fa fa-plus"></i> {{trans('words.add_user')}}</a>
                   <a href="{{URL::to('admin/users/export')}}" class="btn btn-info btn-md waves-effect waves-light m-b-20 mt-2" data-toggle="tooltip" title="{{trans('words.export_user')}}"><i class="fa fa-file-excel-o"></i> {{trans('words.export_user')}}</a>
@@ -43,6 +46,9 @@
                 <table class="table table-bordered">
                   <thead>
                     <tr>
+                      <th width="40" class="text-center">
+                        <input type="checkbox" id="check_all_users" title="Select all on this page">
+                      </th>
                       <th>{{trans('words.name')}}</th>
                       <th>{{trans('words.email')}}</th>
                       <th>{{trans('words.phone')}}</th>
@@ -53,6 +59,9 @@
                   <tbody>
                    @foreach($user_list as $i => $user_data)
                     <tr id="card_box_id_{{$user_data->id}}">
+                      <td class="text-center">
+                        <input type="checkbox" class="user_row_checkbox" value="{{$user_data->id}}">
+                      </td>
                       <td>{{ $user_data->name }}</td>
                       <td>{{ $user_data->email }}
 
@@ -67,6 +76,7 @@
                       <td>@if($user_data->status==1)<span class="badge badge-success">{{trans('words.active')}}</span> @else<span class="badge badge-danger">{{trans('words.inactive')}}</span>@endif</td>
                                              
                       <td>
+                      <a href="{{ url('admin/users/promotional-email?user_id='.$user_data->id) }}" class="btn btn-icon waves-effect waves-light btn-warning m-b-5 m-r-5" data-toggle="tooltip" title="Send Email to this User"> <i class="fa fa-envelope"></i> </a>
                       <a href="{{ url('admin/users/history/'.$user_data->id) }}" class="btn btn-icon waves-effect waves-light btn-primary m-b-5 m-r-5" data-toggle="tooltip" title="{{trans('words.user_history')}}"> <i class="fa fa-eye"></i> </a>
                       <a href="{{ url('admin/users/edit_user/'.$user_data->id) }}" class="btn btn-icon waves-effect waves-light btn-success m-b-5 m-r-5" data-toggle="tooltip" title="{{trans('words.edit')}}"> <i class="fa fa-edit"></i> </a>
                       <a href="#" class="btn btn-icon waves-effect waves-light btn-danger m-b-5 data_remove" data-toggle="tooltip" title="{{trans('words.remove')}}" data-id="{{$user_data->id}}"> <i class="fa fa-remove"></i> </a>           
@@ -166,8 +176,44 @@
  })
  
  });
- 
- </script>
+
+  // Multi-user checkbox selection for promotional email
+  function updateSelectedUsersCount() {
+    var selectedIds = [];
+    $('.user_row_checkbox:checked').each(function() {
+      selectedIds.push($(this).val());
+    });
+    $('#selected_users_count').text(selectedIds.length);
+    if (selectedIds.length > 0) {
+      $('#btn_send_selected_email').fadeIn(200);
+    } else {
+      $('#btn_send_selected_email').fadeOut(200);
+    }
+  }
+
+  $('#check_all_users').on('change', function() {
+    $('.user_row_checkbox').prop('checked', $(this).prop('checked'));
+    updateSelectedUsersCount();
+  });
+
+  $(document).on('change', '.user_row_checkbox', function() {
+    updateSelectedUsersCount();
+    if (!$(this).prop('checked')) {
+      $('#check_all_users').prop('checked', false);
+    }
+  });
+
+  $('#btn_send_selected_email').on('click', function() {
+    var selectedIds = [];
+    $('.user_row_checkbox:checked').each(function() {
+      selectedIds.push($(this).val());
+    });
+    if (selectedIds.length > 0) {
+      window.location.href = "{{ url('admin/users/promotional-email') }}?user_ids=" + selectedIds.join(',');
+    }
+  });
+
+  </script>
     
 
 @endsection

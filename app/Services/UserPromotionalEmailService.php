@@ -14,21 +14,28 @@ class UserPromotionalEmailService
     /**
      * Queue a promotional campaign for users in database.
      */
-    public function queueCampaign($title, $subject, $content, $audience = 'all', $adminId = null)
+    public function queueCampaign($title, $subject, $content, $audience = 'all', $adminId = null, array $specificUserIds = [])
     {
-        return DB::transaction(function () use ($title, $subject, $content, $audience, $adminId) {
+        $campaign = DB::transaction(function () use ($title, $subject, $content, $audience, $adminId, $specificUserIds) {
             $query = User::whereNotNull('email')->where('email', '!=', '');
 
-            if ($audience === 'active_only') {
+            if ($audience === 'specific_users' || !empty($specificUserIds)) {
+                $query->whereIn('id', $specificUserIds);
+            } elseif ($audience === 'active_only') {
                 $query->where('status', 1);
+                $query->where(function ($q) {
+                    $q->where('usertype', 'User')
+                      ->orWhereNull('usertype')
+                      ->orWhere('usertype', '');
+                });
+            } else {
+                // Target general users (exclude other Admins/Sub_Admins from promotional spam)
+                $query->where(function ($q) {
+                    $q->where('usertype', 'User')
+                      ->orWhereNull('usertype')
+                      ->orWhere('usertype', '');
+                });
             }
-
-            // Target general users (exclude other Admins/Sub_Admins from promotional spam)
-            $query->where(function ($q) {
-                $q->where('usertype', 'User')
-                  ->orWhereNull('usertype')
-                  ->orWhere('usertype', '');
-            });
 
             $users = $query->select('id', 'name', 'email')->get();
 
@@ -69,6 +76,17 @@ class UserPromotionalEmailService
 
             return $campaign;
         });
+
+        // For specific targeted users or small batches (<= 10 recipients), process immediately
+        if ($campaign && $campaign->total_recipients > 0 && ($audience === 'specific_users' || $campaign->total_recipients <= 10)) {
+            try {
+                $this->processBatch(10);
+            } catch (\Throwable $e) {
+                Log::warning('[UserPromotionalEmailService] Immediate batch process error: ' . $e->getMessage());
+            }
+        }
+
+        return $campaign;
     }
 
     /**
