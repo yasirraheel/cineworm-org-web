@@ -712,6 +712,39 @@ if (! function_exists('check_app_user_plan')) {
     }
 }
 
+if (! function_exists('user_has_paid_sub')) {
+
+    function user_has_paid_sub($user = null)
+    {
+        if (!$user) {
+            $user = \Illuminate\Support\Facades\Auth::user();
+        }
+
+        if (!$user) {
+            return false;
+        }
+
+        if (method_exists($user, 'hasPaidSubscription')) {
+            return $user->hasPaidSubscription();
+        }
+
+        if (in_array($user->usertype ?? '', ['Admin', 'Sub_Admin', 'Moderator'], true)) {
+            return true;
+        }
+
+        if (empty($user->plan_id) || empty($user->exp_date)) {
+            return false;
+        }
+
+        if (strtotime(date('m/d/Y')) > (int) $user->exp_date) {
+            return false;
+        }
+
+        $plan = \App\SubscriptionPlan::find($user->plan_id);
+        return $plan && ((float) $plan->plan_price > 0 || (float) ($user->plan_amount ?? 0) > 0);
+    }
+}
+
 if (! function_exists('get_ads')) {
 
     function get_ads($key)

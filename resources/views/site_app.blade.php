@@ -585,7 +585,9 @@ document.addEventListener('DOMContentLoaded', function() {
     {!!stripslashes(getcong('site_footer_code'))!!}
 @endif
 
-@include('_particles.live_chat_widget')
+@if(Auth::check() && Auth::user()->hasPaidSubscription())
+    @include('_particles.live_chat_widget')
+@endif
 
 </body>
 </html>

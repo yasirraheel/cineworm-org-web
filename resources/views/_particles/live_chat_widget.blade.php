@@ -1,4 +1,5 @@
-{{-- Cineworm Native Live Chat Widget (Tawk.to Style) --}}
+{{-- Cineworm Native Live Chat Widget (Exclusive to Paid Subscribers) --}}
+@if(Auth::check() && Auth::user()->hasPaidSubscription())
 <div id="cw-livechat-widget">
     {{-- Floating Launcher Button --}}
     <div id="cw-chat-launcher" title="Chat with Cineworm Support">
@@ -52,13 +53,10 @@
             </div>
         </div>
 
-        {{-- Guest Name Strip --}}
-        @guest
+        {{-- Subscriber Identity Strip --}}
         <div id="cw-guest-identity-bar">
-            <span>Chatting as: <strong id="cw-guest-display-name">Guest</strong></span>
-            <a href="javascript:void(0)" id="cw-edit-guest-name">Edit</a>
+            <span>Chatting as: <strong>{{ Auth::user()->name }}</strong> <span style="background: rgba(0, 210, 133, 0.15); color: #00d285; border: 1px solid rgba(0, 210, 133, 0.3); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-left: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Paid Member</span></span>
         </div>
-        @endguest
 
         {{-- Message Area --}}
         <div id="cw-chat-messages">
@@ -566,22 +564,12 @@
         pollTimer: null,
         typingPingTimer: null,
         soundEnabled: localStorage.getItem('cw_chat_sound') !== 'off',
-        guestToken: localStorage.getItem('cw_chat_guest_token') || '',
-        guestName: localStorage.getItem('cw_chat_guest_name') || '',
+        guestToken: '',
+        guestName: @json(Auth::user()->name),
         unreadCount: 0,
         audioCtx: null,
-        isAuth: {{ Auth::check() ? 'true' : 'false' }}
+        isAuth: true
     };
-
-    // Initialize Guest Identity if not exists
-    if (!CW_CHAT.isAuth && !CW_CHAT.guestToken) {
-        CW_CHAT.guestToken = 'cw_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        localStorage.setItem('cw_chat_guest_token', CW_CHAT.guestToken);
-    }
-    if (!CW_CHAT.guestName) {
-        CW_CHAT.guestName = 'Guest #' + (CW_CHAT.guestToken ? CW_CHAT.guestToken.slice(-4) : 'User');
-        localStorage.setItem('cw_chat_guest_name', CW_CHAT.guestName);
-    }
 
     // DOM Elements
     var launcher = document.getElementById('cw-chat-launcher');
@@ -945,3 +933,4 @@
     }
 })();
 </script>
+@endif

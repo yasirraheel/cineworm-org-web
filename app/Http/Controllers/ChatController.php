@@ -23,55 +23,68 @@ class ChatController extends Controller
 
         $user = Auth::user();
 
-        if ($user->usertype === 'Admin') {
+        if (in_array($user->usertype, ['Admin', 'Sub_Admin', 'Moderator'], true)) {
             $page_title = 'Live Chat & Support';
             return view('admin.pages.chat.chat', compact('page_title'));
-        } else {
-            // For regular users visiting /messages, redirect to home page with chat trigger
-            return redirect('/?open_chat=1');
         }
+
+        if (!$user->hasPaidSubscription()) {
+            \Session::flash('error_flash_message', 'Live Chat Support is exclusively available to members with an active paid subscription.');
+            return redirect('membership_plan');
+        }
+
+        return redirect('/?open_chat=1');
     }
 
     /* =========================================================================
-       PUBLIC WIDGET ENDPOINTS (Guest & Authenticated User)
+       PUBLIC WIDGET ENDPOINTS (Exclusive to Paid Subscribers & Staff)
        ========================================================================= */
+
+    /**
+     * Authorize that the current request is from an authenticated user with an active paid subscription
+     */
+    private function authorizePaidChatAccess()
+    {
+        if (!Auth::check()) {
+            return response()->json([
+                'success' => false,
+                'code' => 'unauthenticated',
+                'message' => 'Please sign in to access Live Chat Support.',
+            ], 401);
+        }
+
+        $user = Auth::user();
+        if (!$user->hasPaidSubscription()) {
+            return response()->json([
+                'success' => false,
+                'code' => 'subscription_required',
+                'message' => 'Live Chat Support is exclusively available to members with an active paid subscription.',
+            ], 403);
+        }
+
+        return null;
+    }
 
     /**
      * Fetch messages for the floating chat widget
      */
     public function fetchWidgetMessages(Request $request)
     {
+        if ($authError = $this->authorizePaidChatAccess()) {
+            return $authError;
+        }
+
         $user = Auth::user();
-        $guestToken = $request->input('guest_token');
         $lastId = (int) $request->input('last_id', 0);
         $markRead = $request->boolean('mark_read', false);
 
-        if (!$user && empty($guestToken)) {
-            return response()->json([
-                'success' => true,
-                'messages' => [],
-                'unread_count' => 0,
-            ]);
-        }
+        $query = Message::query()->where('user_id', $user->id);
 
-        $query = Message::query();
-
-        if ($user) {
-            $query->where('user_id', $user->id);
-            if ($markRead) {
-                Message::where('user_id', $user->id)
-                    ->where('sender', 'admin')
-                    ->where('is_read', false)
-                    ->update(['is_read' => true]);
-            }
-        } else {
-            $query->where('guest_token', $guestToken);
-            if ($markRead) {
-                Message::where('guest_token', $guestToken)
-                    ->where('sender', 'admin')
-                    ->where('is_read', false)
-                    ->update(['is_read' => true]);
-            }
+        if ($markRead) {
+            Message::where('user_id', $user->id)
+                ->where('sender', 'admin')
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
         }
 
         if ($lastId > 0) {
@@ -86,7 +99,7 @@ class ChatController extends Controller
                 return [
                     'id' => $msg->id,
                     'sender' => $isAdmin ? 'admin' : 'user',
-                    'sender_name' => $isAdmin ? 'Support Agent' : ($msg->user ? $msg->user->name : ($msg->guest_name ?: 'You')),
+                    'sender_name' => $isAdmin ? 'Support Agent' : ($msg->user ? $msg->user->name : 'You'),
                     'message' => e($msg->message),
                     'time' => $msg->created_at ? $msg->created_at->format('h:i A') : '',
                     'is_read' => (bool) $msg->is_read,
@@ -95,25 +108,19 @@ class ChatController extends Controller
             });
 
         // Unread admin messages count
-        $unreadQuery = Message::query()->where('sender', 'admin')->where('is_read', false);
-        if ($user) {
-            $unreadQuery->where('user_id', $user->id);
-        } else {
-            $unreadQuery->where('guest_token', $guestToken);
-        }
-        $unreadCount = $unreadQuery->count();
+        $unreadCount = Message::where('user_id', $user->id)
+            ->where('sender', 'admin')
+            ->where('is_read', false)
+            ->count();
 
         // Highest user message ID that admin has read (for double ticks ✓✓)
-        $lastReadQuery = Message::where('is_read', true)->where('sender', '!=', 'admin');
-        if ($user) {
-            $lastReadQuery->where('user_id', $user->id);
-        } else {
-            $lastReadQuery->where('guest_token', $guestToken);
-        }
-        $lastReadUserMsgId = (int) $lastReadQuery->max('id');
+        $lastReadUserMsgId = (int) Message::where('user_id', $user->id)
+            ->where('is_read', true)
+            ->where('sender', '!=', 'admin')
+            ->max('id');
 
         // Check if Admin is currently typing
-        $adminTypingKey = 'cw_admin_typing_' . ($user ? ('user_' . $user->id) : ('guest_' . $guestToken));
+        $adminTypingKey = 'cw_admin_typing_user_' . $user->id;
         $isAdminTyping = (bool) Cache::has($adminTypingKey);
 
         return response()->json([
@@ -122,8 +129,8 @@ class ChatController extends Controller
             'unread_count' => $unreadCount,
             'last_read_user_msg_id' => $lastReadUserMsgId,
             'is_admin_typing' => $isAdminTyping,
-            'is_auth' => (bool) $user,
-            'user_name' => $user ? $user->name : null,
+            'is_auth' => true,
+            'user_name' => $user->name,
         ]);
     }
 
@@ -132,14 +139,12 @@ class ChatController extends Controller
      */
     public function widgetTyping(Request $request)
     {
-        $user = Auth::user();
-        $guestToken = $request->input('guest_token');
-
-        if (!$user && empty($guestToken)) {
-            return response()->json(['success' => false]);
+        if ($authError = $this->authorizePaidChatAccess()) {
+            return $authError;
         }
 
-        $key = 'cw_typing_' . ($user ? ('user_' . $user->id) : ('guest_' . $guestToken));
+        $user = Auth::user();
+        $key = 'cw_typing_user_' . $user->id;
         Cache::put($key, now()->timestamp, 4);
 
         return response()->json(['success' => true]);
@@ -150,51 +155,33 @@ class ChatController extends Controller
      */
     public function sendWidgetMessage(Request $request)
     {
+        if ($authError = $this->authorizePaidChatAccess()) {
+            return $authError;
+        }
+
         $validated = $request->validate([
             'message' => 'required|string|max:3000',
-            'guest_token' => 'nullable|string|max:64',
-            'guest_name' => 'nullable|string|max:50',
         ]);
 
         $user = Auth::user();
-        $guestToken = $validated['guest_token'] ?? null;
-        $guestName = $validated['guest_name'] ?? null;
 
         $msg = new Message();
         $msg->message = trim($validated['message']);
         $msg->is_read = false;
         $msg->ip_address = $request->ip();
-
-        if ($user) {
-            $msg->user_id = $user->id;
-            $msg->sender = 'user';
-            $msg->sender_type = 'user';
-            $msg->guest_token = null;
-            $msg->guest_name = null;
-        } else {
-            if (empty($guestToken)) {
-                $guestToken = 'gw_' . Str::random(24);
-            }
-            if (empty($guestName)) {
-                $guestName = 'Guest #' . substr($guestToken, -4);
-            }
-            $msg->user_id = null;
-            $msg->sender = 'user';
-            $msg->sender_type = 'guest';
-            $msg->guest_token = $guestToken;
-            $msg->guest_name = $guestName;
-        }
-
+        $msg->user_id = $user->id;
+        $msg->sender = 'user';
+        $msg->sender_type = 'user';
+        $msg->guest_token = null;
+        $msg->guest_name = null;
         $msg->save();
 
         return response()->json([
             'success' => true,
-            'guest_token' => $guestToken,
-            'guest_name' => $guestName,
             'message' => [
                 'id' => $msg->id,
                 'sender' => 'user',
-                'sender_name' => $user ? $user->name : ($guestName ?: 'You'),
+                'sender_name' => $user->name,
                 'message' => e($msg->message),
                 'time' => $msg->created_at ? $msg->created_at->format('h:i A') : '',
                 'created_at' => $msg->created_at ? $msg->created_at->toIso8601String() : null,
@@ -207,23 +194,18 @@ class ChatController extends Controller
      */
     public function getWidgetUnread(Request $request)
     {
-        $user = Auth::user();
-        $guestToken = $request->input('guest_token');
-
-        if (!$user && empty($guestToken)) {
+        if (!Auth::check() || !Auth::user()->hasPaidSubscription()) {
             return response()->json(['unread_count' => 0]);
         }
 
-        $query = Message::where('sender', 'admin')->where('is_read', false);
-
-        if ($user) {
-            $query->where('user_id', $user->id);
-        } else {
-            $query->where('guest_token', $guestToken);
-        }
+        $user = Auth::user();
+        $unreadCount = Message::where('user_id', $user->id)
+            ->where('sender', 'admin')
+            ->where('is_read', false)
+            ->count();
 
         return response()->json([
-            'unread_count' => $query->count()
+            'unread_count' => $unreadCount
         ]);
     }
 
@@ -356,6 +338,14 @@ class ChatController extends Controller
                 ->update(['is_read' => true]);
 
             $customerUser = User::find($targetId);
+            $planName = 'Free';
+            if ($customerUser && $customerUser->plan_id) {
+                $planObj = \App\SubscriptionPlan::find($customerUser->plan_id);
+                if ($planObj) {
+                    $planName = $planObj->plan_name . ((float)$planObj->plan_price > 0 ? ' ($' . $planObj->plan_price . ')' : ' (Free)');
+                }
+            }
+
             $customer = [
                 'type' => 'user',
                 'id' => $targetId,
@@ -363,7 +353,9 @@ class ChatController extends Controller
                 'email' => $customerUser ? $customerUser->email : 'Registered User',
                 'phone' => $customerUser->phone ?? 'N/A',
                 'created_at' => $customerUser && $customerUser->created_at ? $customerUser->created_at->format('M d, Y') : 'N/A',
-                'plan' => $customerUser->plan_name ?? 'Free',
+                'plan' => $planName,
+                'has_paid_sub' => $customerUser ? $customerUser->hasPaidSubscription() : false,
+                'expires_at' => ($customerUser && $customerUser->exp_date) ? date('M d, Y', $customerUser->exp_date) : 'N/A',
             ];
         } else {
             $query->where('guest_token', $targetId);
