@@ -24,5 +24,7 @@ class VerifyCsrfToken extends Middleware
          'user/editor/api/*',
          '/livechat/*',
          'livechat/*',
+         '/newsletter/subscribe',
+         'newsletter/subscribe',
     ];
 }
