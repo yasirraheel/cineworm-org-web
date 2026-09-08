@@ -79,6 +79,11 @@ Route::get('/clear-all-cache', function() {
 Route::post('comments/add', 'CommentsController@add');
 Route::get('comments/get', 'CommentsController@getComments');
 
+// Newsletter Public Routes
+Route::post('newsletter/subscribe', 'NewsletterPublicController@subscribe');
+Route::get('newsletter/unsubscribe/{token}', 'NewsletterPublicController@unsubscribe');
+Route::post('newsletter/resubscribe/{token}', 'NewsletterPublicController@resubscribe');
+
 Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
     Route::get('movies', 'MoviesController@movies_list');
     Route::get('movies/add_movie', 'MoviesController@addMovie');
@@ -431,6 +436,17 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
 
         Route::post('ajax_status', 'ActionsController@ajax_status');
         Route::post('ajax_delete', 'ActionsController@ajax_delete');
+
+        // ── Newsletter Manager ──────────────────────────────────────────────
+        Route::get('newsletter/subscribers', 'NewsletterController@subscribers');
+        Route::post('newsletter/add', 'NewsletterController@addSubscriber');
+        Route::post('newsletter/toggle-status/{id}', 'NewsletterController@toggleStatus');
+        Route::post('newsletter/delete/{id}', 'NewsletterController@deleteSubscriber');
+        Route::get('newsletter/export', 'NewsletterController@exportSubscribers');
+        Route::get('newsletter/send', 'NewsletterController@composeView');
+        Route::post('newsletter/send-test', 'NewsletterController@sendTestEmail');
+        Route::post('newsletter/send', 'NewsletterController@sendNewsletter');
+        // ─────────────────────────────────────────────────────────────────
 
         //Route::get('maintenance/{mode}', 'SettingsController@maintenance');
 

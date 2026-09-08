@@ -1,5 +1,32 @@
 <!-- Start Footer Area -->
 <footer>
+  <!-- Newsletter Subscription Area -->
+  <div class="footer-newsletter-area" style="background: #111114; border-top: 1px solid #232328; border-bottom: 1px solid #232328; padding: 30px 0;">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-lg-6 col-md-12 mb-3 mb-lg-0">
+          <h4 style="color: #ffffff; margin: 0 0 6px 0; font-size: 19px; font-weight: 600;">
+            <i class="fa fa-envelope-o" style="color: #ff4d00; margin-right: 8px;"></i>
+            Subscribe to our Newsletter
+          </h4>
+          <p style="color: #8e8e9c; margin: 0; font-size: 13.5px;">
+            Get the latest movie updates, trending releases, and news delivered directly to your inbox.
+          </p>
+        </div>
+        <div class="col-lg-6 col-md-12">
+          <form id="footerNewsletterForm" style="display: flex; gap: 10px; max-width: 480px; margin-left: auto;">
+            @csrf
+            <input type="email" name="email" id="footerNewsletterEmail" placeholder="Enter your email address..." required style="flex: 1; background: #1c1c22; border: 1px solid #33333d; border-radius: 6px; padding: 11px 16px; color: #ffffff; font-size: 14px; outline: none;">
+            <button type="submit" id="footerNewsletterBtn" style="background: #ff4d00; color: #ffffff; border: none; border-radius: 6px; padding: 11px 22px; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; transition: background 0.2s;">
+              Subscribe
+            </button>
+          </form>
+          <div id="footerNewsletterMsg" style="display: none; margin-top: 8px; font-size: 13px; text-align: right;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="footer-area vfx-item-ptb">
     <div class="footer-wrapper">
       <div class="container-fluid">
@@ -87,6 +114,58 @@
   </div>
   <!-- End Scroll Top Area -->
 
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('footerNewsletterForm');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var emailInput = document.getElementById('footerNewsletterEmail');
+        var btn = document.getElementById('footerNewsletterBtn');
+        var msg = document.getElementById('footerNewsletterMsg');
+        var email = emailInput.value.trim();
+        if (!email) return;
+
+        btn.disabled = true;
+        btn.innerText = 'Subscribing...';
+        msg.style.display = 'none';
+
+        fetch('{{ url("newsletter/subscribe") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ email: email })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          btn.disabled = false;
+          btn.innerText = 'Subscribe';
+          msg.style.display = 'block';
+          if (data.status === 'success' || data.status === 'info') {
+            msg.style.color = '#28a745';
+            msg.innerHTML = '<i class="fa fa-check-circle"></i> ' + data.message;
+            if (data.status === 'success') {
+              emailInput.value = '';
+            }
+          } else {
+            msg.style.color = '#dc3545';
+            msg.innerHTML = '<i class="fa fa-exclamation-circle"></i> ' + (data.message || 'Something went wrong.');
+          }
+        })
+        .catch(function() {
+          btn.disabled = false;
+          btn.innerText = 'Subscribe';
+          msg.style.display = 'block';
+          msg.style.color = '#dc3545';
+          msg.innerHTML = '<i class="fa fa-exclamation-circle"></i> Failed to subscribe. Please try again.';
+        });
+      });
+    }
+  });
+  </script>
 </footer>
 <!-- End Footer Area -->
 

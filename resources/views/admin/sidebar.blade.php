@@ -506,6 +506,19 @@
                     </li>
                     <li class="has_sub">
                         <a href="javascript:void(0);" class="waves-effect"><i
+                                class="fa fa-envelope-o"></i><span>Newsletter</span><span
+                                class="menu-arrow"></span></a>
+                        <ul class="list-unstyled">
+                            <li class="{{ request()->is('admin/newsletter/subscribers*') ? 'active' : '' }}"><a
+                                    href="{{ URL::to('admin/newsletter/subscribers') }}"><i
+                                        class="fa fa-users"></i><span>Subscribers</span></a></li>
+                            <li class="{{ request()->is('admin/newsletter/send*') ? 'active' : '' }}"><a
+                                    href="{{ URL::to('admin/newsletter/send') }}"><i
+                                        class="fa fa-paper-plane"></i><span>Send Newsletter</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect"><i
                                 class="fa fa-android"></i><span>{{ trans('words.android_app') }}</span><span
                                 class="menu-arrow"></span></a>
                         <ul class="list-unstyled">
