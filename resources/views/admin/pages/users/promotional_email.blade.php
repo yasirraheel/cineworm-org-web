@@ -272,110 +272,47 @@
         }
       });
 
-      // User Search Autocomplete with Debounce
-      var searchTimeout = null;
-      $('#user_search_input').on('keyup', function() {
-        var term = $(this).val().trim();
-        clearTimeout(searchTimeout);
+      // Helper to escape HTML characters
+      function escapeHtml(text) {
+        if (!text) return '';
+        return $('<div>').text(text).html();
+      }
 
-        if (term.length < 1) {
-          $('#user_search_dropdown').hide().empty();
-          $('#search_spinner').hide();
-          return;
-        }
+      // Render Chip HTML for a selected user
+      function renderUserChip(u) {
+        var initials = (u.name || 'U').substring(0, 2).toUpperCase();
+        var planName = u.plan_name || 'No Plan';
+        var phoneText = u.phone ? (' &bull; ' + escapeHtml(u.phone)) : '';
 
-        $('#search_spinner').show();
-        searchTimeout = setTimeout(function() {
-          $.ajax({
-            url: "{{ url('admin/users/promotional-email/search-users') }}",
-            type: 'GET',
-            data: { q: term },
-            dataType: 'json',
-            success: function(res) {
-              $('#search_spinner').hide();
-              var dropdown = $('#user_search_dropdown');
-              dropdown.empty();
-
-              if (!res.results || res.results.length === 0) {
-                dropdown.html('<div class="p-3 text-muted text-center"><i class="fa fa-info-circle mr-1"></i> No matching users found</div>').show();
-                return;
-              }
-
-              res.results.forEach(function(u) {
-                var isAlreadyAdded = ($('#input_user_id_' + u.id).length > 0);
-                var initials = (u.name || 'U').substring(0, 2).toUpperCase();
-                var statusBadge = u.status === 1
-                  ? '<span class="badge badge-success ml-2" style="font-size:10px;">Active</span>'
-                  : '<span class="badge badge-danger ml-2" style="font-size:10px;">Inactive</span>';
-
-                var itemHtml = `
-                  <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex align-items-center search-result-item" data-user='${JSON.stringify(u)}' style="background: #1c273c; border-color: #2b3954; color: #fff; padding: 10px 14px;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #3bafda; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; margin-right: 12px; flex-shrink: 0;">
-                      ${initials}
-                    </div>
-                    <div style="flex-grow: 1; min-width: 0;">
-                      <div class="font-weight-bold text-truncate">${u.name} ${statusBadge} <span class="badge badge-info ml-1" style="font-size:10px;">${u.plan_name}</span></div>
-                      <div class="text-muted text-truncate" style="font-size: 12px;"><i class="fa fa-envelope mr-1"></i>${u.email} ${u.phone ? '&bull; ' + u.phone : ''}</div>
-                    </div>
-                    <div style="margin-left: 10px;">
-                      ${isAlreadyAdded ? '<span class="badge badge-secondary">Added</span>' : '<button type="button" class="btn btn-xs btn-primary"><i class="fa fa-plus"></i> Add</button>'}
-                    </div>
-                  </a>
-                `;
-                dropdown.append(itemHtml);
-              });
-              dropdown.show();
-            },
-            error: function() {
-              $('#search_spinner').hide();
-            }
-          });
-        }, 250);
-      });
-
-      // Add user from search results
-      $(document).on('click', '.search-result-item', function() {
-        var user = $(this).data('user');
-        if (!user) return;
-
-        if ($('#input_user_id_' + user.id).length > 0) {
-          // Already added
-          $('#user_search_dropdown').hide();
-          $('#user_search_input').val('');
-          return;
-        }
-
-        var initials = (user.name || 'U').substring(0, 2).toUpperCase();
-        var chipHtml = `
-          <div class="user-chip-item d-flex align-items-center m-1 p-2" style="background: #1e283d; border: 1px solid #334366; border-radius: 6px; color: #e2e8f0; font-size: 13px;" id="user_chip_${user.id}">
+        return `
+          <div class="user-chip-item d-flex align-items-center m-1 p-2" style="background: #1e283d; border: 1px solid #334366; border-radius: 6px; color: #e2e8f0; font-size: 13px;" id="user_chip_${u.id}">
             <div class="avatar-mini mr-2" style="width: 32px; height: 32px; border-radius: 50%; background: #3bafda; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;">
               ${initials}
             </div>
             <div class="user-meta mr-3">
-              <div class="font-weight-bold text-white">${user.name} <span class="badge badge-info ml-1" style="font-size: 10px;">${user.plan_name}</span></div>
-              <div class="text-muted" style="font-size: 11px;"><i class="fa fa-envelope mr-1"></i>${user.email} ${user.phone ? '&bull; ' + user.phone : ''}</div>
+              <div class="font-weight-bold text-white">${escapeHtml(u.name)} <span class="badge badge-info ml-1" style="font-size: 10px;">${escapeHtml(planName)}</span></div>
+              <div class="text-muted" style="font-size: 11px;"><i class="fa fa-envelope mr-1"></i>${escapeHtml(u.email)}${phoneText}</div>
             </div>
-            <button type="button" class="btn btn-xs btn-outline-danger btn-remove-chip ml-auto" data-id="${user.id}" title="Remove recipient" style="border: none; background: transparent; color: #ff5b5b; font-size: 16px; line-height: 1; padding: 2px 6px;">
+            <button type="button" class="btn btn-xs btn-outline-danger btn-remove-chip ml-auto" data-id="${u.id}" title="Remove recipient" style="border: none; background: transparent; color: #ff5b5b; font-size: 16px; line-height: 1; padding: 2px 6px;">
               <i class="fa fa-times-circle"></i>
             </button>
-            <input type="hidden" name="user_ids[]" value="${user.id}" class="user-id-input" id="input_user_id_${user.id}">
+            <input type="hidden" name="user_ids[]" value="${u.id}" class="user-id-input" id="input_user_id_${u.id}">
           </div>
         `;
+      }
 
-        $('#users_chips_wrapper').append(chipHtml);
+      // Add a single user chip to the container
+      function appendUserChip(u) {
+        if ($('#input_user_id_' + u.id).length > 0) {
+          return false;
+        }
+        $('#users_chips_wrapper').append(renderUserChip(u));
         $('#no_users_selected_notice').hide();
-        $('#user_search_dropdown').hide().empty();
-        $('#user_search_input').val('');
         updateSelectedUsersBadgeCount();
-      });
+        return true;
+      }
 
-      // Remove user chip
-      $(document).on('click', '.btn-remove-chip', function() {
-        var id = $(this).data('id');
-        $('#user_chip_' + id).remove();
-        updateSelectedUsersBadgeCount();
-      });
-
+      // Update badge count and placeholder visibility
       function updateSelectedUsersBadgeCount() {
         var count = $('.user-id-input').length;
         $('#specific_count').text(count);
@@ -386,10 +323,221 @@
         }
       }
 
+      // Remove User Chip
+      $(document).on('click', '.btn-remove-chip', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        $('#user_chip_' + id).remove();
+        updateSelectedUsersBadgeCount();
+
+        // If dropdown is open, update that user row
+        var row = $(`.search-result-row[data-user-id="${id}"]`);
+        if (row.length) {
+          row.find('.search-row-cb').prop('disabled', false).prop('checked', false);
+          row.find('.action-btn-area').html(`<button type="button" class="btn btn-xs btn-outline-primary btn-add-single" data-user-id="${id}" style="font-size: 11px; padding: 3px 8px;"><i class="fa fa-plus"></i> Add</button>`);
+          syncSearchSelectionHeader();
+        }
+      });
+
+      // Synchronize "Select All" checkbox and "Add Selected (X)" button in dropdown header
+      function syncSearchSelectionHeader() {
+        var unselectedAndEnabled = $('.search-row-cb:not(:disabled)');
+        var checkedBoxes = $('.search-row-cb:checked');
+        var checkedCount = checkedBoxes.length;
+
+        $('#selected_search_count').text(checkedCount);
+        $('#btn_add_selected_search').prop('disabled', checkedCount === 0);
+
+        var totalAvailable = unselectedAndEnabled.length;
+        $('#available_search_count').text(totalAvailable);
+
+        if (totalAvailable > 0 && checkedCount === totalAvailable) {
+          $('#check_all_search_results').prop('checked', true).prop('disabled', false);
+        } else if (totalAvailable > 0) {
+          $('#check_all_search_results').prop('checked', false).prop('disabled', false);
+        } else {
+          $('#check_all_search_results').prop('checked', false).prop('disabled', true);
+        }
+      }
+
+      // User Search Autocomplete with Debounce
+      var searchTimeout = null;
+      var searchDropdown = $('#user_search_dropdown');
+      var searchSpinner = $('#search_spinner');
+
+      $('#user_search_input').on('keyup input', function() {
+        var term = $(this).val().trim();
+        clearTimeout(searchTimeout);
+
+        if (term.length < 1) {
+          searchDropdown.hide().empty();
+          searchSpinner.hide();
+          return;
+        }
+
+        searchSpinner.show();
+        searchTimeout = setTimeout(function() {
+          $.ajax({
+            url: "{{ url('admin/users/promotional-email/search-users') }}",
+            type: 'GET',
+            data: { q: term },
+            dataType: 'json',
+            success: function(res) {
+              searchSpinner.hide();
+              renderSearchResults(res.results || [], term);
+            },
+            error: function() {
+              searchSpinner.hide();
+              searchDropdown.html('<div class="p-3 text-center text-danger"><i class="fa fa-exclamation-triangle"></i> Error searching users.</div>').show();
+            }
+          });
+        }, 250);
+      });
+
+      // Render search results with selection controls
+      function renderSearchResults(users, query) {
+        if (!users || users.length === 0) {
+          searchDropdown.html('<div class="p-3 text-center text-muted" style="color: #94a3b8;"><i class="fa fa-info-circle mr-1"></i> No matching users found for "' + escapeHtml(query) + '".</div>').show();
+          return;
+        }
+
+        var availableCount = 0;
+        var rowsHtml = '';
+
+        users.forEach(function(u) {
+          var alreadyAdded = $('#input_user_id_' + u.id).length > 0;
+          if (!alreadyAdded) availableCount++;
+
+          var initials = (u.name || 'U').substring(0, 2).toUpperCase();
+          var planName = u.plan_name || 'No Plan';
+          var phoneText = u.phone ? (' &bull; ' + escapeHtml(u.phone)) : '';
+
+          rowsHtml += `
+            <div class="search-result-row list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2" 
+                 data-user='${JSON.stringify(u).replace(/'/g, "&apos;")}' 
+                 data-user-id="${u.id}"
+                 style="background: #1c273c; border-color: #2c3850; cursor: pointer; transition: background 0.15s ease;">
+              <div class="d-flex align-items-center" style="flex: 1; min-width: 0;">
+                <div class="custom-control custom-checkbox mr-2">
+                  <input type="checkbox" class="custom-control-input search-row-cb" id="cb_user_${u.id}" data-user-id="${u.id}" ${alreadyAdded ? 'disabled' : ''}>
+                  <label class="custom-control-label" for="cb_user_${u.id}" style="cursor: pointer;"></label>
+                </div>
+                <div class="avatar-mini mr-2 flex-shrink-0" style="width: 32px; height: 32px; border-radius: 50%; background: #3bafda; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;">
+                  ${initials}
+                </div>
+                <div class="user-meta text-truncate mr-2">
+                  <div class="font-weight-bold text-white text-truncate" style="font-size: 13px;">
+                    ${escapeHtml(u.name)} 
+                    <span class="badge badge-info ml-1" style="font-size: 10px;">${escapeHtml(planName)}</span>
+                    ${u.status == 1 ? '<span class="badge badge-success ml-1" style="font-size: 9px;">Active</span>' : '<span class="badge badge-danger ml-1" style="font-size: 9px;">Inactive</span>'}
+                  </div>
+                  <div class="text-muted text-truncate" style="font-size: 11px;">
+                    <i class="fa fa-envelope mr-1"></i>${escapeHtml(u.email)}${phoneText}
+                  </div>
+                </div>
+              </div>
+              <div class="action-btn-area flex-shrink-0">
+                ${alreadyAdded 
+                  ? '<span class="badge badge-secondary" style="font-size: 11px; padding: 4px 7px;"><i class="fa fa-check"></i> Added</span>' 
+                  : `<button type="button" class="btn btn-xs btn-outline-primary btn-add-single" data-user-id="${u.id}" style="font-size: 11px; padding: 3px 8px;"><i class="fa fa-plus"></i> Add</button>`
+                }
+              </div>
+            </div>
+          `;
+        });
+
+        var headerHtml = `
+          <div class="d-flex align-items-center justify-content-between p-2 border-bottom border-secondary" style="background: #141c2b; position: sticky; top: 0; z-index: 10;">
+            <div class="custom-control custom-checkbox ml-1">
+              <input type="checkbox" class="custom-control-input" id="check_all_search_results" ${availableCount === 0 ? 'disabled' : ''}>
+              <label class="custom-control-label text-white font-weight-bold" for="check_all_search_results" style="cursor: pointer; font-size: 12px;">
+                Select All (<span id="available_search_count">${availableCount}</span>)
+              </label>
+            </div>
+            <button type="button" id="btn_add_selected_search" class="btn btn-xs btn-primary font-weight-bold" disabled style="padding: 3px 10px; font-size: 12px;">
+              <i class="fa fa-user-plus mr-1"></i> Add Selected (<span id="selected_search_count">0</span>)
+            </button>
+          </div>
+        `;
+
+        searchDropdown.html(headerHtml + '<div class="search-rows-container">' + rowsHtml + '</div>').show();
+      }
+
+      // Handle "Select All" Checkbox in Search Dropdown Header
+      $(document).on('change', '#check_all_search_results', function() {
+        var isChecked = $(this).is(':checked');
+        $('.search-row-cb:not(:disabled)').prop('checked', isChecked);
+        syncSearchSelectionHeader();
+      });
+
+      // Handle individual row checkbox change
+      $(document).on('change', '.search-row-cb', function(e) {
+        e.stopPropagation();
+        syncSearchSelectionHeader();
+      });
+
+      // Handle clicking anywhere on a search result row to toggle checkbox
+      $(document).on('click', '.search-result-row', function(e) {
+        if ($(e.target).closest('.btn-add-single').length) {
+          return;
+        }
+        if ($(e.target).is('.search-row-cb') || $(e.target).is('label[for^="cb_user_"]')) {
+          return;
+        }
+        var cb = $(this).find('.search-row-cb');
+        if (!cb.prop('disabled')) {
+          cb.prop('checked', !cb.prop('checked')).trigger('change');
+        }
+      });
+
+      // Handle single "+ Add" button click
+      $(document).on('click', '.btn-add-single', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var row = $(this).closest('.search-result-row');
+        var user = row.data('user');
+        if (user) {
+          appendUserChip(user);
+          row.find('.search-row-cb').prop('checked', false).prop('disabled', true);
+          row.find('.action-btn-area').html('<span class="badge badge-secondary" style="font-size: 11px; padding: 4px 7px;"><i class="fa fa-check"></i> Added</span>');
+          syncSearchSelectionHeader();
+        }
+      });
+
+      // Handle "+ Add Selected (X)" bulk button click
+      $(document).on('click', '#btn_add_selected_search', function(e) {
+        e.preventDefault();
+        var checkedBoxes = $('.search-row-cb:checked');
+        if (checkedBoxes.length === 0) return;
+
+        var addedCount = 0;
+        checkedBoxes.each(function() {
+          var row = $(this).closest('.search-result-row');
+          var user = row.data('user');
+          if (user) {
+            if (appendUserChip(user)) {
+              addedCount++;
+            }
+          }
+        });
+
+        searchDropdown.hide();
+        $('#user_search_input').val('');
+
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: false
+        });
+        Toast.fire({ icon: 'success', title: 'Added ' + addedCount + ' recipient(s)' });
+      });
+
       // Close search dropdown on click outside
       $(document).on('click', function(e) {
         if (!$(e.target).closest('#user_search_input, #user_search_dropdown').length) {
-          $('#user_search_dropdown').hide();
+          searchDropdown.hide();
         }
       });
 
