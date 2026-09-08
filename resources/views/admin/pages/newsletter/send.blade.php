@@ -6,25 +6,51 @@
       <div class="content">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-12">
+            <div class="col-lg-12">
               <div class="card-box">
 
-                <div class="row m-b-20">
-                  <div class="col-md-8">
-                    <h4 class="m-t-0 header-title"><i class="fa fa-paper-plane text-primary m-r-5"></i> Compose & Send Newsletter</h4>
-                    <p class="text-muted font-13 m-b-0">
-                      Broadcast news, releases, or announcements to all active subscribers. Every email includes a secure unsubscribe link.
-                    </p>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <a href="{{ URL::to('admin/newsletter/subscribers') }}">
+                      <h4 class="header-title m-t-0 m-b-30 text-primary pull-left" style="font-size: 20px;">
+                        <i class="fa fa-arrow-left"></i> {{ trans('words.back') }}
+                      </h4>
+                    </a>
                   </div>
-                  <div class="col-md-4 text-md-right">
-                    <a href="{{ url('admin/newsletter/subscribers') }}" class="btn btn-secondary waves-effect">
-                      <i class="fa fa-arrow-left m-r-5"></i> Back to Subscribers
+                  <div class="col-sm-6">
+                    <a href="#" class="btn btn-info btn-md waves-effect waves-light m-b-20 mt-2 pull-right" title="Test Email" data-toggle="modal" data-target="#smtp_test_model">
+                      <i class="fa fa-send"></i> Test Email
                     </a>
                   </div>
                 </div>
 
+                <!-- Test Email Modal -->
+                <div id="smtp_test_model" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Send Test Email</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">{{ trans('words.test_email') }}</label>
+                          <div class="col-sm-9">
+                            <input type="email" name="test_email" placeholder="{{ trans('words.email') }}" class="form-control" id="test_email" value="{{ $admin_email }}" autocomplete="off" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" id="test_email_sent_btn" class="btn btn-primary waves-effect waves-light">
+                          {{ trans('words.send') }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 @if(Session::has('flash_message'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <div class="alert alert-success">
                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                       </button>
@@ -34,7 +60,10 @@
 
                 @if($errors->any())
                   <div class="alert alert-danger">
-                    <ul class="m-b-0">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    <ul class="m-b-0 pl-3">
                       @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                       @endforeach
@@ -42,72 +71,42 @@
                   </div>
                 @endif
 
-                <div class="row">
-                  <!-- Main Compose Form -->
-                  <div class="col-lg-8">
-                    <form action="{{ url('admin/newsletter/send') }}" method="POST" id="newsletterForm">
-                      @csrf
+                <form action="{{ url('admin/newsletter/send') }}" method="POST" class="form-horizontal" id="newsletterForm">
+                  @csrf
 
-                      <div class="form-group">
-                        <label class="font-weight-bold">Audience Target</label>
-                        <div class="p-2" style="background: #25252e; border: 1px solid #33333d; border-radius: 4px; color: #d0d0d8;">
-                          <i class="fa fa-users text-success m-r-5"></i>
-                          Sending to <strong>{{ $active_count }}</strong> Active Subscribers
-                          @if($active_count == 0)
-                            <span class="text-danger ml-2 font-weight-bold">(No active subscribers to send to)</span>
-                          @endif
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="subject" class="font-weight-bold">Subject Line <span class="text-danger">*</span></label>
-                        <input type="text" name="subject" id="subject" class="form-control" placeholder="e.g. New Releases on Cineworm this weekend!" value="{{ old('subject') }}" required>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="content" class="font-weight-bold">Message Content (HTML or formatted text) <span class="text-danger">*</span></label>
-                        <textarea name="content" id="content" rows="12" class="form-control" placeholder="Write your announcement or newsletter body here..." required>{{ old('content') }}</textarea>
-                        <small class="form-text text-muted">You can write plain text or HTML markup (headings, paragraphs, links, images, etc.).</small>
-                      </div>
-
-                      <div class="form-group m-t-20">
-                        <button type="button" id="btnBroadcastConfirm" class="btn btn-primary btn-lg waves-effect waves-light" @if($active_count == 0) disabled @endif>
-                          <i class="fa fa-send m-r-5"></i> Send Newsletter to {{ $active_count }} Subscribers
-                        </button>
-                      </div>
-                    </form>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Audience Target</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" value="{{ $active_count }} Active Subscribers" readonly>
+                      @if($active_count == 0)
+                        <small class="text-danger">No active subscribers found in database.</small>
+                      @endif
+                    </div>
                   </div>
 
-                  <!-- Test Send Card -->
-                  <div class="col-lg-4">
-                    <div class="card-box" style="background: #1a1a21; border: 1px solid #2d2d38;">
-                      <h5 class="header-title m-t-0" style="color: #fff;"><i class="fa fa-flask text-warning m-r-5"></i> Test Delivery First</h5>
-                      <p class="text-muted font-13">
-                        Always preview the newsletter in your own inbox to verify how it displays before sending it to your entire subscriber list.
-                      </p>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Subject Line *</label>
+                    <div class="col-sm-8">
+                      <input type="text" name="subject" id="subject" class="form-control" placeholder="e.g. New Releases on Cineworm" value="{{ old('subject') }}" required>
+                    </div>
+                  </div>
 
-                      <div class="form-group">
-                        <label>Test Recipient Email</label>
-                        <input type="email" id="test_email" class="form-control" value="{{ $admin_email }}" placeholder="your-email@example.com">
-                      </div>
+                  <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Message Content *</label>
+                    <div class="col-sm-8">
+                      <textarea id="elm1" name="content" class="form-control">{{ old('content') }}</textarea>
+                    </div>
+                  </div>
 
-                      <button type="button" id="btnSendTest" class="btn btn-warning btn-block waves-effect waves-light">
-                        <i class="fa fa-envelope-o m-r-5"></i> Send Test Preview
+                  <div class="form-group">
+                    <div class="offset-sm-3 col-sm-9 pl-1">
+                      <button type="button" id="btnSubmitNewsletter" class="btn btn-primary waves-effect waves-light" @if($active_count == 0) disabled @endif>
+                        <i class="fa fa-send"></i> Send Newsletter
                       </button>
-
-                      <div id="testResultAlert" class="m-t-15" style="display: none;"></div>
-                    </div>
-
-                    <div class="card-box" style="background: #1a1a21; border: 1px solid #2d2d38;">
-                      <h5 class="header-title m-t-0" style="color: #fff;"><i class="fa fa-info-circle text-info m-r-5"></i> Tips</h5>
-                      <ul class="text-muted font-13 pl-3 mb-0" style="line-height: 1.8;">
-                        <li>Keep your subject line punchy and descriptive.</li>
-                        <li>Include call-to-action buttons or links back to your movies and shows.</li>
-                        <li>The system automatically includes your logo and an unsubscribe footer for compliance.</li>
-                      </ul>
                     </div>
                   </div>
-                </div>
+
+                </form>
 
               </div>
             </div>
@@ -117,15 +116,25 @@
       @include("admin.copyright") 
   </div>
 
-  <script src="{{ URL::asset('admin_assets/js/jquery.min.js') }}"></script>
   <script type="text/javascript">
-    $(document).ready(function() {
-      // Send Test Email AJAX
-      $('#btnSendTest').click(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+      // Ensure TinyMCE initializes if not already auto-initialized
+      if (typeof tinymce !== 'undefined' && !tinymce.get('elm1')) {
+        tinymce.init({
+          selector: "textarea#elm1",
+          height: 350,
+          plugins: 'print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen link template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount textpattern noneditable help charmap quickbars emoticons',
+          toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor"
+        });
+      }
+
+      // Test Email Send
+      $('#test_email_sent_btn').click(function() {
         var testEmail = $('#test_email').val();
         var subject = $('#subject').val();
-        var content = $('#content').val();
-        var resultDiv = $('#testResultAlert');
+        var content = (typeof tinymce !== 'undefined' && tinymce.get('elm1'))
+          ? tinymce.get('elm1').getContent()
+          : $('#elm1').val();
 
         if (!subject) {
           alert('Please enter a subject line first.');
@@ -135,7 +144,6 @@
 
         if (!content) {
           alert('Please enter message content first.');
-          $('#content').focus();
           return;
         }
 
@@ -145,9 +153,8 @@
           return;
         }
 
-        var origBtnText = $(this).html();
-        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin m-r-5"></i> Sending...');
-        resultDiv.hide();
+        var btn = $(this);
+        btn.html('sending...').prop('disabled', true);
 
         $.ajax({
           type: 'POST',
@@ -158,44 +165,57 @@
             subject: subject,
             content: content
           },
-          success: function(res) {
-            $('#btnSendTest').prop('disabled', false).html(origBtnText);
-            if (res.status === 'success') {
-              resultDiv.removeClass('alert-danger').addClass('alert alert-success').html('<i class="fa fa-check m-r-5"></i> ' + res.message).slideDown();
+          dataType: 'json',
+          success: function(response) {
+            btn.html("{{ trans('words.send') }}").prop('disabled', false);
+            $('#smtp_test_model').modal('hide');
+
+            const Toast = Swal.mixin({
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: false
+            });
+
+            if (response.status === 'success') {
+              Toast.fire({ icon: 'success', title: response.message });
             } else {
-              resultDiv.removeClass('alert-success').addClass('alert alert-danger').html('<i class="fa fa-times m-r-5"></i> ' + res.message).slideDown();
+              Toast.fire({ icon: 'error', title: response.message });
             }
           },
           error: function(xhr) {
-            $('#btnSendTest').prop('disabled', false).html(origBtnText);
-            var errMsg = 'Failed to send test email. Please check your SMTP settings.';
+            btn.html("{{ trans('words.send') }}").prop('disabled', false);
+            var errMsg = 'Failed to send test email.';
             if (xhr.responseJSON && xhr.responseJSON.message) {
               errMsg = xhr.responseJSON.message;
             }
-            resultDiv.removeClass('alert-success').addClass('alert alert-danger').html('<i class="fa fa-times m-r-5"></i> ' + errMsg).slideDown();
+            alert(errMsg);
           }
         });
       });
 
-      // Broadcast Confirmation
-      $('#btnBroadcastConfirm').click(function() {
+      // Confirmation
+      $('#btnSubmitNewsletter').click(function() {
         var subject = $('#subject').val();
-        var content = $('#content').val();
+        var content = (typeof tinymce !== 'undefined' && tinymce.get('elm1'))
+          ? tinymce.get('elm1').getContent()
+          : $('#elm1').val();
 
         if (!subject || !content) {
-          alert('Please provide both a subject line and message content.');
+          alert('Please provide both a Subject Line and Message Content.');
           return;
         }
 
         Swal.fire({
-          title: 'Broadcast Newsletter?',
-          text: "This will send the newsletter to {{ $active_count }} active subscriber(s). Are you sure?",
-          icon: 'question',
+          title: '{{ trans("words.dlt_warning") }}',
+          text: "Send newsletter to {{ $active_count }} active subscriber(s)?",
+          icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#3085d6',
           cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, broadcast now!',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: 'Yes, Send Now!',
+          cancelButtonText: "{{ trans('words.btn_cancel') }}",
           background: "#1a2234",
           color: "#fff"
         }).then((result) => {

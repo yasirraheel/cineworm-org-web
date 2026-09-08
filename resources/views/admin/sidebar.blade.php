@@ -158,21 +158,24 @@
 
 
 
-                    <li class="has_sub">
-                        <a href="javascript:void(0);" class="waves-effect">
+                    @php
+                        $isUsersActive = request()->is('admin/users*') || request()->is('admin/sub_admin*') || request()->is('admin/deleted_users*');
+                    @endphp
+                    <li class="has_sub {{ $isUsersActive ? 'subdrop' : '' }}">
+                        <a href="javascript:void(0);" class="waves-effect {{ $isUsersActive ? 'active subdrop' : '' }}">
                             <i class="fa fa-users"></i>
                             <span>{{ trans('words.users') }}</span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <ul class="list-unstyled">
-                            <li class="{{ classActivePath('users') }}">
-                                <a href="{{ URL::to('admin/users') }}" class="{{ classActivePath('users') }}">
+                        <ul class="list-unstyled" style="{{ $isUsersActive ? 'display: block;' : '' }}">
+                            <li class="{{ (request()->is('admin/users') || request()->is('admin/users/add_user') || request()->is('admin/users/edit_user*') || request()->is('admin/users/history*')) ? 'active' : '' }}">
+                                <a href="{{ URL::to('admin/users') }}" class="{{ (request()->is('admin/users') || request()->is('admin/users/add_user') || request()->is('admin/users/edit_user*') || request()->is('admin/users/history*')) ? 'active' : '' }}">
                                     <i class="fa fa-users"></i>
                                     <span>{{ trans('words.users') }}</span>
                                 </a>
                             </li>
                             <li class="{{ request()->is('admin/users/promotional-email*') ? 'active' : '' }}">
-                                <a href="{{ URL::to('admin/users/promotional-email') }}">
+                                <a href="{{ URL::to('admin/users/promotional-email') }}" class="{{ request()->is('admin/users/promotional-email*') ? 'active' : '' }}">
                                     <i class="fa fa-envelope-o"></i>
                                     <span>Send Promo Email</span>
                                 </a>
@@ -188,21 +191,24 @@
                         </ul>
                     </li>
 
-                    <li class="has_sub">
-                        <a href="javascript:void(0);" class="waves-effect">
+                    @php
+                        $isNewsletterActive = request()->is('admin/newsletter*');
+                    @endphp
+                    <li class="has_sub {{ $isNewsletterActive ? 'subdrop' : '' }}">
+                        <a href="javascript:void(0);" class="waves-effect {{ $isNewsletterActive ? 'active subdrop' : '' }}">
                             <i class="fa fa-newspaper-o"></i>
                             <span>Newsletter</span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <ul class="list-unstyled">
+                        <ul class="list-unstyled" style="{{ $isNewsletterActive ? 'display: block;' : '' }}">
                             <li class="{{ request()->is('admin/newsletter/subscribers*') ? 'active' : '' }}">
-                                <a href="{{ URL::to('admin/newsletter/subscribers') }}">
+                                <a href="{{ URL::to('admin/newsletter/subscribers') }}" class="{{ request()->is('admin/newsletter/subscribers*') ? 'active' : '' }}">
                                     <i class="fa fa-users"></i>
                                     <span>Subscribers</span>
                                 </a>
                             </li>
                             <li class="{{ request()->is('admin/newsletter/send*') ? 'active' : '' }}">
-                                <a href="{{ URL::to('admin/newsletter/send') }}">
+                                <a href="{{ URL::to('admin/newsletter/send') }}" class="{{ request()->is('admin/newsletter/send*') ? 'active' : '' }}">
                                     <i class="fa fa-paper-plane"></i>
                                     <span>Send Newsletter</span>
                                 </a>
