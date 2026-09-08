@@ -87,6 +87,7 @@ class TaskCron extends Command
             (new PromotionalCampaignService())->processDueCampaigns(5, 25);
             (new WhatsappServerService())->ensureRunning();
             (new WhatsappCampaignService())->processDueCampaigns(3, 10);
+            (new \App\Services\UserPromotionalEmailService())->processBatch(30);
 
             $monitor->markSuccess('Cron completed successfully.', [
                 'campaigns_checked' => PromotionalCampaign::whereIn('status', [

@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
+use App\UserPromotionalCampaign;
+use App\Services\UserPromotionalEmailService;
+use Illuminate\Support\Facades\Mail;
 
 class UsersController extends MainAdminController
 {
@@ -471,4 +474,104 @@ class UsersController extends MainAdminController
     }
 
 
+
+    public function promotionalEmailView()
+    {
+        if (Auth::User()->usertype != "Admin") {
+            \Session::flash('flash_message', trans('words.access_denied'));
+            return redirect('admin/dashboard');
+        }
+
+        $page_title = 'Send Promotional Email';
+
+        $total_users = User::whereNotNull('email')->where('email', '!=', '')
+            ->where(function ($q) {
+                $q->where('usertype', 'User')
+                  ->orWhereNull('usertype')
+                  ->orWhere('usertype', '');
+            })->count();
+
+        $active_users = User::whereNotNull('email')->where('email', '!=', '')
+            ->where('status', 1)
+            ->where(function ($q) {
+                $q->where('usertype', 'User')
+                  ->orWhereNull('usertype')
+                  ->orWhere('usertype', '');
+            })->count();
+
+        $campaigns = UserPromotionalCampaign::orderBy('id', 'desc')->paginate(10);
+
+        return view('admin.pages.users.promotional_email', compact('page_title', 'total_users', 'active_users', 'campaigns'));
+    }
+
+    public function sendPromotionalEmail(Request $request)
+    {
+        if (Auth::User()->usertype != "Admin") {
+            \Session::flash('flash_message', trans('words.access_denied'));
+            return redirect('admin/dashboard');
+        }
+
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'content' => 'required|string',
+            'audience' => 'required|string|in:all,active_only',
+        ]);
+
+        $subject = trim($request->input('subject'));
+        $content = $request->input('content');
+        $audience = $request->input('audience');
+
+        $campaign = (new UserPromotionalEmailService())->queueCampaign(
+            $subject,
+            $subject,
+            $content,
+            $audience,
+            Auth::id()
+        );
+
+        \Session::flash('flash_message', "Promotional campaign queued successfully! {$campaign->total_recipients} user email(s) have been added to the queue and will be delivered in rate-limited batches via the server cron.");
+
+        return redirect('admin/users/promotional-email');
+    }
+
+    public function testPromotionalEmail(Request $request)
+    {
+        if (Auth::User()->usertype != "Admin") {
+            return response()->json(['status' => 'error', 'message' => trans('words.access_denied')], 403);
+        }
+
+        $request->validate([
+            'test_email' => 'required|email',
+            'subject' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        $testEmail = trim($request->input('test_email'));
+        $subject = '[TEST] ' . trim($request->input('subject'));
+        $bodyContent = $request->input('content');
+
+        try {
+            Mail::send('emails.newsletter', [
+                'subject' => $subject,
+                'name' => 'Admin Tester',
+                'body_content' => $bodyContent,
+                'unsubscribe_url' => url('/'),
+            ], function ($message) use ($testEmail, $subject) {
+                $message->to($testEmail)
+                        ->from(getcong('site_email'), getcong('site_name'))
+                        ->subject($subject);
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "Test promotional email delivered to {$testEmail}!",
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to send test email: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }
+

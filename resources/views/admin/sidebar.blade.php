@@ -171,6 +171,12 @@
                                     <span>{{ trans('words.users') }}</span>
                                 </a>
                             </li>
+                            <li class="{{ request()->is('admin/users/promotional-email*') ? 'active' : '' }}">
+                                <a href="{{ URL::to('admin/users/promotional-email') }}">
+                                    <i class="fa fa-envelope-o"></i>
+                                    <span>Send Promo Email</span>
+                                </a>
+                            </li>
                             <li class="{{ classActivePath('sub_admin') }}"><a href="{{ URL::to('admin/sub_admin') }}"
                                     class="{{ classActivePath('sub_admin') }}"><i
                                         class="fa fa-shield"></i><span>Roles & Permissions</span></a></li>
@@ -178,6 +184,28 @@
                                     href="{{ URL::to('admin/deleted_users') }}"
                                     class="{{ classActivePath('deleted_users') }}"><i
                                         class="fa fa-users"></i><span>{{ trans('words.deleted_users') }}</span></a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="has_sub">
+                        <a href="javascript:void(0);" class="waves-effect">
+                            <i class="fa fa-newspaper-o"></i>
+                            <span>Newsletter</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul class="list-unstyled">
+                            <li class="{{ request()->is('admin/newsletter/subscribers*') ? 'active' : '' }}">
+                                <a href="{{ URL::to('admin/newsletter/subscribers') }}">
+                                    <i class="fa fa-users"></i>
+                                    <span>Subscribers</span>
+                                </a>
+                            </li>
+                            <li class="{{ request()->is('admin/newsletter/send*') ? 'active' : '' }}">
+                                <a href="{{ URL::to('admin/newsletter/send') }}">
+                                    <i class="fa fa-paper-plane"></i>
+                                    <span>Send Newsletter</span>
+                                </a>
                             </li>
                         </ul>
                     </li>
@@ -502,19 +530,6 @@
                                     class="{{ classActivePath('deleted_users') }}"><i
                                         class="fa fa-users"></i><span>{{ trans('words.deleted_users') }}</span></a>
                             </li>
-                        </ul>
-                    </li>
-                    <li class="has_sub">
-                        <a href="javascript:void(0);" class="waves-effect"><i
-                                class="fa fa-envelope-o"></i><span>Newsletter</span><span
-                                class="menu-arrow"></span></a>
-                        <ul class="list-unstyled">
-                            <li class="{{ request()->is('admin/newsletter/subscribers*') ? 'active' : '' }}"><a
-                                    href="{{ URL::to('admin/newsletter/subscribers') }}"><i
-                                        class="fa fa-users"></i><span>Subscribers</span></a></li>
-                            <li class="{{ request()->is('admin/newsletter/send*') ? 'active' : '' }}"><a
-                                    href="{{ URL::to('admin/newsletter/send') }}"><i
-                                        class="fa fa-paper-plane"></i><span>Send Newsletter</span></a></li>
                         </ul>
                     </li>
                     <li class="has_sub">

@@ -25,11 +25,10 @@
                       <button type="submit"><i class="fa fa-search"></i></button>
                     {!! Form::close() !!}
                   </div>             
-                <div class="col-md-3">
-                  <a href="{{URL::to('admin/users/add_user')}}" class="btn btn-success btn-md waves-effect waves-light m-b-20 mt-2" data-toggle="tooltip" title="{{trans('words.add_user')}}"><i class="fa fa-plus"></i> {{trans('words.add_user')}}</a>
-                </div>
-                <div class="col-md-3">
-                  <a href="{{URL::to('admin/users/export')}}" class="btn btn-info btn-md waves-effect waves-light m-b-20 mt-2 pull-right" data-toggle="tooltip" title="{{trans('words.export_user')}}"><i class="fa fa-file-excel-o"></i> {{trans('words.export_user')}}</a>
+                <div class="col-md-6 text-md-right">
+                  <a href="{{URL::to('admin/users/promotional-email')}}" class="btn btn-primary btn-md waves-effect waves-light m-b-20 mt-2 m-r-5" data-toggle="tooltip" title="Send Promotional Email to Users"><i class="fa fa-envelope-o"></i> Send Promo Email</a>
+                  <a href="{{URL::to('admin/users/add_user')}}" class="btn btn-success btn-md waves-effect waves-light m-b-20 mt-2 m-r-5" data-toggle="tooltip" title="{{trans('words.add_user')}}"><i class="fa fa-plus"></i> {{trans('words.add_user')}}</a>
+                  <a href="{{URL::to('admin/users/export')}}" class="btn btn-info btn-md waves-effect waves-light m-b-20 mt-2" data-toggle="tooltip" title="{{trans('words.export_user')}}"><i class="fa fa-file-excel-o"></i> {{trans('words.export_user')}}</a>
                 </div>
               </div>
 

@@ -250,6 +250,9 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('users/delete/{id}', 'UsersController@delete');
         Route::get('users/history/{id}', 'UsersController@user_history');
         Route::get('users/export', 'UsersController@user_export');
+        Route::get('users/promotional-email', 'UsersController@promotionalEmailView');
+        Route::post('users/promotional-email/send', 'UsersController@sendPromotionalEmail');
+        Route::post('users/promotional-email/test', 'UsersController@testPromotionalEmail');
 
         Route::get('sub_admin', 'UsersController@admin_user_list');
         Route::get('sub_admin/add_user', 'UsersController@admin_addUser');
