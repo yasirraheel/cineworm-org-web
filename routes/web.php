@@ -608,6 +608,7 @@ Route::post('user/news_tickers/store', 'UserNewsTickerController@store');
 
 // User Live Broadcasts
 Route::get('user/live_broadcasts', 'UserLiveBroadcastController@index');
+Route::get('user/cinemeet', 'UserLiveBroadcastController@index');
 Route::get('user/live_broadcasts/create', 'UserLiveBroadcastController@create');
 Route::post('user/live_broadcasts/create', 'UserLiveBroadcastController@store');
 Route::post('user/live_broadcasts/update/{id}', 'UserLiveBroadcastController@updateRoom');

@@ -1,6 +1,6 @@
 @extends('site_app')
 
-@section('head_title', 'My Live Broadcasts | '.getcong('site_name'))
+@section('head_title', 'CineMeet | '.getcong('site_name'))
 @section('head_url', Request::url())
 
 @section('content')
@@ -231,11 +231,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-12">
-                <h2>My Live Broadcasts</h2>
+                <h2>CineMeet</h2>
                 <nav id="breadcrumbs">
                     <ul>
                         <li><a href="{{ URL::to('/') }}">Home</a></li>
-                        <li>My Live Broadcasts</li>
+                        <li>CineMeet</li>
                     </ul>
                 </nav>
             </div>
@@ -261,19 +261,19 @@
                         {{-- Header Row --}}
                         <div class="row" style="margin-bottom: 20px;" id="tourHeaderSection">
                             <div class="col-md-6">
-                                <h3 style="color:#fff;margin-bottom:5px;" id="tourHeaderTitle"><i class="fa fa-video-camera" style="color:#e50914;margin-right:8px;"></i> Live Broadcasts</h3>
-                                <p style="color:#ccc;font-size:14px;">Manage and customize your live video meeting rooms.</p>
+                                <h3 style="color:#fff;margin-bottom:5px;" id="tourHeaderTitle"><i class="fa fa-video-camera" style="color:#e50914;margin-right:8px;"></i> CineMeet</h3>
+                                <p style="color:#ccc;font-size:14px;">Manage and customize your CineMeet video rooms.</p>
                             </div>
                             <div class="col-md-6 text-right" style="text-align: right; padding-top: 10px;">
                                 <button type="button" onclick="startLiveTour(true);" class="vfx-item-btn-danger text-uppercase" style="background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; margin-right:5px;" id="btnQuickTour">
                                     <i class="fa fa-question-circle"></i> Quick Tour
                                 </button>
                                 <a href="javascript:void(0);" onclick="openNewMeetingModal();" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; margin-right:5px;" id="btnCustomizeCreate">
-                                    <i class="fa fa-sliders"></i> Customize & Create
+                                    <i class="fa fa-sliders"></i> Customize & Create CineMeet
                                 </a>
                                 @if(!$inCall)
                                     <a href="{{ URL::to('user/live_broadcasts?room=' . $roomId) }}" class="vfx-item-btn-danger text-uppercase" style="text-decoration:none; background-color:#28a745;" id="btnStartCallTop">
-                                        <i class="fa fa-play"></i> Start Call
+                                        <i class="fa fa-play"></i> Start CineMeet
                                     </a>
                                 @endif
                             </div>
@@ -300,7 +300,7 @@
                                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                                         {{-- Leave Call --}}
                                         <a href="{{ URL::to('user/live_broadcasts') }}" class="btn btn-sm btn-danger" onclick="return leaveCallConfirm(this.href);" style="background:#e50914; border:none; padding:6px 14px; font-size:13px; font-weight:600;">
-                                            <i class="fa fa-phone"></i> Leave Call
+                                            <i class="fa fa-phone"></i> Leave CineMeet
                                         </a>
 
                                         {{-- Copy Link --}}
@@ -309,7 +309,7 @@
                                         </button>
 
                                         {{-- Share WhatsApp --}}
-                                        <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn btn-sm btn-success" style="background:#25D366; border:none; padding:6px 14px; font-size:13px; font-weight:600; color:#fff !important;">
+                                        <a href="https://api.whatsapp.com/send?text={{ urlencode('Join my CineMeet on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn btn-sm btn-success" style="background:#25D366; border:none; padding:6px 14px; font-size:13px; font-weight:600; color:#fff !important;">
                                             <i class="fa-brands fa-whatsapp"></i> WhatsApp
                                         </a>
 
@@ -322,7 +322,7 @@
 
                                 {{-- Guest Link Bar --}}
                                 <div style="margin-bottom: 15px;" id="shareLinkBox">
-                                    <label style="color:#ccc; font-size:13px; font-weight:600; margin-bottom:5px; display:block;">Guest Share Link</label>
+                                    <label style="color:#ccc; font-size:13px; font-weight:600; margin-bottom:5px; display:block;">CineMeet Share Link</label>
                                     <div style="display: flex; align-items: center; width: 100%; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.4);">
                                         <input type="text" id="shareUrlInput" value="{{ $shareableJoinUrl }}" readonly style="flex: 1; background: transparent; border: none; color: #fff; padding: 10px 14px; font-size: 14px; font-family: monospace; outline: none;">
                                         <button type="button" onclick="copyInviteLink('{{ $shareableJoinUrl }}')" style="background: #e50914; color: #fff; border: none; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
@@ -371,7 +371,7 @@
                                             <td style="border-color: rgba(255,255,255,0.1); color:#ccc;">{{ $broadcast->created_at ? $broadcast->created_at->format('M d, Y') : '—' }}</td>
                                             <td style="border-color: rgba(255,255,255,0.1);">
                                                 <a href="{{ URL::to('user/live_broadcasts?room=' . $broadcast->zoom_meeting_id) }}" class="btn btn-sm btn-success" style="background:#e50914; border:none; padding:5px 12px; font-size:13px; margin-right:4px; text-decoration:none;">
-                                                    <i class="fa fa-video-camera"></i> Start Call
+                                                    <i class="fa fa-video-camera"></i> Start CineMeet
                                                 </a>
                                                 <button type="button" class="btn btn-sm btn-info" style="background:#17a2b8; border:none; color:#fff; padding:5px 12px; font-size:13px; margin-right:4px;" onclick="openEditMeetingModal('{{ $broadcast->id }}', '{{ addslashes($broadcast->title) }}', '{{ addslashes($broadcast->zoom_meeting_password) }}')">
                                                     <i class="fa fa-sliders"></i> Customize
@@ -385,7 +385,7 @@
                                         <tr>
                                             <td colspan="5" class="text-center" style="border-color: rgba(255,255,255,0.1); padding: 30px; color:#ccc;">
                                                 <i class="fa fa-video-camera" style="font-size:32px; display:block; margin-bottom:14px; opacity:0.2;"></i>
-                                                No live broadcasts scheduled yet.
+                                                No CineMeet rooms scheduled yet.
                                             </td>
                                         </tr>
                                     @endforelse
@@ -417,11 +417,11 @@
 
     <div id="tourPopoverTitle" class="tour-popover-title">
         <i id="tourPopoverIcon" class="fa fa-video-camera"></i>
-        <span id="tourPopoverTitleText">Live Broadcasts</span>
+        <span id="tourPopoverTitleText">CineMeet</span>
     </div>
 
     <p id="tourPopoverDesc" class="tour-popover-desc">
-        Welcome! Here you can manage and launch live video calls directly inside CineWorm.
+        Welcome! Here you can manage and launch CineMeet video calls directly inside CineWorm.
     </p>
 
     <div id="tourPopoverDots" class="tour-popover-dots">
@@ -449,32 +449,32 @@ var tourSteps = [
     {
         target: '#tourHeaderTitle',
         icon: 'fa-video-camera',
-        title: 'Live Broadcasts Workspace',
-        desc: 'This is your Live Meetings dashboard where you can launch, customize, and manage HD video calls directly inside CineWorm.'
+        title: 'CineMeet Workspace',
+        desc: 'This is your CineMeet dashboard where you can launch, customize, and manage HD video calls directly inside CineWorm.'
     },
     {
         target: '#btnCustomizeCreate',
         icon: 'fa-sliders',
-        title: 'Customize & Create Meetings',
-        desc: 'Click this button to configure your meeting topic, set a security password, and select default mic, camera, screen share & chat rules.'
+        title: 'Customize & Create CineMeet',
+        desc: 'Click this button to configure your CineMeet room title, set a security password, and select default mic, camera, screen share & chat rules.'
     },
     {
         target: '#btnStartCallTop',
         icon: 'fa-play-circle',
-        title: '1-Click Start Call',
-        desc: 'Click "Start Call" to immediately launch your live meeting workspace inside CineWorm!'
+        title: '1-Click Start CineMeet',
+        desc: 'Click "Start CineMeet" to immediately launch your CineMeet workspace inside CineWorm!'
     },
     {
         target: '#shareLinkBox',
         icon: 'fa-share-alt',
-        title: 'Invite Guests with Native Links',
+        title: 'Invite Guests to CineMeet',
         desc: 'Copy or share native cineworm.org/meeting/join/... links with your guests via WhatsApp or clipboard. Guests are protected by subscription login.'
     },
     {
         target: '#historyTableBox',
         icon: 'fa-list-alt',
-        title: 'Meeting History & Customization',
-        desc: 'View all your previously created meetings, re-start calls anytime, or click "Customize" to update security passwords and topics.'
+        title: 'CineMeet History & Customization',
+        desc: 'View all your previously created CineMeet rooms, re-start calls anytime, or click "Customize" to update security passwords and room titles.'
     }
 ];
 
@@ -617,12 +617,12 @@ document.addEventListener('DOMContentLoaded', function() {
 function openNewMeetingModal() {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
-            title: 'Customize & Create Live Meeting',
+            title: 'Customize & Create CineMeet Room',
             html: `
                 <div style="text-align:left; font-size:13px; color:#ccc; margin-top:10px;">
                     <div style="margin-bottom:12px;">
-                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;">Meeting Topic / Title</label>
-                        <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:13px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s Live Meeting" placeholder="e.g. Weekly Strategy Sync, Film Review...">
+                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;">CineMeet Room Title</label>
+                        <input type="text" id="swalMeetingTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:13px; padding:8px 12px; border-radius:4px; width:100%;" value="{{ Auth::user()->name }}'s CineMeet" placeholder="e.g. Weekly Strategy Sync, Film Review...">
                     </div>
 
                     <div style="margin-bottom:12px;">
@@ -667,7 +667,7 @@ function openNewMeetingModal() {
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: 'Create & Start Meeting',
+            confirmButtonText: 'Create & Start CineMeet',
             confirmButtonColor: '#e50914',
             cancelButtonText: 'Cancel',
             cancelButtonColor: '#333',
@@ -683,7 +683,7 @@ function openNewMeetingModal() {
                 const chat = document.getElementById('swalChat').value;
 
                 if (!title || !title.trim()) {
-                    Swal.showValidationMessage('Please enter a meeting topic');
+                    Swal.showValidationMessage('Please enter a CineMeet room title');
                     return false;
                 }
                 return { 
@@ -726,11 +726,11 @@ function openNewMeetingModal() {
 function openEditMeetingModal(id, currentTitle, currentPassword) {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
-            title: 'Customize Meeting Settings',
+            title: 'Customize CineMeet Settings',
             html: `
                 <div style="text-align:left; font-size:14px; color:#ccc; margin-top:10px;">
                     <div style="margin-bottom:12px;">
-                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;">Meeting Topic / Title</label>
+                        <label style="font-weight:600; margin-bottom:4px; display:block; color:#fff;">CineMeet Room Title</label>
                         <input type="text" id="swalEditTitle" class="form-control" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.2); font-size:14px; padding:8px 12px; border-radius:4px; width:100%;" value="${currentTitle}">
                     </div>
                     <div style="margin-bottom:12px;">
@@ -740,7 +740,7 @@ function openEditMeetingModal(id, currentTitle, currentPassword) {
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: 'Save Customizations',
+            confirmButtonText: 'Save CineMeet Settings',
             confirmButtonColor: '#e50914',
             cancelButtonText: 'Cancel',
             cancelButtonColor: '#333',
@@ -750,7 +750,7 @@ function openEditMeetingModal(id, currentTitle, currentPassword) {
                 const title = document.getElementById('swalEditTitle').value;
                 const password = document.getElementById('swalEditPassword').value;
                 if (!title || !title.trim()) {
-                    Swal.showValidationMessage('Please enter a meeting topic');
+                    Swal.showValidationMessage('Please enter a CineMeet room title');
                     return false;
                 }
                 return { title: title.trim(), password: password.trim() };
@@ -804,7 +804,7 @@ function showCopyToast() {
         Swal.fire({
             icon: 'success',
             title: 'Invite Link Copied!',
-            text: 'The meeting link has been copied to your clipboard.',
+            text: 'The CineMeet link has been copied to your clipboard.',
             timer: 2200,
             showConfirmButton: false,
             confirmButtonColor: '#e50914',
@@ -817,14 +817,14 @@ function showCopyToast() {
 function leaveCallConfirm(url) {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
-            title: 'Leave Video Call?',
-            text: 'Are you sure you want to exit this meeting?',
+            title: 'Leave CineMeet?',
+            text: 'Are you sure you want to exit this CineMeet room?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#e50914',
             cancelButtonColor: '#333',
-            confirmButtonText: 'Yes, Leave Meeting',
-            cancelButtonText: 'Stay in Call',
+            confirmButtonText: 'Yes, Leave CineMeet',
+            cancelButtonText: 'Stay in CineMeet',
             background: '#181d27',
             color: '#fff'
         }).then(function(result) {

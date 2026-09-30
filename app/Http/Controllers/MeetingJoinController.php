@@ -18,7 +18,7 @@ class MeetingJoinController extends Controller
         if (!Auth::check()) {
             // Save return URL so user is redirected back to meeting after login
             session(['url.intended' => $request->fullUrl()]);
-            \Session::flash('error_flash_message', 'Please log in or sign up on CineWorm to join this live meeting.');
+            \Session::flash('error_flash_message', 'Please log in or sign up on CineWorm to join this CineMeet call.');
             return redirect('login');
         }
 
@@ -26,14 +26,14 @@ class MeetingJoinController extends Controller
         $roomId = preg_replace('/[^a-zA-Z0-9_\-]/', '', $roomId);
 
         if (empty($roomId)) {
-            \Session::flash('error_flash_message', 'Invalid meeting room ID.');
+            \Session::flash('error_flash_message', 'Invalid CineMeet room ID.');
             return redirect('dashboard');
         }
 
         // Find broadcast meeting record if exists
         $broadcast = LiveBroadcast::where('zoom_meeting_id', $roomId)->first();
         
-        $meetingTitle = $broadcast ? $broadcast->title : 'Live Meeting Room';
+        $meetingTitle = $broadcast ? $broadcast->title : 'CineMeet Room';
         $hostUser     = $broadcast ? $broadcast->user : null;
 
         // Password protection check

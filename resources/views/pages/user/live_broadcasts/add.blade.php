@@ -1,6 +1,6 @@
 @extends('site_app')
 
-@section('head_title', 'Create Live Broadcast | '.getcong('site_name'))
+@section('head_title', 'Create CineMeet Room | '.getcong('site_name'))
 @section('head_url', Request::url())
 
 @section('content')
@@ -8,12 +8,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-12">
-                <h2>Create Live Broadcast</h2>
+                <h2>CineMeet</h2>
                 <nav id="breadcrumbs">
                     <ul>
                         <li><a href="{{ URL::to('/') }}">Home</a></li>
-                        <li><a href="{{ URL::to('user/live_broadcasts') }}">Live Broadcasts</a></li>
-                        <li>Create</li>
+                        <li><a href="{{ URL::to('user/live_broadcasts') }}">CineMeet</a></li>
+                        <li>Create Room</li>
                     </ul>
                 </nav>
             </div>
@@ -31,8 +31,8 @@
                         
                         <div class="row" style="margin-bottom: 20px;">
                             <div class="col-md-12">
-                                <h3 style="color:#fff;margin-bottom:5px;"><i class="fa fa-video-camera" style="color:#e50914;margin-right:8px;"></i> Create New Broadcast</h3>
-                                <p style="color:#ccc;font-size:14px;">Fill out the form below to schedule a new live broadcast.</p>
+                                <h3 style="color:#fff;margin-bottom:5px;"><i class="fa fa-video-camera" style="color:#e50914;margin-right:8px;"></i> Create New CineMeet Room</h3>
+                                <p style="color:#ccc;font-size:14px;">Fill out the form below to create a new CineMeet room.</p>
                             </div>
                         </div>
 
@@ -54,7 +54,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label>Broadcast Title *</label>
+                                    <label>CineMeet Room Title *</label>
                                     <input type="text" name="title" id="title" value="{{ old('title') }}" class="form-control" placeholder="E.g. Weekly Talk Show with Guests">
                                     @if ($errors->has('title'))
                                         <span class="help-block text-danger">
@@ -68,7 +68,7 @@
                         <div class="row mt-3">
                             <div class="col-lg-12">
                                 <button type="submit" class="vfx-item-btn-danger text-uppercase">
-                                    <i class="fa fa-check"></i> Create Broadcast
+                                    <i class="fa fa-check"></i> Create CineMeet Room
                                 </button>
                                 <a href="{{ URL::to('user/live_broadcasts') }}" class="vfx-item-btn-danger text-uppercase" style="background-color: #555; margin-left: 10px;">Cancel</a>
                             </div>

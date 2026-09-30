@@ -45,7 +45,7 @@ class UserLiveBroadcastController extends Controller
     public function index(Request $request)
     {
         if (!$this->hasLiveBroadcastFeature()) {
-            \Session::flash('error_flash_message', 'Your current plan does not support Live Broadcasts. Please upgrade your subscription plan.');
+            \Session::flash('error_flash_message', 'Your current plan does not support CineMeet. Please upgrade your subscription plan.');
             return redirect('dashboard');
         }
 
@@ -67,7 +67,7 @@ class UserLiveBroadcastController extends Controller
             ->where('zoom_meeting_id', $roomId)
             ->first();
 
-        $meetingTitle = $currentBroadcast->title ?? ($user->name . "'s Live Meeting");
+        $meetingTitle = $currentBroadcast->title ?? ($user->name . "'s CineMeet");
         $roomPassword = $currentBroadcast->zoom_meeting_password ?? '';
 
         // Construct embedded CineMeet URL with full customization parameters
@@ -110,7 +110,7 @@ class UserLiveBroadcastController extends Controller
     public function create()
     {
         if (!$this->hasLiveBroadcastFeature()) {
-            \Session::flash('error_flash_message', 'Your current plan does not support Live Broadcasts.');
+            \Session::flash('error_flash_message', 'Your current plan does not support CineMeet.');
             return redirect('dashboard');
         }
 
@@ -123,7 +123,7 @@ class UserLiveBroadcastController extends Controller
     public function store(Request $request)
     {
         if (!$this->hasLiveBroadcastFeature()) {
-            \Session::flash('error_flash_message', 'Your current plan does not support Live Broadcasts.');
+            \Session::flash('error_flash_message', 'Your current plan does not support CineMeet.');
             return redirect('dashboard');
         }
 
@@ -137,7 +137,7 @@ class UserLiveBroadcastController extends Controller
 
         // Generate unique room ID
         $roomId = 'cineworm_' . $user->id . '_' . Str::lower(Str::random(6));
-        $title  = $request->title ? trim($request->title) : ($user->name . "'s Live Meeting (" . date('M d, H:i') . ")");
+        $title  = $request->title ? trim($request->title) : ($user->name . "'s CineMeet (" . date('M d, H:i') . ")");
         $password = $request->password ? trim($request->password) : '';
 
         $audio  = $request->get('audio', '1');
@@ -159,7 +159,7 @@ class UserLiveBroadcastController extends Controller
         $broadcast->status                = 1; // Active
         $broadcast->save();
 
-        \Session::flash('flash_message', 'New customized live meeting created successfully!');
+        \Session::flash('flash_message', 'New customized CineMeet room created successfully!');
         return redirect()->to("user/live_broadcasts?room={$roomId}&audio={$audio}&video={$video}&screen={$screen}&chat={$chat}&notify={$notify}");
     }
 
@@ -174,7 +174,7 @@ class UserLiveBroadcastController extends Controller
 
         $broadcast = LiveBroadcast::where('user_id', Auth::user()->id)->where('id', $id)->first();
         if (!$broadcast) {
-            return response()->json(['success' => false, 'message' => 'Meeting not found'], 404);
+            return response()->json(['success' => false, 'message' => 'CineMeet room not found'], 404);
         }
 
         if ($request->has('title')) {
@@ -186,7 +186,7 @@ class UserLiveBroadcastController extends Controller
 
         $broadcast->save();
 
-        \Session::flash('flash_message', 'Meeting customization settings saved!');
+        \Session::flash('flash_message', 'CineMeet settings saved!');
         return redirect()->back();
     }
 }

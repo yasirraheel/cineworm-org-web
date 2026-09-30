@@ -60,11 +60,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-12">
-                <h2>Live Meeting Room</h2>
+                <h2>CineMeet</h2>
                 <nav id="breadcrumbs">
                     <ul>
                         <li><a href="{{ URL::to('/') }}">Home</a></li>
-                        <li>Join Meeting</li>
+                        <li>Join CineMeet</li>
                     </ul>
                 </nav>
             </div>
@@ -102,7 +102,7 @@
                             </button>
 
                             {{-- Share WhatsApp --}}
-                            <a href="https://api.whatsapp.com/send?text={{ urlencode('Join live meeting on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn btn-sm btn-success" style="background:#25D366; border:none; padding:7px 16px; font-size:13px; font-weight:600; color:#fff !important;">
+                            <a href="https://api.whatsapp.com/send?text={{ urlencode('Join CineMeet on CineWorm: ' . $shareableJoinUrl) }}" target="_blank" class="btn btn-sm btn-success" style="background:#25D366; border:none; padding:7px 16px; font-size:13px; font-weight:600; color:#fff !important;">
                                 <i class="fa-brands fa-whatsapp"></i> WhatsApp
                             </a>
 
@@ -117,7 +117,7 @@
                     <div style="margin-bottom: 15px;">
                         <div style="display: flex; align-items: center; width: 100%; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.4);">
                             <span style="background:rgba(255,255,255,0.05); color:#ccc; padding:10px 14px; font-size:12px; font-weight:600; border-right:1px solid rgba(255,255,255,0.1); white-space:nowrap;">
-                                Meeting Share Link
+                                CineMeet Share Link
                             </span>
                             <input type="text" id="shareUrlInput" value="{{ $shareableJoinUrl }}" readonly style="flex: 1; background: transparent; border: none; color: #fff; padding: 10px 14px; font-size: 13px; font-family: monospace; outline: none;">
                             <button type="button" onclick="copyInviteLink('{{ $shareableJoinUrl }}')" style="background: #e50914; color: #fff; border: none; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
@@ -132,7 +132,7 @@
                             class="cinemeet-join-frame"
                             src="{{ $cinemeetEmbedUrl }}"
                             allow="camera; microphone; display-capture; autoplay; clipboard-write; fullscreen"
-                            title="CineWorm Live Video Meeting">
+                            title="CineMeet Video Meeting">
                         </iframe>
                     </div>
 
@@ -161,7 +161,7 @@ function showCopyToast() {
         Swal.fire({
             icon: 'success',
             title: 'Invite Link Copied!',
-            text: 'The meeting link has been copied to your clipboard.',
+            text: 'The CineMeet link has been copied to your clipboard.',
             timer: 2200,
             showConfirmButton: false,
             confirmButtonColor: '#e50914',
