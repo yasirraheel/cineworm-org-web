@@ -49,14 +49,14 @@
                             </div>
                         @endif
 
-                        {!! Form::open(array('url' => 'user/live_broadcasts/create','class'=>'form-horizontal','name'=>'broadcast_form','id'=>'broadcast_form','role'=>'form','enctype' => 'multipart/form-data')) !!}
+                        {!! Form::open(array('url' => 'user/live_broadcasts/create','class'=>'form-horizontal','name'=>'cinemeet_form','id'=>'cinemeet_form','role'=>'form','enctype' => 'multipart/form-data')) !!}
 
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label>CineMeet Room Title *</label>
-                                    <input type="text" name="title" id="title" value="{{ old('title') }}" class="form-control" placeholder="E.g. Weekly Talk Show with Guests">
-                                    @if ($errors->has('title'))
+                                    <input type="text" name="title" id="title" value="{{ old('title') }}" class="form-control" placeholder="E.g. Weekly Strategy Sync, Film Review...">
+                                    @if (isset($errors) && $errors->has('title'))
                                         <span class="help-block text-danger">
                                             <strong>{{ $errors->first('title') }}</strong>
                                         </span>
