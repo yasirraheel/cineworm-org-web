@@ -29,8 +29,8 @@ class FlutterwaveController extends Controller
         
         $user_id=Auth::user()->id; 
         $user_email=Auth::user()->email;
-        $user_phone=Auth::user()->phone;
-        $user_name=Auth::user()->name;
+        $user_phone=Auth::user()->phone ?: '';
+        $user_name=Auth::user()->name ?: 'User';
         
         $plan_id = Session::get('plan_id');
         $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();

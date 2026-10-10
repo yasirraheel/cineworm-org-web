@@ -656,6 +656,7 @@ Route::get('reel2reel', function () {
 
 Route::get('membership_plan', 'UserController@membership_plan');
 Route::get('payment_method/{plan_id}', 'UserController@payment_method');
+Route::post('subscription_register', 'UserController@subscription_register');
 
 Route::post('paypal/pay', 'PaypalController@paypal_pay');
 Route::get('paypal/success', 'PaypalController@paypal_success');

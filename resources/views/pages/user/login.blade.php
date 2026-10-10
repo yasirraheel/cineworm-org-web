@@ -60,6 +60,9 @@ function verifyCaptcha() {
              
 
             <div class="form-group">
+            @if(request('plan_id') || Session::has('plan_id'))
+              <input type="hidden" name="plan_id" value="{{ request('plan_id', Session::get('plan_id')) }}">
+            @endif
               <input type="email" name="email" id="email" value="{{old('email')}}" class="form-control" placeholder="{{trans('words.email')}}" >
             </div>
             <div class="form-group">
@@ -84,7 +87,7 @@ function verifyCaptcha() {
             </div>
             <button class="btn-submit btn-block my-4 mb-4" type="submit">{{trans('words.login_text')}}</button>
             {!! Form::close() !!}
-            <p class="text-3 text-center mb-3">{{trans('words.dont_have_account')}} <a href="{{ url('signup') }}" class="btn-link" title="signup">{{trans('words.sign_up')}}</a></p>
+            <p class="text-3 text-center mb-3">{{trans('words.dont_have_account')}} <a href="{{ url('signup') }}{{ (request('plan_id') || Session::has('plan_id')) ? '?plan_id=' . (request('plan_id') ?: Session::get('plan_id')) : '' }}" class="btn-link" title="signup">{{trans('words.sign_up')}}</a></p>
             <p class="text-3 text-center mb-3"><a href="{{ route('verification.notice') }}" class="btn-link" title="resend verification">Didn't receive verification email?</a></p>
             <div class="socail-login-item mx-auto w-100 text-center">
 

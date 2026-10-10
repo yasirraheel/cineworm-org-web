@@ -572,6 +572,17 @@ class IndexController extends Controller
             $user_id = Auth::user()->id;
             save_user_device_history($user_id, $this->detectCurrentDeviceName(), Session::getId());
 
+            $planId = $request->get('plan_id') ?: Session::get('plan_id');
+            if ($planId) {
+                Session::put('plan_id', $planId);
+                return redirect('payment_method/' . $planId);
+            }
+
+            if (Session::has('redirect_to_after_login')) {
+                $redirectTo = Session::pull('redirect_to_after_login');
+                return redirect($redirectTo);
+            }
+
             return redirect('dashboard');
         }
     }
@@ -590,21 +601,16 @@ class IndexController extends Controller
 
         $inputs = $request->all();
 
+        $rule = array(
+            'username' => 'nullable|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'email' => ['required', 'email', 'max:200', User::uniqueEmailRule()],
+            'password' => 'required|confirmed|min:8',
+            'password_confirmation' => 'required'
+        );
+
         if (getcong('recaptcha_on_signup')) {
-            $rule = array(
-                'name' => 'required',
-                'email' => ['required', 'email', 'max:200', User::uniqueEmailRule()],
-                'password' => 'required|confirmed|min:8',
-                'password_confirmation' => 'required',
-                'g-recaptcha-response' => 'required'
-            );
-        } else {
-            $rule = array(
-                'name' => 'required',
-                'email' => ['required', 'email', 'max:200', User::uniqueEmailRule()],
-                'password' => 'required|confirmed|min:8',
-                'password_confirmation' => 'required'
-            );
+            $rule['g-recaptcha-response'] = 'required';
         }
 
 
@@ -643,15 +649,21 @@ class IndexController extends Controller
             }
         }
 
+        $username = trim($inputs['username'] ?? $inputs['name'] ?? '');
+        if ($username === '') {
+            $username = explode('@', $inputs['email'])[0];
+        }
+
         $user = new User;
 
         //$confirmation_code = str_random(30);
 
 
         $user->usertype = 'User';
-        $user->name = $inputs['name'];
+        $user->name = $username;
         $user->email = $inputs['email'];
         $user->password = bcrypt($inputs['password']);
+        $user->phone = null;
 
         $user->save();
         assignDefaultSignupPlanToUser($user);
@@ -662,6 +674,17 @@ class IndexController extends Controller
         Session::flash('signup_flash_message', 'Account created successfully! Please check your email to verify your account.');
 
         Auth::login($user);
+
+        $planId = $request->get('plan_id') ?: Session::get('plan_id');
+        if ($planId) {
+            Session::put('plan_id', $planId);
+            return redirect('payment_method/' . $planId);
+        }
+
+        if (Session::has('redirect_to_after_login')) {
+            $redirectTo = Session::pull('redirect_to_after_login');
+            return redirect($redirectTo);
+        }
 
         return $this->handleUserWasAuthenticated($request);
     }

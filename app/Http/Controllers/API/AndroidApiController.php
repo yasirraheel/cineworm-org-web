@@ -650,12 +650,17 @@ class AndroidApiController extends MainAPIController
 
         $get_data=checkSignSalt($_POST['data']);
 
-        $name=isset($get_data['name'])?$get_data['name']:'';
-        $email=isset($get_data['email'])?$get_data['email']:'';
+        $username=isset($get_data['username']) ? trim($get_data['username']) : (isset($get_data['name']) ? trim($get_data['name']) : '');
+        $email=isset($get_data['email'])?trim($get_data['email']):'';
         $password=isset($get_data['password'])?$get_data['password']:'';
 
+        if ($username==='') {
+            $username = explode('@', $email)[0];
+        }
 
-        if ($name=='' AND $email=='' AND $password=='')
+        $name = $username;
+
+        if ($email=='' || $password=='')
         {
 
                $response[] = array('msg' => "All fields required",'success'=>'0');

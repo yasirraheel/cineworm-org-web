@@ -147,6 +147,7 @@ return [
     'search_by_name_email' => 'Rechercher par nom ou email ...',
     'user_history' => 'Historique utilisateur',
     'name' => 'Nom',
+    'username' => 'Nom d\'utilisateur',
     'email' => 'Email',
     'password' => 'Mot de passe',
     'phone' => 'Téléphone',

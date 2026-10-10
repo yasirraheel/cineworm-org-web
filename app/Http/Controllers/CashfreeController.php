@@ -46,9 +46,9 @@ class CashfreeController extends Controller
 
          $plan_amount=$plan_info->plan_price;
          $customer_id=Auth::user()->id;
-         $customer_name=Auth::user()->name;
+         $customer_name=Auth::user()->name ?: 'User';
          $customer_email=Auth::user()->email;
-         $customer_phone=Auth::user()->phone;
+         $customer_phone=Auth::user()->phone ?: '9999999999';
 
          $return_url=\URL::to('cashfree/success/');
 

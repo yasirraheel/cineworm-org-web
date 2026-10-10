@@ -330,23 +330,36 @@ class UserController extends Controller
 
     public function payment_method($plan_id)
     {
-
-        if(!Auth::check())
-        {
-            \Session::flash('error_flash_message', trans('words.access_denied'));
-            return redirect('login');
-        }
-        if(Auth::User()->usertype=="Admin" OR Auth::User()->usertype=="Sub_Admin")
-        {
-            return redirect('admin');
-        }
-
         $plan_info = SubscriptionPlan::active()->where('id',$plan_id)->first();
 
         if(!$plan_info)
         {
             \Session::flash('flash_message', 'Select plan!');
             return redirect('membership_plan');
+        }
+
+        Session::put('plan_id', $plan_id);
+
+        if(Session::get('coupon_percentage'))
+        {
+            //If coupon used
+            $discount_price_less =  $plan_info->plan_price * Session::get('coupon_percentage') / 100;
+        }
+        else
+        {
+            //If no coupon used
+            $discount_price_less = 0;
+        }
+
+        if(!Auth::check())
+        {
+            Session::put('redirect_to_after_login', 'payment_method/' . $plan_id);
+            return view('pages.payment.payment_method',compact('plan_info','discount_price_less'));
+        }
+
+        if(Auth::User()->usertype=="Admin" OR Auth::User()->usertype=="Sub_Admin")
+        {
+            return redirect('admin');
         }
 
         //For free plan
@@ -386,24 +399,84 @@ class UserController extends Controller
              return redirect('dashboard');
         }
 
-        Session::put('plan_id', $plan_id);
         Session::flash('razorpay_order_id',Session::get('razorpay_order_id'));
 
-
-        if(Session::get('coupon_percentage'))
-        {
-            //If coupon used
-            $discount_price_less =  $plan_info->plan_price * Session::get('coupon_percentage') / 100;
-
-        }
-        else
-        {
-            //If no coupon used
-            $discount_price_less = 0;
-        }
-
-
         return view('pages.payment.payment_method',compact('plan_info','discount_price_less'));
+    }
+
+    public function subscription_register(Request $request)
+    {
+        $inputs = $request->all();
+        $plan_id = $request->input('plan_id', Session::get('plan_id'));
+
+        $rule = array(
+            'username' => 'nullable|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'email' => ['required', 'email', 'max:200', User::uniqueEmailRule()],
+            'password' => 'required|confirmed|min:8',
+            'password_confirmation' => 'required'
+        );
+
+        if (getcong('recaptcha_on_signup')) {
+            $rule['g-recaptcha-response'] = 'required';
+        }
+
+        $validator = \Validator::make($inputs, $rule);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator->messages());
+        }
+
+        //check reCaptcha
+        if (getcong('recaptcha_on_signup') && !empty($inputs['g-recaptcha-response'])) {
+            $recaptcha_response = $inputs['g-recaptcha-response'];
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+                'secret' => getcong('recaptcha_secret_key'),
+                'response' => $recaptcha_response,
+                'remoteip' => $_SERVER['REMOTE_ADDR']
+            ]);
+            $resp = json_decode(curl_exec($ch));
+            curl_close($ch);
+
+            if (!$resp || $resp->success != true) {
+                \Session::flash('error_flash_message', 'Captcha timeout or duplicate');
+                return redirect()->back()->withInput();
+            }
+        }
+
+        $username = trim($inputs['username'] ?? $inputs['name'] ?? '');
+        if ($username === '') {
+            $username = explode('@', $inputs['email'])[0];
+        }
+
+        $user = new User;
+        $user->usertype = 'User';
+        $user->name = $username;
+        $user->email = $inputs['email'];
+        $user->password = bcrypt($inputs['password']);
+        $user->phone = null;
+        $user->save();
+
+        assignDefaultSignupPlanToUser($user);
+
+        // Send Email Verification
+        \App\Http\Controllers\Auth\EmailVerificationController::sendVerificationEmail($user);
+
+        Auth::login($user);
+
+        Session::flash('flash_message', 'Account registered! Please select your payment method below.');
+
+        if ($plan_id) {
+            Session::put('plan_id', $plan_id);
+            return redirect('payment_method/' . $plan_id);
+        }
+
+        return redirect('membership_plan');
     }
 
     public function my_watchlist()

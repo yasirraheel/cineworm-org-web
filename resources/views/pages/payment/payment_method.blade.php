@@ -20,6 +20,12 @@
 .payment_loading{
   opacity: 0.5;
 }
+.sub-register-card {
+  background: #1a2234;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 30px;
+}
 </style>  
 
 <div id="loading" style="display: none;"></div>
@@ -75,16 +81,63 @@
     <?php Session::forget('error');?>
     @endif
 
+    @if (count($errors) > 0)
+      <div class="alert alert-danger">
+        <ul>
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
       <div class="payment-details-area">
         <h3>{{trans('words.payment_method')}}</h3>
         <div class="select-plan-text">{{trans('words.you_have_selected')}}<span>{{$plan_info->plan_name}}</span></div>
-        <p>{{trans('words.you_are_logged')}} <a href="#" title="user_email">{{Auth::User()->email}}</a> {{trans('words.if_you_would_like')}} {{trans('words.different_account_subscription')}}, <a href="{{ URL::to('logout') }}" title="logout">{{trans('words.logout')}}</a> {{trans('words.now')}}.</p>
+        @if(Auth::check())
+          <p>{{trans('words.you_are_logged')}} <a href="#" title="user_email">{{Auth::User()->email}}</a> {{trans('words.if_you_would_like')}} {{trans('words.different_account_subscription')}}, <a href="{{ URL::to('logout') }}" title="logout">{{trans('words.logout')}}</a> {{trans('words.now')}}.</p>
+        @else
+          <p class="text-white mb-1">To complete your subscription to <strong>{{$plan_info->plan_name}}</strong>, please register with your username, email, and password or log in below.</p>
+        @endif
         <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.change_plan')}}</a></div>
       </div>
     </div>
-   </div> 
+   </div>
+
+   @if(!Auth::check())
+     <!-- Unregistered / Guest Subscription Registration -->
+     <div class="row mt-4 mb-4">
+       <div class="col-lg-5 col-md-7 col-sm-10 mx-auto">
+         <div class="sub-register-card">
+           <h3 class="form-title-item mb-2 text-white text-center">{{trans('words.sign_up')}}</h3>
+           <p class="text-center text-muted mb-4" style="font-size: 14px;">Create your account to continue to payment. No name or phone number required.</p>
+
+           {!! Form::open(array('url' => 'subscription_register','class'=>'','id'=>'sub_register_form','role'=>'form')) !!}
+             <input type="hidden" name="plan_id" value="{{$plan_info->id}}">
+
+             <div class="form-group mb-3">
+               <input type="text" class="form-control" name="username" id="sub_username" value="{{old('username')}}" placeholder="{{trans('words.username')}}" required>
+             </div>
+             <div class="form-group mb-3">
+               <input type="email" class="form-control" name="email" id="sub_email" value="{{old('email')}}" placeholder="{{trans('words.email')}}" required>
+             </div>
+             <div class="form-group mb-3">
+               <input type="password" class="form-control" id="sub_password" name="password" placeholder="{{trans('words.password')}} {{trans('words.at_least_8_char')}}" required>
+             </div>
+             <div class="form-group mb-3">
+               <input type="password" class="form-control" id="sub_password_confirmation" name="password_confirmation" placeholder="{{trans('words.confirm_password')}}" required>
+             </div>
+
+             <button class="btn-submit btn-block w-100 mb-3" type="submit">{{trans('words.sign_up')}} & Continue to Payment</button>
+           {!! Form::close() !!}
+
+           <p class="text-3 text-center mb-0 mt-3 text-white">{{trans('words.already_sign_up')}} <a class="btn-link" href="{{ url('login?plan_id='.$plan_info->id) }}" title="login">{{trans('words.login_text')}}</a></p>
+         </div>
+       </div>
+     </div>
+   @else
+     <!-- Payment Gateways (Available to all registered users without phone requirements) -->
      <div class="row membership_plan_block">
-    @if(Auth::User()->phone!='')
 
       @if(getPaymentGatewayInfo(1)->status)
         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
@@ -107,10 +160,10 @@
           <h1>{{getPaymentGatewayInfo(2)->gateway_name}}</h1>
           <h4>{{getPaymentGatewayInfo(2)->gateway_short_info}}</h4>           
           <a href="{{ URL::to('stripe/pay') }}" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>
-          <!-- <button type="button" class="vfx-item-btn-danger text-uppercase" data-bs-toggle="modal" data-bs-target="#stripeModal">{{trans('words.pay_now')}}</button> -->               
           </div>
       </div>
     @endif 
+
     @if(getPaymentGatewayInfo(3)->status) 
     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
         <div class="select-payment-method">
@@ -122,6 +175,7 @@
         </div>
     </div>
     @endif
+
     @if(getPaymentGatewayInfo(4)->status)
     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
         <div class="select-payment-method">
@@ -154,29 +208,23 @@
     <?php 
     $payu_mode=getPaymentGatewayInfo(6,'mode');
 
-    $key=getPaymentGatewayInfo(6,'payu_key'); //posted merchant key from client
-    $salt=getPaymentGatewayInfo(6,'payu_salt'); // add salt here from your credentials in payUMoney dashboard
-    $txnId=substr(hash('sha256', mt_rand() . microtime()), 0, 20); //posted txnid from client
+    $key=getPaymentGatewayInfo(6,'payu_key');
+    $salt=getPaymentGatewayInfo(6,'payu_salt');
+    $txnId=substr(hash('sha256', mt_rand() . microtime()), 0, 20);
     $amount=number_format($plan_info->plan_price - $discount_price_less,2); 
     $productName=$plan_info->plan_name; 
-    $firstName=Auth::User()->name; 
-    $email=Auth::User()->email; 
+    $firstName=Auth::check() ? Auth::User()->name : 'User'; 
+    $email=Auth::check() ? Auth::User()->email : ''; 
 
-
-    /***************** USER DEFINED VARIABLES GOES HERE ***********************/
-    //all varibles posted from client
     $udf1="";
     $udf2="";
     $udf3="";
     $udf4="";
     $udf5="";
 
-    /***************** DO NOT EDIT ***********************/
     $payhash_str = $key . '|' . $txnId . '|' .$amount  . '|' .$productName  . '|' . $firstName . '|' . $email . '|' . $udf1 . '|' . $udf2 . '|' . $udf3 . '|' . $udf4 . '|' . $udf5 . '||||||'. $salt;
      
-
     $hash = strtolower(hash('sha512', $payhash_str));
-    /***************** DO NOT EDIT ***********************/
 
     if($payu_mode=="live")
     {
@@ -186,7 +234,6 @@
     {
       $payu_url="https://test.payu.in/_payment";
     }
-
     ?>
 
     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
@@ -208,18 +255,16 @@
           <input type="hidden" name="udf4" value="" />
           <input type="hidden" name="udf5" value="" />
 
-          <input type="hidden" name="surl" value="{{\URL::to('payu_success/')}}" />
-          <input type="hidden" name="furl" value="{{\URL::to('payu_fail/')}}" />
-          <input type="hidden" name="phone" value="{{Auth::User()->phone}}" />
+          <input type="hidden" name="surl" value="{{URL::to('payu_success/')}}" />
+          <input type="hidden" name="furl" value="{{URL::to('payu_fail/')}}" />
+          <input type="hidden" name="phone" value="{{Auth::check() && Auth::User()->phone ? Auth::User()->phone : '0000000000'}}" />
           <input type="hidden" name="hash" value="<?php echo $hash;?>"/>
-
  
           <button type="submit" class="vfx-item-btn-danger text-uppercase">{{trans('words.pay_now')}}</button>
           {!! Form::close() !!}
         </div>
     </div>
     @endif
-
 
     @if(getPaymentGatewayInfo(7)->status)
     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
@@ -295,158 +340,10 @@
     </div>
     @endif
 
-      
-  @else
-    @if(getPaymentGatewayInfo(1)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(1)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(1)->gateway_short_info}}</h4> 
+     </div>
+   @endif
 
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(2)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(2)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(2)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(3)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(3)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(3)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(4)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(4)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(4)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(5)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(5)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(5)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(6)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(6)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(6)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(7)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(7)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(7)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(8)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(8)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(8)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(9)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(9)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(9)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(10)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-        <h1>{{getPaymentGatewayInfo(10)->gateway_name}}</h1>
-        <h4>{{getPaymentGatewayInfo(10)->gateway_short_info}}</h4> 
-
-        <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-         
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(11)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-          <h1>{{getPaymentGatewayInfo(11)->gateway_name}}</h1>
-          <h4>{{getPaymentGatewayInfo(11)->gateway_short_info}}</h4>
-          
-          <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#phone_update" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>    
-          
-        </div>
-    </div>
-    @endif
-
-    @if(getPaymentGatewayInfo(12)->status)
-    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-        <div class="select-payment-method">
-          <h1>{{getPaymentGatewayInfo(12)->gateway_name}}</h1>
-          <h4>{{getPaymentGatewayInfo(12)->gateway_short_info}}</h4>
-          
-          <a href="Javascript:void(0);" data-bs-toggle="modal" data-bs-target="#bank_transfer_info" class="vfx-item-btn-danger text-uppercase" title="{{trans('words.pay_now')}}">{{trans('words.pay_now')}}</a>
-          
-        </div>
-    </div>
-    @endif
-
-     
-
-  @endif  
-
-  </div>
-  </div>
+  </div> 
 </div>
 <!-- End Payment Method --> 
 
@@ -474,63 +371,6 @@
   </div>
 @endif
 
-  
-  <div id="phone_update" class="modal fade stripe-payment-block" role="dialog" aria-labelledby="phone_update" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-        
-        <div class="modal-content">
-        <div class="modal-header">
-           <h4 class="modal-title">{{trans('words.update')}} {{trans('words.phone')}}</h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close_trailer_pop"><i class="fa fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            <div class="edit-profile-form">  
-              @if (count($errors) > 0)
-                <div class="alert alert-danger">
-                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-                @if(Session::has('flash_message'))
-                      <div class="alert alert-success">
-                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span></button>
-                          {{ Session::get('flash_message') }}
-                      </div>
-                @endif
-
-            {!! Form::open(array('url' => 'phone_update','class'=>'row"','name'=>'profile_form','id'=>'user_form','role'=>'form','enctype' => 'multipart/form-data')) !!}  
-              <input name="" value="" type="hidden">
-              
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                <div class="form-group mb-4">
-                  <label>{{trans('words.phone')}}</label>
-                  <input type="number" name="phone" id="phone" value="" class="form-control" placeholder="" required>
-                </div>
-              </div>
-             
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                <div class="form-group d-flex align-items-end flex-column mt-30">
-                  <button type="submit" class="vfx-item-btn-danger text-uppercase">{{trans('words.update')}}</button>
-                </div>   
-              </div>           
-              
-            {!! Form::close() !!}
-
-          </div>  
-    
-        </div>
-        
-      </div>
-
-    </div>
-   
-  </div> 
-
 <script src="{{ URL::asset('site_assets/js/jquery-3.3.1.min.js') }}"></script>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -547,29 +387,26 @@
         type: "POST",
         url: "{{ URL::to('razorpay_get_order_id') }}",
         data: { 
-            id: $(this).val(), // < note use of 'this' here
+            id: $(this).val(),
             _token: "{{ csrf_token() }}" 
         },
         success: function(result) {
-            //$('#paymentWidget').attr("data-order_id",'111');
-            
-            //alert(result);
             $('.vfx-item-ptb').removeClass('payment_loading');
             $("#loading").hide();
 
             var options = {
-                      "key": "{{getcong('razorpay_key')}}", // Enter the Key ID generated from the Dashboard
-                      "amount": "{{$plan_info->plan_price - $discount_price_less}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                      "key": "{{getcong('razorpay_key')}}",
+                      "amount": "{{$plan_info->plan_price - $discount_price_less}}",
                       "currency": "INR",
                       "name": "{{getcong('site_name')}}",
                       "description": "{{$plan_info->plan_name}}",
                       "image": "{{ URL::asset('/'.getcong('site_logo')) }}",
-                      "order_id": result, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                      "order_id": result,
                       "callback_url": "{{ URL::to('razorpay-success') }}",
                       "prefill": {
-                          "name": "{{Auth::user()->name}}",
-                          "email": "{{Auth::user()->email}}",
-                          "contact": "{{Auth::user()->phone}}"
+                          "name": "{{Auth::check() ? Auth::user()->name : ''}}",
+                          "email": "{{Auth::check() ? Auth::user()->email : ''}}",
+                          "contact": "{{Auth::check() ? (Auth::user()->phone ?? '') : ''}}"
                       },                       
                       "theme": {
                           "color": "#3399cc"
@@ -579,8 +416,6 @@
             var rzp1 = new Razorpay(options);
 
             rzp1.open();  
-
-            //alert(result);
         },
         error: function(result) {
             alert('error');
@@ -606,18 +441,15 @@
         type: "POST",
         url: "{{ URL::to('cashfree/get_cashfree_session_id') }}",
         data: { 
-            id: $(this).val(), // < note use of 'this' here
+            id: $(this).val(),
             _token: "{{ csrf_token() }}" 
         },
         success: function(result) {
-             
-            //alert(result);
             $('.membership_plan_block').removeClass('payment_loading');
             $("#loading").hide();
  
             const cf = new Cashfree(result);
             cf.redirect();
-
          },
         error: function(result) {
             alert('error');
@@ -626,12 +458,4 @@
 });
 </script>
 
-<script type="text/javascript">
- 
- $('#open_phone_update').on('click', function(e) {    
-    $('#phone_update').modal('show');
- }); 
-
-</script>
- 
 @endsection

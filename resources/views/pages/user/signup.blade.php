@@ -57,8 +57,12 @@ function verifyCaptcha() {
 
               
 
+            @if(request('plan_id') || Session::has('plan_id'))
+              <input type="hidden" name="plan_id" value="{{ request('plan_id', Session::get('plan_id')) }}">
+            @endif
+
             <div class="form-group">
-                  <input type="text" class="form-control" name="name" id="name" value="{{old('name')}}" placeholder="{{trans('words.name')}}">
+                  <input type="text" class="form-control" name="username" id="username" value="{{old('username', old('name'))}}" placeholder="{{trans('words.username')}}" required>
             </div>
             <div class="form-group">
               <input type="email" class="form-control" name="email" id="email" value="{{old('email')}}" placeholder="{{trans('words.email')}}">
