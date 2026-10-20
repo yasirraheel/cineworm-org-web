@@ -78,7 +78,7 @@
 </div>
 
 <!-- Modal for Add/Edit Feature -->
-<div id="featureModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="featureModal" class="modal fade plan-feature-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content pt-3 pb-3 pl-0 pr-0">
             <div class="modal-header pl-3 pr-3">
@@ -175,6 +175,18 @@ function editFeature(feature) {
         text-overflow: ellipsis;
         vertical-align: middle;
         white-space: nowrap;
+    }
+
+    .plan-feature-modal .form-text {
+        color: #b8b8bd;
+    }
+
+    .plan-feature-modal .form-text code {
+        background-color: #2a2a2d;
+        border: 1px solid #4a4a4d;
+        border-radius: 3px;
+        color: #ffd1dc;
+        padding: 2px 5px;
     }
 </style>
 
