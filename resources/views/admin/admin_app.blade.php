@@ -88,7 +88,7 @@
 
   <!-- App js -->
    <script src="{{ URL::asset('admin_assets/js/jquery.core.js') }}"></script>
-   <script src="{{ URL::asset('admin_assets/js/jquery.app.js') }}"></script>
+   <script src="{{ URL::asset('admin_assets/js/jquery.app.js') }}?v=20261021"></script>
 
   <script type="text/javascript">
     (function ($) {

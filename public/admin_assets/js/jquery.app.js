@@ -73,8 +73,20 @@
       // LEFT SIDE MAIN NAVIGATION
       $this.$menuItem.on(event, $this.menuItemClick);
 
-      // NAVIGATION HIGHLIGHT & OPEN PARENT
-      $("#sidebar-menu ul li.has_sub a.active").parents("li:last").children("a:first").addClass("active").trigger("click");
+      // NAVIGATION HIGHLIGHT & OPEN PARENT. Do not trigger the click handler
+      // here: an already active parent would be toggled closed on every page
+      // load, hiding the active child link's submenu.
+      $("#sidebar-menu ul li.has_sub a.active").each(function() {
+        var $parent = $(this).closest("ul").closest("li.has_sub");
+
+        if (!$parent.length) {
+          return;
+        }
+
+        $parent.addClass("subdrop");
+        $parent.children("a:first").addClass("active subdrop");
+        $parent.children("ul:first").show();
+      });
     },
 
     //init Sidemenu
