@@ -43,6 +43,27 @@ class SubscriptionPlan extends Model
         'whatsapp_marketing_access' => 'WhatsApp Web & Campaigns',
     ];
 
+    /**
+     * Return the active, admin-managed feature catalog used by plan forms and
+     * feature checks. Keep the legacy catalog as a fallback for installations
+     * that have not populated the plan_features table yet.
+     */
+    public static function getAvailableFeatures(): array
+    {
+        $features = PlanFeature::where('status', 1)->orderBy('sort_order')->orderBy('id')->get();
+
+        if ($features->isEmpty()) {
+            return self::AVAILABLE_FEATURES;
+        }
+
+        $map = [];
+        foreach ($features as $feature) {
+            $map[$feature->feature_key] = $feature->feature_name;
+        }
+
+        return $map;
+    }
+
     public function scopeActive($query)
     {
         return $query->where(function ($subQuery) {
@@ -93,7 +114,7 @@ class SubscriptionPlan extends Model
 
     public function getDirectFeatureKeys(): array
     {
-        return array_values(array_intersect((array) $this->features, array_keys(self::AVAILABLE_FEATURES)));
+        return array_values(array_intersect((array) $this->features, array_keys(self::getAvailableFeatures())));
     }
 
     public function getRawFeatureKeys(): array
@@ -149,12 +170,12 @@ class SubscriptionPlan extends Model
 
     public function getEffectiveFeatureLabels(): array
     {
-        return array_values(array_intersect_key(self::AVAILABLE_FEATURES, array_flip($this->getEffectiveFeatureKeys())));
+        return array_values(array_intersect_key(self::getAvailableFeatures(), array_flip($this->getEffectiveFeatureKeys())));
     }
 
     public function getDirectFeatureLabels(): array
     {
-        return array_values(array_intersect_key(self::AVAILABLE_FEATURES, array_flip($this->getDirectFeatureKeys())));
+        return array_values(array_intersect_key(self::getAvailableFeatures(), array_flip($this->getDirectFeatureKeys())));
     }
 
     public function wouldCreateInheritanceLoop($includedPlanIds): bool

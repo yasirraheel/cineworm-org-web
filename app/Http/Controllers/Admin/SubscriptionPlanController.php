@@ -106,7 +106,7 @@ class SubscriptionPlanController extends MainAdminController
                 return redirect()->back()->withErrors($validator->messages());
         } 
 
-        $featureKeys = array_keys(SubscriptionPlan::AVAILABLE_FEATURES);
+        $featureKeys = array_keys(SubscriptionPlan::getAvailableFeatures());
         $selectedFeatures = array_values(array_intersect($inputs['features'] ?? [], $featureKeys));
         $includedPlanIds = array_values(array_unique(array_filter(array_map('intval', $inputs['included_plan_ids'] ?? []))));
         $isDefaultSignupPlan = (int) ($inputs['is_default_signup_plan'] ?? 0) === 1;

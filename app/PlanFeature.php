@@ -33,18 +33,7 @@ class PlanFeature extends Model
 
     public static function getActiveFeaturesMap(): array
     {
-        $features = self::where('status', 1)->orderBy('sort_order')->orderBy('id')->get();
-
-        if ($features->isEmpty()) {
-            return SubscriptionPlan::AVAILABLE_FEATURES;
-        }
-
-        $map = [];
-        foreach ($features as $feature) {
-            $map[$feature->feature_key] = $feature->feature_name;
-        }
-
-        return $map;
+        return SubscriptionPlan::getAvailableFeatures();
     }
 
     public static function getActiveFeaturesConfig(): array
