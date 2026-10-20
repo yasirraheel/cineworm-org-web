@@ -225,13 +225,20 @@
                         </a>
                     </li>
 
-                    <li class="has_sub">
-                        <a href="javascript:void(0);" class="waves-effect">
+                    @php
+                        $isSubscriptionsActive = request()->is('admin/subscription_plan*')
+                            || request()->is('admin/plan_features*')
+                            || request()->is('admin/transactions*')
+                            || request()->is('admin/coupons*')
+                            || request()->is('admin/payment_gateway*');
+                    @endphp
+                    <li class="has_sub {{ $isSubscriptionsActive ? 'subdrop' : '' }}">
+                        <a href="javascript:void(0);" class="waves-effect {{ $isSubscriptionsActive ? 'active subdrop' : '' }}">
                             <i class="fa fa-credit-card"></i>
                             <span>Subscriptions</span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <ul class="list-unstyled">
+                        <ul class="list-unstyled" style="{{ $isSubscriptionsActive ? 'display: block;' : '' }}">
                             <li class="{{ classActivePath('subscription_plan') }}">
                                 <a href="{{ URL::to('admin/subscription_plan') }}"
                                     class="{{ classActivePath('subscription_plan') }}">

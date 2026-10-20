@@ -90,6 +90,52 @@
    <script src="{{ URL::asset('admin_assets/js/jquery.core.js') }}"></script>
    <script src="{{ URL::asset('admin_assets/js/jquery.app.js') }}"></script>
 
+  <script type="text/javascript">
+    (function ($) {
+      $(function () {
+        var $sidebar = $('.sidebar-inner.slimscrollleft');
+        if (!$sidebar.length) {
+          return;
+        }
+
+        var storageKey = 'cineworm.admin.sidebar.scrollTop';
+
+        function saveSidebarPosition() {
+          try {
+            window.sessionStorage.setItem(storageKey, String(Math.max(0, Math.round($sidebar.scrollTop()))));
+          } catch (error) {
+            // Storage can be unavailable in private browsing; scrolling should still work normally.
+          }
+        }
+
+        function restoreSidebarPosition() {
+          var savedPosition;
+          try {
+            savedPosition = parseInt(window.sessionStorage.getItem(storageKey), 10);
+          } catch (error) {
+            return;
+          }
+
+          if (!isFinite(savedPosition) || savedPosition <= 0) {
+            return;
+          }
+
+          if ($sidebar.parent().hasClass('slimScrollDiv')) {
+            $sidebar.slimScroll({ scrollTo: savedPosition });
+          } else {
+            $sidebar.scrollTop(savedPosition);
+          }
+        }
+
+        $sidebar.on('scroll.cinewormSidebar slimscrolling.cinewormSidebar', saveSidebarPosition);
+        $('#sidebar-menu').on('click.cinewormSidebar', 'a[href]:not([href^="javascript:"])', saveSidebarPosition);
+
+        restoreSidebarPosition();
+        window.setTimeout(restoreSidebarPosition, 150);
+      });
+    }(jQuery));
+  </script>
+
 <script type="text/javascript">
     $(document).ready(function () {
       if ($("#elm1").length > 0) {
