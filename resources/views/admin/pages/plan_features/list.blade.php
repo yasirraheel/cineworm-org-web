@@ -34,6 +34,7 @@
                                         <th>Icon</th>
                                         <th>Feature Name</th>
                                         <th>Feature Key</th>
+                                        <th>Link</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -44,6 +45,14 @@
                                             <td><i class="{{ $feature->icon }}"></i></td>
                                             <td><strong>{{ $feature->feature_name }}</strong></td>
                                             <td><code class="plan-feature-key">{{ $feature->feature_key }}</code></td>
+                                            <td>
+                                                @if($feature->url && $feature->url !== 'javascript:void(0);')
+                                                    @php $featureLink = str_starts_with($feature->url, 'http') ? $feature->url : url($feature->url); @endphp
+                                                    <a href="{{ $featureLink }}" class="plan-feature-link" target="_blank" rel="noopener noreferrer">{{ $feature->url }}</a>
+                                                @else
+                                                    <span class="text-muted">Not linked</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if($feature->status == 1)
                                                     <span class="badge badge-success">Active</span>
@@ -93,6 +102,13 @@
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Feature Link</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="url" id="feature_url" class="form-control" placeholder="e.g. user/films or https://example.com">
+                            <small class="form-text text-muted">Use a site path such as <code>user/films</code> or a full external URL.</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Status</label>
                         <div class="col-sm-8">
                             <select class="form-control" name="status" id="feature_status">
@@ -116,6 +132,7 @@ function resetForm() {
     document.getElementById('feature_id').value = '';
     document.getElementById('feature_name').value = '';
     document.getElementById('feature_icon').value = 'fa fa-check-circle';
+    document.getElementById('feature_url').value = '';
     document.getElementById('feature_status').value = '1';
 }
 
@@ -124,6 +141,7 @@ function editFeature(feature) {
     document.getElementById('feature_id').value = feature.id;
     document.getElementById('feature_name').value = feature.feature_name;
     document.getElementById('feature_icon').value = feature.icon || 'fa fa-check-circle';
+    document.getElementById('feature_url').value = feature.url || '';
     document.getElementById('feature_status').value = feature.status;
     $('#featureModal').modal('show');
 }
@@ -147,6 +165,16 @@ function editFeature(feature) {
         color: #ffd1dc;
         font-size: 12px;
         line-height: 1.4;
+    }
+
+    .plan-features-card .plan-feature-link {
+        color: #74c7ff;
+        display: inline-block;
+        max-width: 240px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        white-space: nowrap;
     }
 </style>
 

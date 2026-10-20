@@ -68,15 +68,15 @@ class PlanFeature extends Model
         foreach ($features as $feature) {
             $key = $feature->feature_key;
             
-            if (isset($systemMap[$key])) {
+            $rawUrl = trim($feature->url ?? '');
+            if (!empty($rawUrl) && $rawUrl !== '#' && $rawUrl !== 'javascript:void(0);') {
+                $finalUrl = str_starts_with($rawUrl, 'http') ? $rawUrl : URL::to($rawUrl);
+            } elseif (isset($systemMap[$key])) {
+                // Keep a safe system default for older rows that have no link,
+                // while allowing admins to override it from the feature form.
                 $finalUrl = $systemMap[$key];
             } else {
-                $rawUrl = trim($feature->url ?? '');
-                if (!empty($rawUrl) && $rawUrl !== '#' && $rawUrl !== 'javascript:void(0);') {
-                    $finalUrl = str_starts_with($rawUrl, 'http') ? $rawUrl : URL::to($rawUrl);
-                } else {
-                    $finalUrl = 'javascript:void(0);';
-                }
+                $finalUrl = 'javascript:void(0);';
             }
 
             $config[$key] = [
