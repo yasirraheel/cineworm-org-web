@@ -7,10 +7,10 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <div class="card-box table-responsive">
+                    <div class="card-box table-responsive plan-features-card">
                         <div class="row">
                             <div class="col-md-6">
-                                <h3>Plan Features Management</h3>
+                                <h3 class="plan-features-heading">Plan Features Management</h3>
                             </div>
                             <div class="col-md-6 text-right">
                                 <button type="button" class="btn btn-success waves-effect waves-light m-b-20" data-toggle="modal" data-target="#featureModal" onclick="resetForm()">
@@ -43,7 +43,7 @@
                                         <tr>
                                             <td><i class="{{ $feature->icon }}"></i></td>
                                             <td><strong>{{ $feature->feature_name }}</strong></td>
-                                            <td><code>{{ $feature->feature_key }}</code></td>
+                                            <td><code class="plan-feature-key">{{ $feature->feature_key }}</code></td>
                                             <td>
                                                 @if($feature->status == 1)
                                                     <span class="badge badge-success">Active</span>
@@ -128,5 +128,26 @@ function editFeature(feature) {
     $('#featureModal').modal('show');
 }
 </script>
+
+<style>
+    /* Keep the plan feature heading and keys readable on the dark admin card. */
+    .plan-features-card .plan-features-heading {
+        color: #f9f9f9;
+        font-size: 24px;
+        font-weight: 600;
+        margin: 10px 0 20px;
+    }
+
+    .plan-features-card .plan-feature-key {
+        display: inline-block;
+        padding: 3px 7px;
+        border: 1px solid #4a4a4d;
+        border-radius: 4px;
+        background-color: #2a2a2d;
+        color: #ffd1dc;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+</style>
 
 @endsection
