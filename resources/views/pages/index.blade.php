@@ -1409,6 +1409,17 @@
             @if ($sections_data->post_type == 'LiveTV')
                 <!-- Start Live TV Video Section -->
                 @php($live_tv_url = URL::to('livetv'))
+                @php
+                    $live_tv_ids = array_filter(array_map('trim', explode(',', (string) $sections_data->tv_ids)));
+                    $live_tv_items = App\LiveTV::whereIn('id', $live_tv_ids)
+                        ->where('status', 1)
+                        ->whereNotNull('channel_name')
+                        ->where('channel_name', '!=', '')
+                        ->whereNotNull('channel_slug')
+                        ->where('channel_slug', '!=', '')
+                        ->orderBy('id', 'DESC')
+                        ->get();
+                @endphp
                 <div class="video-shows-section live-tv-video-block vfx-item-ptb">
                     <div class="container-fluid">
                         <div class="row">
@@ -1425,21 +1436,21 @@
                                 </div>
 
                                 <div class="tv-season-video-carousel owl-carousel">
-                                    @foreach (explode(',', $sections_data->tv_ids) as $tv_data)
+                                    @foreach ($live_tv_items as $tv)
                                         <div class="single-video">
-                                            <a href="{{ URL::to('livetv/details/' . App\LiveTV::getLiveTvInfo($tv_data, 'channel_slug') . '/' . $tv_data) }}"
-                                                title="{{ App\LiveTV::getLiveTvInfo($tv_data, 'channel_name') }}">
+                                            <a href="{{ URL::to('livetv/details/' . $tv->channel_slug . '/' . $tv->id) }}"
+                                                title="{{ $tv->channel_name }}">
                                                 <div class="video-img">
-                                                    @if (App\LiveTV::getLiveTvInfo($tv_data, 'channel_access') == 'Paid')
+                                                    @if ($tv->channel_access == 'Paid')
                                                         <div class="vid-lab-premium"><img
                                                                 src="{{ URL::asset('site_assets/images/ic-premium.png') }}"
                                                                 alt="ic-premium" title="LiveTV-ic-premium"></div>
                                                     @endif
                                                     <span
-                                                        class="video-item-content">{{ App\LiveTV::getLiveTvInfo($tv_data, 'channel_name') }}</span>
-                                                    <img src="{{ URL::to('/' . App\LiveTV::getLiveTvInfo($tv_data, 'channel_thumb')) }}"
-                                                        alt="{{ App\LiveTV::getLiveTvInfo($tv_data, 'channel_name') }}"
-                                                        title="LiveTV-{{ App\LiveTV::getLiveTvInfo($tv_data, 'channel_name') }}" />
+                                                        class="video-item-content">{{ $tv->channel_name }}</span>
+                                                    <img src="{{ URL::to('/' . $tv->channel_thumb) }}"
+                                                        alt="{{ $tv->channel_name }}"
+                                                        title="LiveTV-{{ $tv->channel_name }}" />
                                                 </div>
                                             </a>
                                         </div>
