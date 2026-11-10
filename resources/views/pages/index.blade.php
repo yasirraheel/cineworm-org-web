@@ -1408,17 +1408,18 @@
         @if (getcong('menu_livetv'))
             @if ($sections_data->post_type == 'LiveTV')
                 <!-- Start Live TV Video Section -->
+                @php($live_tv_url = URL::to('livetv'))
                 <div class="video-shows-section live-tv-video-block vfx-item-ptb">
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="vfx-item-section">
-                                    <a href="{{ URL::to('collections/' . $sections_data->section_slug . '/' . $sections_data->id) }}"
+                                    <a href="{{ $live_tv_url }}"
                                         title="{{ $sections_data->section_name }}">
                                         <h3>{{ $sections_data->section_name }}</h3>
                                     </a>
                                     <span class="view-more">
-                                        <a href="{{ URL::to('collections/' . $sections_data->section_slug . '/' . $sections_data->id) }}"
+                                        <a href="{{ $live_tv_url }}"
                                             title="view-more">{{ trans('words.view_all') }}</a>
                                     </span>
                                 </div>

@@ -329,6 +329,16 @@ class IndexController extends Controller
     {
         $home_section = HomeSections::where('id', $id)->where('status', 1)->first();
 
+        // A deleted or disabled home-section must not produce a PHP 500 when
+        // an old homepage link is still cached or bookmarked.
+        if (!$home_section) {
+            if ($slug === 'live-tv') {
+                return redirect('livetv');
+            }
+
+            abort(404);
+        }
+
         //echo $home_section->post_type;exit;
 
         if ($home_section->post_type == "Movie") {
