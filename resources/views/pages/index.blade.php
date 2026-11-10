@@ -1408,7 +1408,6 @@
         @if (getcong('menu_livetv'))
             @if ($sections_data->post_type == 'LiveTV')
                 <!-- Start Live TV Video Section -->
-                @php($live_tv_url = URL::to('livetv'))
                 @php
                     $live_tv_ids = array_filter(array_map('trim', explode(',', (string) $sections_data->tv_ids)));
                     $live_tv_items = App\LiveTV::whereIn('id', $live_tv_ids)
@@ -1425,12 +1424,12 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="vfx-item-section">
-                                    <a href="{{ $live_tv_url }}"
+                                    <a href="{{ URL::to('livetv') }}"
                                         title="{{ $sections_data->section_name }}">
                                         <h3>{{ $sections_data->section_name }}</h3>
                                     </a>
                                     <span class="view-more">
-                                        <a href="{{ $live_tv_url }}"
+                                        <a href="{{ URL::to('livetv') }}"
                                             title="view-more">{{ trans('words.view_all') }}</a>
                                     </span>
                                 </div>
