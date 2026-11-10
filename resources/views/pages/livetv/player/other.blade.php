@@ -50,8 +50,11 @@
 					 showPreloader:"yes",
 					 preloaderColors:["#999999", "#FFFFFF"],
 					 addKeyboardSupport:"yes",
-					 autoPlay:"{{get_player_cong('autoplay')}}",
-					 autoPlayText:"Click to Unmute",
+					 // Start the stream as soon as the Live TV page opens. The player
+					 // begins muted when the browser blocks audible autoplay; viewers
+					 // can enable sound from the volume control without pressing Play.
+					 autoPlay:"yes",
+					 autoPlayText:"",
 					 loop:"yes",
 					 scrubAtTimeAtFirstPlay:"00:00:00",
 					 maxWidth:1325,
