@@ -85,7 +85,7 @@ class UserLiveBroadcastController extends Controller
         $durationParam = $request->get('duration', 'unlimited');
 
         $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}{$passParam}&audio={$audioParam}&video={$videoParam}&screen={$screenParam}&chat={$chatParam}&hide={$hideParam}&notify={$notifyParam}&duration={$durationParam}";
-        $shareableJoinUrl = url("meeting/join/{$roomId}") . (!empty($roomPassword) ? ('?roomPassword=' . urlencode($roomPassword)) : '');
+        $shareableJoinUrl = $this->buildGuestJoinUrl($cinemeetBaseUrl, $roomId, $roomPassword);
 
         // Paginated history list of broadcasts
         $live_broadcasts = LiveBroadcast::where('user_id', $user->id)
@@ -146,7 +146,7 @@ class UserLiveBroadcastController extends Controller
         $chat   = $request->get('chat', '1');
         $notify = $request->get('notify', '1');
 
-        $shareUrl = url("meeting/join/{$roomId}") . (!empty($password) ? ('?roomPassword=' . urlencode($password)) : '');
+        $shareUrl = $this->buildGuestJoinUrl($cinemeetBaseUrl, $roomId, $password);
 
         $broadcast = new LiveBroadcast();
         $broadcast->user_id               = $user->id;
@@ -161,6 +161,19 @@ class UserLiveBroadcastController extends Controller
 
         \Session::flash('flash_message', 'New customized CineMeet room created successfully!');
         return redirect()->to("user/live_broadcasts?room={$roomId}&audio={$audio}&video={$video}&screen={$screen}&chat={$chat}&notify={$notify}");
+    }
+
+    /**
+     * Build a public guest link that joins the SFU directly.
+     */
+    private function buildGuestJoinUrl(string $cinemeetBaseUrl, string $roomId, string $roomPassword = ''): string
+    {
+        $params = ['room' => $roomId];
+        if (!empty($roomPassword)) {
+            $params['roomPassword'] = $roomPassword;
+        }
+
+        return $cinemeetBaseUrl . '/join?' . http_build_query($params);
     }
 
     /**
