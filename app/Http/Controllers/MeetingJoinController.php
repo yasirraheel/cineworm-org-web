@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\LiveBroadcast;
 
 class MeetingJoinController extends Controller
@@ -20,6 +21,10 @@ class MeetingJoinController extends Controller
 
         // Find broadcast meeting record if exists
         $broadcast = LiveBroadcast::where('zoom_meeting_id', $roomId)->first();
+
+        $user = Auth::user();
+        $meetingTitle = $broadcast ? $broadcast->title : 'CineMeet Room';
+        $hostUser = $broadcast ? $broadcast->user : null;
         
         // Password protection check
         $dbPassword = $broadcast ? $broadcast->zoom_meeting_password : '';
@@ -27,23 +32,31 @@ class MeetingJoinController extends Controller
 
         $cinemeetBaseUrl = rtrim(env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org'), '/');
 
-        // Do not send a CineMeet token here. CineMeet's `token` parameter is a
-        // JWT created with its own JWT_KEY; the old custom HMAC value was not a
-        // valid CineMeet JWT and caused the iframe to return `Invalid Token`.
-        // The current CineMeet server allows public room joins, so the room URL
-        // is sufficient. If host/user authentication is enabled later, the
-        // CineMeet login flow will handle authentication inside the iframe.
+        // Keep the CineMeet wrapper on cineworm.org. Guests may use this page
+        // without logging in; only the embedded SFU loads from the subdomain.
         $joinParams = [
             'room' => $roomId,
             'audio' => $request->get('audio', '1'),
             'video' => $request->get('video', '1'),
             'screen' => $request->get('screen', '1'),
             'chat' => $request->get('chat', '1'),
+            'roomPassword' => !empty($roomPassword) ? $roomPassword : '0',
         ];
-        if (!empty($roomPassword) && $roomPassword !== '0') {
-            $joinParams['roomPassword'] = $roomPassword;
+        if ($user) {
+            $joinParams['name'] = $user->name ?? '';
+            $joinParams['avatar'] = $user->user_icon ? asset($user->user_icon) : '';
         }
 
-        return redirect()->away($cinemeetBaseUrl . '/join?' . http_build_query($joinParams));
+        $cinemeetEmbedUrl = $cinemeetBaseUrl . '/join?' . http_build_query($joinParams);
+        $shareableJoinUrl = url("meeting/join/{$roomId}") . (!empty($roomPassword) ? ('?roomPassword=' . urlencode($roomPassword)) : '');
+
+        return view('pages.meeting.join', compact(
+            'roomId',
+            'meetingTitle',
+            'hostUser',
+            'roomPassword',
+            'cinemeetEmbedUrl',
+            'shareableJoinUrl'
+        ));
     }
 }

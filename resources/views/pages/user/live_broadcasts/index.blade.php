@@ -376,7 +376,7 @@
                                                 <button type="button" class="btn btn-sm btn-info" style="background:#17a2b8; border:none; color:#fff; padding:5px 12px; font-size:13px; margin-right:4px;" onclick="openEditMeetingModal('{{ $broadcast->id }}', '{{ addslashes($broadcast->title) }}', '{{ addslashes($broadcast->zoom_meeting_password) }}')">
                                                     <i class="fa fa-sliders"></i> Customize
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:5px 12px; font-size:13px;" onclick="copyInviteLink('{{ rtrim(env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org'), '/') . '/join?room=' . urlencode($broadcast->zoom_meeting_id) . (!empty($broadcast->zoom_meeting_password) ? '&roomPassword=' . urlencode($broadcast->zoom_meeting_password) : '') }}')">
+                                                <button type="button" class="btn btn-sm btn-secondary" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:5px 12px; font-size:13px;" onclick="copyInviteLink('{{ url('meeting/join/' . $broadcast->zoom_meeting_id) }}@if(!empty($broadcast->zoom_meeting_password))?roomPassword={{ urlencode($broadcast->zoom_meeting_password) }}@endif')">
                                                     <i class="fa fa-copy"></i> Copy Link
                                                 </button>
                                             </td>
@@ -468,7 +468,7 @@ var tourSteps = [
         target: '#shareLinkBox',
         icon: 'fa-share-alt',
         title: 'Invite Guests to CineMeet',
-        desc: 'Copy or share direct CineMeet SFU links with guests via WhatsApp or clipboard. Guests can join without a CineWorm account.'
+        desc: 'Copy or share CineMeet wrapper links with guests via WhatsApp or clipboard. Guests can join without a CineWorm account.'
     },
     {
         target: '#historyTableBox',
