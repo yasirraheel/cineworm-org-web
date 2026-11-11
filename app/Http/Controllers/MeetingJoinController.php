@@ -42,13 +42,6 @@ class MeetingJoinController extends Controller
 
         $cinemeetBaseUrl = rtrim(env('CINEMEET_API_URL', 'https://cinemeet.cineworm.org'), '/');
 
-        // HMAC signature token for CineMeet iframe verification
-        $secret  = env('CINEMEET_SECRET', 'cineworm_secret_key_2026');
-        $expires = time() + 14400; // 4 hours valid
-        $tokenData = "{$roomId}.{$user->id}.{$expires}";
-        $hmac     = hash_hmac('sha256', $tokenData, $secret);
-        $signedToken = "{$tokenData}.{$hmac}";
-
         // Encode user credentials
         $nameEncoded   = urlencode($user->name ?? 'User-' . rand(1000, 9999));
         $avatarUrl     = $user->user_icon ? asset($user->user_icon) : '';
@@ -60,7 +53,13 @@ class MeetingJoinController extends Controller
         $screenParam   = $request->get('screen', '1');
         $chatParam     = $request->get('chat', '1');
 
-        $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}{$passParam}&token={$signedToken}&audio={$audioParam}&video={$videoParam}&screen={$screenParam}&chat={$chatParam}";
+        // Do not send a CineMeet token here. CineMeet's `token` parameter is a
+        // JWT created with its own JWT_KEY; the old custom HMAC value was not a
+        // valid CineMeet JWT and caused the iframe to return `Invalid Token`.
+        // The current CineMeet server allows public room joins, so the room URL
+        // is sufficient. If host/user authentication is enabled later, the
+        // CineMeet login flow will handle authentication inside the iframe.
+        $cinemeetEmbedUrl = "{$cinemeetBaseUrl}/join?room={$roomId}&name={$nameEncoded}&avatar={$avatarEncoded}{$passParam}&audio={$audioParam}&video={$videoParam}&screen={$screenParam}&chat={$chatParam}";
         $shareableJoinUrl = url("meeting/join/{$roomId}") . (!empty($roomPassword) ? ('?roomPassword=' . urlencode($roomPassword)) : '');
 
         return view('pages.meeting.join', compact(
