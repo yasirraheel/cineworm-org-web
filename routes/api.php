@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('internal/account-sync', 'AccountSyncController@upsert');
+Route::post('internal/account-sync-batch', 'AccountSyncController@upsertBatch');
 
 Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
 
