@@ -160,8 +160,6 @@
                                                         title="{{ trans('words.dashboard_text') }}"><i
                                                             class="fa fa-database"></i>{{ trans('words.dashboard_text') }}</a>
                                                 </li>
-                                                <li><a href="{{ route('user.live-tv.create') }}" title="Add Live TV"><i class="fa fa-television"></i>Add Live TV</a></li>
-                                                <li><a href="{{ route('user.live-tv.index') }}" title="My Live TV"><i class="fa fa-list"></i>My Live TV</a></li>
                                                 @if(in_array('promotion_services', $promotionUserFeatures, true))
                                                     <li><a href="{{ URL::to('promotions') }}"
                                                             title="Promotion"><i
