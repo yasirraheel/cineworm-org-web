@@ -98,69 +98,6 @@
     flex: 0 0 auto;
   }
 
-  .user-sidebar-dropdown {
-    margin-top: 18px;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 8px;
-    overflow: hidden;
-    background: rgba(255,255,255,.03);
-  }
-
-  .user-sidebar-dropdown-toggle,
-  .plan-group-toggle {
-    width: 100%;
-    border: 0;
-    background: transparent;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-align: left;
-    cursor: pointer;
-  }
-
-  .user-sidebar-dropdown-toggle {
-    padding: 14px 15px;
-    font-size: 15px;
-    font-weight: 700;
-  }
-
-  .user-sidebar-dropdown-toggle:hover,
-  .plan-group-toggle:hover {
-    background: rgba(254,2,120,.12);
-  }
-
-  .user-sidebar-dropdown-body {
-    padding: 0 12px 12px;
-  }
-
-  .user-sidebar-dropdown-body a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-    padding: 10px 8px;
-    border-top: 1px solid rgba(255,255,255,.06);
-    text-decoration: none;
-  }
-
-  .user-sidebar-dropdown-body a:hover {
-    color: #fe0278;
-  }
-
-  .plan-group-toggle {
-    padding: 0;
-  }
-
-  .plan-group-toggle h6 {
-    margin: 0;
-    flex: 1;
-  }
-
-  .plan-group-toggle .fa {
-    color: #fe0278;
-  }
-
   @media only screen and (max-width: 991px) {
     .dashboard-feature-sidebar {
       margin-bottom: 25px;
@@ -192,36 +129,12 @@
     <a href="{{ URL::to('profile') }}" class="vfx-item-btn-danger text-uppercase"><i class="fa fa-edit"></i>{{trans('words.edit')}}</a><br /><br />
     <a href="#" class="vfx-item-btn-danger text-uppercase data_remove"><i class="fa fa-trash"></i>Account Delete</a>
 
-    <div class="user-sidebar-dropdown">
-      <button type="button" class="user-sidebar-dropdown-toggle" data-toggle="collapse" data-target="#liveTvSidebarMenu" aria-expanded="{{ request()->is('user/live-tv*') ? 'true' : 'false' }}">
-        <span><i class="fa fa-television mr-2"></i>Live TV</span>
-        <i class="fa fa-chevron-down"></i>
-      </button>
-      <div id="liveTvSidebarMenu" class="collapse {{ request()->is('user/live-tv*') ? 'show' : '' }}">
-        <div class="user-sidebar-dropdown-body">
-          <a href="{{ route('user.live-tv.create') }}"><i class="fa fa-plus-circle"></i><span>Add Live TV</span></a>
-          <a href="{{ route('user.live-tv.index') }}"><i class="fa fa-list"></i><span>My Live TV Submissions</span></a>
-        </div>
-      </div>
-    </div>
-
-    <div class="user-sidebar-dropdown">
-      <button type="button" class="user-sidebar-dropdown-toggle" data-toggle="collapse" data-target="#subscriptionSidebarMenu" aria-expanded="true">
-        <span><i class="fa fa-credit-card mr-2"></i>Subscription</span>
-        <i class="fa fa-chevron-down"></i>
-      </button>
-      <div id="subscriptionSidebarMenu" class="collapse show">
-        <div class="user-sidebar-dropdown-body">
-          @if($currentPlan)
-            <div class="text-white py-2"><strong>Current Plan:</strong> {{ $currentPlan->plan_name }}</div>
-            @if($currentPlan->plan_price !== null)
-              <div class="text-muted pb-2">Price: {{ html_entity_decode(getcong('currency_sign')) }} {{ number_format((float) $currentPlan->plan_price, 2) }}</div>
-            @endif
-          @else
-            <div class="text-muted py-2">No plan selected</div>
-          @endif
-          <a href="{{ URL::to('membership_plan') }}"><i class="fa fa-arrow-up"></i><span>{{ $currentPlan ? trans('words.upgrade_plan') : trans('words.select_plan') }}</span></a>
-        </div>
+    <div class="dashboard-feature-sidebar" style="margin-top: 18px;">
+      <div class="dashboard-feature-links">
+        <a href="{{ route('user.live-tv.create') }}">
+          <i class="fa fa-television"></i>
+          <span>Add Live TV</span>
+        </a>
       </div>
     </div>
 
@@ -235,11 +148,8 @@
             if (empty($uniqueFeatures)) continue;
         @endphp
         <div class="plan-group">
-          <button type="button" class="plan-group-toggle" data-toggle="collapse" data-target="#planFeatures{{ $plan->id }}" aria-expanded="{{ $currentPlan && $currentPlan->id == $plan->id ? 'true' : 'false' }}">
-            <h6>{{ $plan->plan_name }}</h6>
-            <i class="fa fa-chevron-down"></i>
-          </button>
-          <div id="planFeatures{{ $plan->id }}" class="dashboard-feature-links collapse {{ $currentPlan && $currentPlan->id == $plan->id ? 'show' : '' }}">
+          <h6>{{ $plan->plan_name }}</h6>
+          <div class="dashboard-feature-links">
             @foreach($uniqueFeatures as $featureKey)
               @if(isset($featureLinkConfig[$featureKey]))
                   @php 

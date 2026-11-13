@@ -146,8 +146,23 @@
                 </div>
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">
                   <div class="member-ship-option">
-                    <h5 class="color-up">Account Overview</h5>
-                    <p class="premuim-memplan-bold-text mb-0">Manage Live TV and your subscription from the sidebar.</p>
+                    <h5 class="color-up">{{trans('words.my_subscription')}}</h5>
+                    @if($currentPlan)
+                    <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>{{ $currentPlan->plan_name }}</span></span>
+                    @if($user->start_date)
+                    <span class="premuim-memplan-bold-text"><strong>Plan Started:</strong><span>{{ date('F, d, Y',$user->start_date) }}</span></span>
+                    @endif
+                    @if($user->exp_date)
+                    <span class="premuim-memplan-bold-text"><strong>{{trans('words.subscription_expires_on')}}:</strong><span>{{ date('F, d, Y',$user->exp_date) }}</span></span>
+                    @endif
+                    @if(!empty($currentPlan->plan_price) || $currentPlan->plan_price === '0' || $currentPlan->plan_price === 0)
+                    <span class="premuim-memplan-bold-text"><strong>Plan Price:</strong><span>{{ html_entity_decode(getcong('currency_sign')) }} {{ number_format((float) $currentPlan->plan_price, 2) }}</span></span>
+                    @endif
+                    <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.upgrade_plan')}}</a></div>
+                    @else
+                    <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>No Plan Selected</span></span>
+                    <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.select_plan')}}</a></div>
+                    @endif
                   </div>
                 </div>
               </div>
