@@ -146,6 +146,13 @@
                 </div>
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">
                   <div class="member-ship-option">
+                    <h5 class="color-up">Live TV Submissions</h5>
+                    <p class="premuim-memplan-bold-text">Add a channel for admin review. It will only become public after approval.</p>
+                    <a href="{{ route('user.live-tv.create') }}" class="vfx-item-btn-danger text-uppercase dashboard-card-action"><i class="fa fa-television"></i> Add Live TV</a>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">
+                  <div class="member-ship-option">
                     <h5 class="color-up">{{trans('words.my_subscription')}}</h5>
                     @if($currentPlan)
                     <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>{{ $currentPlan->plan_name }}</span></span>
@@ -262,7 +269,7 @@
                                       title="{{ $info->channel_name }}">
                                       <div class="video-img">
                                           <span class="video-item-content">{{ $info->channel_name }}</span>
-                                          <img src="{{ URL::to('/' . $info->channel_thumb) }}"
+                                          <img src="{{ live_tv_thumb_url($info->channel_thumb) }}"
                                               alt="{{ $info->channel_name }}"
                                               title="LiveTV-{{ $info->channel_name }}">
                                       </div>

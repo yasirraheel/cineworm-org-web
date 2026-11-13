@@ -1012,7 +1012,7 @@
                                                     title="{{ $info->channel_name }}">
                                                     <div class="video-img">
                                                         <span class="video-item-content">{{ $info->channel_name }}</span>
-                                                        <img src="{{ URL::to('/' . $info->channel_thumb) }}"
+                                                        <img src="{{ live_tv_thumb_url($info->channel_thumb) }}"
                                                             alt="{{ $info->channel_name }}"
                                                             title="LiveTV-{{ $info->channel_name }}">
                                                     </div>
@@ -1447,7 +1447,7 @@
                                                     @endif
                                                     <span
                                                         class="video-item-content">{{ $tv->channel_name }}</span>
-                                                    <img src="{{ URL::to('/' . $tv->channel_thumb) }}"
+                                                    <img src="{{ live_tv_thumb_url($tv->channel_thumb) }}"
                                                         alt="{{ $tv->channel_name }}"
                                                         title="LiveTV-{{ $tv->channel_name }}" />
                                                 </div>

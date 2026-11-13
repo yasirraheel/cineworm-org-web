@@ -12,7 +12,8 @@
 
                 <div class="row">
                  
-                  <div class="col-md-3">
+                  <div class="col-md-6 text-right">
+                    <a href="{{ route('admin.live-tv.submissions') }}" class="btn btn-info btn-md waves-effect waves-light m-b-20 mt-2 mr-2"><i class="fa fa-user"></i> User Submissions</a>
                      {!! Form::open(array('url' => 'admin/live_tv','class'=>'app-search','id'=>'search','role'=>'form','method'=>'get')) !!}   
                       <input type="text" name="s" placeholder="{{trans('words.search_by_title')}}" class="form-control">
                       <button type="submit"><i class="fa fa-search"></i></button>

@@ -224,6 +224,9 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
         Route::get('tv_category/delete/{id}', 'TvCategoryController@delete');
 
         Route::get('live_tv', 'LiveTvController@live_tv_list');
+        Route::get('live_tv/submissions', 'LiveTvController@submissions')->name('admin.live-tv.submissions');
+        Route::post('live_tv/submissions/{id}/approve', 'LiveTvController@approveSubmission')->name('admin.live-tv.submissions.approve');
+        Route::post('live_tv/submissions/{id}/reject', 'LiveTvController@rejectSubmission')->name('admin.live-tv.submissions.reject');
         Route::get('live_tv/add_live_tv', 'LiveTvController@addTv');
         Route::get('live_tv/edit_live_tv/{id}', 'LiveTvController@editTv');
         Route::post('live_tv/add_edit_live_tv', 'LiveTvController@addnew');
@@ -546,6 +549,11 @@ Route::post('profile', 'UserController@editprofile');
 Route::post('phone_update', 'UserController@phone_update');
 Route::get('watchlist', 'UserController@my_watchlist');
 Route::get('account_delete', 'UserController@account_delete');
+Route::group(['middleware' => 'auth', 'prefix' => 'user/live-tv', 'as' => 'user.live-tv.'], function () {
+    Route::get('/', 'UserLiveTvSubmissionController@index')->name('index');
+    Route::get('/create', 'UserLiveTvSubmissionController@create')->name('create');
+    Route::post('/', 'UserLiveTvSubmissionController@store')->name('store');
+});
 Route::get('promotions', 'UserPromotionController@index');
 Route::get('promotions/lists', 'UserPromotionController@lists');
 Route::post('promotions/lists/save', 'UserPromotionController@saveList');

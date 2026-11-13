@@ -24,7 +24,7 @@
 @endif
 
 
-@section('head_image', URL::to('/' . $tv_info->channel_thumb))
+@section('head_image', live_tv_thumb_url($tv_info->channel_thumb))
 
 @section('head_url', Request::url())
 
@@ -708,7 +708,7 @@
                           </div>
                           @endif
 
-                          <img src="{{URL::to('/'.$live_tv_data->channel_thumb)}}" title="{{$live_tv_data->channel_name}}" alt="{{$live_tv_data->channel_name}}">
+                          <img src="{{ live_tv_thumb_url($live_tv_data->channel_thumb) }}" title="{{$live_tv_data->channel_name}}" alt="{{$live_tv_data->channel_name}}">
                          </div>
                          <div class="season-title-item">
                           <h3 class="mb-0">{{Str::limit(stripslashes($live_tv_data->channel_name),20)}}</h3>
@@ -750,7 +750,7 @@
 
                                                     <span
                                                         class="video-item-content">{{ stripslashes($related_data->channel_name) }}</span>
-                                                    <img src="{{ URL::to('/' . $related_data->channel_thumb) }}"
+                                                    <img src="{{ live_tv_thumb_url($related_data->channel_thumb) }}"
                                                         alt="{{ stripslashes($related_data->channel_name) }}"
                                                         title="{{ stripslashes($related_data->channel_name) }}">
                                                 </div>

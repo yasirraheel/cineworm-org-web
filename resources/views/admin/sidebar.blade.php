@@ -86,6 +86,7 @@
               <ul class="list-unstyled">
                 <li class="{{classActivePath('tv_category')}}"><a href="{{ URL::to('admin/tv_category') }}" class="{{classActivePath('tv_category')}}"><i class="fa fa-tags"></i><span>{{trans('words.live_tv_category')}}</span></a></li>
                 <li class="{{classActivePath('live_tv')}}"><a href="{{ URL::to('admin/live_tv') }}" class="{{classActivePath('live_tv')}}"><i class="fa fa-list"></i><span>{{trans('words.tv_channel')}}</span></a></li>
+                <li class="{{ request()->is('admin/live_tv/submissions') ? 'active' : '' }}"><a href="{{ route('admin.live-tv.submissions') }}"><i class="fa fa-user"></i><span>User Submissions</span></a></li>
                </ul>
             </li>
 
