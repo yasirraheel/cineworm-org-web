@@ -19,6 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('internal/account-sync', 'AccountSyncController@upsert');
+
 Route::group(['prefix' => 'v1','namespace' => 'API'], function(){
 
     // Simple test endpoint - no authentication needed
