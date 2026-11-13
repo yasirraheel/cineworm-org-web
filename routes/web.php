@@ -549,7 +549,7 @@ Route::post('profile', 'UserController@editprofile');
 Route::post('phone_update', 'UserController@phone_update');
 Route::get('watchlist', 'UserController@my_watchlist');
 Route::get('account_delete', 'UserController@account_delete');
-Route::group(['middleware' => 'auth', 'prefix' => 'user/live-tv', 'as' => 'user.live-tv.'], function () {
+Route::group(['prefix' => 'user/live-tv', 'as' => 'user.live-tv.'], function () {
     Route::get('/', 'UserLiveTvSubmissionController@index')->name('index');
     Route::get('/create', 'UserLiveTvSubmissionController@create')->name('create');
     Route::post('/', 'UserLiveTvSubmissionController@store')->name('store');
