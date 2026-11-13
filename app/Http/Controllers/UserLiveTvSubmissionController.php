@@ -12,23 +12,31 @@ class UserLiveTvSubmissionController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
     }
 
     public function index()
     {
+        if (!Auth::check()) {
+            return redirect('login');
+        }
         $submissions = LiveTVSubmission::where('user_id', Auth::id())->latest()->get();
         return view('pages.user.live_tv_submissions.index', compact('submissions'));
     }
 
     public function create()
     {
+        if (!Auth::check()) {
+            return redirect('login');
+        }
         $cat_list = TvCategory::where('status', '1')->orderBy('category_name')->get();
         return view('pages.user.live_tv_submissions.create', compact('cat_list'));
     }
 
     public function store(Request $request)
     {
+        if (!Auth::check()) {
+            return redirect('login');
+        }
         if ($request->input('channel_url_type') === 'Embed' && !$request->filled('channel_url')) {
             $request->merge(['channel_url' => $request->input('channel_url_embed')]);
         }
