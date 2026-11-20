@@ -40,6 +40,11 @@
     padding-bottom: 42px;
   }
 
+  .dashboard-hero .container-fluid {
+    position: relative;
+    z-index: 2;
+  }
+
   .dashboard-hero-summary {
     display: grid;
     gap: 18px;
@@ -100,6 +105,34 @@
   }
 
   .dashboard-hero-card .premuim-memplan-bold-text {
+    color: #ffffff;
+    display: block;
+    font-size: 15px;
+    line-height: 22px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .dashboard-hero-card .premuim-memplan-bold-text strong {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .dashboard-hero-card .premuim-memplan-bold-text > span {
+    background: rgba(255, 255, 255, .12);
+    border-radius: 4px;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 6px;
+    padding: 2px 9px;
+  }
+
+  .dashboard-hero-card .vfx-item-btn-danger {
+    box-shadow: 0 6px 18px rgba(254, 2, 120, .2);
+    display: inline-block;
     position: relative;
   }
 
