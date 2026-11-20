@@ -36,6 +36,73 @@
     text-decoration: none;
   }
 
+  .dashboard-hero {
+    padding-bottom: 42px;
+  }
+
+  .dashboard-hero-summary {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 30px;
+  }
+
+  .dashboard-hero-card {
+    background: linear-gradient(135deg, rgba(42, 22, 83, .98), rgba(20, 10, 49, .96));
+    border: 1px solid rgba(254, 2, 120, .42);
+    border-radius: 14px;
+    box-shadow: 0 14px 38px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .08);
+    overflow: hidden;
+    padding: 22px 24px;
+    position: relative;
+    transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+  }
+
+  .dashboard-hero-card::before {
+    background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, .12) 48%, transparent 72%);
+    content: '';
+    height: 180%;
+    left: -80%;
+    pointer-events: none;
+    position: absolute;
+    top: -40%;
+    transform: rotate(18deg);
+    transition: left .7s ease;
+    width: 55%;
+  }
+
+  .dashboard-hero-card:hover {
+    border-color: #fe0278;
+    box-shadow: 0 18px 48px rgba(254, 2, 120, .22), 0 0 24px rgba(254, 2, 120, .12), inset 0 1px 0 rgba(255, 255, 255, .12);
+    transform: translateY(-5px);
+  }
+
+  .dashboard-hero-card:hover::before {
+    left: 125%;
+  }
+
+  .dashboard-hero-card h5 {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    position: relative;
+  }
+
+  .dashboard-hero-card h5::after {
+    background: #fe0278;
+    border-radius: 3px;
+    content: '';
+    display: block;
+    height: 3px;
+    margin-top: 8px;
+    width: 42px;
+  }
+
+  .dashboard-hero-card .premuim-memplan-bold-text {
+    position: relative;
+  }
+
   .cineworm-workstation {
     background: #1c103c;
     border: 1px solid rgba(255, 255, 255, .08);
@@ -97,8 +164,23 @@
     gap: 12px;
     min-height: 76px;
     padding: 13px;
+    position: relative;
     text-decoration: none;
-    transition: all .2s ease;
+    transition: all .25s ease;
+    overflow: hidden;
+  }
+
+  .cineworm-workstation-card::before {
+    background: linear-gradient(110deg, transparent 22%, rgba(255, 255, 255, .1) 50%, transparent 78%);
+    content: '';
+    height: 180%;
+    left: -100%;
+    pointer-events: none;
+    position: absolute;
+    top: -40%;
+    transform: rotate(18deg);
+    transition: left .6s ease;
+    width: 55%;
   }
 
   .cineworm-workstation-card:hover {
@@ -106,7 +188,12 @@
     border-color: #fe0278;
     color: #ffffff;
     text-decoration: none;
-    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(254, 2, 120, .16), inset 0 1px 0 rgba(255, 255, 255, .08);
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .cineworm-workstation-card:hover::before {
+    left: 125%;
   }
 
   .cineworm-workstation-icon {
@@ -183,6 +270,11 @@
     color: #fe0278;
     font-size: 20px;
     font-weight: 700;
+    transition: transform .25s ease;
+  }
+
+  .cineworm-workstation-card:hover .cineworm-workstation-arrow {
+    transform: translateX(4px);
   }
 
   @keyframes cineworm-workstation-pulse {
@@ -238,6 +330,10 @@
   }
 
   @media only screen and (max-width: 991px) {
+    .dashboard-hero-summary {
+      grid-template-columns: 1fr;
+    }
+
     .dashboard-card-col {
       margin-bottom: 25px;
     }
@@ -282,7 +378,7 @@
 
 
 <!-- Start Breadcrumb -->
-<div class="breadcrumb-section bg-xs" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
+<div class="breadcrumb-section bg-xs dashboard-hero" style="background-image: url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
   <div class="container-fluid">
     <div class="row">
       <div class="col-xl-12">
@@ -293,6 +389,41 @@
             <li>{{trans('words.dashboard_text')}}</li>
           </ul>
         </nav>
+      </div>
+    </div>
+
+    <div class="dashboard-hero-summary">
+      <div class="dashboard-hero-card">
+        <h5>Stats</h5>
+        <span class="premuim-memplan-bold-text"><strong>Joined Since:</strong>
+          <span>{{ date('F, d, Y',strtotime(Auth::User()->created_at)) }}</span>
+        </span>
+        <span class="premuim-memplan-bold-text"><strong>Total Films:</strong>
+          <span>{{ \App\Movies::where('added_by', Auth::user()->id)->count() }}</span>
+        </span>
+        <span class="premuim-memplan-bold-text"><strong>Active Device:</strong>
+          <span>{{ \App\UsersDeviceHistory::where('user_id', Auth::user()->id)->first()->user_device_name ?? 'No Active Device' }}</span>
+        </span>
+      </div>
+
+      <div class="dashboard-hero-card">
+        <h5>{{trans('words.my_subscription')}}</h5>
+        @if($currentPlan)
+        <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>{{ $currentPlan->plan_name }}</span></span>
+        @if($user->start_date)
+        <span class="premuim-memplan-bold-text"><strong>Plan Started:</strong><span>{{ date('F, d, Y',$user->start_date) }}</span></span>
+        @endif
+        @if($user->exp_date)
+        <span class="premuim-memplan-bold-text"><strong>{{trans('words.subscription_expires_on')}}:</strong><span>{{ date('F, d, Y',$user->exp_date) }}</span></span>
+        @endif
+        @if(!empty($currentPlan->plan_price) || $currentPlan->plan_price === '0' || $currentPlan->plan_price === 0)
+        <span class="premuim-memplan-bold-text"><strong>Plan Price:</strong><span>{{ html_entity_decode(getcong('currency_sign')) }} {{ number_format((float) $currentPlan->plan_price, 2) }}</span></span>
+        @endif
+        <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.upgrade_plan')}}</a></div>
+        @else
+        <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>No Plan Selected</span></span>
+        <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.select_plan')}}</a></div>
+        @endif
       </div>
     </div>
   </div>
@@ -307,6 +438,7 @@
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
 
+        @if(false)
         <div class="profile-section">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -488,6 +620,8 @@
             </div>
           </div>
         </div>
+        @endif
+        @include('pages.user._workstation')
       </div>
 
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
