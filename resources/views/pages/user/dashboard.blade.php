@@ -6,6 +6,13 @@
 
 @section('content')
 
+@php
+  $activePlans = \App\SubscriptionPlan::active()->orderBy('plan_price')->get();
+  $featureLinkConfig = \App\PlanFeature::getActiveFeaturesConfig();
+  $planFeatureKeys = $currentPlan ? $currentPlan->getEffectiveFeatureKeys() : [];
+  $renderedWorkstationFeatures = [];
+@endphp
+
 <style>
   .dashboard-card-grid {
     display: flex;
@@ -27,6 +34,160 @@
     padding: 12px;
     box-sizing: border-box;
     text-decoration: none;
+  }
+
+  .cineworm-workstation {
+    background: #1c103c;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 8px;
+    margin-top: 2px;
+    overflow: hidden;
+    padding: 24px;
+  }
+
+  .cineworm-workstation-heading {
+    align-items: flex-start;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .cineworm-workstation-heading h4 {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+
+  .cineworm-workstation-heading h4 span {
+    color: #fe0278;
+  }
+
+  .cineworm-workstation-heading p {
+    color: rgba(255, 255, 255, .65);
+    font-size: 13px;
+    margin: 0;
+  }
+
+  .cineworm-workstation-badge {
+    background: rgba(254, 2, 120, .14);
+    border: 1px solid rgba(254, 2, 120, .4);
+    border-radius: 16px;
+    color: #ff5ca5;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+
+  .cineworm-workstation-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cineworm-workstation-card {
+    align-items: center;
+    background: rgba(0, 0, 0, .2);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 6px;
+    color: #ffffff;
+    display: flex;
+    gap: 12px;
+    min-height: 76px;
+    padding: 13px;
+    text-decoration: none;
+    transition: all .2s ease;
+  }
+
+  .cineworm-workstation-card:hover {
+    background: rgba(254, 2, 120, .16);
+    border-color: #fe0278;
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+
+  .cineworm-workstation-icon {
+    align-items: center;
+    animation: cineworm-workstation-pulse 3s ease-in-out infinite;
+    background: #fe0278;
+    border-radius: 50%;
+    color: #ffffff;
+    display: inline-flex;
+    flex: 0 0 36px;
+    font-size: 18px;
+    font-weight: 700;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+  }
+
+  .cineworm-workstation-card:nth-child(2) .cineworm-workstation-icon { animation-delay: .25s; }
+  .cineworm-workstation-card:nth-child(3) .cineworm-workstation-icon { animation-delay: .5s; }
+  .cineworm-workstation-card:nth-child(4) .cineworm-workstation-icon { animation-delay: .75s; }
+  .cineworm-workstation-card:nth-child(5) .cineworm-workstation-icon { animation-delay: 1s; }
+
+  .cineworm-workstation-card-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .cineworm-workstation-card-copy strong {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .cineworm-workstation-card-copy small {
+    color: rgba(255, 255, 255, .58);
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .cineworm-workstation-card.is-locked {
+    background: rgba(0, 0, 0, .32);
+    opacity: .62;
+  }
+
+  .cineworm-workstation-card.is-locked:hover {
+    background: rgba(254, 2, 120, .1);
+    opacity: .85;
+    transform: none;
+  }
+
+  .cineworm-workstation-card.is-danger:hover {
+    background: rgba(220, 53, 69, .16);
+    border-color: #dc3545;
+  }
+
+  .cineworm-workstation-card.is-danger .cineworm-workstation-icon {
+    background: #dc3545;
+  }
+
+  .cineworm-workstation-card.is-danger .cineworm-workstation-arrow {
+    color: #ff7b87;
+  }
+
+  .cineworm-workstation-lock {
+    color: #ff5ca5;
+    font-size: 14px;
+    margin-left: 4px;
+  }
+
+  .cineworm-workstation-arrow {
+    color: #fe0278;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  @keyframes cineworm-workstation-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(254, 2, 120, .16); }
+    50% { box-shadow: 0 0 0 6px rgba(254, 2, 120, 0); }
   }
 
   .dashboard-feature-sidebar {
@@ -89,10 +250,31 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .cineworm-workstation-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media only screen and (max-width: 575px) {
     .dashboard-feature-links {
+      grid-template-columns: 1fr;
+    }
+
+    .cineworm-workstation {
+      padding: 18px;
+    }
+
+    .cineworm-workstation-heading {
+      display: block;
+    }
+
+    .cineworm-workstation-badge {
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .cineworm-workstation-grid {
       grid-template-columns: 1fr;
     }
   }
@@ -127,8 +309,7 @@
 
         <div class="profile-section">
           <div class="row">
-            @include('pages.user._sidebar')
-            <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <div class="row dashboard-card-grid">
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 dashboard-card-col">
                   <div class="member-ship-option">
@@ -166,6 +347,144 @@
                   </div>
                 </div>
               </div>
+
+              <section class="cineworm-workstation" aria-labelledby="cineworm-workstation-title">
+                <div class="cineworm-workstation-heading">
+                  <div>
+                    <h4 id="cineworm-workstation-title">Cineworm <span>Workstation</span></h4>
+                    <p>Your creative tools and Cineworm services in one place.</p>
+                  </div>
+                  <span class="cineworm-workstation-badge">Tools</span>
+                </div>
+
+                <div class="cineworm-workstation-grid">
+                  <a class="cineworm-workstation-card" href="{{ URL::to('reel2reel/') }}" aria-label="Open Reel2Reel video editor">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-scissors"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>Reel2Reel</strong>
+                      <small>Video editor, effects and stock</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="{{ URL::to('user/live_broadcasts') }}" aria-label="Open CineMeet">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-video-camera"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>CineMeet</strong>
+                      <small>Meetings and collaboration rooms</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="{{ route('user.live-tv.create') }}" aria-label="Add Live TV">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-television"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>Add Live TV</strong>
+                      <small>Submit a live channel for admin review</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="{{ URL::to('cinegrab/') }}" aria-label="Open CineGrab Downloader">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-download"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>CineGrab</strong>
+                      <small>Download videos from supported sites</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="https://stock.cineworm.org/" target="_blank" rel="noopener" aria-label="Open CineStock">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-th-large"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>CineStock</strong>
+                      <small>Stock audio, video, effects and LUTs</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="{{ URL::to('livetv/') }}" aria-label="Open Live TV">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-play"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>Live TV</strong>
+                      <small>Browse live channels and streams</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="{{ URL::to('game/remote-control') }}" aria-label="Open Cineworm Games">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-gamepad"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>Games</strong>
+                      <small>Play Cineworm interactive games</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="{{ URL::to('profile') }}" aria-label="Edit personal profile">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-user"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>My Profile</strong>
+                      <small>Update your Cineworm profile</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="{{ URL::to('user/films') }}" aria-label="Open film uploads">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-upload"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>Film Uploads</strong>
+                      <small>Manage your uploaded films</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card" href="{{ URL::to('membership_plan') }}" aria-label="View subscription plans">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-credit-card"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>Subscription Plans</strong>
+                      <small>View plans and upgrade access</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  <a class="cineworm-workstation-card is-danger data_remove" href="#" aria-label="Delete account">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-trash"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>Delete Account</strong>
+                      <small>Permanently remove your account</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
+                  @foreach($activePlans as $plan)
+                    @php
+                      $uniqueFeatures = array_diff($plan->getDirectFeatureKeys(), $renderedWorkstationFeatures);
+                    @endphp
+                    @foreach($uniqueFeatures as $featureKey)
+                      @if(isset($featureLinkConfig[$featureKey]))
+                        @php
+                          $renderedWorkstationFeatures[] = $featureKey;
+                          $featureLink = $featureLinkConfig[$featureKey];
+                          $hasAccess = in_array($featureKey, $planFeatureKeys, true);
+                        @endphp
+                        @if($hasAccess)
+                          <a class="cineworm-workstation-card" href="{{ $featureLink['url'] }}" aria-label="Open {{ $featureLink['title'] }}">
+                        @else
+                          <a class="cineworm-workstation-card is-locked" href="javascript:void(0);" onclick="showUpgradeWarning('{{ addslashes($plan->plan_name) }}', '{{ addslashes($featureLink['title']) }}')" aria-label="Unlock {{ $featureLink['title'] }}">
+                        @endif
+                            <span class="cineworm-workstation-icon" aria-hidden="true"><i class="{{ $featureLink['icon'] }}"></i></span>
+                            <span class="cineworm-workstation-card-copy">
+                              <strong>{{ $featureLink['title'] }} @unless($hasAccess)<i class="fa fa-lock cineworm-workstation-lock" aria-hidden="true"></i>@endunless</strong>
+                              <small>{{ $hasAccess ? 'Available with your plan' : 'Available on the ' . $plan->plan_name . ' plan' }}</small>
+                            </span>
+                            <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                          </a>
+                      @endif
+                    @endforeach
+                  @endforeach
+                </div>
+              </section>
             </div>
           </div>
         </div>
@@ -410,6 +729,24 @@
     }
   });
 });
+
+  function showUpgradeWarning(planName, featureName) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Upgrade Required',
+      html: 'You need to subscribe to the <strong>' + planName + '</strong> plan to access <strong>' + featureName + '</strong>.',
+      confirmButtonText: 'View Plans',
+      confirmButtonColor: '#fe0278',
+      showCancelButton: true,
+      cancelButtonText: 'Close',
+      background: '#1a2234',
+      color: '#fff'
+    }).then(function(result) {
+      if (result.isConfirmed) {
+        window.location.href = "{{ URL::to('membership_plan') }}";
+      }
+    });
+  }
 
 </script>
 
