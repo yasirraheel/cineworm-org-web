@@ -199,8 +199,10 @@
   }
 
   .cineworm-workstation-grid {
+    align-items: stretch;
     display: grid;
     gap: 12px;
+    grid-auto-rows: minmax(98px, 1fr);
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -212,8 +214,9 @@
     color: #ffffff;
     display: flex;
     gap: 12px;
-    min-height: 76px;
-    padding: 13px;
+    height: 100%;
+    min-height: 98px;
+    padding: 16px;
     position: relative;
     text-decoration: none;
     transition: all .25s ease;
@@ -276,14 +279,15 @@
 
   .cineworm-workstation-card-copy strong {
     color: #ffffff;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
+    line-height: 22px;
   }
 
   .cineworm-workstation-card-copy small {
     color: rgba(255, 255, 255, .58);
-    font-size: 11px;
-    line-height: 16px;
+    font-size: 13px;
+    line-height: 19px;
   }
 
   .cineworm-workstation-card.is-locked {
