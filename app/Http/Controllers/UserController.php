@@ -362,6 +362,16 @@ class UserController extends Controller
             return redirect('admin');
         }
 
+        // Paid subscribers must not be able to accidentally downgrade to the Free plan.
+        $currentUserPlan = Auth::User()->plan_id
+            ? SubscriptionPlan::find(Auth::User()->plan_id)
+            : null;
+
+        if ($currentUserPlan && (float) $currentUserPlan->plan_price > 0 && (float) $plan_info->plan_price <= 0) {
+            Session::flash('error', 'Your paid subscription is still active. The Free plan cannot replace it.');
+            return redirect('membership_plan');
+        }
+
         //For free plan
         if($plan_info->plan_price <=0)
         {

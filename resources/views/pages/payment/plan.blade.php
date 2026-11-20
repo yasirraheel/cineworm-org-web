@@ -31,8 +31,8 @@
     color: #ffffff;
     display: flex;
     align-items: flex-start;
-    font-size: 14px;
-    line-height: 22px;
+    font-size: 15px;
+    line-height: 24px;
     margin-bottom: 10px;
     min-height: 22px;
     padding-left: 28px;
@@ -65,6 +65,12 @@
     }
   }
 </style>
+
+@php
+  $currentUserPlan = Auth::check() && Auth::user()->plan_id
+    ? \App\SubscriptionPlan::find(Auth::user()->plan_id)
+    : null;
+@endphp
   
  
 <!-- Start Breadcrumb -->
@@ -115,6 +121,7 @@
           $includedPlanNames = $plan_data->getIncludedPlanNames();
           $directFeatureLabels = $plan_data->getDirectFeatureLabels();
           $isCurrentPlan = Auth::check() && Auth::user()->plan_id == $plan_data->id;
+          $isPaidCurrentPlan = $currentUserPlan && (float) $currentUserPlan->plan_price > 0;
         @endphp
         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
             <div class="membership-plan-list @if($isCurrentPlan) is-current-plan @endif">
@@ -148,6 +155,8 @@
             @endif
             @if($isCurrentPlan)
             <span class="vfx-item-btn-danger membership-plan-disabled-btn text-uppercase mb-30 d-inline-block">Active</span>
+            @elseif($isPaidCurrentPlan && (float) $plan_data->plan_price <= 0)
+            <span class="vfx-item-btn-danger membership-plan-disabled-btn text-uppercase mb-30 d-inline-block">Unavailable</span>
             @else
             <a href="{{ URL::to('payment_method/'.$plan_data->id) }}" class="vfx-item-btn-danger text-uppercase mb-30" title="plan">{{trans('words.select_plan')}}</a>
             @endif

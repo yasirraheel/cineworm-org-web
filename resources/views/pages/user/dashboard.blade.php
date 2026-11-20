@@ -10,6 +10,7 @@
   $activePlans = \App\SubscriptionPlan::active()->orderBy('plan_price')->get();
   $featureLinkConfig = \App\PlanFeature::getActiveFeaturesConfig();
   $planFeatureKeys = $currentPlan ? $currentPlan->getEffectiveFeatureKeys() : [];
+  $showUpgradeAction = !$currentPlan || (float) $currentPlan->plan_price <= 0;
   $renderedWorkstationFeatures = [];
 @endphp
 
@@ -285,9 +286,9 @@
   }
 
   .cineworm-workstation-card-copy small {
-    color: rgba(255, 255, 255, .58);
-    font-size: 13px;
-    line-height: 19px;
+    color: rgba(255, 255, 255, .74);
+    font-size: 14px;
+    line-height: 20px;
   }
 
   .cineworm-workstation-card.is-locked {
@@ -473,7 +474,9 @@
         @if(!empty($currentPlan->plan_price) || $currentPlan->plan_price === '0' || $currentPlan->plan_price === 0)
         <span class="premuim-memplan-bold-text"><strong>Plan Price:</strong><span>{{ html_entity_decode(getcong('currency_sign')) }} {{ number_format((float) $currentPlan->plan_price, 2) }}</span></span>
         @endif
+        @if($showUpgradeAction)
         <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.upgrade_plan')}}</a></div>
+        @endif
         @else
         <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>No Plan Selected</span></span>
         <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.select_plan')}}</a></div>
@@ -525,7 +528,9 @@
                     @if(!empty($currentPlan->plan_price) || $currentPlan->plan_price === '0' || $currentPlan->plan_price === 0)
                     <span class="premuim-memplan-bold-text"><strong>Plan Price:</strong><span>{{ html_entity_decode(getcong('currency_sign')) }} {{ number_format((float) $currentPlan->plan_price, 2) }}</span></span>
                     @endif
+                    @if($showUpgradeAction)
                     <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.upgrade_plan')}}</a></div>
+                    @endif
                     @else
                     <span class="premuim-memplan-bold-text"><strong>{{trans('words.current_plan')}}:</strong><span>No Plan Selected</span></span>
                     <div class="mt-3"><a href="{{ URL::to('membership_plan') }}" class="vfx-item-btn-danger text-uppercase">{{trans('words.select_plan')}}</a></div>
