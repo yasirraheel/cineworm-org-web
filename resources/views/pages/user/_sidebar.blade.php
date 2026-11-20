@@ -14,6 +14,46 @@
     $featureLinkConfig = \App\PlanFeature::getActiveFeaturesConfig();
 @endphp
 <style>
+  /* User workspaces use the main content first; account/tool cards follow below it. */
+  .profile-section > .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .profile-section > .row > .col-lg-3 {
+    flex: 0 0 100%;
+    margin-top: 30px;
+    max-width: 100%;
+    order: 2;
+  }
+
+  .profile-section > .row > .col-lg-8,
+  .profile-section > .row > .col-lg-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    order: 1;
+  }
+
+  .profile-section > .row > .col-lg-3 .img-profile,
+  .profile-section > .row > .col-lg-3 .profile_title_item {
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-section > .row > .col-lg-3 .profile_title_item {
+    background: linear-gradient(135deg, rgba(28, 16, 60, .98), rgba(13, 6, 32, .98));
+    border: 1px solid rgba(254, 2, 120, .24);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .18);
+    padding: 22px;
+  }
+
+  .profile-section > .row > .col-lg-3 .dashboard-feature-links {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .dashboard-feature-sidebar {
     margin-top: 25px;
     text-align: left;
@@ -99,6 +139,10 @@
   }
 
   @media only screen and (max-width: 991px) {
+    .profile-section > .row > .col-lg-3 .dashboard-feature-links {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .dashboard-feature-sidebar {
       margin-bottom: 25px;
     }
@@ -110,6 +154,10 @@
   }
 
   @media only screen and (max-width: 575px) {
+    .profile-section > .row > .col-lg-3 .dashboard-feature-links {
+      grid-template-columns: 1fr;
+    }
+
     .dashboard-feature-links {
       grid-template-columns: 1fr;
     }

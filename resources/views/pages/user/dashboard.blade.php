@@ -37,7 +37,24 @@
   }
 
   .dashboard-hero {
-    padding-bottom: 42px;
+    align-items: flex-start;
+    height: auto !important;
+    min-height: 0;
+    padding: 34px 0 46px;
+  }
+
+  .dashboard-hero .row:first-child {
+    margin-bottom: 24px;
+  }
+
+  .dashboard-hero .row:first-child > .col-xl-12 {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .dashboard-hero .row:first-child #breadcrumbs {
+    margin-top: 0;
   }
 
   .dashboard-hero .container-fluid {
