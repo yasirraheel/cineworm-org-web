@@ -55,7 +55,48 @@
   }
 
   .dashboard-hero .row:first-child #breadcrumbs {
-    margin-top: 0;
+    display: none;
+  }
+
+  .dashboard-breadcrumb-trail {
+    background: #0d0620;
+    border-bottom: 1px solid rgba(254, 2, 120, .16);
+    padding: 12px 0;
+  }
+
+  .dashboard-breadcrumb-trail nav {
+    margin: 0;
+  }
+
+  .dashboard-breadcrumb-trail ul {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dashboard-breadcrumb-trail li {
+    color: rgba(255, 255, 255, .74);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .dashboard-breadcrumb-trail li + li::before {
+    color: #fe0278;
+    content: '›';
+    margin-right: 10px;
+  }
+
+  .dashboard-breadcrumb-trail a {
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  .dashboard-breadcrumb-trail a:hover {
+    color: #fe0278;
   }
 
   .dashboard-hero .container-fluid {
@@ -486,6 +527,17 @@
   </div>
 </div>
 <!-- End Breadcrumb -->
+
+<div class="dashboard-breadcrumb-trail" aria-label="Breadcrumb">
+  <div class="container-fluid">
+    <nav>
+      <ul>
+        <li><a href="{{ URL::to('/') }}" title="{{trans('words.home')}}">{{trans('words.home')}}</a></li>
+        <li>{{trans('words.dashboard_text')}}</li>
+      </ul>
+    </nav>
+  </div>
+</div>
 
 <!-- Start Dashboard Page -->
 
