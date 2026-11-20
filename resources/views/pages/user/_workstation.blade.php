@@ -20,12 +20,6 @@
       <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
     </a>
 
-    <a class="cineworm-workstation-card" href="{{ route('user.live-tv.create') }}" aria-label="Add Live TV">
-      <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-television"></i></span>
-      <span class="cineworm-workstation-card-copy"><strong>Add Live TV</strong><small>Submit a live channel for admin review</small></span>
-      <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
-    </a>
-
     <a class="cineworm-workstation-card" href="{{ URL::to('cinegrab/') }}" aria-label="Open CineGrab Downloader">
       <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-download"></i></span>
       <span class="cineworm-workstation-card-copy"><strong>CineGrab</strong><small>Download videos from supported sites</small></span>
@@ -35,18 +29,6 @@
     <a class="cineworm-workstation-card" href="https://stock.cineworm.org/" target="_blank" rel="noopener" aria-label="Open CineStock">
       <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-th-large"></i></span>
       <span class="cineworm-workstation-card-copy"><strong>CineStock</strong><small>Stock audio, video, effects and LUTs</small></span>
-      <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
-    </a>
-
-    <a class="cineworm-workstation-card" href="{{ URL::to('livetv/') }}" aria-label="Open Live TV">
-      <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-play"></i></span>
-      <span class="cineworm-workstation-card-copy"><strong>Live TV</strong><small>Browse live channels and streams</small></span>
-      <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
-    </a>
-
-    <a class="cineworm-workstation-card" href="{{ URL::to('game/remote-control') }}" aria-label="Open Cineworm Games">
-      <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-gamepad"></i></span>
-      <span class="cineworm-workstation-card-copy"><strong>Games</strong><small>Play Cineworm interactive games</small></span>
       <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
     </a>
 
@@ -68,16 +50,10 @@
       <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
     </a>
 
-    <a class="cineworm-workstation-card is-danger data_remove" href="#" aria-label="Delete account">
-      <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-trash"></i></span>
-      <span class="cineworm-workstation-card-copy"><strong>Delete Account</strong><small>Permanently remove your account</small></span>
-      <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
-    </a>
-
     @foreach($activePlans as $plan)
       @php $uniqueFeatures = array_diff($plan->getDirectFeatureKeys(), $renderedWorkstationFeatures); @endphp
       @foreach($uniqueFeatures as $featureKey)
-        @if(isset($featureLinkConfig[$featureKey]))
+        @if(isset($featureLinkConfig[$featureKey]) && !in_array($featureKey, ['watch_content', 'play_games'], true))
           @php
             $renderedWorkstationFeatures[] = $featureKey;
             $featureLink = $featureLinkConfig[$featureKey];
