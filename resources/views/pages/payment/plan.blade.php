@@ -31,8 +31,8 @@
     color: #ffffff;
     display: flex;
     align-items: flex-start;
-    font-size: 15px;
-    line-height: 24px;
+    font-size: 14px;
+    line-height: 22px;
     margin-bottom: 10px;
     min-height: 22px;
     padding-left: 28px;
