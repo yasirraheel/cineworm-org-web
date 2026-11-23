@@ -691,6 +691,15 @@
                     <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
                   </a>
 
+                  <a class="cineworm-workstation-card" href="{{ route('affiliate.landing') }}" aria-label="Open affiliate program">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-share-alt"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>Affiliate Program</strong>
+                      <small>Share Cineworm and earn commission</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
                   <a class="cineworm-workstation-card is-danger data_remove" href="#" aria-label="Delete account">
                     <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-trash"></i></span>
                     <span class="cineworm-workstation-card-copy">

@@ -29,6 +29,7 @@ use Intervention\Image\Facades\Image;
 use App\Models\NewsTicker;
 use App\Models\RssFeed;
 use App\Services\RssFeedService;
+use App\Services\AffiliateService;
 use ProtoneMedia\LaravelFFMpeg;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider;
@@ -677,6 +678,7 @@ class IndexController extends Controller
 
         $user->save();
         assignDefaultSignupPlanToUser($user);
+        AffiliateService::recordSignup($user, $request->cookie('affiliate_referral_code'));
 
         // Send Email Verification
         \App\Http\Controllers\Auth\EmailVerificationController::sendVerificationEmail($user);

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Services\AffiliateService;
 use Illuminate\Database\Eloquent\Model;
 
 class Transactions extends Model
@@ -12,6 +13,20 @@ class Transactions extends Model
 
 
 	public $timestamps = false;
+
+    protected static function booted()
+    {
+        static::created(function (Transactions $transaction) {
+            try {
+                AffiliateService::recordTransaction($transaction);
+            } catch (\Throwable $e) {
+                \Log::error('Affiliate commission processing failed', [
+                    'transaction_id' => $transaction->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
+    }
  
 	  
 }

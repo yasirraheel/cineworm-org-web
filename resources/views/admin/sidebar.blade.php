@@ -231,7 +231,8 @@
                             || request()->is('admin/plan_features*')
                             || request()->is('admin/transactions*')
                             || request()->is('admin/coupons*')
-                            || request()->is('admin/payment_gateway*');
+                            || request()->is('admin/payment_gateway*')
+                            || request()->is('admin/affiliate*');
                     @endphp
                     <li class="has_sub {{ $isSubscriptionsActive ? 'subdrop' : '' }}">
                         <a href="javascript:void(0);" class="waves-effect {{ $isSubscriptionsActive ? 'active subdrop' : '' }}">
@@ -272,6 +273,12 @@
                                     class="{{ classActivePath('payment_gateway') }}">
                                     <i class="fa fa-money"></i>
                                     <span>Payment Gateways</span>
+                                </a>
+                            </li>
+                            <li class="{{ request()->is('admin/affiliate*') ? 'active' : '' }}">
+                                <a href="{{ URL::to('admin/affiliate') }}" class="{{ request()->is('admin/affiliate*') ? 'active' : '' }}">
+                                    <i class="fa fa-share-alt"></i>
+                                    <span>Affiliate Program</span>
                                 </a>
                             </li>
                         </ul>

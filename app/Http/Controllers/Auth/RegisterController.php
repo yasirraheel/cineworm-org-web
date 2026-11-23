@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Services\AffiliateService;
 
 class RegisterController extends Controller
 {
@@ -76,6 +77,7 @@ class RegisterController extends Controller
         ]);
 
         assignDefaultSignupPlanToUser($user);
+        AffiliateService::recordSignup($user, request()->cookie('affiliate_referral_code'));
 
         return $user;
     }

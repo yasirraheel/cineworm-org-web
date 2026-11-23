@@ -117,6 +117,18 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
 
         Route::get('settings', 'SettingsController@settings');
 
+        // Affiliate program management
+        Route::get('affiliate', 'AffiliateController@index')->name('admin.affiliate.index');
+        Route::post('affiliate/settings', 'AffiliateController@updateSettings')->name('admin.affiliate.settings');
+        Route::post('affiliate/tiers', 'AffiliateController@storeTier')->name('admin.affiliate.tiers.store');
+        Route::post('affiliate/tiers/{id}', 'AffiliateController@updateTier')->name('admin.affiliate.tiers.update');
+        Route::post('affiliate/tiers/{id}/delete', 'AffiliateController@deleteTier')->name('admin.affiliate.tiers.delete');
+        Route::post('affiliate/commissions/{id}/approve', 'AffiliateController@approveCommission')->name('admin.affiliate.commissions.approve');
+        Route::post('affiliate/commissions/{id}/reject', 'AffiliateController@rejectCommission')->name('admin.affiliate.commissions.reject');
+        Route::post('affiliate/payouts/{id}/approve', 'AffiliateController@approvePayout')->name('admin.affiliate.payouts.approve');
+        Route::post('affiliate/payouts/{id}/reject', 'AffiliateController@rejectPayout')->name('admin.affiliate.payouts.reject');
+        Route::post('affiliate/payouts/{id}/paid', 'AffiliateController@markPayoutPaid')->name('admin.affiliate.payouts.paid');
+
         // ── CineMeet Manager ──────────────────────────────────────────────────
         Route::prefix('cinemeet')->name('admin.cinemeet.')->group(function () {
             Route::get('/',           'CinemeetController@dashboard')      ->name('dashboard');
@@ -531,6 +543,11 @@ Route::get('auth/facebook/callback', 'Auth\FacebookController@handleFacebookCall
 
 Route::get('signup', 'IndexController@signup');
 Route::post('signup', 'IndexController@postSignup');
+
+// Public affiliate landing and referral attribution
+Route::get('affiliate', 'AffiliateController@landing')->name('affiliate.landing');
+Route::get('affiliate/ref/{code}', 'AffiliateController@referral')->name('affiliate.referral');
+Route::post('affiliate/payout', 'AffiliateController@requestPayout')->middleware('auth')->name('affiliate.payout');
 
 // Email Verification Routes
 Route::get('email/verify', 'Auth\EmailVerificationController@notice')->name('verification.notice');
