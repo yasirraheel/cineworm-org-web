@@ -14,7 +14,7 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mb-4">
                 <div class="member-ship-option">
                     <h5 class="color-up">{{ $settings->landing_title }}</h5>
                     <p>{{ $settings->landing_description }}</p>
@@ -31,7 +31,7 @@
                     <span class="premuim-memplan-bold-text"><strong>Current tier:</strong><span>{{ $currentTier ? $currentTier->name . ' (' . $currentTier->commission_percent . '%)' : 'Not qualified yet' }}</span></span>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 mb-4">
                 <div class="member-ship-option">
                     <h5 class="color-up">Commission tiers</h5>
                     @foreach($tiers as $tier)
@@ -43,14 +43,14 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"><div class="member-ship-option"><h5 class="color-up">Referrals</h5><h2>{{ $account->referrals_count }}</h2></div></div>
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"><div class="member-ship-option"><h5 class="color-up">Available</h5><h2>{{ getcong('currency_code') ?: 'USD' }} {{ number_format($availableBalance, 2) }}</h2></div></div>
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"><div class="member-ship-option"><h5 class="color-up">Total earned</h5><h2>{{ getcong('currency_code') ?: 'USD' }} {{ number_format((float) $account->total_earned, 2) }}</h2></div></div>
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12"><div class="member-ship-option"><h5 class="color-up">Total paid</h5><h2>{{ getcong('currency_code') ?: 'USD' }} {{ number_format((float) $account->total_paid, 2) }}</h2></div></div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 mb-4"><div class="member-ship-option"><h5 class="color-up">Referrals</h5><h2>{{ $account->referrals_count }}</h2></div></div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 mb-4"><div class="member-ship-option"><h5 class="color-up">Available</h5><h2>{{ getcong('currency_code') ?: 'USD' }} {{ number_format($availableBalance, 2) }}</h2></div></div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 mb-4"><div class="member-ship-option"><h5 class="color-up">Total earned</h5><h2>{{ getcong('currency_code') ?: 'USD' }} {{ number_format((float) $account->total_earned, 2) }}</h2></div></div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 mb-4"><div class="member-ship-option"><h5 class="color-up">Total paid</h5><h2>{{ getcong('currency_code') ?: 'USD' }} {{ number_format((float) $account->total_paid, 2) }}</h2></div></div>
         </div>
 
         <div class="row">
-            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mb-4">
                 <div class="member-ship-option">
                     <h5 class="color-up">Request payout</h5>
                     <p>{{ $settings->payout_instructions ?: 'Submit your request and the admin team will review it.' }}</p>
@@ -65,7 +65,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mb-4">
                 <div class="member-ship-option">
                     <h5 class="color-up">How it works</h5>
                     <p>Signup attribution is saved from your link. Commission is created only after a referred member completes a confirmed payment.</p>
