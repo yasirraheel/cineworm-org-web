@@ -34,14 +34,10 @@
             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 mb-4">
                 <div class="member-ship-option">
                     <h5 class="color-up">Commission tiers</h5>
-                    <div class="row">
-                        @foreach($tiers as $tier)
-                            <div class="col-xs-4"><strong>{{ $tier->name }}:</strong></div>
-                            <div class="col-xs-8"><span class="premuim-memplan-bold-text"><span>{{ $tier->min_referrals }}{{ $tier->max_referrals ? ' - ' . $tier->max_referrals : '+' }} referrals · {{ $tier->commission_percent }}%</span></span></div>
-                        @endforeach
-                        <div class="col-xs-4"><strong>Recurring:</strong></div>
-                        <div class="col-xs-8"><span class="premuim-memplan-bold-text"><span>{{ $settings->recurring_commission_percent }}%</span></span></div>
-                    </div>
+                    @foreach($tiers as $tier)
+                        <span class="premuim-memplan-bold-text"><strong style="display:inline-block; width:90px;">{{ $tier->name }}:</strong><span>{{ $tier->min_referrals }}{{ $tier->max_referrals ? ' - ' . $tier->max_referrals : '+' }} referrals · {{ $tier->commission_percent }}%</span></span>
+                    @endforeach
+                    <span class="premuim-memplan-bold-text"><strong style="display:inline-block; width:90px;">Recurring:</strong><span>{{ $settings->recurring_commission_percent }}%</span></span>
                 </div>
             </div>
         </div>
