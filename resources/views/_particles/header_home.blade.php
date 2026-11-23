@@ -32,6 +32,12 @@
                                         <span>{{ trans('words.subscription_plan') }}</span>
                                     </a>
                                 </div>
+                                <div class="signup-btn-item" style="float:right; margin-left:10px;">
+                                    <a href="{{ route('affiliate.landing') }}" title="Affiliate Program">
+                                        <i class="fa fa-share-alt" aria-hidden="true"></i>
+                                        <span>Affiliate</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

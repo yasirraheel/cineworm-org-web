@@ -89,6 +89,13 @@
                                                 {{ trans('words.subscription_plan') }}
                                             </a>
                                         </li>
+                                        <li>
+                                            <a href="{{ route('affiliate.landing') }}"
+                                                class="{{ request()->is('affiliate*') ? 'active' : '' }}"
+                                                title="Affiliate Program">
+                                                Affiliate
+                                            </a>
+                                        </li>
                                         @if (Auth::check())
                                             <li>
                                                 <a href="{{ URL::to('dashboard') }}"
