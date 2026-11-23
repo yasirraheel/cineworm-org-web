@@ -8,7 +8,7 @@ use App\AffiliateReferral;
 use App\AffiliateSetting;
 use App\AffiliateTier;
 use App\Transactions;
-use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -36,7 +36,7 @@ class AffiliateService
         }
     }
 
-    public static function ensureAccount(User $user): AffiliateAccount
+    public static function ensureAccount(Authenticatable $user): AffiliateAccount
     {
         $account = AffiliateAccount::firstOrCreate(
             ['user_id' => $user->id],
@@ -46,7 +46,7 @@ class AffiliateService
         return $account;
     }
 
-    public static function recordSignup(User $user, ?string $code = null): ?AffiliateReferral
+    public static function recordSignup(Authenticatable $user, ?string $code = null): ?AffiliateReferral
     {
         if (!self::settings()->enabled) {
             return null;
