@@ -502,6 +502,7 @@ Route::get('movies/watch/{slug}/{id}', 'MoviesController@movies_watch');
 
 // Creator-owned paid films. The landing page is public; checkout and playback
 // are protected and the stream itself is only available after a verified sale.
+Route::get('cineflix', 'CreatorFilmController@index')->name('cineflix');
 Route::middleware('auth')->group(function () {
     Route::get('creator-films/paypal/success', 'CreatorFilmController@paypalSuccess')->name('creator-films.paypal.success');
     Route::get('creator-films/paypal/fail', 'CreatorFilmController@paypalFail')->name('creator-films.paypal.fail');

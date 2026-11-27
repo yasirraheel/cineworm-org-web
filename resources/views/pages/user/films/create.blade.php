@@ -30,6 +30,7 @@
     .cine-upload-toggle-card { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:15px 16px; background:rgba(8,5,23,.54); border:1px solid rgba(255,255,255,.13); border-radius:10px; transition:border-color .18s, background .18s, transform .18s; }
     .cine-upload-toggle-card + .cine-upload-toggle-card { margin-top:10px; }
     .cine-upload-toggle-card:hover { border-color:rgba(255,15,120,.62); transform:translateY(-1px); }
+    .cine-upload-toggle-card.is-disabled { opacity:.52; }
     .cine-upload-toggle-copy strong { display:block; color:#fff; font-size:14px; }
     .cine-upload-toggle-copy small { display:block; margin-top:4px; color:rgba(255,255,255,.55); font-size:11px; line-height:1.45; }
     .cine-upload-switch { position:relative; display:inline-flex; flex:0 0 auto; cursor:pointer; }
@@ -101,7 +102,7 @@
                                 <div class="cine-upload-toggle-card"><span class="cine-upload-toggle-copy"><strong>I own this film</strong><small>Turn this on only if you own the rights to the film.</small></span><label class="cine-upload-switch" for="is_owner_toggle"><input type="hidden" name="is_owner" value="0"><input type="checkbox" name="is_owner" id="is_owner_toggle" value="1" @checked((string) old('is_owner', '0') === '1')><span class="cine-upload-switch-track"></span><span class="cine-upload-switch-state">Off</span></label></div>
                             </div>
                             <div class="cine-upload-field"><label>Viewer access <em>*</em></label>
-                                <div class="cine-upload-toggle-card"><span class="cine-upload-toggle-copy"><strong>Paid film</strong><small>When enabled, the owner can request a viewer price and admin approval is required.</small></span><label class="cine-upload-switch" for="creator_sale_toggle"><input type="hidden" name="creator_sale_enabled" value="0"><input type="checkbox" name="creator_sale_enabled" id="creator_sale_toggle" value="1" @checked((string) old('creator_sale_enabled', '0') === '1')><span class="cine-upload-switch-track"></span><span class="cine-upload-switch-state">Off</span></label></div>
+                                <div class="cine-upload-toggle-card"><span class="cine-upload-toggle-copy"><strong>Paid film</strong><small>Turn on film ownership first, then enable this to set the viewer price below. Admin approval is required.</small></span><label class="cine-upload-switch" for="creator_sale_toggle"><input type="hidden" name="creator_sale_enabled" value="0"><input type="checkbox" name="creator_sale_enabled" id="creator_sale_toggle" value="1" @checked((string) old('creator_sale_enabled', '0') === '1')><span class="cine-upload-switch-track"></span><span class="cine-upload-switch-state">Off</span></label></div>
                             <div id="creator_sale_options" class="cine-upload-sale-options">
                                 <div class="cine-upload-field"><label for="creator_price">Viewer price <em>*</em></label><input type="number" id="creator_price" name="creator_price" min="0.01" step="0.01" value="{{ old('creator_price') }}" placeholder="e.g. 4.99"><small class="cine-upload-help">Currency: {{ getcong('currency_code') ?: 'USD' }}. Paid films must use a public Google Drive source.</small></div>
                                 <div class="cine-upload-field"><label for="creator_trailer_url">Free trailer URL</label><input type="url" id="creator_trailer_url" name="creator_trailer_url" value="{{ old('creator_trailer_url') }}" placeholder="https://youtube.com/... or https://vimeo.com/..."><small class="cine-upload-help">Optional preview viewers can watch before purchase.</small></div>
@@ -135,9 +136,15 @@ document.addEventListener('DOMContentLoaded', function () {
     var ownerToggle = document.getElementById('is_owner_toggle');
     var saleBox = document.getElementById('creator_sale_options');
     var price = document.getElementById('creator_price');
+    var saleCard = saleToggle.closest('.cine-upload-toggle-card');
     var saleState = saleToggle.parentElement.querySelector('.cine-upload-switch-state');
     var ownerState = ownerToggle.parentElement.querySelector('.cine-upload-switch-state');
     function toggleSale() {
+        saleToggle.disabled = !ownerToggle.checked;
+        saleCard.classList.toggle('is-disabled', saleToggle.disabled);
+        if (saleToggle.disabled) {
+            saleToggle.checked = false;
+        }
         var paid = saleToggle.checked && ownerToggle.checked;
         if (saleToggle.checked && !ownerToggle.checked) {
             saleToggle.checked = false;

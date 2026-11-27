@@ -45,6 +45,10 @@
                                             </li>
                                         @endif
 
+                                        <li><a href="{{ route('cineflix') }}"
+                                                class="{{ request()->is('cineflix') || request()->is('creator-films/*') ? 'active' : '' }}"
+                                                title="CineFlix">CineFlix</a></li>
+
                                         @if (getcong('menu_shows'))
                                             <li><a href="{{ URL::to('shows/') }}"
                                                     class="{{ classActivePathSite('shows') }}"

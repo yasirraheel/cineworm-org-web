@@ -17,6 +17,19 @@ class CreatorFilmController extends Controller
     {
     }
 
+    public function index()
+    {
+        $films = Movies::where('status', 1)
+            ->where('upcoming', 0)
+            ->where('creator_sale_enabled', 1)
+            ->where('creator_sale_status', 'approved')
+            ->where('creator_price', '>', 0)
+            ->orderByDesc('id')
+            ->paginate(18);
+
+        return view('pages.movies.cineflix', compact('films'));
+    }
+
     public function show(string $slug, int $id)
     {
         $movie = $this->approvedFilm($id);

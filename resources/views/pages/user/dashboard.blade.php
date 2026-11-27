@@ -647,6 +647,15 @@
                     <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
                   </a>
 
+                  <a class="cineworm-workstation-card" href="{{ route('cineflix') }}" aria-label="Open CineFlix creator films">
+                    <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-film"></i></span>
+                    <span class="cineworm-workstation-card-copy">
+                      <strong>CineFlix</strong>
+                      <small>Browse and watch creator-owned films</small>
+                    </span>
+                    <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+
                   <a class="cineworm-workstation-card" href="{{ URL::to('livetv/') }}" aria-label="Open Live TV">
                     <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-play"></i></span>
                     <span class="cineworm-workstation-card-copy">
