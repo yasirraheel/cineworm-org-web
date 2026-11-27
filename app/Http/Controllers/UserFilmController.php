@@ -93,8 +93,13 @@ class UserFilmController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'video_title' => 'required|max:255',
+            'video_title' => 'required|string|max:255',
+            'video_description' => 'required|string|max:10000',
+            'movie_language' => 'required|integer',
             'genres'      => 'required|array|min:1',
+            'video_type' => 'required|in:URL,GoogleDrive,HLS',
+            'video_url' => 'required|string|max:2000',
+            'poster_link' => 'nullable|url|max:2000',
             'creator_price' => 'nullable|numeric|min:0.01',
             'creator_trailer_url' => 'nullable|url|max:2000',
         ]);
@@ -124,7 +129,7 @@ class UserFilmController extends Controller
         $video_type = $request->video_type;
         if ($video_type === 'Local')  $video_url = $request->video_url_local;
         elseif ($video_type === 'URL')   $video_url = $request->video_url;
-        elseif ($video_type === 'HLS')   $video_url = $request->video_url_hls;
+        elseif ($video_type === 'HLS')   $video_url = $request->input('video_url_hls') ?: $request->input('video_url');
         elseif ($video_type === 'DASH')  $video_url = $request->video_url_dash;
         elseif ($video_type === 'Embed') $video_url = $request->video_embed_code;
         else                             $video_url = $request->video_url;
@@ -142,7 +147,7 @@ class UserFilmController extends Controller
             }
         } elseif (stripos($video_url, 'vimeo.com') !== false) {
             $video_type = 'Vimeo';
-        } elseif (stripos($video_url, 'drive.google.com') !== false) {
+        } elseif (stripos($video_url, 'drive.google.com') !== false || stripos($video_url, 'googleapis.com') !== false) {
             $video_type = 'GoogleDrive';
             $fileId = $this->extractGoogleDriveFileId($video_url);
         }

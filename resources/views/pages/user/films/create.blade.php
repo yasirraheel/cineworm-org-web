@@ -1,573 +1,152 @@
-@extends('admin.admin_app')
+@extends('site_app')
+
+@section('head_title', 'Upload Film | ' . getcong('site_name'))
+@section('head_url', Request::url())
 
 @section('content')
+<style>
+    .cine-upload-page { color: #fff; }
+    .cine-upload-page .breadcrumb-section { margin-bottom: 0; }
+    .cine-upload-hero { padding: 34px 0 26px; }
+    .cine-upload-hero h1 { margin: 0 0 8px; font-size: 32px; font-weight: 800; }
+    .cine-upload-hero p { margin: 0; color: rgba(255,255,255,.68); font-size: 15px; }
+    .cine-upload-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr); gap: 24px; align-items: start; }
+    .cine-upload-card { background: rgba(24, 16, 53, .96); border: 1px solid rgba(255,255,255,.10); border-radius: 14px; padding: 26px; box-shadow: 0 12px 35px rgba(0,0,0,.16); }
+    .cine-upload-card + .cine-upload-card { margin-top: 18px; }
+    .cine-upload-section-title { display: flex; align-items: center; gap: 12px; margin: 0 0 20px; font-size: 20px; font-weight: 800; }
+    .cine-upload-section-title i { color: #ff0f78; font-size: 18px; }
+    .cine-upload-section-title span { display: block; width: 34px; height: 3px; margin-left: auto; background: linear-gradient(90deg,#ff0f78,#ff8a00); border-radius: 3px; }
+    .cine-upload-field { margin-bottom: 18px; }
+    .cine-upload-field:last-child { margin-bottom: 0; }
+    .cine-upload-field label { display: block; margin-bottom: 8px; color: rgba(255,255,255,.92); font-size: 13px; font-weight: 700; }
+    .cine-upload-field label em { color: #ff7b93; font-style: normal; }
+    .cine-upload-field input:not([type="radio"]), .cine-upload-field select, .cine-upload-field textarea {
+        width: 100%; color: #fff; background: rgba(8,5,23,.72); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; padding: 12px 14px; outline: none; transition: border-color .18s, box-shadow .18s;
+    }
+    .cine-upload-field textarea { min-height: 128px; resize: vertical; }
+    .cine-upload-field input:not([type="radio"]):focus, .cine-upload-field select:focus, .cine-upload-field textarea:focus { border-color: #ff0f78; box-shadow: 0 0 0 3px rgba(255,15,120,.13); }
+    .cine-upload-field select option { background: #181035; color: #fff; }
+    .cine-upload-help { display: block; margin-top: 7px; color: rgba(255,255,255,.52); font-size: 12px; line-height: 1.5; }
+    .cine-upload-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .cine-upload-choice { position: relative; display: flex; align-items: center; gap: 12px; min-height: 66px; padding: 13px 15px; cursor: pointer; background: rgba(8,5,23,.54); border: 1px solid rgba(255,255,255,.13); border-radius: 10px; transition: border-color .18s, background .18s, transform .18s; }
+    .cine-upload-choice:hover { border-color: rgba(255,15,120,.65); transform: translateY(-1px); }
+    .cine-upload-choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .cine-upload-choice-mark { display: grid; place-items: center; width: 20px; height: 20px; flex: 0 0 20px; border: 2px solid rgba(255,255,255,.42); border-radius: 50%; }
+    .cine-upload-choice-mark::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; transform: scale(0); transition: transform .18s; }
+    .cine-upload-choice-copy strong { display: block; font-size: 14px; color: #fff; }
+    .cine-upload-choice-copy small { display: block; margin-top: 3px; color: rgba(255,255,255,.55); font-size: 11px; }
+    .cine-upload-choice input:checked + .cine-upload-choice-mark { border-color: #ff0f78; background: #ff0f78; box-shadow: 0 0 0 4px rgba(255,15,120,.12); }
+    .cine-upload-choice input:checked + .cine-upload-choice-mark::after { transform: scale(1); }
+    .cine-upload-choice:has(input:checked) { background: linear-gradient(135deg, rgba(255,15,120,.18), rgba(255,126,0,.08)); border-color: rgba(255,15,120,.82); }
+    .cine-upload-sale-options { display: none; margin-top: 14px; padding: 16px; border: 1px solid rgba(255,15,120,.30); border-radius: 10px; background: rgba(255,15,120,.06); }
+    .cine-upload-sale-options.is-visible { display: block; }
+    .cine-upload-note { display: flex; gap: 10px; align-items: flex-start; padding: 13px 14px; margin-bottom: 18px; border-radius: 9px; background: rgba(79, 168, 255, .10); border: 1px solid rgba(79, 168, 255, .22); color: rgba(255,255,255,.76); font-size: 12px; line-height: 1.55; }
+    .cine-upload-note i { color: #62b4ff; margin-top: 2px; }
+    .cine-upload-checklist { list-style: none; padding: 0; margin: 0; }
+    .cine-upload-checklist li { display: flex; gap: 10px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.08); color: rgba(255,255,255,.70); font-size: 13px; line-height: 1.45; }
+    .cine-upload-checklist li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .cine-upload-checklist i { color: #64d69a; margin-top: 3px; }
+    .cine-upload-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 22px; }
+    .cine-upload-back { color: rgba(255,255,255,.68) !important; font-size: 13px; text-decoration: none !important; }
+    .cine-upload-submit { border: 0; cursor: pointer; }
+    .cine-upload-error { margin-bottom: 20px; padding: 14px 16px; border-radius: 9px; background: rgba(229,9,20,.13); border: 1px solid rgba(229,9,20,.42); color: #ffd7da; }
+    .cine-upload-error ul { margin: 0; padding-left: 18px; }
+    @media (max-width: 900px) { .cine-upload-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 560px) { .cine-upload-card { padding: 18px; } .cine-upload-choice-grid { grid-template-columns: 1fr; } .cine-upload-hero h1 { font-size: 26px; } .cine-upload-actions { justify-content: stretch; flex-direction: column-reverse; } .cine-upload-actions > * { width: 100%; text-align: center; } }
+</style>
 
-<div class="content-page">
-    <div class="content">
+<div class="cine-upload-page">
+    <div class="breadcrumb-section bg-xs" style="background-image:url('{{ URL::asset('site_assets/images/breadcrum-bg.jpg') }}')">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card-box">
+            <div class="row"><div class="col-xl-12">
+                <h2>Upload Film</h2>
+                <nav id="breadcrumbs"><ul><li><a href="{{ URL::to('/') }}">Home</a></li><li><a href="{{ URL::to('dashboard') }}">Dashboard</a></li><li>Upload Film</li></ul></nav>
+            </div></div>
+        </div>
+    </div>
 
-                        {{-- Header --}}
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <a href="{{ URL::to('user/films') }}">
-                                    <h4 class="header-title m-t-0 m-b-30 text-primary pull-left" style="font-size:20px;">
-                                        <i class="fa fa-arrow-left"></i> My Films
-                                    </h4>
-                                </a>
-                            </div>
-                            <div class="col-sm-6">
-                                <h4 class="header-title m-t-0 m-b-30 pull-right" style="font-size:20px;color:#aaa;">
-                                    <i class="fa fa-clock-o"></i> Submitted films require admin approval
-                                </h4>
-                            </div>
-                        </div>
+    <div class="vfx-item-ptb">
+        <div class="container-fluid">
+            <div class="cine-upload-hero">
+                <h1>Share your film with Cineworm</h1>
+                <p>Submit the film details and source below. Our team will review it before it goes live.</p>
+            </div>
 
-                        {{-- Alerts --}}
-                        @if(count($errors) > 0)
-                            <div class="alert alert-danger">
-                                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-                                <ul>@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
-                            </div>
-                        @endif
-                        @if(Session::has('flash_message'))
-                            <div class="alert alert-success">
-                                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-                                {{ Session::get('flash_message') }}
-                            </div>
-                        @endif
+            @if($errors->any())
+                <div class="cine-upload-error"><strong>Please check the following:</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+            @endif
 
-                        <div id="result" class="m-t-15"></div>
+            <form method="POST" action="{{ URL::to('user/films/store') }}" id="movie_form">
+                @csrf
+                <input type="hidden" name="creator_currency" value="{{ getcong('currency_code') ?: 'USD' }}">
 
-                        <form method="POST" action="{{ URL::to('user/films/store') }}"
-                              class="form-horizontal" name="movie_form" id="movie_form">
-                            @csrf
-
-                            <input type="hidden" id="from" name="from" value="movie">
-                            <input type="hidden" name="imdb_id" id="imdb_id" value="{{ old('imdb_id') }}">
-                            <input type="hidden" name="imdb_votes" id="imdb_votes" value="{{ old('imdb_votes') }}">
-                            <input type="hidden" name="imdb_rating" id="imdb_rating" value="{{ old('imdb_rating') }}">
-                            <input type="hidden" name="content_rating" id="content_rating" value="{{ old('content_rating') }}">
-                            <input type="hidden" name="release_date" id="release_date" value="{{ old('release_date') }}">
-                            <input type="hidden" name="duration" id="duration" value="{{ old('duration') }}">
-
+                <div class="cine-upload-layout">
+                    <main>
+                        <section class="cine-upload-card">
+                            <h3 class="cine-upload-section-title"><i class="fa fa-film"></i> Film details <span></span></h3>
+                            <div class="cine-upload-field"><label for="video_title">Film title <em>*</em></label><input id="video_title" name="video_title" value="{{ old('video_title') }}" maxlength="255" required placeholder="Enter the title of your film"><small class="cine-upload-help">Use the official title viewers should see.</small></div>
+                            <div class="cine-upload-field"><label for="elm1">Description <em>*</em></label><textarea id="elm1" name="video_description" required placeholder="Tell viewers what this film is about...">{{ old('video_description') }}</textarea></div>
                             <div class="row">
-
-                                {{-- ── LEFT: Film Info ── --}}
-                                <div class="col-md-6">
-                                    <h4 class="m-t-0 m-b-30 header-title" style="font-size:20px;">Film Information</h4>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Import From IMDb</label>
-                                        <div class="col-sm-6">
-                                            <input type="text" name="imdb_id_title" id="imdb_id_title" value=""
-                                                   class="form-control"
-                                                   placeholder="Enter IMDb ID (e.g. tt1469304)"
-                                                   @if (!getcong('omdb_api_key')) disabled @endif>
-                                            <small class="form-text text-muted">Use an IMDb ID to auto-fill film details.</small>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <button type="button" id="import_movie_btn"
-                                                    class="btn btn-primary waves-effect waves-light text-uppercase mt-1 pt-2 pb-2 pl-3 pr-3"
-                                                    @if (!getcong('omdb_api_key')) disabled @endif>
-                                                {{ trans('words.fetch') }}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <hr />
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Film Title *</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="video_title" id="video_title"
-                                                   value="{{ old('video_title') }}" class="form-control"
-                                                   placeholder="Enter film title">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-12 col-form-label">Description</label>
-                                        <div class="col-sm-12">
-                                            <div class="card-box pl-0 description_box">
-                                                <textarea id="elm1" name="video_description">{{ old('video_description') }}</textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Upcoming?</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control" name="upcoming" id="upcoming">
-                                                <option value="0" @if(old('upcoming')=='0') selected @endif>No — release now</option>
-                                                <option value="1" @if(old('upcoming')=='1') selected @endif>Yes — upcoming film</option>
-                                            </select>
-                                            <small class="form-text text-muted">(Upcoming films show on Home page only)</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Are you the owner? *</label>
-                                        <div class="col-sm-8">
-                                            <div class="radio radio-success form-check-inline pl-2" style="margin-top:8px;">
-                                                <input type="radio" name="is_owner" id="is_owner_yes" value="1">
-                                                <label for="is_owner_yes">Yes, I am the owner</label>
-                                            </div>
-                                            <div class="radio form-check-inline" style="margin-top:8px;">
-                                                <input type="radio" name="is_owner" id="is_owner_no" value="0" checked>
-                                                <label for="is_owner_no">No, sharing someone else's work</label>
-                                            </div>
-                                            <small class="form-text text-muted">(Owners get digital awards based on likes)</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Sell this film?</label>
-                                        <div class="col-sm-8">
-                                            <div class="radio radio-success form-check-inline pl-2" style="margin-top:8px;">
-                                                <input type="radio" name="creator_sale_enabled" id="creator_sale_yes" value="1" @checked(old('creator_sale_enabled') == '1')>
-                                                <label for="creator_sale_yes">Yes, charge viewers</label>
-                                            </div>
-                                            <div class="radio form-check-inline" style="margin-top:8px;">
-                                                <input type="radio" name="creator_sale_enabled" id="creator_sale_no" value="0" @checked(old('creator_sale_enabled', '0') != '1')>
-                                                <label for="creator_sale_no">No, keep it free</label>
-                                            </div>
-                                            <small class="form-text text-muted">Paid films are reviewed first and are not included in random free streaming.</small>
-                                        </div>
-                                    </div>
-
-                                    <div id="creator_sale_options" class="form-group row" style="display:none;">
-                                        <label class="col-sm-3 col-form-label">Viewer price</label>
-                                        <div class="col-sm-8">
-                                            <input type="number" name="creator_price" id="creator_price" class="form-control" min="0.01" step="0.01" value="{{ old('creator_price') }}" placeholder="e.g. 4.99">
-                                            <input type="hidden" name="creator_currency" value="{{ getcong('currency_code') ?: 'USD' }}">
-                                            <small class="form-text text-muted">Currency: {{ getcong('currency_code') ?: 'USD' }}. A platform fee may apply according to admin settings.</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Language *</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control select2" name="movie_language" id="movie_language">
-                                                <option value="">— Select Language —</option>
-                                                @foreach($language_list as $lang)
-                                                    <option value="{{ $lang->id }}" @if(old('movie_language')==$lang->id) selected @endif>
-                                                        {{ $lang->language_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Genre(s) *</label>
-                                        <div class="col-sm-8">
-                                            <select name="genres[]" class="select2 select2-multiple"
-                                                    multiple="multiple" id="movie_genre_id"
-                                                    data-placeholder="Select Genres...">
-                                                @foreach($genre_list as $g)
-                                                    <option value="{{ $g->id }}" @if(is_array(old('genres')) && in_array($g->id, old('genres'))) selected @endif>
-                                                        {{ $g->genre_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Actors <small class="text-muted">(comma separated)</small></label>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="actors" id="actors"
-                                                   value="{{ old('actors') }}" class="form-control"
-                                                   placeholder="e.g. John Doe, Jane Smith">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Directors <small class="text-muted">(comma separated)</small></label>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="director" id="director"
-                                                   value="{{ old('director') }}" class="form-control"
-                                                   placeholder="e.g. James Cameron">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Funding URL</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="funding_url" id="funding_url"
-                                                   value="{{ old('funding_url') }}" class="form-control"
-                                                   placeholder="https://kickstarter.com/…">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Webpage URL</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="webpage_url" id="webpage_url"
-                                                   value="{{ old('webpage_url') }}" class="form-control"
-                                                   placeholder="https://myfilm.com">
-                                        </div>
-                                    </div>
-
-                                </div>{{-- /col-md-6 left --}}
-
-                                {{-- ── RIGHT: Poster + Video + Subtitles ── --}}
-                                <div class="col-md-6">
-                                    <h4 class="m-t-0 m-b-30 header-title" style="font-size:20px;">Poster / Video / Subtitles</h4>
-
-                                    {{-- Poster --}}
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Poster URL</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="poster_link" id="poster_link"
-                                                   value="{{ old('poster_link') }}" class="form-control"
-                                                   placeholder="https://example.com/poster.jpg">
-                                            <small class="form-text text-muted">Leave blank — auto-fetched for YouTube & Vimeo.</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Free trailer URL</label>
-                                        <div class="col-sm-8">
-                                            <input type="url" name="creator_trailer_url" class="form-control"
-                                                   value="{{ old('creator_trailer_url') }}" placeholder="Optional YouTube/Vimeo trailer link">
-                                            <small class="form-text text-muted">Optional preview shown before a paid film is purchased.</small>
-                                        </div>
-                                    </div>
-
-                                    <hr/>
-
-                                    {{-- Video Type --}}
-                                    <div class="form-group row" id="hide_when_upcoming">
-                                        <label class="col-sm-3 col-form-label">Video Type</label>
-                                        <div class="col-sm-8">
-                                            <select class="form-control" name="video_type" id="video_type">
-                                                <option value="" disabled selected>Select video type</option>
-                                                <option value="URL"   @if(old('video_type')=='URL')   selected @endif>URL (Direct MP4)</option>
-                                                <option value="GoogleDrive" @if(old('video_type')=='GoogleDrive') selected @endif>Google Drive</option>
-                                                <option value="HLS"   @if(old('video_type')=='HLS')   selected @endif>HLS / m3u8 / MPEG-DASH / YouTube / Vimeo</option>
-                                                <option value="Embed" @if(old('video_type')=='Embed') selected @endif>Embed Code</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    {{-- Video Quality --}}
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Multi-Quality (480/720/1080)</label>
-                                        <div class="col-sm-8">
-                                            <div class="radio radio-success form-check-inline pl-2" style="margin-top:8px;">
-                                                <input type="radio" name="video_quality" id="vq_active" value="1">
-                                                <label for="vq_active">Active</label>
-                                            </div>
-                                            <div class="radio form-check-inline" style="margin-top:8px;">
-                                                <input type="radio" name="video_quality" id="vq_inactive" value="0" checked>
-                                                <label for="vq_inactive">Inactive</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {{-- URL inputs --}}
-                                    <div id="url_id">
-                                        <small class="form-text text-muted" style="margin-bottom:10px;">Supported: MP4 URL. External files must be CORS-enabled.</small>
-                                        <div class="form-group row">
-                                            <label class="col-sm-3 col-form-label">Video URL (Default)</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" name="video_url" class="form-control"
-                                                       value="{{ old('video_url') }}" placeholder="http://example.com/demo.mp4">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-3 col-form-label">Video URL 480p</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" name="video_url_480" class="form-control"
-                                                       value="{{ old('video_url_480') }}" placeholder="http://example.com/480.mp4">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-3 col-form-label">Video URL 720p</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" name="video_url_720" class="form-control"
-                                                       value="{{ old('video_url_720') }}" placeholder="http://example.com/720.mp4">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="col-sm-3 col-form-label">Video URL 1080p</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" name="video_url_1080" class="form-control"
-                                                       value="{{ old('video_url_1080') }}" placeholder="http://example.com/1080.mp4">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {{-- Embed --}}
-                                    <div id="embed_id" style="display:none;">
-                                        <div class="form-group row">
-                                            <label class="col-sm-3 col-form-label">Embed Code</label>
-                                            <div class="col-sm-8">
-                                                <textarea name="video_embed_code" class="form-control" rows="5"
-                                                          placeholder="<iframe src=&quot;…&quot;></iframe>">{{ old('video_embed_code') }}</textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {{-- HLS --}}
-                                    <div id="hls_id" style="display:none;">
-                                        <small class="form-text text-muted" style="margin-bottom:10px;">Supported: MP4, YouTube, Vimeo, HLS/m3u8. External files must be CORS-enabled.</small>
-                                        <div class="form-group row">
-                                            <label class="col-sm-3 col-form-label">HLS / Stream URL</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" name="video_url_hls" class="form-control"
-                                                       value="{{ old('video_url_hls') }}" placeholder="http://example.com/test.m3u8">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr/>
-
-                                    {{-- Subtitles --}}
-                                    <h5 class="header-title m-b-20">Subtitles</h5>
-                                    <small class="form-text text-muted" style="margin-bottom:16px;display:block;">Supported: .srt or .vtt file URLs only. External files must be CORS-enabled.</small>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Subtitles</label>
-                                        <div class="col-sm-8">
-                                            <div class="radio radio-success form-check-inline pl-2" style="margin-top:8px;">
-                                                <input type="radio" id="inlineRadio5" value="1" name="subtitle_on_off">
-                                                <label for="inlineRadio5">Active</label>
-                                            </div>
-                                            <div class="radio form-check-inline" style="margin-top:8px;">
-                                                <input type="radio" id="inlineRadio6" value="0" name="subtitle_on_off" checked>
-                                                <label for="inlineRadio6">Inactive</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    @foreach([['1','English'],['2','French'],['3','Spanish']] as [$n, $ph])
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Subtitle Language {{ $n }}</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="subtitle_language{{ $n }}" id="subtitle_language{{ $n }}"
-                                                   value="{{ old('subtitle_language'.$n) }}"
-                                                   placeholder="{{ $ph }}" class="form-control">
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-3 col-form-label">Subtitle URL {{ $n }}</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" name="subtitle_url{{ $n }}" id="subtitle_url{{ $n }}"
-                                                   value="{{ old('subtitle_url'.$n) }}"
-                                                   class="form-control" placeholder="http://example.com/demo.srt">
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-info btn-xs"
-                                                        onclick="document.getElementById('upload_srt{{ $n }}').click()">Upload SRT</button>
-                                                <input type="file" id="upload_srt{{ $n }}" style="display:none"
-                                                       onchange="uploadSrt(this, 'subtitle_url{{ $n }}')">
-                                                <button type="button" class="btn btn-warning btn-xs"
-                                                        onclick="showPasteModal('subtitle_url{{ $n }}')">Paste SRT Content</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
-
-                                </div>{{-- /col-md-6 right --}}
-
-                            </div>{{-- /row --}}
-
-                            <div class="form-group">
-                                <div class="offset-sm-3 col-sm-9" style="display:flex;gap:12px;margin-top:20px;">
-                                    <a href="{{ URL::to('user/films') }}" class="btn btn-secondary waves-effect">
-                                        <i class="fa fa-times"></i> Cancel
-                                    </a>
-                                    <button type="submit" id="add_btn_id" class="btn btn-primary waves-effect waves-light">
-                                        <i class="fa fa-upload"></i> Submit Film for Review
-                                    </button>
-                                </div>
+                                <div class="col-md-6 cine-upload-field"><label for="movie_language">Language <em>*</em></label><select id="movie_language" name="movie_language" required><option value="">Select language</option>@foreach($language_list as $lang)<option value="{{ $lang->id }}" @selected(old('movie_language') == $lang->id)>{{ $lang->language_name }}</option>@endforeach</select></div>
+                                <div class="col-md-6 cine-upload-field"><label for="movie_genre_id">Genre(s) <em>*</em></label><select id="movie_genre_id" name="genres[]" multiple required>@foreach($genre_list as $genre)<option value="{{ $genre->id }}" @selected(is_array(old('genres')) && in_array($genre->id, old('genres')))>{{ $genre->genre_name }}</option>@endforeach</select><small class="cine-upload-help">Select at least one genre.</small></div>
                             </div>
+                        </section>
 
-                        </form>
+                        <section class="cine-upload-card">
+                            <h3 class="cine-upload-section-title"><i class="fa fa-shield"></i> Rights and access <span></span></h3>
+                            <div class="cine-upload-field"><label>Are you the film owner? <em>*</em></label><div class="cine-upload-choice-grid">
+                                <label class="cine-upload-choice"><input type="radio" name="is_owner" id="is_owner_yes" value="1" @checked(old('is_owner') === '1') required><span class="cine-upload-choice-mark"></span><span class="cine-upload-choice-copy"><strong>Yes, I own it</strong><small>You can request paid access for viewers.</small></span></label>
+                                <label class="cine-upload-choice"><input type="radio" name="is_owner" id="is_owner_no" value="0" @checked(old('is_owner', '0') !== '1')><span class="cine-upload-choice-mark"></span><span class="cine-upload-choice-copy"><strong>No, I am sharing it</strong><small>This film will stay free to watch.</small></span></label>
+                            </div></div>
+                            <div class="cine-upload-field"><label>How should viewers access it? <em>*</em></label><div class="cine-upload-choice-grid">
+                                <label class="cine-upload-choice"><input type="radio" name="creator_sale_enabled" id="creator_sale_yes" value="1" @checked(old('creator_sale_enabled') === '1')><span class="cine-upload-choice-mark"></span><span class="cine-upload-choice-copy"><strong>Paid film</strong><small>Owner approval and payment required.</small></span></label>
+                                <label class="cine-upload-choice"><input type="radio" name="creator_sale_enabled" id="creator_sale_no" value="0" @checked(old('creator_sale_enabled', '0') !== '1')><span class="cine-upload-choice-mark"></span><span class="cine-upload-choice-copy"><strong>Free film</strong><small>Available after normal admin review.</small></span></label>
+                            </div>
+                            <div id="creator_sale_options" class="cine-upload-sale-options">
+                                <div class="cine-upload-field"><label for="creator_price">Viewer price <em>*</em></label><input type="number" id="creator_price" name="creator_price" min="0.01" step="0.01" value="{{ old('creator_price') }}" placeholder="e.g. 4.99"><small class="cine-upload-help">Currency: {{ getcong('currency_code') ?: 'USD' }}. Paid films must use a public Google Drive source.</small></div>
+                                <div class="cine-upload-field"><label for="creator_trailer_url">Free trailer URL</label><input type="url" id="creator_trailer_url" name="creator_trailer_url" value="{{ old('creator_trailer_url') }}" placeholder="https://youtube.com/... or https://vimeo.com/..."><small class="cine-upload-help">Optional preview viewers can watch before purchase.</small></div>
+                            </div></div>
+                        </section>
+                    </main>
 
-                    </div>{{-- /card-box --}}
+                    <aside>
+                        <section class="cine-upload-card">
+                            <h3 class="cine-upload-section-title"><i class="fa fa-link"></i> Video source <span></span></h3>
+                            <div class="cine-upload-note"><i class="fa fa-info-circle"></i><span>Use a source link that the admin team can access. Paid films must be public Google Drive files.</span></div>
+                            <div class="cine-upload-field"><label for="video_type">Source type <em>*</em></label><select id="video_type" name="video_type" required><option value="">Select source type</option><option value="URL" @selected(old('video_type') === 'URL')>Direct MP4 URL</option><option value="GoogleDrive" @selected(old('video_type') === 'GoogleDrive')>Google Drive</option><option value="HLS" @selected(old('video_type') === 'HLS')>HLS / YouTube / Vimeo</option></select></div>
+                            <div class="cine-upload-field"><label for="video_url">Video URL <em>*</em></label><input type="url" id="video_url" name="video_url" value="{{ old('video_url') }}" required placeholder="https://..."><small class="cine-upload-help">Make sure the link is active before submitting.</small></div>
+                            <div class="cine-upload-field"><label for="poster_link">Poster URL</label><input type="url" id="poster_link" name="poster_link" value="{{ old('poster_link') }}" placeholder="https://example.com/poster.jpg"><small class="cine-upload-help">Optional. YouTube/Vimeo thumbnails can be detected automatically.</small></div>
+                        </section>
+                        <section class="cine-upload-card">
+                            <h3 class="cine-upload-section-title"><i class="fa fa-check-circle"></i> Before you submit <span></span></h3>
+                            <ul class="cine-upload-checklist"><li><i class="fa fa-check"></i><span>Title, description, language and genre are complete.</span></li><li><i class="fa fa-check"></i><span>The video link is working and accessible.</span></li><li><i class="fa fa-check"></i><span>You have permission to share the film.</span></li><li><i class="fa fa-clock-o"></i><span>New submissions are reviewed before going live.</span></li></ul>
+                        </section>
+                    </aside>
                 </div>
-            </div>
+                <div class="cine-upload-actions"><a class="cine-upload-back" href="{{ URL::to('user/films') }}">Cancel and go back</a><button type="submit" class="vfx-item-btn-danger text-uppercase cine-upload-submit"><i class="fa fa-paper-plane"></i> Submit film for review</button></div>
+            </form>
         </div>
     </div>
-    @include('admin.copyright')
 </div>
 
-{{-- Paste SRT Modal --}}
-<div id="pasteSrtModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Paste SRT Content</h4>
-                <button type="button" class="close" data-dismiss="modal">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Paste your SRT content here:</label>
-                    <textarea id="srt_content" class="form-control" rows="15"
-                              placeholder="1&#10;00:00:01,000 --> 00:00:04,000&#10;Subtitle text here..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="generateSrt()">Generate &amp; Use</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script type="text/javascript">
-    // SRT Upload
-    function uploadSrt(input, targetId) {
-        if (input.files && input.files[0]) {
-            var formData = new FormData();
-            formData.append('file', input.files[0]);
-            $.ajax({
-                url: '{{ url("admin/movies/upload_srt") }}',
-                type: 'POST',
-                data: formData,
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    if (response.url) {
-                        $('#' + targetId).val(response.url);
-                        autoEnableSubtitles(targetId);
-                        $(input).val('');
-                        Swal.fire('Success', 'SRT uploaded successfully', 'success');
-                    } else {
-                        Swal.fire('Error', response.error, 'error');
-                    }
-                },
-                error: function() { Swal.fire('Error', 'Upload failed', 'error'); }
-            });
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var saleYes = document.getElementById('creator_sale_yes');
+    var ownerNo = document.getElementById('is_owner_no');
+    var saleBox = document.getElementById('creator_sale_options');
+    var price = document.getElementById('creator_price');
+    function toggleSale() {
+        var paid = saleYes.checked && !ownerNo.checked;
+        saleBox.classList.toggle('is-visible', paid);
+        price.required = paid;
+        if (saleYes.checked && ownerNo.checked) {
+            document.getElementById('creator_sale_no').checked = true;
+            saleBox.classList.remove('is-visible');
+            price.required = false;
         }
     }
-
-    var currentPasteTarget = '';
-    function showPasteModal(targetId) {
-        currentPasteTarget = targetId;
-        $('#srt_content').val('');
-        $('#pasteSrtModal').modal('show');
-    }
-
-    function generateSrt() {
-        var content = $('#srt_content').val();
-        if (!content) { Swal.fire('Error', 'Please paste content', 'error'); return; }
-        $.ajax({
-            url: '{{ url("admin/movies/generate_srt") }}',
-            type: 'POST',
-            data: {content: content},
-            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            success: function(response) {
-                if (response.url) {
-                    $('#' + currentPasteTarget).val(response.url);
-                    autoEnableSubtitles(currentPasteTarget);
-                    $('#pasteSrtModal').modal('hide');
-                    Swal.fire('Success', 'SRT generated successfully', 'success');
-                } else {
-                    Swal.fire('Error', response.error, 'error');
-                }
-            },
-            error: function() { Swal.fire('Error', 'Generation failed', 'error'); }
-        });
-    }
-
-    function autoEnableSubtitles(targetId) {
-        $('#inlineRadio5').prop('checked', true);
-        var langMap = {subtitle_url1:'subtitle_language1', subtitle_url2:'subtitle_language2', subtitle_url3:'subtitle_language3'};
-        var lf = document.getElementById(langMap[targetId]);
-        if (lf && !lf.value.trim()) lf.value = 'English';
-    }
-
-    // upcoming toggle
-    $(document).ready(function(){
-        function toggleCreatorSaleOptions() {
-            var paid = $('#creator_sale_yes').is(':checked');
-            $('#creator_sale_options').toggle(paid);
-            $('#creator_price').prop('required', paid);
-            if (paid) {
-                $('#is_owner_yes').prop('checked', true);
-            }
-        }
-
-        $('input[name="creator_sale_enabled"], input[name="is_owner"]').on('change', toggleCreatorSaleOptions);
-        toggleCreatorSaleOptions();
-
-        $('#upcoming').on('change', function(){
-            $('#hide_when_upcoming').toggle($(this).val() != '1');
-        });
-
-        $(document).on('click', '#import_movie_btn', function() {
-            var from = $("#from").val();
-            var id = $("#imdb_id_title").val();
-
-            if (from !== '' && id !== '') {
-                $('.card-box').addClass('payment_loading');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ URL::to("user/films/find_imdb_movie") }}',
-                    data: "id=" + encodeURIComponent(id) + "&from=" + encodeURIComponent(from),
-                    dataType: 'json',
-                    beforeSend: function() {
-                        $("#import_movie_btn").html('Fetching...');
-                    },
-                    success: function(response) {
-                        $('.card-box').removeClass('payment_loading');
-
-                        if (response.imdb_status === 'success') {
-                            $("#imdb_id").val(response.imdbid || '');
-                            $("#imdb_rating").val(response.imdb_rating || '');
-                            $("#imdb_votes").val(response.imdb_votes || '');
-                            $("#content_rating").val(response.content_rating || '');
-                            $("#release_date").val(response.released || '');
-                            $("#duration").val(response.runtime || '');
-                            $("#movie_language").val(response.language || '').trigger('change');
-                            $("#movie_genre_id").val(response.genre || []).trigger('change');
-                            $("#video_title").val(response.title || '');
-                            $("#actors").val((response.actor_name_list || []).join(', '));
-                            $("#director").val((response.director_name_list || []).join(', '));
-                            $("#poster_link").val(response.poster || response.thumbnail || '');
-
-                            if (typeof tinyMCE !== 'undefined' && tinyMCE.activeEditor) {
-                                tinyMCE.activeEditor.setContent(response.plot || '');
-                            }
-
-                            $('#result').html('<div class="alert alert-success alert-dismissable m-t-15"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>Data imported successfully.</div>');
-                        } else {
-                            $('#result').html('<div class="alert alert-danger alert-dismissable m-t-15"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>No data found in IMDb database.</div>');
-                        }
-
-                        $('#import_movie_btn').html('{{ trans('words.fetch') }}');
-                    },
-                    error: function() {
-                        $('.card-box').removeClass('payment_loading');
-                        $('#import_movie_btn').html('{{ trans('words.fetch') }}');
-                        $('#result').html('<div class="alert alert-danger alert-dismissable m-t-15"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>Unable to fetch IMDb data right now.</div>');
-                    }
-                });
-            } else {
-                Swal.fire('Error', 'Please input IMDb ID', 'error');
-            }
-        });
-    });
+    document.querySelectorAll('input[name="creator_sale_enabled"], input[name="is_owner"]').forEach(function (input) { input.addEventListener('change', toggleSale); });
+    toggleSale();
+});
 </script>
-
-@if(Session::has('flash_message'))
-<script>
-    const Toast = Swal.mixin({toast:true, position:'top-end', showConfirmButton:false, timer:3000});
-    Toast.fire({icon:'success', title:'{{ Session::get("flash_message") }}'});
-</script>
-@endif
-@if(count($errors) > 0)
-<script>
-    Swal.fire({icon:'error', title:'Oops...', html:'<p>@foreach($errors->all() as $error){{ $error }}<br/>@endforeach</p>', showConfirmButton:true, confirmButtonColor:'#10c469', background:"#1a2234", color:"#fff"});
-</script>
-@endif
-
 @endsection
