@@ -875,7 +875,11 @@ Route::get('/deploy-auto-pull', function () {
     chdir(base_path());
     $git = shell_exec('git pull origin master 2>&1');
     $view = shell_exec('php artisan view:clear 2>&1');
-    return response("<pre>=== GIT PULL ===\n{$git}\n=== VIEW CLEAR ===\n{$view}</pre>", 200);
+    $migration = '';
+    if (request('migrate') === '1') {
+        $migration = shell_exec('php artisan migrate --force 2>&1');
+    }
+    return response("<pre>=== GIT PULL ===\n{$git}\n=== VIEW CLEAR ===\n{$view}\n=== MIGRATION ===\n{$migration}</pre>", 200);
 });
 
 // Game Remote Control Routes
