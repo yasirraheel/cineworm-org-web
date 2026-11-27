@@ -124,6 +124,30 @@
                                     </div>
 
                                     <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Sell this film?</label>
+                                        <div class="col-sm-8">
+                                            <div class="radio radio-success form-check-inline pl-2" style="margin-top:8px;">
+                                                <input type="radio" name="creator_sale_enabled" id="creator_sale_yes" value="1" @checked(old('creator_sale_enabled') == '1')>
+                                                <label for="creator_sale_yes">Yes, charge viewers</label>
+                                            </div>
+                                            <div class="radio form-check-inline" style="margin-top:8px;">
+                                                <input type="radio" name="creator_sale_enabled" id="creator_sale_no" value="0" @checked(old('creator_sale_enabled', '0') != '1')>
+                                                <label for="creator_sale_no">No, keep it free</label>
+                                            </div>
+                                            <small class="form-text text-muted">Paid films are reviewed first and are not included in random free streaming.</small>
+                                        </div>
+                                    </div>
+
+                                    <div id="creator_sale_options" class="form-group row" style="display:none;">
+                                        <label class="col-sm-3 col-form-label">Viewer price</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" name="creator_price" id="creator_price" class="form-control" min="0.01" step="0.01" value="{{ old('creator_price') }}" placeholder="e.g. 4.99">
+                                            <input type="hidden" name="creator_currency" value="{{ getcong('currency_code') ?: 'USD' }}">
+                                            <small class="form-text text-muted">Currency: {{ getcong('currency_code') ?: 'USD' }}. A platform fee may apply according to admin settings.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
                                         <label class="col-sm-3 col-form-label">Language *</label>
                                         <div class="col-sm-8">
                                             <select class="form-control select2" name="movie_language" id="movie_language">
@@ -205,6 +229,15 @@
                                         </div>
                                     </div>
 
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Free trailer URL</label>
+                                        <div class="col-sm-8">
+                                            <input type="url" name="creator_trailer_url" class="form-control"
+                                                   value="{{ old('creator_trailer_url') }}" placeholder="Optional YouTube/Vimeo trailer link">
+                                            <small class="form-text text-muted">Optional preview shown before a paid film is purchased.</small>
+                                        </div>
+                                    </div>
+
                                     <hr/>
 
                                     {{-- Video Type --}}
@@ -214,6 +247,7 @@
                                             <select class="form-control" name="video_type" id="video_type">
                                                 <option value="" disabled selected>Select video type</option>
                                                 <option value="URL"   @if(old('video_type')=='URL')   selected @endif>URL (Direct MP4)</option>
+                                                <option value="GoogleDrive" @if(old('video_type')=='GoogleDrive') selected @endif>Google Drive</option>
                                                 <option value="HLS"   @if(old('video_type')=='HLS')   selected @endif>HLS / m3u8 / MPEG-DASH / YouTube / Vimeo</option>
                                                 <option value="Embed" @if(old('video_type')=='Embed') selected @endif>Embed Code</option>
                                             </select>
@@ -452,6 +486,18 @@
 
     // upcoming toggle
     $(document).ready(function(){
+        function toggleCreatorSaleOptions() {
+            var paid = $('#creator_sale_yes').is(':checked');
+            $('#creator_sale_options').toggle(paid);
+            $('#creator_price').prop('required', paid);
+            if (paid) {
+                $('#is_owner_yes').prop('checked', true);
+            }
+        }
+
+        $('input[name="creator_sale_enabled"], input[name="is_owner"]').on('change', toggleCreatorSaleOptions);
+        toggleCreatorSaleOptions();
+
         $('#upcoming').on('change', function(){
             $('#hide_when_upcoming').toggle($(this).val() != '1');
         });

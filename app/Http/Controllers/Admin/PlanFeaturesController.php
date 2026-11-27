@@ -60,6 +60,7 @@ class PlanFeaturesController extends Controller
         $feature->url = trim((string) $request->input('url', '')) ?: 'javascript:void(0);';
         $feature->icon = $request->input('icon') ?: 'fa fa-check-circle';
         $feature->status = $request->has('status') ? (int) $request->input('status') : 1;
+        $feature->show_in_workstation = $request->has('show_in_workstation') ? 1 : 0;
         $feature->save();
 
         return redirect()->back()->with('flash_message', 'Plan Feature Saved Successfully');

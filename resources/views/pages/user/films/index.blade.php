@@ -209,7 +209,11 @@
                         @endif
                         <div class="ufilm-card-body">
                             <div class="ufilm-card-title">{{ $film->video_title }}</div>
-                            @if($film->status == 1)
+                            @if($film->status == 1 && $film->creator_sale_enabled && $film->creator_sale_status === 'pending')
+                                <span class="ufilm-card-status ufilm-status-pending">
+                                    <span style="width:5px;height:5px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></span> Sale awaiting approval
+                                </span>
+                            @elseif($film->status == 1)
                                 <span class="ufilm-card-status ufilm-status-live">
                                     <span style="width:5px;height:5px;border-radius:50%;background:#10b981;flex-shrink:0;"></span> Live
                                 </span>
@@ -220,7 +224,7 @@
                             @endif
                             <div class="ufilm-card-actions">
                                 @if($film->status == 1)
-                                    <a href="{{ URL::to('movies/details/'.$film->video_slug.'/'.$film->id) }}" class="ufilm-btn-ghost" target="_blank">
+                                    <a href="{{ $film->creator_sale_enabled && $film->creator_sale_status === 'approved' ? route('creator-films.show', ['slug' => $film->video_slug, 'id' => $film->id]) : URL::to('movies/details/'.$film->video_slug.'/'.$film->id) }}" class="ufilm-btn-ghost" target="_blank">
                                         <i class="fa fa-eye"></i> View
                                     </a>
                                 @endif

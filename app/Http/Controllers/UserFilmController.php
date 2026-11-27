@@ -95,6 +95,8 @@ class UserFilmController extends Controller
         $validator = Validator::make($request->all(), [
             'video_title' => 'required|max:255',
             'genres'      => 'required|array|min:1',
+            'creator_price' => 'nullable|numeric|min:0.01',
+            'creator_trailer_url' => 'nullable|url|max:2000',
         ]);
 
         if ($validator->fails()) {
@@ -142,8 +144,33 @@ class UserFilmController extends Controller
             $video_type = 'Vimeo';
         } elseif (stripos($video_url, 'drive.google.com') !== false) {
             $video_type = 'GoogleDrive';
-            preg_match('/\/d\/(.*?)\//', $video_url, $m);
-            if (!empty($m[1])) $fileId = $m[1];
+            $fileId = $this->extractGoogleDriveFileId($video_url);
+        }
+
+        $isOwner = (int) $request->input('is_owner', 0) === 1;
+        $creatorSaleEnabled = $request->boolean('creator_sale_enabled');
+        if ($creatorSaleEnabled && !$isOwner) {
+            return redirect()->back()
+                ->withErrors(['creator_sale_enabled' => 'Only the film owner can sell a film.'])
+                ->withInput();
+        }
+
+        if ($creatorSaleEnabled && (float) $request->input('creator_price', 0) <= 0) {
+            return redirect()->back()
+                ->withErrors(['creator_price' => 'Enter a valid price for a paid film.'])
+                ->withInput();
+        }
+
+        if ($creatorSaleEnabled && $video_type !== 'GoogleDrive') {
+            return redirect()->back()
+                ->withErrors(['video_url' => 'Paid creator films must use a Google Drive video source.'])
+                ->withInput();
+        }
+
+        if ($creatorSaleEnabled && !$fileId) {
+            return redirect()->back()
+                ->withErrors(['video_url' => 'A valid Google Drive file link is required for a paid film.'])
+                ->withInput();
         }
 
         $movie = new Movies();
@@ -156,7 +183,13 @@ class UserFilmController extends Controller
         $movie->video_url         = $video_url;
         $movie->video_type        = $video_type;
         $movie->video_quality     = $request->video_quality ?? 0;
-        $movie->is_owner          = $request->is_owner ?? 0;
+        $movie->is_owner          = $isOwner ? 1 : 0;
+        $movie->creator_sale_enabled = $creatorSaleEnabled ? 1 : 0;
+        $movie->creator_price     = $creatorSaleEnabled ? (float) $request->input('creator_price') : 0;
+        $movie->creator_currency  = strtoupper((string) ($request->input('creator_currency') ?: (getcong('currency_code') ?: 'USD')));
+        $movie->creator_trailer_url = $request->input('creator_trailer_url');
+        $movie->creator_sale_status = $creatorSaleEnabled ? 'pending' : 'not_for_sale';
+        $movie->creator_approved_at = null;
         $movie->upcoming          = $request->upcoming ?? 0;
         $movie->funding_url       = $request->funding_url ?? '';
         $movie->webpage_url       = $request->webpage_url ?? '';
@@ -204,6 +237,24 @@ class UserFilmController extends Controller
 
         \Session::flash('flash_message', 'Your film has been submitted for review. It will go live once approved by our team.');
         return redirect('user/films');
+    }
+
+    private function extractGoogleDriveFileId(string $url): ?string
+    {
+        $patterns = [
+            '/drive\.google\.com\/file\/d\/([^\/]+)/i',
+            '/drive\.google\.com\/open\?id=([^&]+)/i',
+            '/drive\.google\.com\/uc\?(?:[^#]*&)?id=([^&]+)/i',
+            '/googleapis\.com\/drive\/v3\/files\/([^?]+)/i',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $url, $matches) && !empty($matches[1])) {
+                return trim($matches[1]);
+            }
+        }
+
+        return null;
     }
 
     // ── Helper: find or create actor/director ─────────────────────────────

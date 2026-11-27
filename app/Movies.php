@@ -13,6 +13,27 @@ class Movies extends Model
 
 	public $timestamps = false;
 
+    public function isCreatorPaidFilm(): bool
+    {
+        return (bool) $this->creator_sale_enabled
+            && $this->creator_sale_status === 'approved'
+            && (float) $this->creator_price > 0;
+    }
+
+    public function isCreatorFilm(): bool
+    {
+        return (bool) $this->is_owner && !empty($this->added_by);
+    }
+
+    public function scopeRandomStreamable($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('creator_sale_enabled')
+                ->orWhere('creator_sale_enabled', 0)
+                ->orWhere('creator_sale_status', '!=', 'approved');
+        });
+    }
+
 
 
 	public static function getMoviesInfo($id,$field_name)

@@ -35,6 +35,7 @@
                                         <th>Feature Name</th>
                                         <th>Feature Key</th>
                                         <th>Link</th>
+                                        <th>Workstation</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -51,6 +52,13 @@
                                                     <a href="{{ $featureLink }}" class="plan-feature-link" target="_blank" rel="noopener noreferrer">{{ $feature->url }}</a>
                                                 @else
                                                     <span class="text-muted">Not linked</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($feature->show_in_workstation)
+                                                    <span class="badge badge-info">Shown</span>
+                                                @else
+                                                    <span class="text-muted">Hidden</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -117,6 +125,13 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Show in Workstation</label>
+                        <div class="col-sm-8">
+                            <input type="checkbox" name="show_in_workstation" id="feature_workstation" value="1">
+                            <small class="form-text text-muted">This card will use this feature's name, icon and link on the user dashboard.</small>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer pl-3 pr-3">
                     <button type="submit" class="btn btn-primary waves-effect waves-light"> {{trans('words.save')}}</button>
@@ -134,6 +149,7 @@ function resetForm() {
     document.getElementById('feature_icon').value = 'fa fa-check-circle';
     document.getElementById('feature_url').value = '';
     document.getElementById('feature_status').value = '1';
+    document.getElementById('feature_workstation').checked = false;
 }
 
 function editFeature(feature) {
@@ -143,6 +159,7 @@ function editFeature(feature) {
     document.getElementById('feature_icon').value = feature.icon || 'fa fa-check-circle';
     document.getElementById('feature_url').value = feature.url || '';
     document.getElementById('feature_status').value = feature.status;
+    document.getElementById('feature_workstation').checked = !!feature.show_in_workstation;
     $('#featureModal').modal('show');
 }
 </script>

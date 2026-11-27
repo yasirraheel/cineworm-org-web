@@ -195,6 +195,31 @@
                                             <small class="form-text text-muted" style="display: block; margin-top: 5px;">(Owners get digital awards based on likes)</small>
                                         </div>
                                     </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Creator sale</label>
+                                        <div class="col-sm-8">
+                                            <div class="radio radio-success form-check-inline pl-2" style="margin-top: 8px;">
+                                                <input type="radio" name="creator_sale_enabled" id="creator_sale_yes" value="1" @if(isset($movie->creator_sale_enabled) && $movie->creator_sale_enabled) checked @endif>
+                                                <label for="creator_sale_yes">Sell before watching</label>
+                                            </div>
+                                            <div class="radio form-check-inline" style="margin-top: 8px;">
+                                                <input type="radio" name="creator_sale_enabled" id="creator_sale_no" value="0" @if(!isset($movie->creator_sale_enabled) || !$movie->creator_sale_enabled) checked @endif>
+                                                <label for="creator_sale_no">Free stream</label>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-md-4">
+                                                    <input type="number" min="0.01" step="0.01" name="creator_price" value="{{ old('creator_price', $movie->creator_price ?? '') }}" class="form-control" placeholder="Price">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input type="text" maxlength="3" name="creator_currency" value="{{ old('creator_currency', $movie->creator_currency ?? getcong('currency_code')) }}" class="form-control" placeholder="USD">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="url" name="creator_trailer_url" value="{{ old('creator_trailer_url', $movie->creator_trailer_url ?? '') }}" class="form-control" placeholder="Optional trailer URL">
+                                                </div>
+                                            </div>
+                                            <small class="form-text text-muted">Paid creator films must use a public Google Drive source. Setting status Active approves the sale.</small>
+                                        </div>
+                                    </div>
                                     <!--<div class="form-group row">-->
                                     <!--    <label class="col-sm-3 col-form-label">{{ trans('words.movie_access') }}</label>-->
                                     <!--    <div class="col-sm-8">-->
@@ -541,6 +566,8 @@
                                                     <option value="HLS"
                                                         @if (isset($movie->video_type) and $movie->video_type == 'HLS') selected @endif>HLS/m3u8 /
                                                         MPEG-DASH / YouTube / Vimeo</option>
+                                                    <option value="GoogleDrive"
+                                                        @if (isset($movie->video_type) and $movie->video_type == 'GoogleDrive') selected @endif>Google Drive</option>
                                                     <option value="Embed"
                                                         @if (isset($movie->video_type) and $movie->video_type == 'Embed') selected @endif>Embed Code
                                                     </option>
@@ -708,6 +735,17 @@
                                             </div>
 
 
+                                        </div>
+
+                                        <div class="form-group row" id="google_drive_id"
+                                            @if (!isset($movie->video_type) or $movie->video_type != 'GoogleDrive') style="display:none;" @endif>
+                                            <label class="col-sm-3 col-form-label">Google Drive URL</label>
+                                            <div class="col-sm-8 mb-3">
+                                                <input type="url" name="video_url_google_drive"
+                                                    value="{{ isset($movie->video_url) ? $movie->video_url : null }}"
+                                                    class="form-control" placeholder="https://drive.google.com/file/d/...">
+                                                <small class="form-text text-muted">The file must be publicly readable.</small>
+                                            </div>
                                         </div>
 
                                         <div class="form-group row" id="embed_id"
@@ -1087,5 +1125,22 @@ Subtitle text here..."></textarea>
         </div>
     </div>
 </div>
+
+<script>
+    $(function () {
+        function toggleVideoSource() {
+            var type = $('#video_type').val();
+            $('#local_id, #url_id, #google_drive_id, #embed_id, #hls_id, #dash_id').hide();
+            if (type === 'Local') $('#local_id').show();
+            if (type === 'URL') $('#url_id').show();
+            if (type === 'GoogleDrive') $('#google_drive_id').show();
+            if (type === 'Embed') $('#embed_id').show();
+            if (type === 'HLS') $('#hls_id').show();
+            if (type === 'DASH') $('#dash_id').show();
+        }
+        $('#video_type').on('change', toggleVideoSource);
+        toggleVideoSource();
+    });
+</script>
 
 @endsection

@@ -496,9 +496,23 @@ Route::get('/', 'IndexController@index');
 
 Route::get('collections/{slug}/{id}', 'IndexController@home_collections');
 
-Route::get('movies', 'MoviesController@movies');
+Route::get('movies', 'MoviesController@movies')->name('movies');
 Route::get('movies/details/{slug}/{id}', 'MoviesController@movies_details');
 Route::get('movies/watch/{slug}/{id}', 'MoviesController@movies_watch');
+
+// Creator-owned paid films. The landing page is public; checkout and playback
+// are protected and the stream itself is only available after a verified sale.
+Route::middleware('auth')->group(function () {
+    Route::get('creator-films/paypal/success', 'CreatorFilmController@paypalSuccess')->name('creator-films.paypal.success');
+    Route::get('creator-films/paypal/fail', 'CreatorFilmController@paypalFail')->name('creator-films.paypal.fail');
+    Route::get('creator-films/stripe/success', 'CreatorFilmController@stripeSuccess')->name('creator-films.stripe.success');
+    Route::get('creator-films/{id}/checkout', 'CreatorFilmController@checkout')->name('creator-films.checkout');
+    Route::get('creator-films/{id}/paypal/pay', 'CreatorFilmController@paypalPay')->name('creator-films.paypal.pay');
+    Route::get('creator-films/{id}/stripe/pay', 'CreatorFilmController@stripePay')->name('creator-films.stripe.pay');
+    Route::get('creator-films/{slug}/{id}/watch', 'CreatorFilmController@watch')->name('creator-films.watch');
+    Route::get('creator-films/{id}/stream', 'CreatorFilmController@stream')->name('creator-films.stream');
+});
+Route::get('creator-films/{slug}/{id}', 'CreatorFilmController@show')->name('creator-films.show');
 
 Route::get('movies/{slug}/{id}', 'MoviesController@movies_details')->name('movies_single');
 

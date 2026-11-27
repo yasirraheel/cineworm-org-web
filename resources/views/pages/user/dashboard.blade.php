@@ -12,6 +12,7 @@
   $planFeatureKeys = $currentPlan ? $currentPlan->getEffectiveFeatureKeys() : [];
   $showUpgradeAction = !$currentPlan || (float) $currentPlan->plan_price <= 0;
   $renderedWorkstationFeatures = [];
+  $workstationFeatures = \App\PlanFeature::where('status', 1)->where('show_in_workstation', 1)->orderBy('sort_order')->orderBy('id')->get();
 @endphp
 
 <style>

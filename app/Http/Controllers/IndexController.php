@@ -82,7 +82,7 @@ class IndexController extends Controller
         if (!$this->alreadyInstalled()) {
             return redirect('public/install');
         }
-        $random_movie = Movies::where('status', 1)->inRandomOrder()->first();
+        $random_movie = Movies::where('status', 1)->randomStreamable()->inRandomOrder()->first();
         $slider = Slider::where('status', 1)->whereRaw("find_in_set('Home',slider_display_on)")->orderby('id', 'DESC')->get();
 
         if (Auth::check()) {
@@ -114,7 +114,7 @@ class IndexController extends Controller
         $previousVideos = Session::get('previous_videos', []);
 
         // Fetch a random movie that hasn't been selected before
-        $movies_info = Movies::where('status', 1)
+        $movies_info = Movies::where('status', 1)->randomStreamable()
             ->where('upcoming', 0)
             ->whereNotIn('id', $previousVideos)
             ->inRandomOrder()
@@ -126,7 +126,7 @@ class IndexController extends Controller
         if (!$movies_info) {
             Session::forget('previous_videos');
             $previousVideos = [];
-            $movie = Movies::where('status', 1)
+            $movie = Movies::where('status', 1)->randomStreamable()
                 ->where('upcoming', 0)
                 ->inRandomOrder()
                 ->first();
@@ -169,7 +169,7 @@ class IndexController extends Controller
                 $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('video_title', 'ASC')->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else if ($keyword == 'rand') {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->inRandomOrder()->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->randomStreamable()->inRandomOrder()->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else {
                 $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('id', 'DESC')->paginate($pagination_limit);
@@ -250,7 +250,7 @@ class IndexController extends Controller
             $previousVideos = Session::get('previous_videos', []);
 
             // Fetch a random movie that hasn't been selected before
-            $movies_info = Movies::where('status', 1)
+            $movies_info = Movies::where('status', 1)->randomStreamable()
                 ->where('upcoming', 0)
                 ->whereNotIn('id', $previousVideos)
                 ->inRandomOrder()
@@ -260,7 +260,7 @@ class IndexController extends Controller
             if (!$movies_info) {
                 Session::forget('previous_videos');
                 $previousVideos = [];
-                $movies_info = Movies::where('status', 1)
+                $movies_info = Movies::where('status', 1)->randomStreamable()
                     ->where('upcoming', 0)
                     ->inRandomOrder()
                     ->first();

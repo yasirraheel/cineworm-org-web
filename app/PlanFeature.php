@@ -16,6 +16,7 @@ class PlanFeature extends Model
         'icon',
         'sort_order',
         'status',
+        'show_in_workstation',
     ];
 
     public static function getSystemUrlMap(): array

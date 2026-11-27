@@ -61,7 +61,7 @@ class MoviesController extends Controller
                 $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('video_title', 'ASC')->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else if ($keyword == 'rand') {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->inRandomOrder()->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->randomStreamable()->inRandomOrder()->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else {
                 $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('id', 'DESC')->paginate($pagination_limit);
@@ -87,7 +87,11 @@ class MoviesController extends Controller
         $movies_info = Movies::where('status', 1)->where('id', $id)->first();
         //get a random video on each page load
 
-        $random_movie = Movies::where('status', 1)->where('id', '!=', $id)->inRandomOrder()->first();
+        if ($movies_info && $movies_info->isCreatorPaidFilm()) {
+            return redirect()->route('creator-films.show', ['slug' => $movies_info->video_slug, 'id' => $movies_info->id]);
+        }
+
+        $random_movie = Movies::where('status', 1)->randomStreamable()->where('id', '!=', $id)->inRandomOrder()->first();
 
 
         //    $random_movie = Movies::where('status',1)->inRandomOrder()->first();
@@ -116,6 +120,10 @@ class MoviesController extends Controller
 
         if ($movies_info == '') {
             abort(404, 'Unauthorized action.');
+        }
+
+        if ($movies_info->isCreatorPaidFilm()) {
+            return redirect()->route('creator-films.watch', ['slug' => $movies_info->video_slug, 'id' => $movies_info->id]);
         }
 
         //Check user plan
@@ -173,7 +181,7 @@ class MoviesController extends Controller
                 }
             }
         }
-        $random_movie = Movies::where('status', 1)->where('id', '!=', $id)->inRandomOrder()->first();
+        $random_movie = Movies::where('status', 1)->randomStreamable()->where('id', '!=', $id)->inRandomOrder()->first();
         //View Update
         $v_id = $movies_info->id;
         $video_obj = Movies::findOrFail($v_id);

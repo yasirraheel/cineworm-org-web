@@ -130,6 +130,8 @@ class MoviesController extends MainAdminController
                 $video_url = $request->video_url_dash;
             } else if($video_type == 'Embed') {
                 $video_url = $request->video_embed_code;
+            } else if($video_type == 'GoogleDrive') {
+                $video_url = $request->video_url_google_drive ?: $request->video_url;
             } else {
                 $video_url = $request->video_url;
             }
@@ -225,12 +227,39 @@ class MoviesController extends MainAdminController
             }
 
             // Other fields
-            $movie_obj->added_by = Auth::User()->id;
+            // Preserve the original creator when an admin edits an existing
+            // upload. Reassigning it here makes creator ownership and access
+            // appear to move to the admin and is the source of several
+            // workstation/creator inconsistencies.
+            if (!$movie_obj->exists) {
+                $movie_obj->added_by = Auth::User()->id;
+            }
             $movie_obj->file_id = $fileId;
             $movie_obj->is_owner = $inputs['is_owner'] ?? 0;
             $movie_obj->webpage_url = $inputs['webpage_url'];
 
             $movie_obj->status = auth()->user()->usertype == 'Admin' || auth()->user()->usertype == 'Moderator' ? $inputs['status'] : 0;
+
+            // Creator-sale fields are optional for legacy admin edits. If the
+            // form supplies them, keep the approval state in sync with the
+            // movie's moderation status; otherwise preserve existing values.
+            if (array_key_exists('creator_sale_enabled', $inputs)) {
+                $saleEnabled = (int) $inputs['creator_sale_enabled'] === 1;
+                if ($saleEnabled && ((float) ($inputs['creator_price'] ?? 0) <= 0 || $video_type !== 'GoogleDrive' || empty($fileId))) {
+                    return redirect()->back()->withInput()->with('error', 'Paid creator films require a valid price and a Google Drive source.');
+                }
+                $movie_obj->creator_sale_enabled = $saleEnabled;
+                $movie_obj->creator_price = $saleEnabled ? max(0, (float) ($inputs['creator_price'] ?? 0)) : 0;
+                $movie_obj->creator_currency = strtoupper(trim((string) ($inputs['creator_currency'] ?? $movie_obj->creator_currency ?? getcong('currency_code') ?? 'USD')));
+                $movie_obj->creator_trailer_url = trim((string) ($inputs['creator_trailer_url'] ?? $movie_obj->creator_trailer_url ?? '')) ?: null;
+                $movie_obj->creator_sale_status = $saleEnabled
+                    ? ((int) $movie_obj->status === 1 ? 'approved' : 'pending')
+                    : 'not_for_sale';
+                $movie_obj->creator_approved_at = $saleEnabled && (int) $movie_obj->status === 1 ? now() : null;
+            } elseif ($movie_obj->exists && (bool) $movie_obj->creator_sale_enabled) {
+                $movie_obj->creator_sale_status = (int) $movie_obj->status === 1 ? 'approved' : 'pending';
+                $movie_obj->creator_approved_at = (int) $movie_obj->status === 1 ? ($movie_obj->creator_approved_at ?: now()) : null;
+            }
 
             $movie_obj->video_url = $video_url;
             $movie_obj->video_type = $video_type;
