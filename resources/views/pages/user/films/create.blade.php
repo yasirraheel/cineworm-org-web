@@ -72,7 +72,8 @@
     .cine-upload-checklist li:last-child { border-bottom:1px solid rgba(255,255,255,.09); padding-bottom:11px; }
     .cine-upload-checklist i { display:inline-flex; align-items:center; justify-content:center; flex:0 0 18px; width:18px; height:18px; border-radius:50%; background:rgba(100,214,154,.12); color:#64d69a; font-size:10px; margin-top:1px; }
     .cine-upload-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 22px; }
-    .cine-upload-back { color: rgba(255,255,255,.68) !important; font-size: 13px; text-decoration: none !important; }
+    .cine-upload-back { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; color:#fff !important; font-size:13px; text-decoration:none !important; background:rgba(255,255,255,.08) !important; border:1px solid rgba(255,255,255,.20) !important; }
+    .cine-upload-back:hover { background:rgba(255,15,120,.18) !important; border-color:rgba(255,15,120,.68) !important; color:#fff !important; }
     .cine-upload-submit { border: 0; cursor: pointer; }
     .cine-upload-error { margin-bottom: 20px; padding: 14px 16px; border-radius: 9px; background: rgba(229,9,20,.13); border: 1px solid rgba(229,9,20,.42); color: #ffd7da; }
     .cine-upload-error ul { margin: 0; padding-left: 18px; }
@@ -146,7 +147,7 @@
                         </section>
                     </aside>
                 </div>
-                <div class="cine-upload-actions"><a class="cine-upload-back" href="{{ URL::to('user/films') }}">Cancel and go back</a><button type="submit" class="vfx-item-btn-danger text-uppercase cine-upload-submit"><i class="fa fa-paper-plane"></i> Submit film for review</button></div>
+                <div class="cine-upload-actions"><a class="vfx-item-btn-danger text-uppercase cine-upload-back" href="{{ URL::to('user/films') }}"><i class="fa fa-arrow-left"></i> Cancel and go back</a><button type="submit" class="vfx-item-btn-danger text-uppercase cine-upload-submit"><i class="fa fa-paper-plane"></i> Submit film for review</button></div>
             </form>
         </div>
     </div>
