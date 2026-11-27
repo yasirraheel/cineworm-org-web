@@ -108,7 +108,7 @@ class UserController extends Controller
             ],
             'film_uploads' => [
                 'title' => 'Film Uploads',
-                'url' => URL('user/films'),
+                'url' => URL('user/films/upload'),
                 'icon' => 'fa fa-upload',
             ],
             'promotion_services' => [

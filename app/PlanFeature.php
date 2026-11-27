@@ -22,6 +22,7 @@ class PlanFeature extends Model
     public static function getSystemUrlMap(): array
     {
         return [
+            'film_uploads'              => URL::to('user/films/upload'),
             'film_editing_access'      => '/reel2reel/',
             'extended_media_uploads'   => URL::to('user/films/upload'),
             'priority_promotion'       => URL::to('promotions'),
@@ -44,6 +45,7 @@ class PlanFeature extends Model
 
         if ($features->isEmpty()) {
             return [
+                'film_uploads'               => ['title' => 'Film Uploads', 'url' => URL::to('user/films/upload'), 'icon' => 'fa fa-upload'],
                 'film_editing_access'       => ['title' => 'Film Editing Access', 'url' => '/reel2reel/', 'icon' => 'fa fa-cut'],
                 'extended_media_uploads'    => ['title' => 'Extended Media Uploads', 'url' => URL::to('user/films/upload'), 'icon' => 'fa fa-cloud-upload-alt'],
                 'priority_promotion'        => ['title' => 'Priority Promotion', 'url' => URL::to('promotions'), 'icon' => 'fa fa-rocket'],

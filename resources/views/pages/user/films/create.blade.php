@@ -20,24 +20,27 @@
     .cine-upload-field:last-child { margin-bottom: 0; }
     .cine-upload-field label { display: block; margin-bottom: 8px; color: rgba(255,255,255,.92); font-size: 13px; font-weight: 700; }
     .cine-upload-field label em { color: #ff7b93; font-style: normal; }
-    .cine-upload-field input:not([type="radio"]), .cine-upload-field select, .cine-upload-field textarea {
+    .cine-upload-field input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]), .cine-upload-field select, .cine-upload-field textarea {
         width: 100%; color: #fff; background: rgba(8,5,23,.72); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; padding: 12px 14px; outline: none; transition: border-color .18s, box-shadow .18s;
     }
     .cine-upload-field textarea { min-height: 128px; resize: vertical; }
-    .cine-upload-field input:not([type="radio"]):focus, .cine-upload-field select:focus, .cine-upload-field textarea:focus { border-color: #ff0f78; box-shadow: 0 0 0 3px rgba(255,15,120,.13); }
+    .cine-upload-field input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]):focus, .cine-upload-field select:focus, .cine-upload-field textarea:focus { border-color: #ff0f78; box-shadow: 0 0 0 3px rgba(255,15,120,.13); }
     .cine-upload-field select option { background: #181035; color: #fff; }
     .cine-upload-help { display: block; margin-top: 7px; color: rgba(255,255,255,.52); font-size: 12px; line-height: 1.5; }
-    .cine-upload-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    .cine-upload-choice { position: relative; display: flex; align-items: center; gap: 12px; min-height: 66px; padding: 13px 15px; cursor: pointer; background: rgba(8,5,23,.54); border: 1px solid rgba(255,255,255,.13); border-radius: 10px; transition: border-color .18s, background .18s, transform .18s; }
-    .cine-upload-choice:hover { border-color: rgba(255,15,120,.65); transform: translateY(-1px); }
-    .cine-upload-choice input { position: absolute; opacity: 0; pointer-events: none; }
-    .cine-upload-choice-mark { display: grid; place-items: center; width: 20px; height: 20px; flex: 0 0 20px; border: 2px solid rgba(255,255,255,.42); border-radius: 50%; }
-    .cine-upload-choice-mark::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; transform: scale(0); transition: transform .18s; }
-    .cine-upload-choice-copy strong { display: block; font-size: 14px; color: #fff; }
-    .cine-upload-choice-copy small { display: block; margin-top: 3px; color: rgba(255,255,255,.55); font-size: 11px; }
-    .cine-upload-choice input:checked + .cine-upload-choice-mark { border-color: #ff0f78; background: #ff0f78; box-shadow: 0 0 0 4px rgba(255,15,120,.12); }
-    .cine-upload-choice input:checked + .cine-upload-choice-mark::after { transform: scale(1); }
-    .cine-upload-choice:has(input:checked) { background: linear-gradient(135deg, rgba(255,15,120,.18), rgba(255,126,0,.08)); border-color: rgba(255,15,120,.82); }
+    .cine-upload-toggle-card { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:15px 16px; background:rgba(8,5,23,.54); border:1px solid rgba(255,255,255,.13); border-radius:10px; transition:border-color .18s, background .18s, transform .18s; }
+    .cine-upload-toggle-card + .cine-upload-toggle-card { margin-top:10px; }
+    .cine-upload-toggle-card:hover { border-color:rgba(255,15,120,.62); transform:translateY(-1px); }
+    .cine-upload-toggle-copy strong { display:block; color:#fff; font-size:14px; }
+    .cine-upload-toggle-copy small { display:block; margin-top:4px; color:rgba(255,255,255,.55); font-size:11px; line-height:1.45; }
+    .cine-upload-switch { position:relative; display:inline-flex; flex:0 0 auto; cursor:pointer; }
+    .cine-upload-switch input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+    .cine-upload-switch-track { position:relative; display:block; width:54px; height:30px; border:1px solid rgba(255,255,255,.25); border-radius:999px; background:rgba(255,255,255,.10); transition:background .2s, border-color .2s, box-shadow .2s; }
+    .cine-upload-switch-track::after { content:''; position:absolute; top:4px; left:4px; width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,.72); box-shadow:0 2px 6px rgba(0,0,0,.25); transition:transform .2s, background .2s; }
+    .cine-upload-switch input:checked + .cine-upload-switch-track { border-color:#ff0f78; background:linear-gradient(90deg,#ff0f78,#ff7b00); box-shadow:0 0 0 4px rgba(255,15,120,.12); }
+    .cine-upload-switch input:checked + .cine-upload-switch-track::after { transform:translateX(24px); background:#fff; }
+    .cine-upload-switch input:focus-visible + .cine-upload-switch-track { outline:2px solid #ffb000; outline-offset:3px; }
+    .cine-upload-switch-state { min-width:30px; margin-left:8px; color:rgba(255,255,255,.50); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; }
+    .cine-upload-switch input:checked ~ .cine-upload-switch-state { color:#ff72ae; }
     .cine-upload-sale-options { display: none; margin-top: 14px; padding: 16px; border: 1px solid rgba(255,15,120,.30); border-radius: 10px; background: rgba(255,15,120,.06); }
     .cine-upload-sale-options.is-visible { display: block; }
     .cine-upload-note { display: flex; gap: 10px; align-items: flex-start; padding: 13px 14px; margin-bottom: 18px; border-radius: 9px; background: rgba(79, 168, 255, .10); border: 1px solid rgba(79, 168, 255, .22); color: rgba(255,255,255,.76); font-size: 12px; line-height: 1.55; }
@@ -52,7 +55,7 @@
     .cine-upload-error { margin-bottom: 20px; padding: 14px 16px; border-radius: 9px; background: rgba(229,9,20,.13); border: 1px solid rgba(229,9,20,.42); color: #ffd7da; }
     .cine-upload-error ul { margin: 0; padding-left: 18px; }
     @media (max-width: 900px) { .cine-upload-layout { grid-template-columns: 1fr; } }
-    @media (max-width: 560px) { .cine-upload-card { padding: 18px; } .cine-upload-choice-grid { grid-template-columns: 1fr; } .cine-upload-hero h1 { font-size: 26px; } .cine-upload-actions { justify-content: stretch; flex-direction: column-reverse; } .cine-upload-actions > * { width: 100%; text-align: center; } }
+    @media (max-width: 560px) { .cine-upload-card { padding: 18px; } .cine-upload-toggle-card { align-items:flex-start; } .cine-upload-hero h1 { font-size: 26px; } .cine-upload-actions { justify-content: stretch; flex-direction: column-reverse; } .cine-upload-actions > * { width: 100%; text-align: center; } }
 </style>
 
 <div class="cine-upload-page">
@@ -94,14 +97,11 @@
 
                         <section class="cine-upload-card">
                             <h3 class="cine-upload-section-title"><i class="fa fa-shield"></i> Rights and access <span></span></h3>
-                            <div class="cine-upload-field"><label>Are you the film owner? <em>*</em></label><div class="cine-upload-choice-grid">
-                                <label class="cine-upload-choice"><input type="radio" name="is_owner" id="is_owner_yes" value="1" @checked(old('is_owner') === '1') required><span class="cine-upload-choice-mark"></span><span class="cine-upload-choice-copy"><strong>Yes, I own it</strong><small>You can request paid access for viewers.</small></span></label>
-                                <label class="cine-upload-choice"><input type="radio" name="is_owner" id="is_owner_no" value="0" @checked(old('is_owner', '0') !== '1')><span class="cine-upload-choice-mark"></span><span class="cine-upload-choice-copy"><strong>No, I am sharing it</strong><small>This film will stay free to watch.</small></span></label>
-                            </div></div>
-                            <div class="cine-upload-field"><label>How should viewers access it? <em>*</em></label><div class="cine-upload-choice-grid">
-                                <label class="cine-upload-choice"><input type="radio" name="creator_sale_enabled" id="creator_sale_yes" value="1" @checked(old('creator_sale_enabled') === '1')><span class="cine-upload-choice-mark"></span><span class="cine-upload-choice-copy"><strong>Paid film</strong><small>Owner approval and payment required.</small></span></label>
-                                <label class="cine-upload-choice"><input type="radio" name="creator_sale_enabled" id="creator_sale_no" value="0" @checked(old('creator_sale_enabled', '0') !== '1')><span class="cine-upload-choice-mark"></span><span class="cine-upload-choice-copy"><strong>Free film</strong><small>Available after normal admin review.</small></span></label>
+                            <div class="cine-upload-field"><label>Film ownership <em>*</em></label>
+                                <div class="cine-upload-toggle-card"><span class="cine-upload-toggle-copy"><strong>I own this film</strong><small>Turn this on only if you own the rights to the film.</small></span><label class="cine-upload-switch" for="is_owner_toggle"><input type="hidden" name="is_owner" value="0"><input type="checkbox" name="is_owner" id="is_owner_toggle" value="1" @checked((string) old('is_owner', '0') === '1')><span class="cine-upload-switch-track"></span><span class="cine-upload-switch-state">Off</span></label></div>
                             </div>
+                            <div class="cine-upload-field"><label>Viewer access <em>*</em></label>
+                                <div class="cine-upload-toggle-card"><span class="cine-upload-toggle-copy"><strong>Paid film</strong><small>When enabled, the owner can request a viewer price and admin approval is required.</small></span><label class="cine-upload-switch" for="creator_sale_toggle"><input type="hidden" name="creator_sale_enabled" value="0"><input type="checkbox" name="creator_sale_enabled" id="creator_sale_toggle" value="1" @checked((string) old('creator_sale_enabled', '0') === '1')><span class="cine-upload-switch-track"></span><span class="cine-upload-switch-state">Off</span></label></div>
                             <div id="creator_sale_options" class="cine-upload-sale-options">
                                 <div class="cine-upload-field"><label for="creator_price">Viewer price <em>*</em></label><input type="number" id="creator_price" name="creator_price" min="0.01" step="0.01" value="{{ old('creator_price') }}" placeholder="e.g. 4.99"><small class="cine-upload-help">Currency: {{ getcong('currency_code') ?: 'USD' }}. Paid films must use a public Google Drive source.</small></div>
                                 <div class="cine-upload-field"><label for="creator_trailer_url">Free trailer URL</label><input type="url" id="creator_trailer_url" name="creator_trailer_url" value="{{ old('creator_trailer_url') }}" placeholder="https://youtube.com/... or https://vimeo.com/..."><small class="cine-upload-help">Optional preview viewers can watch before purchase.</small></div>
@@ -131,21 +131,25 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var saleYes = document.getElementById('creator_sale_yes');
-    var ownerNo = document.getElementById('is_owner_no');
+    var saleToggle = document.getElementById('creator_sale_toggle');
+    var ownerToggle = document.getElementById('is_owner_toggle');
     var saleBox = document.getElementById('creator_sale_options');
     var price = document.getElementById('creator_price');
+    var saleState = saleToggle.parentElement.querySelector('.cine-upload-switch-state');
+    var ownerState = ownerToggle.parentElement.querySelector('.cine-upload-switch-state');
     function toggleSale() {
-        var paid = saleYes.checked && !ownerNo.checked;
+        var paid = saleToggle.checked && ownerToggle.checked;
+        if (saleToggle.checked && !ownerToggle.checked) {
+            saleToggle.checked = false;
+            paid = false;
+        }
         saleBox.classList.toggle('is-visible', paid);
         price.required = paid;
-        if (saleYes.checked && ownerNo.checked) {
-            document.getElementById('creator_sale_no').checked = true;
-            saleBox.classList.remove('is-visible');
-            price.required = false;
-        }
+        saleState.textContent = saleToggle.checked ? 'On' : 'Off';
+        ownerState.textContent = ownerToggle.checked ? 'On' : 'Off';
     }
-    document.querySelectorAll('input[name="creator_sale_enabled"], input[name="is_owner"]').forEach(function (input) { input.addEventListener('change', toggleSale); });
+    saleToggle.addEventListener('change', toggleSale);
+    ownerToggle.addEventListener('change', toggleSale);
     toggleSale();
 });
 </script>

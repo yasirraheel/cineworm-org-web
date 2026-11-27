@@ -674,7 +674,7 @@
                     <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
                   </a>
 
-                  <a class="cineworm-workstation-card" href="{{ URL::to('user/films') }}" aria-label="Open film uploads">
+                  <a class="cineworm-workstation-card" href="{{ URL::to('user/films/upload') }}" aria-label="Open film upload form">
                     <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-upload"></i></span>
                     <span class="cineworm-workstation-card-copy">
                       <strong>Film Uploads</strong>

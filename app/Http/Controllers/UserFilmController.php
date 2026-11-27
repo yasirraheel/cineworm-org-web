@@ -54,6 +54,13 @@ class UserFilmController extends Controller
             ->orderBy('id', 'DESC')
             ->paginate(12);
 
+        // There is no value in showing an empty library first. Send new
+        // creators directly to the upload form; the library remains useful
+        // once they have submitted at least one film.
+        if ($films->total() === 0) {
+            return redirect('user/films/upload');
+        }
+
         $page_title = 'My Films';
 
         return view('pages.user.films.index', compact('films', 'page_title'));
