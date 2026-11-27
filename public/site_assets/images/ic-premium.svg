@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Premium</title>
+  <desc id="desc">Gold premium crown badge</desc>
+  <defs>
+    <linearGradient id="premiumGold" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff3a6"/>
+      <stop offset="0.42" stop-color="#ffd13b"/>
+      <stop offset="1" stop-color="#e88900"/>
+    </linearGradient>
+    <linearGradient id="premiumEdge" x1="12" y1="7" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff9d6"/>
+      <stop offset="1" stop-color="#ff9d14"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="32" fill="url(#premiumGold)" stroke="none"/>
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#ffe88a" stroke-width="1.5" opacity="0.75"/>
+  <path d="M17 24.5 24 31l8-13 8 13 7-6.5-3.4 18.5H20.4L17 24.5Z" fill="#fff8c9" stroke="#fffdf0" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M20.5 43h23" stroke="#c87500" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="17" cy="24.5" r="2" fill="#fff8c9"/>
+  <circle cx="32" cy="18" r="2" fill="#fff8c9"/>
+  <circle cx="47" cy="24.5" r="2" fill="#fff8c9"/>
+</svg>

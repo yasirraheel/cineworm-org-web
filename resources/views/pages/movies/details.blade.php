@@ -253,7 +253,7 @@
                                                 <div class="video-img">
                                                     @if ($movies_data->video_access == 'Paid')
                                                         <div class="vid-lab-premium">
-                                                            <img src="{{ URL::asset('site_assets/images/ic-premium.png') }}"
+                                                            <img src="{{ URL::asset('site_assets/images/ic-premium.svg?v=3') }}"
                                                                 alt="ic-premium" title="ic-premium">
                                                         </div>
                                                     @endif

@@ -503,6 +503,29 @@ Route::get('movies/watch/{slug}/{id}', 'MoviesController@movies_watch');
 // Creator-owned paid films. The landing page is public; checkout and playback
 // are protected and the stream itself is only available after a verified sale.
 Route::get('cineflix', 'CreatorFilmController@index')->name('cineflix');
+
+// Hand the authenticated Cineworm account to CineStock through a short-lived,
+// signed URL. The stock app validates the same shared account-sync secret.
+Route::get('stock/sso', function () {
+    $stockUrl = rtrim((string) env('STOCK_APP_URL', 'https://stock.cineworm.org'), '/');
+
+    if (!\Auth::check()) {
+        return redirect()->away($stockUrl . '/login');
+    }
+
+    $secret = (string) config('services.account_sync.secret');
+    if ($secret === '') {
+        return redirect()->away($stockUrl . '/login');
+    }
+
+    $payload = rtrim(strtr(base64_encode(json_encode([
+        'email' => strtolower(trim((string) \Auth::user()->email)),
+        'expires_at' => time() + 60,
+    ], JSON_UNESCAPED_SLASHES)), '+/', '-_'), '=');
+    $signature = hash_hmac('sha256', $payload, $secret);
+
+    return redirect()->away($stockUrl . '/sso/consume?payload=' . rawurlencode($payload) . '&signature=' . rawurlencode($signature));
+})->name('stock.sso');
 Route::middleware('auth')->group(function () {
     Route::get('creator-films/paypal/success', 'CreatorFilmController@paypalSuccess')->name('creator-films.paypal.success');
     Route::get('creator-films/paypal/fail', 'CreatorFilmController@paypalFail')->name('creator-films.paypal.fail');

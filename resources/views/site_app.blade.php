@@ -88,6 +88,40 @@
       .search .search-input input[type=text]::placeholder, .search .search-input input[type=text].focus {
           background: {{$search_bg}} !important;
       }
+
+      /* Shared premium badge used by Cineworm movie and CineFlix cards. */
+      .premium-inline-icon {
+          width: 1.15em;
+          height: 1.15em;
+          object-fit: contain;
+          display: inline-block;
+          vertical-align: -0.2em;
+          flex: 0 0 auto;
+      }
+      .vid-lab-premium {
+          width: 38px !important;
+          height: 38px !important;
+          padding: 0 !important;
+          display: flex !important;
+          align-items: center;
+          justify-content: center;
+          background: transparent !important;
+          border: 0 !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+      }
+      .vid-lab-premium img {
+          width: 38px !important;
+          height: 38px !important;
+          max-width: none !important;
+          max-height: none !important;
+          object-fit: contain !important;
+          display: block !important;
+          margin: 0 !important;
+      }
+      @media (max-width: 768px) {
+          .vid-lab-premium, .vid-lab-premium img { width: 34px !important; height: 34px !important; }
+      }
  </style>
 
  @include('_particles.pwa_meta')

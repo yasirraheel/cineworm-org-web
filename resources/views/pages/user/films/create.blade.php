@@ -4,6 +4,7 @@
 @section('head_url', Request::url())
 
 @section('content')
+<link rel="stylesheet" href="{{ URL::asset('site_assets/css/nice-select.css') }}">
 <style>
     .cine-upload-page { color: #fff; }
     .cine-upload-page .breadcrumb-section { margin-bottom: 0; }
@@ -25,7 +26,27 @@
     }
     .cine-upload-field textarea { min-height: 128px; resize: vertical; }
     .cine-upload-field input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]):focus, .cine-upload-field select:focus, .cine-upload-field textarea:focus { border-color: #ff0f78; box-shadow: 0 0 0 3px rgba(255,15,120,.13); }
-    .cine-upload-field select option { background: #181035; color: #fff; }
+    .cine-upload-field { position: relative; }
+    .cine-upload-field .nice-select { float: none; width: 100%; height: 47px; line-height: 45px; color: #fff; background: rgba(8,5,23,.72); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; padding-left: 14px; padding-right: 38px; }
+    .cine-upload-field .nice-select:hover, .cine-upload-field .nice-select.open, .cine-upload-field .nice-select:focus { border-color: #ff0f78; box-shadow: 0 0 0 3px rgba(255,15,120,.13); }
+    .cine-upload-field .nice-select .current { color: #fff; }
+    .cine-upload-field .nice-select::after { border-color: #ff72ae; right: 16px; }
+    .cine-upload-field .nice-select .list { left: 0; right: 0; width: 100%; max-height: 250px; overflow-y: auto; margin-top: 6px; background: #181035; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 14px 28px rgba(0,0,0,.35); }
+    .cine-upload-field .nice-select .option { color: rgba(255,255,255,.82); line-height: 42px; min-height: 42px; padding: 0 14px; }
+    .cine-upload-field .nice-select .option:hover, .cine-upload-field .nice-select .option.focus, .cine-upload-field .nice-select .option.selected.focus { background: rgba(255,15,120,.18); color: #fff; }
+    .cine-upload-field .nice-select .option.selected { color: #fff; font-weight: 700; }
+    .cine-upload-multiselect { position: relative; }
+    .cine-upload-multiselect-trigger { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:47px; padding:12px 14px; border:1px solid rgba(255,255,255,.15); border-radius:8px; background:rgba(8,5,23,.72); color:#fff; text-align:left; cursor:pointer; transition:border-color .18s, box-shadow .18s; }
+    .cine-upload-multiselect-trigger:hover, .cine-upload-multiselect.is-open .cine-upload-multiselect-trigger { border-color:#ff0f78; box-shadow:0 0 0 3px rgba(255,15,120,.13); }
+    .cine-upload-multiselect-trigger i { color:#ff72ae; transition:transform .18s; }
+    .cine-upload-multiselect.is-open .cine-upload-multiselect-trigger i { transform:rotate(180deg); }
+    .cine-upload-multiselect-menu { display:none; position:absolute; z-index:30; top:calc(100% + 6px); left:0; width:100%; max-height:250px; overflow-y:auto; padding:7px; border:1px solid rgba(255,255,255,.14); border-radius:8px; background:#181035; box-shadow:0 14px 28px rgba(0,0,0,.35); }
+    .cine-upload-multiselect.is-open .cine-upload-multiselect-menu { display:block; }
+    .cine-upload-multiselect-option { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:6px; color:rgba(255,255,255,.82); cursor:pointer; font-size:13px; font-weight:500; transition:background .15s, color .15s; }
+    .cine-upload-multiselect-option:hover, .cine-upload-multiselect-option.is-selected { background:rgba(255,15,120,.18); color:#fff; }
+    .cine-upload-multiselect-option input { position:absolute; width:1px; height:1px; opacity:0; }
+    .cine-upload-multiselect-option span:first-of-type { display:inline-flex; align-items:center; justify-content:center; flex:0 0 17px; width:17px; height:17px; border:1px solid rgba(255,255,255,.34); border-radius:4px; color:transparent; font-size:10px; }
+    .cine-upload-multiselect-option input:checked + span { border-color:#ff0f78; background:linear-gradient(135deg,#ff0f78,#ff7b00); color:#fff; }
     .cine-upload-help { display: block; margin-top: 7px; color: rgba(255,255,255,.52); font-size: 12px; line-height: 1.5; }
     .cine-upload-toggle-card { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:15px 16px; background:rgba(8,5,23,.54); border:1px solid rgba(255,255,255,.13); border-radius:10px; transition:border-color .18s, background .18s, transform .18s; }
     .cine-upload-toggle-card + .cine-upload-toggle-card { margin-top:10px; }
@@ -46,17 +67,17 @@
     .cine-upload-sale-options.is-visible { display: block; }
     .cine-upload-note { display: flex; gap: 10px; align-items: flex-start; padding: 13px 14px; margin-bottom: 18px; border-radius: 9px; background: rgba(79, 168, 255, .10); border: 1px solid rgba(79, 168, 255, .22); color: rgba(255,255,255,.76); font-size: 12px; line-height: 1.55; }
     .cine-upload-note i { color: #62b4ff; margin-top: 2px; }
-    .cine-upload-checklist { list-style: none; padding: 0; margin: 0; }
-    .cine-upload-checklist li { display: flex; gap: 10px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.08); color: rgba(255,255,255,.70); font-size: 13px; line-height: 1.45; }
-    .cine-upload-checklist li:last-child { border-bottom: 0; padding-bottom: 0; }
-    .cine-upload-checklist i { color: #64d69a; margin-top: 3px; }
+    .cine-upload-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; list-style:none; padding:0; margin:0; }
+    .cine-upload-checklist li { display:flex; gap:9px; align-items:flex-start; min-height:62px; padding:11px; border:1px solid rgba(255,255,255,.09); border-radius:8px; background:rgba(8,5,23,.34); color:rgba(255,255,255,.72); font-size:12px; line-height:1.45; }
+    .cine-upload-checklist li:last-child { border-bottom:1px solid rgba(255,255,255,.09); padding-bottom:11px; }
+    .cine-upload-checklist i { display:inline-flex; align-items:center; justify-content:center; flex:0 0 18px; width:18px; height:18px; border-radius:50%; background:rgba(100,214,154,.12); color:#64d69a; font-size:10px; margin-top:1px; }
     .cine-upload-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 22px; }
     .cine-upload-back { color: rgba(255,255,255,.68) !important; font-size: 13px; text-decoration: none !important; }
     .cine-upload-submit { border: 0; cursor: pointer; }
     .cine-upload-error { margin-bottom: 20px; padding: 14px 16px; border-radius: 9px; background: rgba(229,9,20,.13); border: 1px solid rgba(229,9,20,.42); color: #ffd7da; }
     .cine-upload-error ul { margin: 0; padding-left: 18px; }
     @media (max-width: 900px) { .cine-upload-layout { grid-template-columns: 1fr; } }
-    @media (max-width: 560px) { .cine-upload-card { padding: 18px; } .cine-upload-toggle-card { align-items:flex-start; } .cine-upload-hero h1 { font-size: 26px; } .cine-upload-actions { justify-content: stretch; flex-direction: column-reverse; } .cine-upload-actions > * { width: 100%; text-align: center; } }
+    @media (max-width: 560px) { .cine-upload-card { padding: 18px; } .cine-upload-toggle-card { align-items:flex-start; } .cine-upload-hero h1 { font-size: 26px; } .cine-upload-actions { justify-content: stretch; flex-direction: column-reverse; } .cine-upload-actions > * { width: 100%; text-align: center; } .cine-upload-checklist { grid-template-columns: 1fr; } }
 </style>
 
 <div class="cine-upload-page">
@@ -91,8 +112,9 @@
                             <div class="cine-upload-field"><label for="video_title">Film title <em>*</em></label><input id="video_title" name="video_title" value="{{ old('video_title') }}" maxlength="255" required placeholder="Enter the title of your film"><small class="cine-upload-help">Use the official title viewers should see.</small></div>
                             <div class="cine-upload-field"><label for="elm1">Description <em>*</em></label><textarea id="elm1" name="video_description" required placeholder="Tell viewers what this film is about...">{{ old('video_description') }}</textarea></div>
                             <div class="row">
-                                <div class="col-md-6 cine-upload-field"><label for="movie_language">Language <em>*</em></label><select id="movie_language" name="movie_language" required><option value="">Select language</option>@foreach($language_list as $lang)<option value="{{ $lang->id }}" @selected(old('movie_language') == $lang->id)>{{ $lang->language_name }}</option>@endforeach</select></div>
-                                <div class="col-md-6 cine-upload-field"><label for="movie_genre_id">Genre(s) <em>*</em></label><select id="movie_genre_id" name="genres[]" multiple required>@foreach($genre_list as $genre)<option value="{{ $genre->id }}" @selected(is_array(old('genres')) && in_array($genre->id, old('genres')))>{{ $genre->genre_name }}</option>@endforeach</select><small class="cine-upload-help">Select at least one genre.</small></div>
+                                @php($selected_genres = (array) old('genres', []))
+                                <div class="col-md-6 cine-upload-field"><label for="movie_language">Language <em>*</em></label><select class="selectpicker show-menu-arrow wide" id="movie_language" name="movie_language" required><option value="">Select language</option>@foreach($language_list as $lang)<option value="{{ $lang->id }}" @selected(old('movie_language') == $lang->id)>{{ $lang->language_name }}</option>@endforeach</select></div>
+                                <div class="col-md-6 cine-upload-field"><label for="genre_picker_trigger">Genre(s) <em>*</em></label><div class="cine-upload-multiselect" id="genre_picker"><button type="button" class="cine-upload-multiselect-trigger" id="genre_picker_trigger" aria-expanded="false"><span data-genre-label>Select genre(s)</span><i class="fa fa-chevron-down"></i></button><div class="cine-upload-multiselect-menu" role="listbox">@foreach($genre_list as $genre)<label class="cine-upload-multiselect-option"><input type="checkbox" name="genres[]" value="{{ $genre->id }}" @checked(in_array((string) $genre->id, array_map('strval', $selected_genres), true))><span><i class="fa fa-check"></i></span><span>{{ $genre->genre_name }}</span></label>@endforeach</div></div><small class="cine-upload-help">Select at least one genre.</small></div>
                             </div>
                         </section>
 
@@ -114,7 +136,7 @@
                         <section class="cine-upload-card">
                             <h3 class="cine-upload-section-title"><i class="fa fa-link"></i> Video source <span></span></h3>
                             <div class="cine-upload-note"><i class="fa fa-info-circle"></i><span>Use a source link that the admin team can access. Paid films must be public Google Drive files.</span></div>
-                            <div class="cine-upload-field"><label for="video_type">Source type <em>*</em></label><select id="video_type" name="video_type" required><option value="">Select source type</option><option value="URL" @selected(old('video_type') === 'URL')>Direct MP4 URL</option><option value="GoogleDrive" @selected(old('video_type') === 'GoogleDrive')>Google Drive</option><option value="HLS" @selected(old('video_type') === 'HLS')>HLS / YouTube / Vimeo</option></select></div>
+                            <div class="cine-upload-field"><label for="video_type">Source type <em>*</em></label><select class="selectpicker show-menu-arrow wide" id="video_type" name="video_type" required><option value="">Select source type</option><option value="URL" @selected(old('video_type') === 'URL')>Direct MP4 URL</option><option value="GoogleDrive" @selected(old('video_type') === 'GoogleDrive')>Google Drive</option><option value="HLS" @selected(old('video_type') === 'HLS')>HLS / YouTube / Vimeo</option></select></div>
                             <div class="cine-upload-field"><label for="video_url">Video URL <em>*</em></label><input type="url" id="video_url" name="video_url" value="{{ old('video_url') }}" required placeholder="https://..."><small class="cine-upload-help">Make sure the link is active before submitting.</small></div>
                             <div class="cine-upload-field"><label for="poster_link">Poster URL</label><input type="url" id="poster_link" name="poster_link" value="{{ old('poster_link') }}" placeholder="https://example.com/poster.jpg"><small class="cine-upload-help">Optional. YouTube/Vimeo thumbnails can be detected automatically.</small></div>
                         </section>
@@ -139,6 +161,27 @@ document.addEventListener('DOMContentLoaded', function () {
     var saleCard = saleToggle.closest('.cine-upload-toggle-card');
     var saleState = saleToggle.parentElement.querySelector('.cine-upload-switch-state');
     var ownerState = ownerToggle.parentElement.querySelector('.cine-upload-switch-state');
+    var genrePicker = document.getElementById('genre_picker');
+    var genreTrigger = document.getElementById('genre_picker_trigger');
+    var genreLabel = genrePicker.querySelector('[data-genre-label]');
+    var genreOptions = Array.prototype.slice.call(genrePicker.querySelectorAll('input[type="checkbox"]'));
+    function updateGenrePicker() {
+        var selected = genreOptions.filter(function (input) { return input.checked; });
+        genreLabel.textContent = selected.length ? selected.map(function (input) { return input.parentElement.querySelector('span:last-child').textContent.trim(); }).join(', ') : 'Select genre(s)';
+        genreOptions.forEach(function (input) { input.parentElement.classList.toggle('is-selected', input.checked); });
+    }
+    genreTrigger.addEventListener('click', function () {
+        var isOpen = genrePicker.classList.toggle('is-open');
+        genreTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    genreOptions.forEach(function (input) { input.addEventListener('change', updateGenrePicker); });
+    document.addEventListener('click', function (event) {
+        if (!genrePicker.contains(event.target)) {
+            genrePicker.classList.remove('is-open');
+            genreTrigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+    updateGenrePicker();
     function toggleSale() {
         saleToggle.disabled = !ownerToggle.checked;
         saleCard.classList.toggle('is-disabled', saleToggle.disabled);
