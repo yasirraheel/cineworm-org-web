@@ -638,7 +638,7 @@
                     <span class="cineworm-workstation-arrow" aria-hidden="true">&rarr;</span>
                   </a>
 
-                  <a class="cineworm-workstation-card" href="{{ route('stock.sso') }}" target="_blank" rel="noopener" aria-label="Open CineStock">
+                  <a class="cineworm-workstation-card" href="https://stock.cineworm.org/" target="_blank" rel="noopener" aria-label="Open CineStock">
                     <span class="cineworm-workstation-icon" aria-hidden="true"><i class="fa fa-th-large"></i></span>
                     <span class="cineworm-workstation-card-copy">
                       <strong>CineStock</strong>
