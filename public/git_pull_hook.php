@@ -20,3 +20,7 @@ echo "=== GIT PULL OUTPUT ===\n" . $gitOutput . "\n";
 // Clear view cache
 $artisanOutput = shell_exec('php artisan view:clear 2>&1');
 echo "=== VIEW CLEAR ===\n" . $artisanOutput . "\n";
+
+// Clear route cache so updated deployment routes are loaded immediately.
+$routeOutput = shell_exec('php artisan route:clear 2>&1');
+echo "=== ROUTE CLEAR ===\n" . $routeOutput . "\n";
