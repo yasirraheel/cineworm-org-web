@@ -35,6 +35,13 @@
     .cine-upload-field .nice-select .option { color: rgba(255,255,255,.82); line-height: 42px; min-height: 42px; padding: 0 14px; }
     .cine-upload-field .nice-select .option:hover, .cine-upload-field .nice-select .option.focus, .cine-upload-field .nice-select .option.selected.focus { background: rgba(255,15,120,.18); color: #fff; }
     .cine-upload-field .nice-select .option.selected { color: #fff; font-weight: 700; }
+    .cine-upload-file-picker { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:10px; padding:10px; border:1px solid rgba(255,255,255,.10); border-radius:8px; background:rgba(8,5,23,.38); }
+    .cine-upload-file-input { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; }
+    .cine-upload-file-button { display:inline-flex; align-items:center; gap:7px; min-height:38px; padding:8px 12px; cursor:pointer; font-size:12px; }
+    .cine-upload-file-name { max-width:100%; overflow:hidden; color:rgba(255,255,255,.58); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+    .cine-upload-poster-preview { display:none; margin-top:10px; }
+    .cine-upload-poster-preview.is-visible { display:block; }
+    .cine-upload-poster-preview img { display:block; width:74px; height:94px; object-fit:cover; border:1px solid rgba(255,255,255,.18); border-radius:6px; }
     .cine-upload-multiselect { position: relative; }
     .cine-upload-multiselect-trigger { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:47px; padding:12px 14px; border:1px solid rgba(255,255,255,.15); border-radius:8px; background:rgba(8,5,23,.72); color:#fff; text-align:left; cursor:pointer; transition:border-color .18s, box-shadow .18s; }
     .cine-upload-multiselect-trigger:hover, .cine-upload-multiselect.is-open .cine-upload-multiselect-trigger { border-color:#ff0f78; box-shadow:0 0 0 3px rgba(255,15,120,.13); }
@@ -102,7 +109,7 @@
                 <div class="cine-upload-error"><strong>Please check the following:</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
             @endif
 
-            <form method="POST" action="{{ URL::to('user/films/store') }}" id="movie_form">
+            <form method="POST" action="{{ URL::to('user/films/store') }}" id="movie_form" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="creator_currency" value="{{ getcong('currency_code') ?: 'USD' }}">
 
@@ -139,7 +146,7 @@
                             <div class="cine-upload-note"><i class="fa fa-info-circle"></i><span>Use a source link that the admin team can access. Paid films must be public Google Drive files.</span></div>
                             <div class="cine-upload-field"><label for="video_type">Source type <em>*</em></label><select class="selectpicker show-menu-arrow wide" id="video_type" name="video_type" required><option value="">Select source type</option><option value="URL" @selected(old('video_type') === 'URL')>Direct MP4 URL</option><option value="GoogleDrive" @selected(old('video_type') === 'GoogleDrive')>Google Drive</option><option value="HLS" @selected(old('video_type') === 'HLS')>HLS / YouTube / Vimeo</option></select></div>
                             <div class="cine-upload-field"><label for="video_url">Video URL <em>*</em></label><input type="url" id="video_url" name="video_url" value="{{ old('video_url') }}" required placeholder="https://..."><small class="cine-upload-help">Make sure the link is active before submitting.</small></div>
-                            <div class="cine-upload-field"><label for="poster_link">Poster URL</label><input type="url" id="poster_link" name="poster_link" value="{{ old('poster_link') }}" placeholder="https://example.com/poster.jpg"><small class="cine-upload-help">Optional. YouTube/Vimeo thumbnails can be detected automatically.</small></div>
+                            <div class="cine-upload-field"><label for="poster_link">Poster URL</label><input type="url" id="poster_link" name="poster_link" value="{{ old('poster_link') }}" placeholder="https://example.com/poster.jpg"><div class="cine-upload-file-picker"><label for="poster_file" class="vfx-item-btn-danger text-uppercase cine-upload-file-button"><i class="fa fa-upload"></i> Upload poster</label><span id="poster_file_name" class="cine-upload-file-name">No file selected</span><input id="poster_file" name="poster_file" class="cine-upload-file-input" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"><div id="poster_preview" class="cine-upload-poster-preview"><img id="poster_preview_image" src="" alt="Poster preview"></div></div><small class="cine-upload-help">Optional. Use a public URL or upload JPG, PNG or WebP (maximum 5 MB). If both are provided, the uploaded poster is used.</small></div>
                         </section>
                         <section class="cine-upload-card">
                             <h3 class="cine-upload-section-title"><i class="fa fa-check-circle"></i> Before you submit <span></span></h3>
@@ -162,6 +169,22 @@ document.addEventListener('DOMContentLoaded', function () {
     var saleCard = saleToggle.closest('.cine-upload-toggle-card');
     var saleState = saleToggle.parentElement.querySelector('.cine-upload-switch-state');
     var ownerState = ownerToggle.parentElement.querySelector('.cine-upload-switch-state');
+    var posterFile = document.getElementById('poster_file');
+    var posterFileName = document.getElementById('poster_file_name');
+    var posterPreview = document.getElementById('poster_preview');
+    var posterPreviewImage = document.getElementById('poster_preview_image');
+    posterFile.addEventListener('change', function () {
+        var file = posterFile.files && posterFile.files[0];
+        if (!file) {
+            posterFileName.textContent = 'No file selected';
+            posterPreview.classList.remove('is-visible');
+            posterPreviewImage.removeAttribute('src');
+            return;
+        }
+        posterFileName.textContent = file.name;
+        posterPreviewImage.src = URL.createObjectURL(file);
+        posterPreview.classList.add('is-visible');
+    });
     var genrePicker = document.getElementById('genre_picker');
     var genreTrigger = document.getElementById('genre_picker_trigger');
     var genreLabel = genrePicker.querySelector('[data-genre-label]');

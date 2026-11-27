@@ -107,6 +107,7 @@ class UserFilmController extends Controller
             'video_type' => 'required|in:URL,GoogleDrive,HLS',
             'video_url' => 'required|string|max:2000',
             'poster_link' => 'nullable|url|max:2000',
+            'poster_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'creator_price' => 'nullable|numeric|min:0.01',
             'creator_trailer_url' => 'nullable|url|max:2000',
         ]);
@@ -223,8 +224,24 @@ class UserFilmController extends Controller
         $movie->actor_id    = !empty($actorIds)    ? implode(',', $actorIds)    : null;
         $movie->director_id = !empty($directorIds) ? implode(',', $directorIds) : null;
 
-        // Poster
-        if ($request->filled('poster_link')) {
+        // Poster: a user-uploaded file takes priority over a remote URL.
+        $uploadedPoster = null;
+        if ($request->hasFile('poster_file') && $request->file('poster_file')->isValid()) {
+            $posterDirectory = public_path('upload/images/creator-posters');
+            if (!is_dir($posterDirectory)) {
+                mkdir($posterDirectory, 0755, true);
+            }
+
+            $posterFile = $request->file('poster_file');
+            $posterName = 'creator_poster_' . Str::uuid() . '.' . strtolower($posterFile->getClientOriginalExtension());
+            $posterFile->move($posterDirectory, $posterName);
+            $uploadedPoster = 'upload/images/creator-posters/' . $posterName;
+        }
+
+        if ($uploadedPoster) {
+            $movie->video_image       = $uploadedPoster;
+            $movie->video_image_thumb = $uploadedPoster;
+        } elseif ($request->filled('poster_link')) {
             $movie->video_image       = $request->poster_link;
             $movie->video_image_thumb = $request->poster_link;
         } elseif ($video_image) {
