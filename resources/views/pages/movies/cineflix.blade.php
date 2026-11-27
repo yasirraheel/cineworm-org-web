@@ -6,11 +6,10 @@
 @section('content')
     <div class="view-all-video-area view-movie-list-item vfx-item-ptb">
         <div class="container-fluid">
-            <div class="filter-list-area">
+            <div class="filter-list-area" style="text-align:left;">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="page-title-item">CineFlix</div>
-                        <p class="mb-0">Creator films available to watch on Cineworm. Select a film to view its price and access options.</p>
                     </div>
                 </div>
             </div>
