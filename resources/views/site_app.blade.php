@@ -89,7 +89,7 @@
           background: {{$search_bg}} !important;
       }
 
-      /* Shared premium badge used by Cineworm movie and CineFlix cards. */
+      /* Shared premium badge used by Cineworm movie and Cinex cards. */
       .premium-inline-icon {
           width: 1.15em;
           height: 1.15em;
