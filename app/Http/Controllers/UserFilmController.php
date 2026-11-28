@@ -111,7 +111,7 @@ class UserFilmController extends Controller
             'poster_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'funding_url' => 'nullable|url|max:2000',
             'webpage_url' => 'nullable|url|max:2000',
-            'imdb_id' => 'nullable|string|max:50',
+            'imdb_id' => 'nullable|string|max:2000',
             'imdb_rating' => 'nullable|numeric|min:0|max:10',
             'imdb_votes' => 'nullable|integer|min:0',
             'content_rating' => 'nullable|string|max:30',
@@ -119,6 +119,8 @@ class UserFilmController extends Controller
             'release_date' => 'nullable|date',
             'actors' => 'nullable|string|max:2000',
             'director' => 'nullable|string|max:2000',
+            'writer' => 'nullable|string|max:2000',
+            'production_company' => 'nullable|string|max:2000',
             'creator_price' => 'nullable|numeric|min:0.01',
             'creator_trailer_url' => 'nullable|url|max:2000',
         ]);
@@ -240,6 +242,8 @@ class UserFilmController extends Controller
         // Actors / Directors
         $movie->actor_id    = !empty($actorIds)    ? implode(',', $actorIds)    : null;
         $movie->director_id = !empty($directorIds) ? implode(',', $directorIds) : null;
+        $movie->writer = trim((string) $request->input('writer', '')) ?: null;
+        $movie->production_company = trim((string) $request->input('production_company', '')) ?: null;
 
         // Poster: a user-uploaded file takes priority over a remote URL.
         $uploadedPoster = null;

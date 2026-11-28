@@ -277,6 +277,22 @@
 
                                     </div>
                                     <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Writers</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" name="writer" id="writer"
+                                                value="{{ isset($movie->writer) ? stripslashes($movie->writer) : old('writer') }}"
+                                                class="form-control" placeholder="Writer names, separated by commas">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Production Companies</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" name="production_company" id="production_company"
+                                                value="{{ isset($movie->production_company) ? stripslashes($movie->production_company) : old('production_company') }}"
+                                                class="form-control" placeholder="Production company names, separated by commas">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
                                         <label class="col-sm-3 col-form-label">Funding URL</label>
                                         <div class="col-sm-8">
                                             <input type="text" name="funding_url" id="funding_url"

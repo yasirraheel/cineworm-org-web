@@ -17,6 +17,11 @@ chdir($baseDir);
 $gitOutput = shell_exec('git pull origin master 2>&1');
 echo "=== GIT PULL OUTPUT ===\n" . $gitOutput . "\n";
 
+// Apply additive schema changes included in the deployment before the app
+// starts rendering fields that depend on them.
+$migrationOutput = shell_exec('php artisan migrate --force 2>&1');
+echo "=== MIGRATIONS ===\n" . $migrationOutput . "\n";
+
 // Clear view cache
 $artisanOutput = shell_exec('php artisan view:clear 2>&1');
 echo "=== VIEW CLEAR ===\n" . $artisanOutput . "\n";

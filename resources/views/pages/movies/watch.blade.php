@@ -356,6 +356,14 @@
                             <span>{{ $movies_info->imdb_rating }}</span>
                         </div>
                     @endif
+
+                    @if ($movies_info->writer)
+                        <div class="meta-item"><strong>Writer:</strong>&nbsp; {{ $movies_info->writer }}</div>
+                    @endif
+
+                    @if ($movies_info->production_company)
+                        <div class="meta-item"><strong>Production:</strong>&nbsp; {{ $movies_info->production_company }}</div>
+                    @endif
                 </div>
             </div>
 

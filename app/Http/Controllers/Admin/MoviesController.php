@@ -207,6 +207,8 @@ class MoviesController extends MainAdminController
             $movie_obj->video_title = addslashes($inputs['video_title']);
             $movie_obj->video_slug = $video_slug;
             $movie_obj->video_description = addslashes($inputs['video_description']);
+            $movie_obj->writer = trim((string) ($inputs['writer'] ?? '')) ?: null;
+            $movie_obj->production_company = trim((string) ($inputs['production_company'] ?? '')) ?: null;
 
             $movie_obj->actor_id = isset($actorIds) ? implode(',', $actorIds) : null;
 

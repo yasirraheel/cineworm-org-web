@@ -118,6 +118,11 @@
                         <section class="cine-upload-card">
                             <h3 class="cine-upload-section-title"><i class="fa fa-film"></i> Film details <span></span></h3>
                             <div class="cine-upload-field"><label for="video_title">Film title <em>*</em></label><input id="video_title" name="video_title" value="{{ old('video_title') }}" maxlength="255" required placeholder="Enter the title of your film"><small class="cine-upload-help">Use the official title viewers should see.</small></div>
+                            <div class="row">
+                                <div class="col-md-6 cine-upload-field"><label for="imdb_id">IMDb ID or URL</label><input id="imdb_id" name="imdb_id" value="{{ old('imdb_id') }}" maxlength="2000" placeholder="tt1234567 or IMDb URL"></div>
+                                <div class="col-md-3 cine-upload-field"><label for="imdb_rating">IMDb rating</label><input type="number" id="imdb_rating" name="imdb_rating" value="{{ old('imdb_rating') }}" min="0" max="10" step="0.1" placeholder="0.0 - 10.0"></div>
+                                <div class="col-md-3 cine-upload-field"><label for="imdb_votes">IMDb votes</label><input type="number" id="imdb_votes" name="imdb_votes" value="{{ old('imdb_votes') }}" min="0" step="1" placeholder="0"></div>
+                            </div>
                             <div class="cine-upload-field"><label for="elm1">Description <em>*</em></label><textarea id="elm1" name="video_description" required placeholder="Tell viewers what this film is about...">{{ old('video_description') }}</textarea></div>
                             <div class="row">
                                 @php($selected_genres = (array) old('genres', []))
@@ -133,13 +138,12 @@
                                 <div class="col-md-6 cine-upload-field"><label for="director">Director(s)</label><input id="director" name="director" value="{{ old('director') }}" maxlength="2000" placeholder="Director names, separated by commas"></div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 cine-upload-field"><label for="funding_url">Donation / funding URL</label><input type="url" id="funding_url" name="funding_url" value="{{ old('funding_url') }}" maxlength="2000" placeholder="https://..."><small class="cine-upload-help">Optional support link shown on the film page.</small></div>
-                                <div class="col-md-6 cine-upload-field"><label for="webpage_url">Official website URL</label><input type="url" id="webpage_url" name="webpage_url" value="{{ old('webpage_url') }}" maxlength="2000" placeholder="https://..."></div>
+                                <div class="col-md-6 cine-upload-field"><label for="writer">Writer(s)</label><input id="writer" name="writer" value="{{ old('writer') }}" maxlength="2000" placeholder="Writer names, separated by commas"></div>
+                                <div class="col-md-6 cine-upload-field"><label for="production_company">Production company/companies</label><input id="production_company" name="production_company" value="{{ old('production_company') }}" maxlength="2000" placeholder="Production company names, separated by commas"></div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 cine-upload-field"><label for="imdb_id">IMDb ID or URL</label><input id="imdb_id" name="imdb_id" value="{{ old('imdb_id') }}" maxlength="50" placeholder="tt1234567 or IMDb URL"></div>
-                                <div class="col-md-3 cine-upload-field"><label for="imdb_rating">IMDb rating</label><input type="number" id="imdb_rating" name="imdb_rating" value="{{ old('imdb_rating') }}" min="0" max="10" step="0.1" placeholder="0.0 - 10.0"></div>
-                                <div class="col-md-3 cine-upload-field"><label for="imdb_votes">IMDb votes</label><input type="number" id="imdb_votes" name="imdb_votes" value="{{ old('imdb_votes') }}" min="0" step="1" placeholder="0"></div>
+                                <div class="col-md-6 cine-upload-field"><label for="funding_url">Donation / funding URL</label><input type="url" id="funding_url" name="funding_url" value="{{ old('funding_url') }}" maxlength="2000" placeholder="https://..."><small class="cine-upload-help">Optional support link shown on the film page.</small></div>
+                                <div class="col-md-6 cine-upload-field"><label for="webpage_url">Official website URL</label><input type="url" id="webpage_url" name="webpage_url" value="{{ old('webpage_url') }}" maxlength="2000" placeholder="https://..."></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-4 cine-upload-field"><label for="content_rating">Content rating</label><input id="content_rating" name="content_rating" value="{{ old('content_rating') }}" maxlength="30" placeholder="e.g. 16+"></div>

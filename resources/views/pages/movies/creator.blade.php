@@ -35,6 +35,12 @@
                     @if($movie->webpage_url)<a href="{{ $movie->webpage_url }}" target="_blank" rel="noopener" class="vfx-item-btn">Website</a>@endif
                     @if($movie->funding_url)<a href="{{ $movie->funding_url }}" target="_blank" rel="noopener" class="vfx-item-btn">Support / Donate</a>@endif
                 </div>
+                @if($movie->writer || $movie->production_company)
+                    <div class="mt-3">
+                        @if($movie->writer)<div><strong>Writer:</strong> {{ $movie->writer }}</div>@endif
+                        @if($movie->production_company)<div><strong>Production:</strong> {{ $movie->production_company }}</div>@endif
+                    </div>
+                @endif
 
                 @if(!empty($movie->creator_trailer_url))
                     <p class="mt-3"><a href="{{ $movie->creator_trailer_url }}" target="_blank" rel="noopener" class="vfx-item-btn">Watch free trailer</a></p>

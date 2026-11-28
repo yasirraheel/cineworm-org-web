@@ -208,6 +208,14 @@
                             </span>
                         @endif
 
+                        @if ($movies_info->writer)
+                            <span class="des-bold-text"><strong>Writer:</strong> {{ $movies_info->writer }}</span>
+                        @endif
+
+                        @if ($movies_info->production_company)
+                            <span class="des-bold-text"><strong>Production:</strong> {{ $movies_info->production_company }}</span>
+                        @endif
+
                         <h3>{!! strip_tags(Str::limit(stripslashes($movies_info->video_description), 350)) !!}</h3>
 
                         @php
