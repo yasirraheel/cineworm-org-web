@@ -77,10 +77,11 @@ class UserFilmController extends Controller
         $language_list = Language::orderBy('language_name')->get();
         $actor_list    = ActorDirector::where('ad_type', 'actor')->orderBy('ad_name')->get();
         $director_list = ActorDirector::where('ad_type', 'director')->orderBy('ad_name')->get();
+        $canSellCreatorFilms = Auth::user()->hasPaidSubscription();
 
         $page_title = 'Upload Film';
 
-        return view('pages.user.films.create', compact('genre_list', 'language_list', 'actor_list', 'director_list', 'page_title'));
+        return view('pages.user.films.create', compact('genre_list', 'language_list', 'actor_list', 'director_list', 'canSellCreatorFilms', 'page_title'));
     }
 
     public function findImdbMovie(Request $request)
@@ -108,6 +109,16 @@ class UserFilmController extends Controller
             'video_url' => 'required|string|max:2000',
             'poster_link' => 'nullable|url|max:2000',
             'poster_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'funding_url' => 'nullable|url|max:2000',
+            'webpage_url' => 'nullable|url|max:2000',
+            'imdb_id' => 'nullable|string|max:50',
+            'imdb_rating' => 'nullable|numeric|min:0|max:10',
+            'imdb_votes' => 'nullable|integer|min:0',
+            'content_rating' => 'nullable|string|max:30',
+            'duration' => 'nullable|string|max:50',
+            'release_date' => 'nullable|date',
+            'actors' => 'nullable|string|max:2000',
+            'director' => 'nullable|string|max:2000',
             'creator_price' => 'nullable|numeric|min:0.01',
             'creator_trailer_url' => 'nullable|url|max:2000',
         ]);
@@ -165,6 +176,12 @@ class UserFilmController extends Controller
         if ($creatorSaleEnabled && !$isOwner) {
             return redirect()->back()
                 ->withErrors(['creator_sale_enabled' => 'Only the film owner can sell a film.'])
+                ->withInput();
+        }
+
+        if ($creatorSaleEnabled && !Auth::user()->hasPaidSubscription()) {
+            return redirect()->back()
+                ->withErrors(['creator_sale_enabled' => 'Only users with an active paid subscription can charge viewers for a film.'])
                 ->withInput();
         }
 

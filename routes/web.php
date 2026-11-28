@@ -502,7 +502,11 @@ Route::get('movies/watch/{slug}/{id}', 'MoviesController@movies_watch');
 
 // Creator-owned paid films. The landing page is public; checkout and playback
 // are protected and the stream itself is only available after a verified sale.
-Route::get('cineflix', 'CreatorFilmController@index')->name('cineflix');
+Route::get('cinex', 'CreatorFilmController@index')->name('cinex');
+// Keep old shared links/bookmarks working after the CineFlix -> Cinex rename.
+Route::get('cineflix', function () {
+    return redirect()->route('cinex', [], 301);
+})->name('cineflix');
 
 // Hand the authenticated Cineworm account to CineStock through a short-lived,
 // signed URL. The stock app validates the same shared account-sync secret.

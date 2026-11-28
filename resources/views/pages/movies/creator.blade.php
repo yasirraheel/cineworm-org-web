@@ -4,6 +4,14 @@
 @section('head_url', Request::url())
 
 @section('content')
+@php
+    $imdbUrl = null;
+    if (!empty($movie->imdb_id)) {
+        $imdbUrl = filter_var($movie->imdb_id, FILTER_VALIDATE_URL)
+            ? $movie->imdb_id
+            : 'https://www.imdb.com/title/' . ltrim($movie->imdb_id, '/');
+    }
+@endphp
 <div class="vfx-item-ptb">
     <div class="container-fluid">
         <div class="row align-items-center">
@@ -16,6 +24,17 @@
                 <span class="text-uppercase" style="color:#ff0f78;font-weight:700;letter-spacing:.08em;">Creator film</span>
                 <h1 class="mt-2">{{ stripslashes($movie->video_title) }}</h1>
                 <div class="mt-3">{!! stripslashes($movie->video_description) !!}</div>
+
+                <div class="mt-3 d-flex flex-wrap align-items-center" style="gap:10px;">
+                    @if($movie->imdb_rating)
+                        <span class="video-imdb-view"><img src="{{ URL::to('site_assets/images/imdb-logo.png') }}" alt="IMDb"> {{ $movie->imdb_rating }}</span>
+                    @endif
+                    @if($movie->content_rating)<span class="channel_info_count">{{ $movie->content_rating }}</span>@endif
+                    @if($movie->duration)<span class="video-posts-author"><i class="fa fa-clock"></i> {{ $movie->duration }}</span>@endif
+                    @if($imdbUrl)<a href="{{ $imdbUrl }}" target="_blank" rel="noopener" class="vfx-item-btn">IMDb</a>@endif
+                    @if($movie->webpage_url)<a href="{{ $movie->webpage_url }}" target="_blank" rel="noopener" class="vfx-item-btn">Website</a>@endif
+                    @if($movie->funding_url)<a href="{{ $movie->funding_url }}" target="_blank" rel="noopener" class="vfx-item-btn">Support / Donate</a>@endif
+                </div>
 
                 @if(!empty($movie->creator_trailer_url))
                     <p class="mt-3"><a href="{{ $movie->creator_trailer_url }}" target="_blank" rel="noopener" class="vfx-item-btn">Watch free trailer</a></p>

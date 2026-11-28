@@ -27,6 +27,16 @@ class Movies extends Model
 
     public function scopeRandomStreamable($query)
     {
+        return $this->scopeFreeStreamable($query);
+    }
+
+    /**
+     * Films that are allowed in Cineworm's normal/free catalogue.
+     * Approved paid creator films belong to Cinex and must never be mixed
+     * into the free/random catalogue.
+     */
+    public function scopeFreeStreamable($query)
+    {
         return $query->where(function ($q) {
             $q->whereNull('creator_sale_enabled')
                 ->orWhere('creator_sale_enabled', 0)

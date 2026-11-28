@@ -277,6 +277,20 @@
                     </div>
 
                     <div class="action-buttons-section">
+                        @php
+                            $imdbUrl = null;
+                            if (!empty($movies_info->imdb_id)) {
+                                $imdbUrl = filter_var($movies_info->imdb_id, FILTER_VALIDATE_URL)
+                                    ? $movies_info->imdb_id
+                                    : 'https://www.imdb.com/title/' . ltrim($movies_info->imdb_id, '/');
+                            }
+                        @endphp
+                        @if ($imdbUrl)
+                            <a href="{{ $imdbUrl }}" target="_blank" rel="noopener" class="action-btn imdb-btn">
+                                <i class="fa fa-star"></i>
+                                <span>IMDb</span>
+                            </a>
+                        @endif
                         @if ($movies_info->funding_url)
                             <a href="{{ $movies_info->funding_url }}" target="_blank" class="action-btn donate-btn">
                                 <i class="fas fa-donate"></i>

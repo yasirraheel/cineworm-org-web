@@ -44,31 +44,31 @@ class MoviesController extends Controller
         if (isset($_GET['lang_id'])) {
             $movie_lang_id = $_GET['lang_id'];
 
-            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->where('movie_lang_id', $movie_lang_id)->orderBy('id', 'DESC')->paginate($pagination_limit);
+            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->where('movie_lang_id', $movie_lang_id)->orderBy('id', 'DESC')->paginate($pagination_limit);
             $movies_list->appends(\Request::only('lang_id'))->links();
         } else if (isset($_GET['genre_id'])) {
             $movie_genre_id = $_GET['genre_id'];
 
-            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->whereRaw("find_in_set('$movie_genre_id',movie_genre_id)")->orderBy('id', 'DESC')->paginate($pagination_limit);
+            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->whereRaw("find_in_set('$movie_genre_id',movie_genre_id)")->orderBy('id', 'DESC')->paginate($pagination_limit);
             $movies_list->appends(\Request::only('genre_id'))->links();
         } else if (isset($_GET['filter'])) {
             $keyword = $_GET['filter'];
 
             if ($keyword == 'old') {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('id', 'ASC')->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->orderBy('id', 'ASC')->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else if ($keyword == 'alpha') {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('video_title', 'ASC')->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->orderBy('video_title', 'ASC')->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else if ($keyword == 'rand') {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->randomStreamable()->inRandomOrder()->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->inRandomOrder()->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('id', 'DESC')->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->orderBy('id', 'DESC')->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             }
         } else {
-            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('id', 'DESC')->paginate($pagination_limit);
+            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->orderBy('id', 'DESC')->paginate($pagination_limit);
         }
 
         return view('pages.movies.list', compact('slider', 'movies_list'));
@@ -101,7 +101,7 @@ class MoviesController extends Controller
             abort(404, 'Unauthorized action.');
         }
 
-        $related_movies_list = Movies::where('status', 1)->where('id', '!=', $id)->where('movie_lang_id', $movies_info->movie_lang_id)->orderBy('id', 'DESC')->take(10)->get();
+        $related_movies_list = Movies::where('status', 1)->freeStreamable()->where('id', '!=', $id)->where('movie_lang_id', $movies_info->movie_lang_id)->orderBy('id', 'DESC')->take(10)->get();
 
         return view('pages.movies.details', compact('movies_info', 'related_movies_list', 'random_movie'));
     }
@@ -147,7 +147,7 @@ class MoviesController extends Controller
         //     }
         // }
 
-        $related_movies_list = Movies::where('status', 1)->where('id', '!=', $id)->where('movie_lang_id', $movies_info->movie_lang_id)->orderBy('id', 'DESC')->take(10)->get();
+        $related_movies_list = Movies::where('status', 1)->freeStreamable()->where('id', '!=', $id)->where('movie_lang_id', $movies_info->movie_lang_id)->orderBy('id', 'DESC')->take(10)->get();
 
         //Recently Watched
         if (Auth::check()) {

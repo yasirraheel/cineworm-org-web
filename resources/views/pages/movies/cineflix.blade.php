@@ -1,6 +1,6 @@
 @extends('site_app')
 
-@section('head_title', 'CineFlix | ' . getcong('site_name'))
+@section('head_title', 'Cinex | ' . getcong('site_name'))
 @section('head_url', Request::url())
 
 @section('content')
@@ -9,7 +9,7 @@
             <div class="filter-list-area" style="text-align:left;">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="page-title-item">CineFlix</div>
+                        <div class="page-title-item">Cinex</div>
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
             @else
                 <div class="text-center py-5">
                     <i class="fa fa-film d-block mb-3" style="font-size:44px; color:rgba(255,255,255,.22);"></i>
-                    <h2>No CineFlix films available yet</h2>
+                    <h2>No Cinex films available yet</h2>
                     <p>Approved creator films will appear here when they are ready to watch.</p>
                     <a href="{{ URL::to('movies') }}" class="vfx-item-btn-danger text-uppercase">Browse Cineworm Movies</a>
                 </div>

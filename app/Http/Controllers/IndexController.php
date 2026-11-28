@@ -152,31 +152,31 @@ class IndexController extends Controller
         if (isset($_GET['lang_id'])) {
             $movie_lang_id = $_GET['lang_id'];
 
-            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->where('movie_lang_id', $movie_lang_id)->orderBy('id', 'DESC')->paginate($pagination_limit);
+            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->where('movie_lang_id', $movie_lang_id)->orderBy('id', 'DESC')->paginate($pagination_limit);
             $movies_list->appends(\Request::only('lang_id'))->links();
         } else if (isset($_GET['genre_id'])) {
             $movie_genre_id = $_GET['genre_id'];
 
-            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->whereRaw("find_in_set('$movie_genre_id',movie_genre_id)")->orderBy('id', 'DESC')->paginate($pagination_limit);
+            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->whereRaw("find_in_set('$movie_genre_id',movie_genre_id)")->orderBy('id', 'DESC')->paginate($pagination_limit);
             $movies_list->appends(\Request::only('genre_id'))->links();
         } else if (isset($_GET['filter'])) {
             $keyword = $_GET['filter'];
 
             if ($keyword == 'old') {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('id', 'ASC')->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->orderBy('id', 'ASC')->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else if ($keyword == 'alpha') {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('video_title', 'ASC')->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->orderBy('video_title', 'ASC')->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else if ($keyword == 'rand') {
                 $movies_list = Movies::where('status', 1)->where('upcoming', 0)->randomStreamable()->inRandomOrder()->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             } else {
-                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('id', 'DESC')->paginate($pagination_limit);
+                $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->orderBy('id', 'DESC')->paginate($pagination_limit);
                 $movies_list->appends(\Request::only('filter'))->links();
             }
         } else {
-            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->orderBy('id', 'DESC')->paginate($pagination_limit);
+            $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->orderBy('id', 'DESC')->paginate($pagination_limit);
         }
 
         $genres = Genres::where('status', 1)->orderBy('id', 'ASC')->get();
@@ -367,7 +367,7 @@ class IndexController extends Controller
         $keyword = $_GET['s'];
 
         if (getcong('menu_movies')) {
-            $s_movies_list = Movies::where('status', 1)->where("video_title", "LIKE", "%$keyword%")->orderBy('video_title')->get();
+            $s_movies_list = Movies::where('status', 1)->freeStreamable()->where("video_title", "LIKE", "%$keyword%")->orderBy('video_title')->get();
         } else {
             $s_movies_list = array();
         }
@@ -398,7 +398,7 @@ class IndexController extends Controller
     {
         $keyword = $_GET['s'];
 
-        $movies_list = Movies::where('status', 1)->where('upcoming', 0)->where("video_title", "LIKE", "%$keyword%")->orderBy('video_title')->get();
+        $movies_list = Movies::where('status', 1)->where('upcoming', 0)->freeStreamable()->where("video_title", "LIKE", "%$keyword%")->orderBy('video_title')->get();
 
         $series_list = Series::where('status', 1)->where('upcoming', 0)->where("series_name", "LIKE", "%$keyword%")->orderBy('series_name')->get();
 
@@ -424,7 +424,7 @@ class IndexController extends Controller
 
     public function sitemap_movies()
     {
-        $movies_list = Movies::where('status', 1)->orderBy('id', 'DESC')->get();
+        $movies_list = Movies::where('status', 1)->freeStreamable()->orderBy('id', 'DESC')->get();
 
         return response()->view('pages.sitemap_movies', compact('movies_list'))->header('Content-Type', 'text/xml');
     }

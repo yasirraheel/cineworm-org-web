@@ -127,12 +127,39 @@
                         </section>
 
                         <section class="cine-upload-card">
+                            <h3 class="cine-upload-section-title"><i class="fa fa-info-circle"></i> Film metadata <span></span></h3>
+                            <div class="row">
+                                <div class="col-md-6 cine-upload-field"><label for="actors">Actors</label><input id="actors" name="actors" value="{{ old('actors') }}" maxlength="2000" placeholder="Actor names, separated by commas"><small class="cine-upload-help">Optional. Add the main cast viewers should see.</small></div>
+                                <div class="col-md-6 cine-upload-field"><label for="director">Director(s)</label><input id="director" name="director" value="{{ old('director') }}" maxlength="2000" placeholder="Director names, separated by commas"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 cine-upload-field"><label for="funding_url">Donation / funding URL</label><input type="url" id="funding_url" name="funding_url" value="{{ old('funding_url') }}" maxlength="2000" placeholder="https://..."><small class="cine-upload-help">Optional support link shown on the film page.</small></div>
+                                <div class="col-md-6 cine-upload-field"><label for="webpage_url">Official website URL</label><input type="url" id="webpage_url" name="webpage_url" value="{{ old('webpage_url') }}" maxlength="2000" placeholder="https://..."></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 cine-upload-field"><label for="imdb_id">IMDb ID or URL</label><input id="imdb_id" name="imdb_id" value="{{ old('imdb_id') }}" maxlength="50" placeholder="tt1234567 or IMDb URL"></div>
+                                <div class="col-md-3 cine-upload-field"><label for="imdb_rating">IMDb rating</label><input type="number" id="imdb_rating" name="imdb_rating" value="{{ old('imdb_rating') }}" min="0" max="10" step="0.1" placeholder="0.0 - 10.0"></div>
+                                <div class="col-md-3 cine-upload-field"><label for="imdb_votes">IMDb votes</label><input type="number" id="imdb_votes" name="imdb_votes" value="{{ old('imdb_votes') }}" min="0" step="1" placeholder="0"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 cine-upload-field"><label for="content_rating">Content rating</label><input id="content_rating" name="content_rating" value="{{ old('content_rating') }}" maxlength="30" placeholder="e.g. 16+"></div>
+                                <div class="col-md-4 cine-upload-field"><label for="duration">Duration</label><input id="duration" name="duration" value="{{ old('duration') }}" maxlength="50" placeholder="e.g. 1h 35m"></div>
+                                <div class="col-md-4 cine-upload-field"><label for="release_date">Release date</label><input type="date" id="release_date" name="release_date" value="{{ old('release_date') }}"></div>
+                            </div>
+                        </section>
+
+                        <section class="cine-upload-card">
                             <h3 class="cine-upload-section-title"><i class="fa fa-shield"></i> Rights and access <span></span></h3>
                             <div class="cine-upload-field"><label>Film ownership <em>*</em></label>
                                 <div class="cine-upload-toggle-card"><span class="cine-upload-toggle-copy"><strong>I own this film</strong><small>Turn this on only if you own the rights to the film.</small></span><label class="cine-upload-switch" for="is_owner_toggle"><input type="hidden" name="is_owner" value="0"><input type="checkbox" name="is_owner" id="is_owner_toggle" value="1" @checked((string) old('is_owner', '0') === '1')><span class="cine-upload-switch-track"></span><span class="cine-upload-switch-state">Off</span></label></div>
                             </div>
                             <div class="cine-upload-field"><label>Viewer access <em>*</em></label>
-                                <div class="cine-upload-toggle-card"><span class="cine-upload-toggle-copy"><strong>Paid film</strong><small>Turn on film ownership first, then enable this to set the viewer price below. Admin approval is required.</small></span><label class="cine-upload-switch" for="creator_sale_toggle"><input type="hidden" name="creator_sale_enabled" value="0"><input type="checkbox" name="creator_sale_enabled" id="creator_sale_toggle" value="1" @checked((string) old('creator_sale_enabled', '0') === '1')><span class="cine-upload-switch-track"></span><span class="cine-upload-switch-state">Off</span></label></div>
+                                <input type="hidden" name="creator_sale_enabled" value="0">
+                                @if($canSellCreatorFilms)
+                                    <div class="cine-upload-toggle-card"><span class="cine-upload-toggle-copy"><strong>Paid film</strong><small>Only active paid subscribers can charge viewers. Admin approval is required before the film is listed in Cinex.</small></span><label class="cine-upload-switch" for="creator_sale_toggle"><input type="checkbox" name="creator_sale_enabled" id="creator_sale_toggle" value="1" @checked((string) old('creator_sale_enabled', '0') === '1')><span class="cine-upload-switch-track"></span><span class="cine-upload-switch-state">Off</span></label></div>
+                                @else
+                                    <div class="cine-upload-toggle-card is-disabled"><span class="cine-upload-toggle-copy"><strong>Paid film unavailable</strong><small>An active paid subscription is required before you can charge viewers. You can still submit this film for free.</small></span><span class="cine-upload-switch-state">Free only</span></div>
+                                @endif
                             <div id="creator_sale_options" class="cine-upload-sale-options">
                                 <div class="cine-upload-field"><label for="creator_price">Viewer price <em>*</em></label><input type="number" id="creator_price" name="creator_price" min="0.01" step="0.01" value="{{ old('creator_price') }}" placeholder="e.g. 4.99"><small class="cine-upload-help">Currency: {{ getcong('currency_code') ?: 'USD' }}. Paid films must use a public Google Drive source.</small></div>
                                 <div class="cine-upload-field"><label for="creator_trailer_url">Free trailer URL</label><input type="url" id="creator_trailer_url" name="creator_trailer_url" value="{{ old('creator_trailer_url') }}" placeholder="https://youtube.com/... or https://vimeo.com/..."><small class="cine-upload-help">Optional preview viewers can watch before purchase.</small></div>
@@ -166,8 +193,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var ownerToggle = document.getElementById('is_owner_toggle');
     var saleBox = document.getElementById('creator_sale_options');
     var price = document.getElementById('creator_price');
-    var saleCard = saleToggle.closest('.cine-upload-toggle-card');
-    var saleState = saleToggle.parentElement.querySelector('.cine-upload-switch-state');
+    var saleCard = saleToggle ? saleToggle.closest('.cine-upload-toggle-card') : null;
+    var saleState = saleToggle ? saleToggle.parentElement.querySelector('.cine-upload-switch-state') : null;
     var ownerState = ownerToggle.parentElement.querySelector('.cine-upload-switch-state');
     var posterFile = document.getElementById('poster_file');
     var posterFileName = document.getElementById('poster_file_name');
@@ -207,6 +234,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     updateGenrePicker();
     function toggleSale() {
+        if (!saleToggle) {
+            return;
+        }
         saleToggle.disabled = !ownerToggle.checked;
         saleCard.classList.toggle('is-disabled', saleToggle.disabled);
         if (saleToggle.disabled) {
@@ -222,7 +252,9 @@ document.addEventListener('DOMContentLoaded', function () {
         saleState.textContent = saleToggle.checked ? 'On' : 'Off';
         ownerState.textContent = ownerToggle.checked ? 'On' : 'Off';
     }
-    saleToggle.addEventListener('change', toggleSale);
+    if (saleToggle) {
+        saleToggle.addEventListener('change', toggleSale);
+    }
     ownerToggle.addEventListener('change', toggleSale);
     toggleSale();
 });

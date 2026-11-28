@@ -210,6 +210,22 @@
 
                         <h3>{!! strip_tags(Str::limit(stripslashes($movies_info->video_description), 350)) !!}</h3>
 
+                        @php
+                            $imdbUrl = null;
+                            if (!empty($movies_info->imdb_id)) {
+                                $imdbUrl = filter_var($movies_info->imdb_id, FILTER_VALIDATE_URL)
+                                    ? $movies_info->imdb_id
+                                    : 'https://www.imdb.com/title/' . ltrim($movies_info->imdb_id, '/');
+                            }
+                        @endphp
+                        @if($imdbUrl || $movies_info->webpage_url || $movies_info->funding_url)
+                            <div class="video-watch-share-item mt-3" style="display:flex;gap:10px;flex-wrap:wrap;">
+                                @if($imdbUrl)<a href="{{ $imdbUrl }}" target="_blank" rel="noopener" class="vfx-item-btn"><i class="fa fa-star"></i> IMDb</a>@endif
+                                @if($movies_info->webpage_url)<a href="{{ $movies_info->webpage_url }}" target="_blank" rel="noopener" class="vfx-item-btn"><i class="fa fa-globe"></i> Website</a>@endif
+                                @if($movies_info->funding_url)<a href="{{ $movies_info->funding_url }}" target="_blank" rel="noopener" class="vfx-item-btn"><i class="fa fa-donate"></i> Support / Donate</a>@endif
+                            </div>
+                        @endif
+
                     </div>
                 </div>
                  <!-- Banner -->
