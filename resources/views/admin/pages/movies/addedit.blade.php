@@ -206,15 +206,15 @@
                                                 <input type="radio" name="creator_sale_enabled" id="creator_sale_no" value="0" @if(!isset($movie->creator_sale_enabled) || !$movie->creator_sale_enabled) checked @endif>
                                                 <label for="creator_sale_no">Free stream</label>
                                             </div>
-                                            <div class="row mt-2">
+                                            <div class="row mt-2" id="creator_sale_details">
                                                 <div class="col-md-4">
-                                                    <input type="number" min="0.01" step="0.01" name="creator_price" value="{{ old('creator_price', $movie->creator_price ?? '') }}" class="form-control" placeholder="Price">
+                                                    <input type="number" min="0.01" step="0.01" name="creator_price" id="creator_price" value="{{ old('creator_price', $movie->creator_price ?? '') }}" class="form-control" placeholder="Price">
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <input type="text" maxlength="3" name="creator_currency" value="{{ old('creator_currency', $movie->creator_currency ?? getcong('currency_code')) }}" class="form-control" placeholder="USD">
+                                                    <input type="text" maxlength="3" name="creator_currency" id="creator_currency" value="{{ old('creator_currency', $movie->creator_currency ?? getcong('currency_code')) }}" class="form-control" placeholder="USD">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <input type="url" name="creator_trailer_url" value="{{ old('creator_trailer_url', $movie->creator_trailer_url ?? '') }}" class="form-control" placeholder="Optional trailer URL">
+                                                    <input type="url" name="creator_trailer_url" id="creator_trailer_url" value="{{ old('creator_trailer_url', $movie->creator_trailer_url ?? '') }}" class="form-control" placeholder="Optional trailer URL">
                                                 </div>
                                             </div>
                                             <small class="form-text text-muted">Paid creator films must use a public Google Drive source. Setting status Active approves the sale.</small>
@@ -1128,6 +1128,28 @@ Subtitle text here..."></textarea>
 
 <script>
     $(function () {
+        function toggleCreatorSaleFields() {
+            var paid = $('#creator_sale_yes').is(':checked');
+            var $details = $('#creator_sale_details');
+            var $price = $('#creator_price');
+            var $currency = $('#creator_currency');
+            var $trailer = $('#creator_trailer_url');
+
+            $details.toggle(paid);
+            $price.prop('disabled', !paid).prop('required', paid);
+            $currency.prop('disabled', !paid);
+            $trailer.prop('disabled', !paid);
+
+            if (!paid) {
+                $price.val('');
+                $currency.val('');
+                $trailer.val('');
+            }
+        }
+
+        $('#creator_sale_yes, #creator_sale_no').on('change', toggleCreatorSaleFields);
+        toggleCreatorSaleFields();
+
         function toggleVideoSource() {
             var type = $('#video_type').val();
             $('#local_id, #url_id, #google_drive_id, #embed_id, #hls_id, #dash_id').hide();

@@ -215,15 +215,33 @@ class MoviesController extends MainAdminController
             // Handle poster link if provided
             if (isset($inputs['poster_link']) && $inputs['poster_link'] != '') {
                 $image_source = $inputs['poster_link'];
-                $save_to = !empty($inputs['video_image']) ? public_path('/upload/images/' . $inputs['video_image']) : 'NA';
+                $posterDirectory = public_path('/upload/images');
+                if (!is_dir($posterDirectory)) {
+                    mkdir($posterDirectory, 0755, true);
+                }
+                $posterName = !empty($inputs['video_image'])
+                    ? basename($inputs['video_image'])
+                    : 'creator_poster_' . Str::uuid() . '.jpg';
+                $posterPath = $posterDirectory . DIRECTORY_SEPARATOR . $posterName;
 
-                grab_image($image_source, $save_to);
-                $movie_obj->video_image = !empty($inputs['video_image']) ? 'upload/images/' . $inputs['video_image'] : 'NA';
+                grab_image($image_source, $posterPath);
+                $posterValue = is_file($posterPath) && filesize($posterPath) > 0
+                    ? 'upload/images/' . $posterName
+                    : $image_source;
+                $movie_obj->video_image = $posterValue;
+                $movie_obj->video_image_thumb = $posterValue;
 
-            } else {
+            } elseif ($video_image) {
                 // Use the extracted thumbnail (YouTube, Vimeo, or default image)
                 $movie_obj->video_image = $video_image;
                 $movie_obj->video_image_thumb = $video_image;
+            } elseif (!$movie_obj->exists || empty($movie_obj->video_image)) {
+                // Direct MP4 uploads do not expose a thumbnail. Keep the movie
+                // visible on the home page with the app's standard placeholder.
+                $movie_obj->video_image = 'site_assets/images/poster_placeholder.png';
+                $movie_obj->video_image_thumb = 'site_assets/images/poster_placeholder.png';
+            } elseif (empty($movie_obj->video_image_thumb)) {
+                $movie_obj->video_image_thumb = $movie_obj->video_image;
             }
 
             // Other fields
